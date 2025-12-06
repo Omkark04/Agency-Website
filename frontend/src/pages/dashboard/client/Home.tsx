@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <div style={{ padding: "30px", textAlign: "center" }}>
       <h1>
-        {user ? `Hi, ${user}!` : "Hello, User!"}
+        {user ? `Hi, ${user.username}!` : "Hello, User!"}
       </h1>
 
       {!user && (
