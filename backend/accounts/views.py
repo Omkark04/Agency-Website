@@ -1,3 +1,4 @@
+# accounts/views.py
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,21 +7,18 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.conf import settings
-from django.urls import reverse
-from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_str, force_bytes
 from django.contrib.auth.tokens import default_token_generator
 import google.oauth2.id_token
 import google.auth.transport.requests
 
-from .models import User
 from .serializers import (
-    RegisterSerializer, 
-    UserSerializer, 
+    RegisterSerializer,
+    UserSerializer,
     CustomTokenObtainPairSerializer,
     PasswordResetRequestSerializer,
-    PasswordResetConfirmSerializer
+    PasswordResetConfirmSerializer,
 )
 
 User = get_user_model()
@@ -34,39 +32,36 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        
-        # Generate tokens for the new user
         refresh = RefreshToken.for_user(user)
-        
-        return Response({
-            'user': UserSerializer(user, context=self.get_serializer_context()).data,
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-            'message': 'User registered successfully.'
-        }, status=status.HTTP_201_CREATED)
+        return Response(
+            {
+                "user": UserSerializer(user, context=self.get_serializer_context()).data,
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+                "message": "User registered successfully.",
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 class ClientRegisterView(RegisterView):
     def post(self, request, *args, **kwargs):
-        request.data['role'] = 'client'
+        request.data["role"] = "client"
         return super().post(request, *args, **kwargs)
 
 class ServiceHeadRegisterView(RegisterView):
-    permission_classes = [permissions.IsAdminUser]  # Only admins can create service heads
-    
+    permission_classes = [permissions.IsAdminUser]
+
     def post(self, request, *args, **kwargs):
-        request.data['role'] = 'service_head'
+        request.data["role"] = "service_head"
         return super().post(request, *args, **kwargs)
 
 class TeamMemberRegisterView(RegisterView):
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def post(self, request, *args, **kwargs):
-        if request.user.role not in ['admin', 'service_head']:
-            return Response(
-                {'error': 'You do not have permission to register team members'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        request.data['role'] = 'team_member'
+        if request.user.role not in ["admin", "service_head"]:
+            return Response({"error": "You do not have permission to register team members"}, status=status.HTTP_403_FORBIDDEN)
+        request.data["role"] = "team_member"
         return super().post(request, *args, **kwargs)
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -74,116 +69,68 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 class PasswordResetRequestView(APIView):
     permission_classes = [permissions.AllowAny]
-    
+
     def post(self, request):
         serializer = PasswordResetRequestSerializer(data=request.data)
         if serializer.is_valid():
-            email = serializer.validated_data['email']
+            email = serializer.validated_data["email"]
             try:
                 user = User.objects.get(email=email)
                 token = default_token_generator.make_token(user)
                 uid = urlsafe_base64_encode(force_bytes(user.pk))
                 reset_url = f"{settings.FRONTEND_URL}/reset-password/{uid}/{token}/"
-                
                 send_mail(
-                    'Password Reset Request',
-                    f'Click the link to reset your password: {reset_url}',
+                    "Password Reset Request",
+                    f"Click the link to reset your password: {reset_url}",
                     settings.DEFAULT_FROM_EMAIL,
                     [email],
                     fail_silently=False,
                 )
-                return Response(
-                    {'message': 'Password reset email sent'},
-                    status=status.HTTP_200_OK
-                )
             except User.DoesNotExist:
-                # Don't reveal that the user doesn't exist
-                return Response(
-                    {'message': 'If this email exists, a password reset link has been sent'},
-                    status=status.HTTP_200_OK
-                )
+                pass  # Do not reveal existence
+            return Response({"message": "If this email exists, a password reset link has been sent"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PasswordResetConfirmView(APIView):
     permission_classes = [permissions.AllowAny]
-    
+
     def post(self, request, uidb64, token):
         serializer = PasswordResetConfirmSerializer(data=request.data)
         if serializer.is_valid():
             try:
                 uid = force_str(urlsafe_base64_decode(uidb64))
                 user = User.objects.get(pk=uid)
-                
                 if default_token_generator.check_token(user, token):
-                    user.set_password(serializer.validated_data['new_password'])
+                    user.set_password(serializer.validated_data["new_password"])
                     user.save()
-                    return Response(
-                        {'message': 'Password has been reset successfully'},
-                        status=status.HTTP_200_OK
-                    )
-                return Response(
-                    {'error': 'Invalid token'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                    return Response({"message": "Password has been reset successfully"}, status=status.HTTP_200_OK)
+                return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
             except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-                return Response(
-                    {'error': 'Invalid user'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                return Response({"error": "Invalid user"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_object(self):
         return self.request.user
 
 class GoogleOAuthView(APIView):
     permission_classes = [permissions.AllowAny]
-    
+
     def post(self, request):
-        id_token = request.data.get('id_token')
+        id_token = request.data.get("id_token")
         if not id_token:
-            return Response(
-                {'error': 'id_token is required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+            return Response({"error": "id_token is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            # Verify the Google ID token
-            idinfo = google.oauth2.id_token.verify_oauth2_token(
-                id_token, 
-                google.auth.transport.requests.Request(),
-                settings.GOOGLE_CLIENT_ID
-            )
-            
-            # Get or create user
-            email = idinfo.get('email')
-            user, created = User.objects.get_or_create(
-                email=email,
-                defaults={
-                    'username': email.split('@')[0],
-                    'google_id': idinfo.get('sub'),
-                    'role': 'client'
-                }
-            )
-            
+            idinfo = google.oauth2.id_token.verify_oauth2_token(id_token, google.auth.transport.requests.Request(), settings.GOOGLE_CLIENT_ID)
+            email = idinfo.get("email")
+            user, created = User.objects.get_or_create(email=email, defaults={"username": email.split("@")[0], "google_id": idinfo.get("sub"), "role": "client"})
             if not created and not user.google_id:
-                user.google_id = idinfo.get('sub')
+                user.google_id = idinfo.get("sub")
                 user.save()
-            
-            # Generate tokens
             refresh = RefreshToken.for_user(user)
-            
-            return Response({
-                'user': UserSerializer(user).data,
-                'access': str(refresh.access_token),
-                'refresh': str(refresh),
-            })
-            
+            return Response({"user": UserSerializer(user).data, "access": str(refresh.access_token), "refresh": str(refresh)})
         except ValueError:
-            return Response(
-                {'error': 'Invalid token'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
