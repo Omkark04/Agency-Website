@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import Input from '../components/Input';
-import Button from '../components/Button';
-import { register } from '../api/auth';
+import { Input } from '../components/ui/Input';
+import { Button } from '../components/ui/Button';
+import { useAuth } from '../hooks/useAuth';
 
 const Register: React.FC = () => {
   const [form, setForm] = useState({ username: '', email: '', password: '', confirm_password: '' });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const { register: registerUser, loading } = useAuth();
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -20,14 +19,16 @@ const Register: React.FC = () => {
       setError('Passwords do not match');
       return;
     }
-    setLoading(true);
     try {
-      await register({ username: form.username, email: form.email, password: form.password });
-      navigate('/login');
+      await registerUser({
+        username: form.username,
+        email: form.email,
+        password: form.password,
+        role: 'client'
+      });
+      navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Registration failed');
-    } finally {
-      setLoading(false);
+      setError(err.message || 'Registration failed');
     }
   };
 
@@ -46,7 +47,7 @@ const Register: React.FC = () => {
           <button type="button" className="absolute right-2 top-8 text-gray-500" onClick={() => setShowConfirm(!showConfirm)} aria-label="Toggle confirm password visibility">👁</button>
         </div>
         {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
-        <Button type="submit" loading={loading} fullWidth>Register</Button>
+        <Button type="submit" isLoading={loading} fullWidth>Register</Button>
         <p className="mt-4 text-center text-sm">
           Already have an account? <Link to="/login" className="text-blue-600">Login</Link>
         </p>

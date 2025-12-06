@@ -1,6 +1,7 @@
 import api from './index';
 export const login = async (username: string, password: string) => {
-  const response = await api.post('/auth/token/', { username, password });  // Already correct
+  const response = await api.post('/auth/token/', { username, password });
+  // Backend returns: { access, refresh, user }
   return response.data;
 };
 
@@ -15,6 +16,11 @@ export const register = async (userData: {
   password: string;
   role: string;
 }) => {
-  const response = await api.post('/auth/register/client/', userData);  // Already correct
+  // Add password2 field as required by backend serializer
+  const dataToSend = {
+    ...userData,
+    password2: userData.password
+  };
+  const response = await api.post('/auth/register/client/', dataToSend);
   return response.data;
 };

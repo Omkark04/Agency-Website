@@ -1,32 +1,25 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import Input from '../components/Input';
-import Button from '../components/Button';
-import { login } from '../api/auth';
+import { Input } from '../components/ui/Input';
+import { Button } from '../components/ui/Button';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ username: '', email: '', password: '' });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { login, loading } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
     try {
       const identifier = form.email || form.username;
-      const response = await login(identifier, form.password);
-      localStorage.setItem('access', response.data.access);
-      localStorage.setItem('refresh', response.data.refresh);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      navigate('/');
+      await login(identifier, form.password);
+      navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Login failed');
-    } finally {
-      setLoading(false);
+      setError(err.message || 'Login failed');
     }
   };
 
@@ -40,7 +33,7 @@ export default function Login() {
           <button type="button" className="absolute right-2 top-8 text-gray-500" onClick={() => setShowPassword(!showPassword)} aria-label="Toggle password visibility">👁</button>
         </div>
         {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
-        <Button type="submit" loading={loading} fullWidth>Login</Button>
+        <Button type="submit" isLoading={loading} fullWidth>Login</Button>
         <p className="mt-4 text-center text-sm">
           Don’t have an account? <Link to="/register" className="text-blue-600">Register</Link>
         </p>
