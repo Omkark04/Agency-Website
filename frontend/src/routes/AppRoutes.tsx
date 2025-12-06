@@ -2,8 +2,8 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/layout/ProtectedRoute';
 import { DashboardLayout } from '../pages/dashboard/DashboardLayout';
-import { AdminDashboard } from '../pages/dashboard/AdminDashboard';
-import Home from '../pages/Home';
+import { AdminDashboard } from '../pages/dashboard/admin/AdminDashboard';
+import Home from '../pages/dashboard/client/Home';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 

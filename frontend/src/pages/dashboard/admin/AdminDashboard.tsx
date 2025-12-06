@@ -1,6 +1,6 @@
 import React from 'react';
-import { KPICard } from '../../components/dashboard/KPICard';
-import { Card, CardHeader, CardBody } from '../../components/ui/Card';
+import { KPICard } from '../../../components/dashboard/KPICard';
+import { Card, CardHeader, CardBody } from '../../../components/ui/Card';
 
 export const AdminDashboard: React.FC = () => {
   return (

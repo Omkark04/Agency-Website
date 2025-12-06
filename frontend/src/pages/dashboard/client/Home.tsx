@@ -1,4 +1,4 @@
-import { getCurrentUser, logout } from "../utils/auth";
+import { getCurrentUser, logout } from "../../../utils/auth";
 import { Link } from "react-router-dom";
 
 export default function Home() {
