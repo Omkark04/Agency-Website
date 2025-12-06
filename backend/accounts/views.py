@@ -2,6 +2,7 @@ from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.conf import settings
@@ -10,6 +11,8 @@ from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
+import google.oauth2.id_token
+import google.auth.transport.requests
 
 from .models import User
 from .serializers import (
@@ -31,8 +34,14 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        
+        # Generate tokens for the new user
+        refresh = RefreshToken.for_user(user)
+        
         return Response({
             'user': UserSerializer(user, context=self.get_serializer_context()).data,
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
             'message': 'User registered successfully.'
         }, status=status.HTTP_201_CREATED)
 
@@ -129,3 +138,52 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
     
     def get_object(self):
         return self.request.user
+
+class GoogleOAuthView(APIView):
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request):
+        id_token = request.data.get('id_token')
+        if not id_token:
+            return Response(
+                {'error': 'id_token is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            # Verify the Google ID token
+            idinfo = google.oauth2.id_token.verify_oauth2_token(
+                id_token, 
+                google.auth.transport.requests.Request(),
+                settings.GOOGLE_CLIENT_ID
+            )
+            
+            # Get or create user
+            email = idinfo.get('email')
+            user, created = User.objects.get_or_create(
+                email=email,
+                defaults={
+                    'username': email.split('@')[0],
+                    'google_id': idinfo.get('sub'),
+                    'role': 'client'
+                }
+            )
+            
+            if not created and not user.google_id:
+                user.google_id = idinfo.get('sub')
+                user.save()
+            
+            # Generate tokens
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'user': UserSerializer(user).data,
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+            })
+            
+        except ValueError:
+            return Response(
+                {'error': 'Invalid token'},
+                status=status.HTTP_400_BAD_REQUEST
+            )

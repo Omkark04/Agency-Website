@@ -8,13 +8,15 @@ from .views import (
     CustomTokenObtainPairView,
     PasswordResetRequestView,
     PasswordResetConfirmView,
-    UserProfileView
+    UserProfileView,
+    GoogleOAuthView
 )
 
 urlpatterns = [
     # Authentication
     path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('google/', GoogleOAuthView.as_view(), name='google_oauth'),
     
     # Registration
     path('register/client/', ClientRegisterView.as_view(), name='register_client'),

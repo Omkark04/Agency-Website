@@ -8,8 +8,15 @@ class User(AbstractUser):
         ('service_head', 'Service Head'),
         ('team_member', 'Team Member'),
     ]
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='client')
+    id = models.AutoField(primary_key=True)
+    username = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
+    password_hash = models.CharField(max_length=255)  # Django uses password field internally
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='client')
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    company = models.CharField(max_length=100, blank=True, null=True)
+    google_id = models.CharField(max_length=100, blank=True, null=True)
+    avatar_url = models.URLField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

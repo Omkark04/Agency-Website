@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "portfolio",
     "tasks",
     "media",
+    "payments",
     "rest_framework",
     "corsheaders",
 ]
@@ -150,6 +151,14 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Google OAuth settings
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '')
+GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET', '')
+
+# Admin credentials for env-login
+ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', '')
+ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', '')
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWS_CREDENTIALS = True
