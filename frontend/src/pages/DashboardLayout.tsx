@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { Sidebar } from '../../components/layout/Sidebar';
-import { Header } from '../../components/layout/Header';
+import { Sidebar } from '../components/dashboard/Sidebar';
+import { Header } from '../components/dashboard/Header';
 
 interface DashboardLayoutProps {
   userRole?: 'admin' | 'team_head' | 'team_member' | 'client';

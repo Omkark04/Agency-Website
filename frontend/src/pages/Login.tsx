@@ -6,7 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  const [form, setForm] = useState({ username: '', email: '', password: '' });
+  const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const { login, loading } = useAuth();
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ export default function Login() {
     e.preventDefault();
     setError('');
     try {
-      const identifier = form.email || form.username;
+      const identifier = form.email;
       await login(identifier, form.password);
       navigate('/dashboard');
     } catch (err: any) {
@@ -27,7 +27,7 @@ export default function Login() {
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-full max-w-sm">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-        <Input label="Email or Username" type="text" value={form.email || form.username} onChange={e => setForm({ ...form, email: e.target.value, username: e.target.value })} required />
+        <Input label="Email" type="text" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
         <div className="relative">
           <Input label="Password" type={showPassword ? 'text' : 'password'} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required />
           <button type="button" className="absolute right-2 top-8 text-gray-500" onClick={() => setShowPassword(!showPassword)} aria-label="Toggle password visibility">👁</button>

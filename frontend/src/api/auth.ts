@@ -1,9 +1,12 @@
 import api from './index';
-export const login = async (username: string, password: string) => {
-  const response = await api.post('/auth/token/', { username, password });
-  // Backend returns: { access, refresh, user }
+export const login = async (identifier: string, password: string) => {
+  const response = await api.post('/auth/token/', {
+    email: identifier,
+    password
+  });
   return response.data;
 };
+
 
 export const refreshToken = async (refresh: string) => {
   const response = await api.post('/auth/token/refresh/', { refresh });  // Already correct

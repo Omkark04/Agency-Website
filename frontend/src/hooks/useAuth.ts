@@ -46,18 +46,24 @@ export const useAuth = () => {
     checkAuth();
   }, []);
 
-  const login = async (username: string, password: string) => {
+  const login = async (identifier: string, password: string) => {
     try {
       setAuth(prev => ({ ...prev, loading: true, error: null }));
-      const response = await api.post('/auth/token/', { username, password });
-      const { access, refresh, user } = response.data;
       
+      const response = await api.post('/auth/token/', { 
+        email: identifier,
+        password 
+      });
+
+      const { access, refresh, user } = response.data;
+
       localStorage.setItem('access', access);
       localStorage.setItem('refresh', refresh);
       localStorage.setItem('user', JSON.stringify(user));
-      
+
       setAuth({ user, loading: false, error: null });
       navigate('/dashboard');
+
     } catch (error: any) {
       const errorMsg = error.response?.data?.detail || 'Login failed';
       setAuth(prev => ({ ...prev, error: errorMsg, loading: false }));
