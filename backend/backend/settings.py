@@ -3,8 +3,18 @@ from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
 import os
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 load_dotenv()
+
+cloudinary.config( 
+  cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+  api_key=os.getenv("CLOUDINARY_API_KEY"),
+  api_secret=os.getenv("CLOUDINARY_API_SECRET")
+)
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -44,6 +54,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "rest_framework_simplejwt.token_blacklist",
+    #cloudinary
+    'cloudinary',
 
     # local apps
     "accounts",
@@ -53,8 +65,6 @@ INSTALLED_APPS = [
     "tasks",
     "media",
     "payments",
-    "adminpanel",
-    "headpanel",
 ]
 
 MIDDLEWARE = [

@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Service, PricingPlan
+from .models import PriceCard, Service, Department
 
 # Register your models here.
 admin.site.register(Service)
-admin.site.register(PricingPlan)
+admin.site.register(PriceCard)
+admin.site.register(Department)

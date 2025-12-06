@@ -11,7 +11,7 @@ class Order(models.Model):
     id = models.AutoField(primary_key=True)
     client = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="orders")
     service = models.ForeignKey("services.Service", on_delete=models.CASCADE, related_name="orders")
-    pricing_plan = models.ForeignKey("services.PricingPlan", null=True, on_delete=models.SET_NULL, related_name="orders")
+    pricing_plan = models.ForeignKey("services.PriceCard", null=True, on_delete=models.SET_NULL, related_name="orders")
     title = models.CharField(max_length=255)
     details = models.TextField(blank=True)
     price = models.DecimalField(max_digits=12, decimal_places=2)

@@ -1,4 +1,5 @@
 from django.db import models
+from cloudinary.models import CloudinaryField
 
 class Task(models.Model):
     STATUS_CHOICES = [
@@ -17,6 +18,10 @@ class Task(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="todo")
     priority = models.SmallIntegerField(choices=PRIORITY_CHOICES, default=2)
     due_date = models.DateField(null=True, blank=True)
+    
+    # File attachments for tasks
+    attachments = models.JSONField(default=list, blank=True, help_text="List of Cloudinary URLs for task attachments")
+    
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
