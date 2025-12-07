@@ -37,11 +37,9 @@ export const AppRoutes: React.FC = () => {
       >
         <Route element={<DashboardLayout />}>
 
-          {/* ✅ COMMON */}
-          <Route path="/dashboard" element={<AdminDashboard />} />
-
           {/* ✅ ADMIN ONLY */}
           <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+            <Route path="/dashboard" element={<AdminDashboard />} />
             <Route path="/dashboard/departments" element={<Departments />} />
             <Route path="/dashboard/services" element={<Services />} />
             <Route path="/dashboard/price-cards" element={<PriceCards />} />
