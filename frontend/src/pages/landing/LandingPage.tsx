@@ -12,12 +12,10 @@ import { About } from './components/About.tsx';
 import { Contact } from './components/Contact.tsx';
 import { Footer } from './components/Footer.tsx';
 import AuthModal from './components/AuthModal.tsx';
-import { WhatsappFloat } from './components/WhatsappFloat.tsx';
+import WhatsappFloat from './components/WhatsappFloat.tsx';
 
 export const LandingPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authType, setAuthType] = useState<'login' | 'register'>('login');
 
   useEffect(() => {
     // Check for user's preferred color scheme
@@ -36,22 +34,18 @@ export const LandingPage = () => {
   }, [isDarkMode]);
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
-  const openAuthModal = (type: 'login' | 'register') => {
-    setAuthType(type);
-    setIsAuthModalOpen(true);
+
+  const handleGetStartedClick = () => {
+    // Handle get started click - you can add functionality here
+    console.log('Get Started clicked');
   };
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <TopBar />
-      <Header 
-        onLoginClick={() => openAuthModal('login')} 
-        onRegisterClick={() => openAuthModal('register')}
-        onDarkModeToggle={toggleDarkMode}
-        isDarkMode={isDarkMode}
-      />
+      <Header />
       <main>
-        <Hero onGetStartedClick={() => openAuthModal('register')} />
+        <Hero onGetStartedClick={handleGetStartedClick} />
         <TrustStrip />
         <Services />
         <CaseStudies />
@@ -64,12 +58,7 @@ export const LandingPage = () => {
       <Footer />
       <WhatsappFloat />
       
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-        authType={authType}
-        onAuthTypeChange={(type: 'login' | 'register') => setAuthType(type)}
-      />
+      <AuthModal />
     </div>
   );
 };
