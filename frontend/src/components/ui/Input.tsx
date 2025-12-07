@@ -1,35 +1,13 @@
-import React from 'react';
+import React from "react";
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  error?: string;
-  helperText?: string;
 }
 
-export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      label,
-      error,
-      helperText,
-      className = '',
-      ...props
-    },
-    ref
-  ) => {
-    return (
-      <div className={`form-group ${error ? 'is-invalid' : ''}`}>
-        {label && <label className="form-label">{label}</label>}
-        <input
-          ref={ref}
-          className={`form-control ${className}`}
-          {...props}
-        />
-        {error && <div className="invalid-feedback">{error}</div>}
-        {helperText && <div className="form-text">{helperText}</div>}
-      </div>
-    );
-  }
+export const Input: React.FC<Props> = ({ label, ...rest }) => (
+  <label className="block">
+    {label && <span className="text-sm font-medium text-gray-700">{label}</span>}
+    <input className="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" {...rest} />
+  </label>
 );
-
-Input.displayName = 'Input';
+export default Input;

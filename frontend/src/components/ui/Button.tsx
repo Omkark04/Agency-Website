@@ -1,51 +1,35 @@
 import React from 'react';
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
-type ButtonSize = 'sm' | 'md' | 'lg';
+type ButtonVariant = 'primary' | 'secondary' | 'outline';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & { 
+  isLoading?: boolean; 
+  size?: 'sm'|'md'|'lg';
   variant?: ButtonVariant;
-  size?: ButtonSize;
-  isLoading?: boolean;
-  fullWidth?: boolean;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-}
+};
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      children,
-      className = '',
-      variant = 'primary',
-      size = 'md',
-      isLoading = false,
-      fullWidth = false,
-      leftIcon,
-      rightIcon,
-      disabled,
-      ...props
-    },
-    ref
-  ) => {
-    return (
-      <button
-        ref={ref}
-        className={`btn btn-${variant} btn-${size} ${fullWidth ? 'btn-full-width' : ''} ${className}`}
-        disabled={isLoading || disabled}
-        {...props}
-      >
-        {isLoading ? (
-          <span className="btn-loader" />
-        ) : (
-          <>
-            {leftIcon && <span className="btn-icon-left">{leftIcon}</span>}
-            {children}
-            {rightIcon && <span className="btn-icon-right">{rightIcon}</span>}
-          </>
-        )}
-      </button>
-    );
-  }
-);
+export const Button: React.FC<Props> = ({ 
+  children, 
+  isLoading, 
+  size = 'md',
+  variant = 'primary',
+  className = '',
+  ...rest 
+}) => {
+  const sizeCls = size === 'sm' ? 'px-3 py-1 text-sm' : size === 'lg' ? 'px-6 py-3 text-lg' : 'px-4 py-2';
+  
+  const variantClasses = {
+    primary: 'bg-blue-600 hover:bg-blue-700 text-white',
+    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800',
+    outline: 'bg-transparent border border-gray-300 hover:bg-gray-50 text-gray-700'
+  };
 
-Button.displayName = 'Button';
+  return (
+    <button
+      className={`rounded ${variantClasses[variant]} ${sizeCls} disabled:opacity-60 ${className}`}
+      {...rest}
+    >
+      {isLoading ? 'Loading...' : children}
+    </button>
+  );
+};
+export default Button;

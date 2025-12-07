@@ -3,15 +3,17 @@ import { useAuth } from '../../hooks/useAuth';
 
 interface HeaderProps {
   onMenuClick: () => void;
+  title?: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
   const { user, logout } = useAuth();
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
+          {title && <h1 className="text-lg font-medium text-gray-900">{title}</h1>}
           {/* Mobile menu button */}
           <button
             onClick={onMenuClick}
@@ -87,3 +89,5 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
     </header>
   );
 };
+
+export default Header;

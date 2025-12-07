@@ -164,3 +164,5 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, userRole }) =
     </>
   );
 };
+
+export default Sidebar;
