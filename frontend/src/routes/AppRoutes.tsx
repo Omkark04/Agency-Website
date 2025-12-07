@@ -3,6 +3,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/layout/ProtectedRoute';
 import DashboardLayout from '../pages/DashboardLayout';
 
+// Pages
+import { LandingPage } from '../pages/landing/LandingPage';
+
 // Auth
 import Login from '../pages/Login';
 import Register from '../pages/Register';
@@ -25,7 +28,8 @@ export const AppRoutes: React.FC = () => {
     <Routes>
 
       {/* ✅ PUBLIC */}
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
