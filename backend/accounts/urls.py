@@ -11,6 +11,7 @@ from .views import (
     PasswordResetConfirmView,
     UserProfileView,
     GoogleOAuthView,
+    AdminUserListView,
 )
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
     path("password/reset/", PasswordResetRequestView.as_view(), name="password_reset"),
     path("password/reset/confirm/<uidb64>/<token>/", PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("profile/", UserProfileView.as_view(), name="user_profile"),
+    path("admin/users/", AdminUserListView.as_view()),
 ]

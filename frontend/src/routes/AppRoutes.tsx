@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/layout/ProtectedRoute';
+import DashboardLayout from '../pages/DashboardLayout';
 
 // Auth
 import Login from '../pages/Login';
@@ -22,26 +23,25 @@ import MediaLibrary from '../pages/dashboard/admin/MediaLibrary';
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* -------- PUBLIC ROUTES -------- */}
+
+      {/* ✅ PUBLIC */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* -------- PROTECTED DASHBOARD -------- */}
+      {/* ✅ PROTECTED DASHBOARD WITH LAYOUT */}
       <Route
         element={
           <ProtectedRoute allowedRoles={['admin', 'team_head', 'team_member', 'client']} />
         }
       >
-        <Route>
+        <Route element={<DashboardLayout />}>
 
-          {/* ✅ COMMON DASHBOARD LANDING */}
+          {/* ✅ COMMON */}
           <Route path="/dashboard" element={<AdminDashboard />} />
 
-          {/* ✅ ADMIN ONLY ROUTES */}
-          <Route
-            element={<ProtectedRoute allowedRoles={['admin']} />}
-          >
+          {/* ✅ ADMIN ONLY */}
+          <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
             <Route path="/dashboard/departments" element={<Departments />} />
             <Route path="/dashboard/services" element={<Services />} />
             <Route path="/dashboard/price-cards" element={<PriceCards />} />
@@ -54,8 +54,9 @@ export const AppRoutes: React.FC = () => {
         </Route>
       </Route>
 
-      {/* -------- FALLBACK -------- */}
+      {/* ✅ FALLBACK */}
       <Route path="*" element={<Navigate to="/" replace />} />
+
     </Routes>
   );
 };

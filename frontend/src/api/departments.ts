@@ -7,6 +7,7 @@ export interface Department {
   logo?: string | null; // Cloudinary URL
   short_description?: string;
   team_head?: any | null;
+  team_head_id?: number | null;
   is_active: boolean;
   created_at?: string;
 }

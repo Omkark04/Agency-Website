@@ -12,6 +12,7 @@ from django.utils.encoding import force_str, force_bytes
 from django.contrib.auth.tokens import default_token_generator
 import google.oauth2.id_token
 import google.auth.transport.requests
+from accounts.permissions import IsAdmin
 
 from .serializers import (
     RegisterSerializer,
@@ -134,3 +135,9 @@ class GoogleOAuthView(APIView):
             return Response({"user": UserSerializer(user).data, "access": str(refresh.access_token), "refresh": str(refresh)})
         except ValueError:
             return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AdminUserListView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAdmin]

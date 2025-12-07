@@ -1,6 +1,19 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { 
+  FiHome,
+  FiShoppingCart,
+  FiPackage,
+  FiLayers,
+  FiCreditCard,
+  FiUsers,
+  FiCheckSquare,
+  FiImage,
+  FiBarChart2,
+  FiX,
+  FiChevronRight
+} from 'react-icons/fi';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -13,154 +26,226 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, userRole }) =
   const { user } = useAuth();
 
   const menuItems = [
-    {
-      title: 'Dashboard',
-      path: '/dashboard',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      ),
-      roles: ['admin', 'team_head', 'team_member', 'client']
+    { 
+      title: 'Dashboard', 
+      path: '/dashboard', 
+      roles: ['admin', 'team_head', 'team_member', 'client'],
+      icon: FiHome,
+      gradient: 'from-blue-500 to-indigo-600'
     },
-    {
-      title: 'Orders',
-      path: '/dashboard/orders',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-        </svg>
-      ),
-      roles: ['admin', 'team_head', 'client']
+    { 
+      title: 'Orders', 
+      path: '/dashboard/orders', 
+      roles: ['admin', 'team_head', 'client'],
+      icon: FiShoppingCart,
+      gradient: 'from-orange-500 to-rose-600'
     },
-    {
-      title: 'Services',
-      path: '/dashboard/services',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
-      ),
-      roles: ['admin', 'team_head', 'client']
+    { 
+      title: 'Services', 
+      path: '/dashboard/services', 
+      roles: ['admin', 'team_head', 'client'],
+      icon: FiPackage,
+      gradient: 'from-cyan-500 to-blue-600'
     },
-    {
-      title: 'Tasks',
-      path: '/dashboard/tasks',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-        </svg>
-      ),
-      roles: ['admin', 'team_head', 'team_member']
+    { 
+      title: 'Departments', 
+      path: '/dashboard/departments', 
+      roles: ['admin'],
+      icon: FiLayers,
+      gradient: 'from-indigo-500 to-purple-600'
     },
-    {
-      title: 'Media',
-      path: '/dashboard/media',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      ),
-      roles: ['admin', 'team_head', 'team_member']
+    { 
+      title: 'Price Cards', 
+      path: '/dashboard/price-cards', 
+      roles: ['admin'],
+      icon: FiCreditCard,
+      gradient: 'from-pink-500 to-rose-600'
     },
-    {
-      title: 'Users',
-      path: '/dashboard/users',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-      ),
-      roles: ['admin', 'team_head']
+    { 
+      title: 'Users', 
+      path: '/dashboard/users', 
+      roles: ['admin', 'team_head'],
+      icon: FiUsers,
+      gradient: 'from-purple-500 to-pink-600'
     },
-    {
-      title: 'Analytics',
-      path: '/dashboard/analytics',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      ),
-      roles: ['admin', 'team_head']
-    }
+    { 
+      title: 'Tasks', 
+      path: '/dashboard/tasks', 
+      roles: ['admin', 'team_head', 'team_member'],
+      icon: FiCheckSquare,
+      gradient: 'from-green-500 to-emerald-600'
+    },
+    { 
+      title: 'Media', 
+      path: '/dashboard/media', 
+      roles: ['admin', 'team_head', 'team_member'],
+      icon: FiImage,
+      gradient: 'from-violet-500 to-purple-600'
+    },
+    { 
+      title: 'Analytics', 
+      path: '/dashboard/analytics', 
+      roles: ['admin', 'team_head'],
+      icon: FiBarChart2,
+      gradient: 'from-teal-500 to-cyan-600'
+    },
   ];
 
-  const filteredMenuItems = menuItems.filter(item => 
+  const filteredMenuItems = menuItems.filter(item =>
     item.roles.includes(userRole)
   );
 
   return (
     <>
-      {/* Mobile backdrop */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-gray-600 bg-opacity-75 z-20 lg:hidden"
-          onClick={onClose}
-        />
-      )}
-      
-      {/* Sidebar */}
-      <div className={`
-        fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out
-        lg:translate-x-0 lg:static lg:inset-0
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">UdyogWorks</h2>
+      {/* Sidebar Container */}
+      <div className={`fixed inset-y-0 left-0 w-72 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl z-50 transform transition-transform duration-300 ease-out ${
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      } lg:translate-x-0`}>
+        
+        {/* Header with Logo */}
+        <div className="relative h-20 flex items-center justify-between px-6 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-black text-xl">U</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-black text-white tracking-tight">UdyogWorks</h1>
+              <p className="text-xs text-gray-400 font-medium">Professional Suite</p>
+            </div>
+          </div>
+          
+          {/* Close button for mobile */}
           <button
             onClick={onClose}
-            className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+            className="lg:hidden p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <FiX className="w-5 h-5" />
           </button>
         </div>
-        
-        <nav className="mt-8">
-          <div className="px-4 space-y-2">
-            {filteredMenuItems.map((item) => (
+
+        {/* Navigation Menu */}
+        <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+          {filteredMenuItems.map((item, index) => {
+            const isActive = location.pathname === item.path;
+            const Icon = item.icon;
+            
+            return (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={onClose}
-                className={`
-                  group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
-                  ${location.pathname === item.path
-                    ? 'bg-primary text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
-                  }
-                `}
+                className={`group relative flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 ${
+                  isActive
+                    ? 'bg-gradient-to-r from-white/15 to-white/5 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                }`}
+                style={{
+                  animationDelay: `${index * 0.05}s`
+                }}
               >
-                <span className={`
-                  mr-3 flex-shrink-0
-                  ${location.pathname === item.path ? 'text-white' : 'text-gray-400 group-hover:text-gray-500'}
-                `}>
-                  {item.icon}
+                {/* Active Indicator */}
+                {isActive && (
+                  <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b ${item.gradient} rounded-r-full shadow-lg`}></div>
+                )}
+                
+                {/* Icon Container */}
+                <div className={`relative p-2.5 rounded-xl transition-all duration-200 ${
+                  isActive 
+                    ? `bg-gradient-to-br ${item.gradient} shadow-lg` 
+                    : 'bg-white/5 group-hover:bg-white/10'
+                }`}>
+                  <Icon className={`w-5 h-5 transition-transform duration-200 ${
+                    isActive ? 'scale-110' : 'group-hover:scale-110'
+                  }`} />
+                  
+                  {/* Glow Effect for Active */}
+                  {isActive && (
+                    <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} rounded-xl blur-lg opacity-50`}></div>
+                  )}
+                </div>
+
+                {/* Label */}
+                <span className={`flex-1 font-semibold text-[15px] transition-all duration-200 ${
+                  isActive ? 'translate-x-1' : 'group-hover:translate-x-1'
+                }`}>
+                  {item.title}
                 </span>
-                {item.title}
+
+                {/* Arrow Indicator */}
+                <FiChevronRight className={`w-4 h-4 transition-all duration-200 ${
+                  isActive 
+                    ? 'opacity-100 translate-x-0' 
+                    : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0'
+                }`} />
+
+                {/* Hover Background */}
+                {!isActive && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                )}
               </Link>
-            ))}
-          </div>
+            );
+          })}
         </nav>
-        
-        {/* User info */}
+
+        {/* User Info Footer */}
         {user && (
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-medium">
-                  {user.username?.charAt(0).toUpperCase() || 'U'}
+          <div className="relative border-t border-white/10 p-4 bg-gradient-to-r from-white/5 to-transparent backdrop-blur-sm">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all cursor-pointer group">
+              <div className="relative">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg ring-2 ring-white/20">
+                  {user.username?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900"></div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-bold text-white truncate group-hover:text-blue-300 transition-colors">
+                  {user.username || user.email?.split('@')[0] || 'User'}
+                </div>
+                <div className="text-xs text-gray-400 capitalize truncate">
+                  {user.role?.replace('_', ' ') || 'Member'}
                 </div>
               </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">{user.username}</p>
-                <p className="text-xs text-gray-500 capitalize">{user.role?.replace('_', ' ')}</p>
-              </div>
+              <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
             </div>
           </div>
         )}
+
+        {/* Decorative Elements */}
+        <div className="absolute top-32 -left-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-32 -right-20 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl"></div>
       </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        /* Custom Scrollbar */
+        .scrollbar-thin::-webkit-scrollbar {
+          width: 6px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 10px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes slide-in {
+          from {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        nav a {
+          animation: slide-in 0.3s ease-out forwards;
+        }
+      `}} />
     </>
   );
 };
