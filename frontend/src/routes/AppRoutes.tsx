@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/layout/ProtectedRoute';
 import DashboardLayout from '../pages/DashboardLayout';
-
+import ClientDashboard from '@/pages/dashboard/client/ClientDashboard';
 // Pages
 import { LandingPage } from '../pages/landing/LandingPage';
 
@@ -22,7 +22,7 @@ import Users from '../pages/dashboard/admin/Users';
 import Orders from '../pages/dashboard/admin/Orders';
 import Tasks from '../pages/dashboard/admin/Tasks';
 import MediaLibrary from '../pages/dashboard/admin/MediaLibrary';
-import ClientDashboard from '@/pages/dashboard/client/clientdashboard';
+import TeamHeadDashboard from '@/pages/dashboard/teamhead/Teamhead';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -42,6 +42,9 @@ export const AppRoutes: React.FC = () => {
       >
         <Route element={<ProtectedRoute allowedRoles={['client', 'admin']}/>}>
           <Route path='/client-dashboard' element={<ClientDashboard/>}/>
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={['team_head', 'admin']}/>}>
+          <Route path='/team-head-dashboard' element={<TeamHeadDashboard/>}/>
         </Route>
 
           {/* ✅ ADMIN ONLY */}

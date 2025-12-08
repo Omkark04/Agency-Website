@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
-<<<<<<< HEAD
-import { X, Mail, Lock, Eye, EyeOff, LogIn, UserPlus, Facebook, Twitter, Github, ArrowRight } from 'lucide-react';
-=======
 import { X, Mail, Lock, Eye, EyeOff, LogIn, UserPlus, Facebook, Twitter, Github } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
->>>>>>> d272653c1d8c6fc5f578f667c6775352ee839875
 
 type AuthMode = 'login' | 'signup';
 
@@ -73,7 +69,6 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
     }
   };
 
-<<<<<<< HEAD
   // Show FAB when modal is closed (for both controlled and uncontrolled modes)
   const showFAB = isControlled ? !isOpen : !internalIsOpen;
   
@@ -92,7 +87,6 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
           className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
           aria-label="Open login"
         >
-          <ArrowRight size={24} className="text-white" />
         </button>
       </div>
     );
@@ -102,23 +96,6 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
   if (isControlled && !isOpen) {
     return null;
   }
-=======
-  if (!isControlled && !internalIsOpen) {
-    return (
-      <button
-        onClick={() => {
-          setMode('login');
-          setInternalIsOpen(true);
-        }}
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white p-3 rounded-full shadow-lg"
-      >
-        <LogIn size={24} />
-      </button>
-    );
-  }
-
-  if (isControlled && !isOpen) return null;
->>>>>>> d272653c1d8c6fc5f578f667c6775352ee839875
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={toggleModal}>
