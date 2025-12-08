@@ -7,7 +7,11 @@ import logo from '../../../assets/UdyogWorks logo.png';
 // Constants for header heights in pixels
 const TOP_BAR_HEIGHT = 44; // Height of the TopBar component
 
-export const Header = () => {
+interface HeaderProps {
+  onAuthButtonClick?: () => void;
+}
+
+export const Header = ({ onAuthButtonClick }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -17,6 +21,10 @@ export const Header = () => {
   const lastScrollY = useRef(0);
 
   const openAuthModal = (mode: 'login' | 'signup') => {
+    if (onAuthButtonClick) {
+      onAuthButtonClick();
+      return;
+    }
     setAuthMode(mode);
     setIsAuthModalOpen(true);
     setIsMobileMenuOpen(false);
@@ -90,6 +98,7 @@ export const Header = () => {
   const navLinks = [
     { name: 'Home', href: '#home' },
     { name: 'Services', href: '#services' },
+    { name: 'Offers', href: '#offers' },
     { name: 'Work', href: '#work' },
     { name: 'About', href: '#about' },
     { name: 'Testimonials', href: '#testimonials' },

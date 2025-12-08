@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Mail, Lock, Eye, EyeOff, LogIn, UserPlus, Facebook, Twitter, Github } from 'lucide-react';
+import { X, Mail, Lock, Eye, EyeOff, LogIn, UserPlus, Facebook, Twitter, Github, ArrowRight } from 'lucide-react';
 
 type AuthMode = 'login' | 'signup';
 
@@ -51,22 +51,31 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
     console.log('Form submitted:', formData);
   };
 
-  // If we're in uncontrolled mode and the modal is closed, show the FAB
-  if (!isControlled && !internalIsOpen) {
+  // Show FAB when modal is closed (for both controlled and uncontrolled modes)
+  const showFAB = isControlled ? !isOpen : !internalIsOpen;
+  
+  if (showFAB) {
     return (
-      <button 
-        onClick={() => {
-          setMode('login');
-          setInternalIsOpen(true);
-        }}
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50"
-      >
-        <LogIn size={24} />
-      </button>
+      <div className="fixed bottom-8 right-8 z-50">
+        <button 
+          onClick={() => {
+            setMode('login');
+            if (!isControlled) {
+              setInternalIsOpen(true);
+            } else if (onClose) {
+              onClose();
+            }
+          }}
+          className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+          aria-label="Open login"
+        >
+          <ArrowRight size={24} className="text-white" />
+        </button>
+      </div>
     );
   }
   
-  // If we're in controlled mode and isOpen is false, don't render anything
+  // If we're in controlled mode and isOpen is false, don't render the modal (but we've already rendered the FAB)
   if (isControlled && !isOpen) {
     return null;
   }
