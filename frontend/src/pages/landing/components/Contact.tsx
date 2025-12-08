@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Send, MapPin, Mail, Phone } from 'lucide-react';
+import { Send, MapPin, Mail, Phone, Facebook, Twitter, Instagram, Linkedin, MessageCircle } from 'lucide-react';
+import api from '../../../api/api';
 
 const services = [
   'Social Media Design',
@@ -35,8 +36,14 @@ export const Contact = () => {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Make API call to submit contact form
+      await api.post('/api/contact/submit/', {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        service: formData.service,
+        message: formData.message
+      });
       
       setSubmitStatus({
         success: true,
@@ -57,10 +64,24 @@ export const Contact = () => {
         setSubmitStatus(null);
       }, 5000);
       
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error submitting contact form:', error);
+      let errorMessage = 'Something went wrong. Please try again later.';
+      
+      if (error.response?.data) {
+        // Handle validation errors from the API
+        const { data } = error.response;
+        if (typeof data === 'object' && data !== null) {
+          const errorMessages = Object.values(data).flat();
+          errorMessage = errorMessages.join(' ');
+        } else if (typeof data === 'string') {
+          errorMessage = data;
+        }
+      }
+      
       setSubmitStatus({
         success: false,
-        message: 'Something went wrong. Please try again later.'
+        message: errorMessage
       });
     } finally {
       setIsSubmitting(false);
@@ -68,8 +89,8 @@ export const Contact = () => {
   };
 
   return (
-    <section id="contact" className="py-20 bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4">
+    <section id="contact" className="py-20 bg-gray-50 dark:bg-gray-800">
+      <div id="contact" className="container mx-auto px-4">
         <motion.div 
           className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
@@ -245,7 +266,7 @@ export const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900 dark:text-white">Email Us</h4>
-                    <a href="mailto:info@udyogworks.com" className="text-[#0066FF] hover:underline">info@udyogworks.com</a>
+                    <a href="rahulbhatambare72@gmail.com" className="text-[#0066FF] hover:underline">rahulbhatambare72@gmail.com</a>
                   </div>
                 </div>
                 
@@ -255,7 +276,7 @@ export const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900 dark:text-white">Call Us</h4>
-                    <a href="tel:+919876543210" className="text-gray-600 dark:text-gray-400 hover:underline">+91 98765 43210</a>
+                    <a href="tel:+918208776319" className="text-gray-600 dark:text-gray-400 hover:underline">+91 8208776319</a>
                   </div>
                 </div>
               </div>
@@ -264,23 +285,26 @@ export const Contact = () => {
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Follow Us</h4>
                 <div className="flex space-x-4">
                   {[
-                    { name: 'Facebook', icon: 'facebook', color: '#1877F2' },
-                    { name: 'Twitter', icon: 'twitter', color: '#1DA1F2' },
-                    { name: 'Instagram', icon: 'instagram', color: '#E4405F' },
-                    { name: 'LinkedIn', icon: 'linkedin', color: '#0A66C2' }
-                  ].map((social) => (
-                    <a
-                      key={social.name}
-                      href={`https://${social.name.toLowerCase()}.com/udyogworks`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300"
-                      style={{ color: social.color }}
-                      aria-label={social.name}
-                    >
-                      <i className={`fab fa-${social.icon} text-lg`}></i>
-                    </a>
-                  ))}
+                    { name: 'Facebook', icon: Facebook, color: '#1877F2' },
+                    { name: 'Twitter', icon: Twitter, color: '#1DA1F2' },
+                    { name: 'Instagram', icon: Instagram, color: '#E4405F' },
+                    { name: 'LinkedIn', icon: Linkedin, color: '#0A66C2' }
+                  ].map((social) => {
+                    const IconComponent = social.icon;
+                    return (
+                      <a
+                        key={social.name}
+                        href={`https://${social.name.toLowerCase()}.com/udyogworks`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300"
+                        style={{ color: social.color }}
+                        aria-label={social.name}
+                      >
+                        <IconComponent className="w-5 h-5" />
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
               
@@ -293,9 +317,7 @@ export const Contact = () => {
                   rel="noopener noreferrer"
                   className="inline-flex items-center bg-white text-[#0066FF] hover:bg-gray-100 font-semibold py-2 px-6 rounded-full transition-all duration-300"
                 >
-                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M17.498 14.382v3.3c0 .6.7.9 1.1.5l3.2-2.4c.4-.3.4-.8.2-1.1-2.6-3.6-7.1-4.1-10.5-1.9-2.6 1.7-3.8 4.9-2.8 7.8.1.4-.2.8-.6.8h-.3c-1.5 0-3.2-.8-4.3-2.2-3.3-4.1-2.4-9.9 2.1-13.2 3.4-2.5 8.1-2.3 11.2.6 3.1 2.9 3.7 7.6 1.5 11.2z"/>
-                  </svg>
+                  <MessageCircle className="w-5 h-5 mr-2" />
                   Chat on WhatsApp
                 </a>
               </div>

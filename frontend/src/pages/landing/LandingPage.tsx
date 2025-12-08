@@ -19,46 +19,65 @@ export const LandingPage = () => {
 
   useEffect(() => {
     // Check for user's preferred color scheme
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setIsDarkMode(true);
-    }
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setIsDarkMode(prefersDark);
+    
+    // Add/remove dark class based on state
+    document.documentElement.classList.toggle('dark', prefersDark);
+    
+    // Listen for system color scheme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsDarkMode(e.matches);
+      document.documentElement.classList.toggle('dark', e.matches);
+    };
+    
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  useEffect(() => {
-    // Toggle dark mode class on document element
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
-
-  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
-
   const handleGetStartedClick = () => {
-    // Handle get started click - you can add functionality here
-    console.log('Get Started clicked');
+    // Smooth scroll to contact section
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+    <div className={`flex flex-col min-h-screen ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <TopBar />
       <Header />
-      <main>
-        <Hero onGetStartedClick={handleGetStartedClick} />
+      <main className="flex-grow pt-[120px] md:pt-[100px]" style={{ scrollMarginTop: '120px' }}>
+        <section id="home" className="scroll-mt-24">
+          <Hero onGetStartedClick={handleGetStartedClick} />
+        </section>
         <TrustStrip />
-        <Services />
-        <CaseStudies />
-        <Process />
-        <Pricing />
-        <Testimonials />
-        <About />
-        <Contact />
+        <section id="services" className="scroll-mt-24">
+          <Services />
+        </section>
+        <section id="work" className="scroll-mt-24">
+          <CaseStudies />
+        </section>
+        <section id="process" className="scroll-mt-24">
+          <Process />
+        </section>
+        <section id="pricing" className="scroll-mt-24">
+          <Pricing />
+        </section>
+        <section id="testimonials" className="scroll-mt-24">
+          <Testimonials />
+        </section>
+        <section id="about" className="scroll-mt-24">
+          <About />
+        </section>
+        <section id="contact" className="scroll-mt-24">
+          <Contact />
+        </section>
       </main>
       <Footer />
-      <WhatsappFloat />
-      
       <AuthModal />
+      <WhatsappFloat />
     </div>
   );
 };

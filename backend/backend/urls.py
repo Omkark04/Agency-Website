@@ -12,6 +12,9 @@ from portfolio.views import PortfolioProjectViewSet
 from tasks.views import TaskViewSet
 from media.views import MediaViewSet, UploadMediaView
 
+# Contacts app
+from contacts.views import ContactSubmissionView
+
 # JWT Auth
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -38,8 +41,11 @@ urlpatterns = [
     # Authentication (accounts app)
     path('auth/', include("accounts.urls")),
 
-    # imae upload
+    # Image upload
     path("api/upload/", UploadMediaView.as_view()),
+    
+    # Contact form
+    path("api/contact/", include('contacts.urls')),
 
     # JWT Endpoints (optional but recommended)
     path("auth/jwt/login/", TokenObtainPairView.as_view(), name="jwt-login"),
