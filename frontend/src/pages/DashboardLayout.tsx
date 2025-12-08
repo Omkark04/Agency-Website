@@ -54,7 +54,7 @@ const DashboardLayout: React.FC = () => {
 
       {/* Main Content Area with Smooth Transition */}
       <div className={`min-h-screen flex flex-col transition-all duration-300 ease-out ${
-        sidebarOpen ? 'lg:ml-72' : 'lg:ml-0'
+        sidebarOpen ? 'lg:ml-72' : 'lg:ml-72'
       }`}>
         {/* Desktop Header - Glassmorphism */}
         <div className="hidden lg:block sticky top-0 z-30">

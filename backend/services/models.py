@@ -35,7 +35,7 @@ class Service(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
-    logo = models.ImageField(upload_to="services/logos/", null=True, blank=True)
+    logo = models.URLField(null=True, blank=True)
 
     short_description = models.TextField(blank=True)
     long_description = models.TextField(blank=True)

@@ -145,7 +145,7 @@ export const AdminDashboard: React.FC = () => {
                 <span className="text-xs font-bold text-purple-600">Verified</span>
               </div>
             </div>
-            <p className="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Total Clients</p>
+            <p className="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Total Users</p>
             <p className="text-4xl font-black text-gray-900">{clientsCount}</p>
             <div className="mt-4 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-2 text-sm text-gray-600">

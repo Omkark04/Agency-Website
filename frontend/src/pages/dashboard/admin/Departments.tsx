@@ -71,9 +71,9 @@ export default function Departments() {
               </div>
               <Button 
                 onClick={() => { setEditing(null); setOpenForm(true); }}
-                className="flex items-center gap-2 bg-white text-indigo-600 hover:bg-gray-50 px-6 py-3 font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all rounded-xl"
+                className="text-black flex items-center gap-2 bg-white text-indigo-600 hover:bg-gray-50 px-6 py-3 font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all rounded-xl"
               >
-                <FiPlus className="text-xl" />
+                <FiPlus className="text-black text-xl" />
                 Create Department
               </Button>
             </div>

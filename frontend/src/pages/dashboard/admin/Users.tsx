@@ -84,8 +84,8 @@ export function Users() {
                   <p className="text-white/90 text-lg mt-1">Manage system users and their roles</p>
                 </div>
               </div>
-              <Button className="flex items-center gap-2 bg-white text-purple-600 hover:bg-gray-50 px-6 py-3 font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all rounded-xl">
-                <FiUserPlus className="text-xl" />
+              <Button className="text-black flex items-center gap-2 bg-white text-purple-600 hover:bg-gray-50 px-6 py-3 font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all rounded-xl">
+                <FiUserPlus className="text-black text-xl" />
                 Add User
               </Button>
             </div>

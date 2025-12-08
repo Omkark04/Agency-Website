@@ -74,9 +74,9 @@ const Services = () => {
               </div>
               <Button 
                 onClick={() => { setEdit(null); setOpen(true); }}
-                className="flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-6 py-3 font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all rounded-xl"
+                className=" flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-6 py-3 font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all rounded-xl"
               >
-                <FiPlus className="text-xl" />
+                <FiPlus className="text-black text-xl" />
                 Create Service
               </Button>
             </div>
@@ -196,7 +196,7 @@ const Services = () => {
                             <FiLayers className="text-gray-600 h-5 w-5" />
                           </div>
                           <span className="font-bold text-gray-900">
-                            {s.department || 'No department'}
+                            {s.department_title || 'No department'}
                           </span>
                         </div>
                       </td>
@@ -244,10 +244,10 @@ const Services = () => {
                 </p>
                 <Button 
                   onClick={() => { setEdit(null); setOpen(true); }}
-                  className="flex items-center gap-2 mx-auto bg-gradient-to-r from-blue-600 to-cyan-600 px-8 py-4 text-lg font-bold shadow-xl"
+                  className="text-black flex items-center gap-2 mx-auto bg-gradient-to-r from-blue-600 to-cyan-600 px-8 py-4 text-lg font-bold shadow-xl"
                 >
-                  <FiPlus />
-                  Create Service
+                  <FiPlus className='text-gray-500'/>
+                    Add Service
                 </Button>
               </div>
             )}
