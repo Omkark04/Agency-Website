@@ -22,6 +22,7 @@ import Users from '../pages/dashboard/admin/Users';
 import Orders from '../pages/dashboard/admin/Orders';
 import Tasks from '../pages/dashboard/admin/Tasks';
 import MediaLibrary from '../pages/dashboard/admin/MediaLibrary';
+import ClientDashboard from '@/pages/dashboard/client/clientdashboard';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -39,10 +40,13 @@ export const AppRoutes: React.FC = () => {
           <ProtectedRoute allowedRoles={['admin', 'team_head', 'team_member', 'client']} />
         }
       >
-        <Route element={<DashboardLayout />}>
+        <Route element={<ProtectedRoute allowedRoles={['client', 'admin']}/>}>
+          <Route path='/client-dashboard' element={<ClientDashboard/>}/>
+        </Route>
 
           {/* ✅ ADMIN ONLY */}
           <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+            <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<AdminDashboard />} />
             <Route path="/dashboard/departments" element={<Departments />} />
             <Route path="/dashboard/services" element={<Services />} />
