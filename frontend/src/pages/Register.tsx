@@ -47,7 +47,7 @@ const Register: React.FC = () => {
           <button type="button" className="absolute right-2 top-8 text-gray-500" onClick={() => setShowConfirm(!showConfirm)} aria-label="Toggle confirm password visibility">👁</button>
         </div>
         {error && <div className="text-red-600 text-sm mb-2">{error}</div>}
-        <Button type="submit" isLoading={loading} fullWidth>Register</Button>
+        <Button type="submit" isLoading={loading} className="w-full">Register</Button>
         <p className="mt-4 text-center text-sm">
           Already have an account? <Link to="/login" className="text-blue-600">Login</Link>
         </p>
