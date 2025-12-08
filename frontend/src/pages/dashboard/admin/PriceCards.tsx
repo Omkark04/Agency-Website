@@ -138,15 +138,31 @@ export default function PriceCards() {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <div className="p-2 bg-blue-50 rounded-lg">
-                              <FiPackage className="text-blue-600" />
-                            </div>
-                            <span className="font-medium text-gray-900">
-                              {c.service?.title ?? c.service}
-                            </span>
-                          </div>
+                          {(() => {
+                            const service = services.find(s => s.id === c.service);
+                            return (
+                              <div className="flex items-center gap-3">
+                                {service?.logo ? (
+                                  <img
+                                    src={service.logo}
+                                    alt={service.title}
+                                    className="w-10 h-10 object-cover rounded border"
+                                  />
+                                ) : (
+                                  <div className="p-2 bg-blue-50 rounded-lg">
+                                    <FiPackage className="text-blue-600" />
+                                  </div>
+                                )}
+
+                                <span className="font-medium text-gray-900">
+                                  {service?.title || `Service #${c.service}`}
+                                </span>
+                              </div>
+                            );
+                          })()}
                         </td>
+
+
                         <td className="px-6 py-4">
                           <div className="font-bold text-lg text-gray-900">
                             ₹{c.price}

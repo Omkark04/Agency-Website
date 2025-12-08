@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { listMedia, uploadMedia, createMedia } from '../../../api/media';
+import { listMedia, uploadMedia, createMedia, deleteMedia } from '../../../api/media';
 import type { MediaItem } from '../../../api/media';
 import { Button } from '../../../components/ui/Button';
 import { useAuth } from '../../../hooks/useAuth';
@@ -13,7 +13,8 @@ import {
   FiCalendar,
   FiSearch,
   FiX,
-  FiCheck
+  FiCheck,
+  FiTrash2
 } from 'react-icons/fi';
 
 export default function MediaLibrary() {
@@ -25,6 +26,18 @@ export default function MediaLibrary() {
   const [filter, setFilter] = useState<'all' | 'image' | 'video'>('all');
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const { user } = useAuth();
+  const handleDelete = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this media?')) return;
+
+    try {
+      await deleteMedia(id);
+      loadMedia();
+    } catch (err) {
+      console.error('Delete failed:', err);
+      alert('Failed to delete media');
+    }
+  };
+
 
   const loadMedia = async () => {
     try {
@@ -304,6 +317,8 @@ export default function MediaLibrary() {
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+
+                    {/* ✅ COPY */}
                     <button
                       onClick={() => copyToClipboard(item.url, item.id)}
                       className={`p-2.5 rounded-xl backdrop-blur-sm font-bold transition-all shadow-lg ${
@@ -311,13 +326,21 @@ export default function MediaLibrary() {
                           ? 'bg-green-500 text-white' 
                           : 'bg-white/90 hover:bg-white text-gray-700'
                       }`}
-                      title={copiedId === item.id ? 'Copied!' : 'Copy URL'}
                     >
                       {copiedId === item.id ? (
                         <FiCheck className="h-4 w-4" />
                       ) : (
                         <FiCopy className="h-4 w-4" />
                       )}
+                    </button>
+
+                    {/* ✅ DELETE */}
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="p-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white shadow-lg transition-all"
+                      title="Delete Media"
+                    >
+                      <FiTrash2 className="h-4 w-4" />
                     </button>
                   </div>
                 </div>

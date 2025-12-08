@@ -72,7 +72,9 @@ export const useAuth = () => {
   };
 
   const register = async (userData: {
+    name: string;
     username: string;
+    phone: string;
     email: string;
     password: string;
     role: string;

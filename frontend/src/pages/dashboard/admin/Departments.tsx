@@ -283,10 +283,10 @@ export default function Departments() {
                 </p>
                 <Button 
                   onClick={() => { setEditing(null); setOpenForm(true); }}
-                  className="flex items-center gap-2 mx-auto bg-gradient-to-r from-indigo-600 to-blue-600 px-8 py-4 text-lg font-bold shadow-xl"
+                  className="flex items-center gap-2 bg-white text-blue-700 px-6 py-3 rounded-xl font-bold shadow-xl"
                 >
                   <FiPlus />
-                  Create Department
+                    <p className='text-black'>Create Department</p>
                 </Button>
               </div>
             )}

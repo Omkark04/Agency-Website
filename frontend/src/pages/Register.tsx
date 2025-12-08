@@ -21,7 +21,9 @@ const Register: React.FC = () => {
     }
     try {
       await registerUser({
+        name: '',
         username: form.username,
+        phone: '',
         email: form.email,
         password: form.password,
         role: 'client'
