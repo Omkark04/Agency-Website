@@ -1,11 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Mail, Lock, Eye, EyeOff, LogIn, UserPlus, Facebook, Twitter, Github } from 'lucide-react';
 
 type AuthMode = 'login' | 'signup';
 
-export const AuthModal = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [mode, setMode] = useState<AuthMode>('login');
+interface AuthModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  defaultMode?: AuthMode;
+}
+
+export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalProps) => {
+  // If the modal is controlled by props, use the defaultMode prop, otherwise manage state internally
+  const [mode, setMode] = useState<AuthMode>(defaultMode || 'login');
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  
+  // Determine if we're in controlled or uncontrolled mode
+  const isControlled = isOpen !== undefined;
+  
+  const toggleModal = () => {
+    if (!isControlled) {
+      setInternalIsOpen(!internalIsOpen);
+    } else if (onClose) {
+      onClose();
+    }
+  };
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -13,9 +31,11 @@ export const AuthModal = () => {
     password: ''
   });
 
-  const toggleModal = () => {
-    setIsOpen(!isOpen);
-  };
+  useEffect(() => {
+    if (defaultMode) {
+      setMode(defaultMode);
+    }
+  }, [defaultMode]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -31,27 +51,36 @@ export const AuthModal = () => {
     console.log('Form submitted:', formData);
   };
 
-  if (!isOpen) {
+  // If we're in uncontrolled mode and the modal is closed, show the FAB
+  if (!isControlled && !internalIsOpen) {
     return (
       <button 
-        onClick={toggleModal}
+        onClick={() => {
+          setMode('login');
+          setInternalIsOpen(true);
+        }}
         className="fixed bottom-6 right-6 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50"
       >
         <LogIn size={24} />
       </button>
     );
   }
+  
+  // If we're in controlled mode and isOpen is false, don't render anything
+  if (isControlled && !isOpen) {
+    return null;
+  }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={isControlled ? onClose : toggleModal}>
+      <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
             {mode === 'login' ? 'Welcome Back' : 'Create Account'}
           </h2>
           <button 
-            onClick={toggleModal}
+            onClick={isControlled ? onClose : toggleModal}
             className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             <X size={24} />
@@ -211,7 +240,12 @@ export const AuthModal = () => {
             {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
             <button
               type="button"
-              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+              onClick={() => {
+                setMode(mode === 'login' ? 'signup' : 'login');
+                if (!isControlled) {
+                  setInternalIsOpen(true);
+                }
+              }}
               className="text-[#00C2A8] font-medium hover:underline"
             >
               {mode === 'login' ? 'Sign up' : 'Sign in'}
