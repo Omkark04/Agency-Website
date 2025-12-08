@@ -137,15 +137,15 @@ export const Footer = () => {
               
               <div className="flex items-center">
                 <Mail className="h-5 w-5 text-[#00C2A8] mr-3 flex-shrink-0" />
-                <a href="mailto:info@udyogworks.com" className="text-gray-400 hover:text-[#00C2A8] transition-colors duration-300 text-sm">
-                  info@udyogworks.com
+                <a href="rahulbhatambare72@gmail.com" className="text-gray-400 hover:text-[#00C2A8] transition-colors duration-300 text-sm">
+                  rahulbhatambare72@gmail.com
                 </a>
               </div>
               
               <div className="flex items-center">
                 <Phone className="h-5 w-5 text-[#00C2A8] mr-3 flex-shrink-0" />
-                <a href="tel:+919876543210" className="text-gray-400 hover:text-[#00C2A8] transition-colors duration-300 text-sm">
-                  +91 98765 43210
+                <a href="tel:+918208776319" className="text-gray-400 hover:text-[#00C2A8] transition-colors duration-300 text-sm">
+                  +91 8208776319
                 </a>
               </div>
             </div>

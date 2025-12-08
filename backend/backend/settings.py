@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "tasks",
     "media",
     "payments",
+    "contacts",
 ]
 
 MIDDLEWARE = [
