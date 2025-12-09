@@ -23,6 +23,9 @@ import Orders from '../pages/dashboard/admin/Orders';
 import Tasks from '../pages/dashboard/admin/Tasks';
 import MediaLibrary from '../pages/dashboard/admin/MediaLibrary';
 
+// New Pages
+import { NotificationsPage } from '../pages/Notifications';
+
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
@@ -40,6 +43,9 @@ export const AppRoutes: React.FC = () => {
         }
       >
         <Route element={<DashboardLayout />}>
+
+          {/* ✅ ALL AUTHENTICATED USERS */}
+          <Route path="/notifications" element={<NotificationsPage />} />
 
           {/* ✅ ADMIN ONLY */}
           <Route element={<ProtectedRoute allowedRoles={['admin']} />}>

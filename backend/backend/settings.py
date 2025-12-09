@@ -3,20 +3,24 @@ from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
 import os
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Build paths inside the project
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Cloudinary Configuration (lazy loading to avoid global variable conflicts)
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
-load_dotenv()
-
 cloudinary.config( 
   cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
   api_key=os.getenv("CLOUDINARY_API_KEY"),
-  api_secret=os.getenv("CLOUDINARY_API_SECRET")
+  api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+  secure=True  # Use HTTPS for all URLs
 )
-
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-default")
 DEBUG = os.getenv("DEBUG", "True") == "True"
@@ -37,10 +41,28 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": False,
+    "BLACKLIST_AFTER_ROTATION": True,  # Enable blacklisting after rotation
+    "UPDATE_LAST_LOGIN": True,
 }
 
 AUTH_USER_MODEL = "accounts.User"
+
+# Redis Cache Configuration
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+    }
+}
+
+# Celery Configuration
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
+
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -54,6 +76,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "rest_framework_simplejwt.token_blacklist",
+    "django_filters",  # For filtering
     #cloudinary
     'cloudinary',
 
@@ -66,7 +89,10 @@ INSTALLED_APPS = [
     "media",
     "payments",
     "contacts",
+    "notifications",  # Phase 2
+    "analytics",      # Phase 2
 ]
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -77,6 +103,28 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+# CORS Configuration
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Vite dev server
+    "http://localhost:3000",  # Alternative React dev server
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
 ]
 
 ROOT_URLCONF = "backend.urls"

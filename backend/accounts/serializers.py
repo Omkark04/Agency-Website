@@ -37,9 +37,36 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
-        data = super().validate(attrs)
-        data.update({"user": UserSerializer(self.user).data})
-        return data
+        # Get user by email
+        email = attrs.get("email") or attrs.get(self.username_field)
+        try:
+            user = User.objects.get(email=email)
+            
+            # Check if account is locked out
+            if user.is_locked_out():
+                lockout_time = user.lockout_until
+                raise serializers.ValidationError({
+                    "detail": f"Account is locked due to multiple failed login attempts. "
+                             f"Try again after {lockout_time.strftime('%Y-%m-%d %H:%M:%S')}"
+                })
+        except User.DoesNotExist:
+            pass  # Let the parent class handle invalid credentials
+        
+        try:
+            data = super().validate(attrs)
+            # Reset failed login attempts on successful login
+            if hasattr(self, 'user') and self.user:
+                self.user.reset_failed_login()
+            data.update({"user": UserSerializer(self.user).data})
+            return data
+        except Exception as e:
+            # Increment failed login attempts
+            try:
+                user = User.objects.get(email=email)
+                user.increment_failed_login()
+            except User.DoesNotExist:
+                pass
+            raise e
 
     @classmethod
     def get_token(cls, user):

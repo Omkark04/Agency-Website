@@ -10,6 +10,8 @@ from django.conf import settings
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_str, force_bytes
 from django.contrib.auth.tokens import default_token_generator
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
 import google.oauth2.id_token
 import google.auth.transport.requests
 from accounts.permissions import IsAdmin
@@ -65,9 +67,11 @@ class TeamMemberRegisterView(RegisterView):
         request.data["role"] = "team_member"
         return super().post(request, *args, **kwargs)
 
+@method_decorator(ratelimit(key='ip', rate='5/m', method='POST'), name='dispatch')
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
+@method_decorator(ratelimit(key='ip', rate='3/h', method='POST'), name='dispatch')
 class PasswordResetRequestView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -135,6 +139,59 @@ class GoogleOAuthView(APIView):
             return Response({"user": UserSerializer(user).data, "access": str(refresh.access_token), "refresh": str(refresh)})
         except ValueError:
             return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@method_decorator(ratelimit(key='ip', rate='5/m', method='POST'), name='dispatch')
+class AdminEnvLoginView(APIView):
+    """
+    Admin login using environment variables.
+    This endpoint allows admin to login using credentials stored in .env file.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        if not email or not password:
+            return Response({"error": "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check against environment variables
+        admin_email = settings.ADMIN_EMAIL
+        admin_password = settings.ADMIN_PASSWORD
+
+        if not admin_email or not admin_password:
+            return Response({"error": "Admin credentials not configured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if email == admin_email and password == admin_password:
+            # Get or create admin user
+            user, created = User.objects.get_or_create(
+                email=admin_email,
+                defaults={
+                    "username": "admin",
+                    "role": "admin",
+                    "is_staff": True,
+                    "is_superuser": True
+                }
+            )
+            
+            # Ensure user has admin role
+            if user.role != "admin":
+                user.role = "admin"
+                user.is_staff = True
+                user.is_superuser = True
+                user.save()
+
+            # Generate tokens
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "user": UserSerializer(user).data,
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+                "message": "Admin logged in successfully"
+            }, status=status.HTTP_200_OK)
+        
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class AdminUserListView(generics.ListAPIView):
