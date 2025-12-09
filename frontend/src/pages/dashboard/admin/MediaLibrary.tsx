@@ -14,7 +14,10 @@ import {
   FiSearch,
   FiX,
   FiCheck,
-  FiTrash2
+  FiTrash2,
+  FiAlertCircle,
+  FiInfo,
+  FiExternalLink
 } from 'react-icons/fi';
 
 export default function MediaLibrary() {
@@ -25,26 +28,27 @@ export default function MediaLibrary() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'image' | 'video'>('all');
   const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [itemToDelete, setItemToDelete] = useState<MediaItem | null>(null);
   const { user } = useAuth();
-  const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this media?')) return;
 
-    try {
-      await deleteMedia(id);
-      loadMedia();
-    } catch (err) {
-      console.error('Delete failed:', err);
-      alert('Failed to delete media');
-    }
+  // Determine media type from file
+  const getMediaType = (file: File): 'image' | 'video' => {
+    if (file.type.startsWith('image/')) return 'image';
+    if (file.type.startsWith('video/')) return 'video';
+    return 'image'; // default fallback
   };
 
-
+  // Load media from API
   const loadMedia = async () => {
     try {
+      setIsLoading(true);
       const res = await listMedia();
       setMedia(res.data);
     } catch (error) {
       console.error('Failed to load media:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -52,55 +56,91 @@ export default function MediaLibrary() {
     loadMedia(); 
   }, []);
 
+  // Handle file upload
   const handleUpload = async () => {
-    if (!file) return;
+    if (!file || !user) return;
     
     setUploading(true);
     try {
+      // First upload to Cloudinary
       const uploadResponse = await uploadMedia(file);
-      const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
+      
+      // Then create media record
+      const mediaType = getMediaType(file);
       
       await createMedia({ 
         url: uploadResponse.data.url,
+        thumbnail_url: uploadResponse.data.thumbnail_url || uploadResponse.data.url,
         media_type: mediaType,
         caption: caption || file.name,
-        owner: user?.id as number | undefined,
+        file_name: file.name,
+        file_size: file.size,
+        mime_type: file.type,
+        owner: parseInt(user.id) || 0,
         project: null,
         service: null
       });
       
+      // Refresh media list
       await loadMedia();
+      
+      // Reset form
       setFile(null);
       setCaption('');
       const fileInput = document.getElementById('file-upload') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
-    } catch (error) {
+      
+    } catch (error: any) {
       console.error('Upload failed:', error);
-      alert('Failed to upload file. Please try again.');
+      const errorMsg = error.response?.data?.error || 'Failed to upload file. Please try again.';
+      alert(`Upload failed: ${errorMsg}`);
     } finally {
       setUploading(false);
     }
   };
 
+  // Handle delete media
+  const handleDelete = async (item: MediaItem) => {
+    try {
+      await deleteMedia(item.id);
+      loadMedia();
+      setItemToDelete(null);
+    } catch (err) {
+      console.error('Delete failed:', err);
+      alert('Failed to delete media');
+    }
+  };
+
+  // Format file size
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (!bytes) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  // Filter media based on search and filter
   const filteredMedia = media.filter(item => {
     const matchesSearch = (item.caption || '').toLowerCase().includes(search.toLowerCase()) ||
+                         (item.file_name || '').toLowerCase().includes(search.toLowerCase()) ||
                          item.url.toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filter === 'all' || item.media_type === filter;
     return matchesSearch && matchesFilter;
   });
 
+  // Copy URL to clipboard
   const copyToClipboard = (text: string, id: number) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  // Get file icon based on type
+  const getFileIcon = (item: MediaItem) => {
+    if (item.media_type === 'video') return <FiVideo className="h-16 w-16 text-white mb-3 mx-auto opacity-80" />;
+    if (item.mime_type?.includes('pdf')) return <FiFile className="h-16 w-16 text-red-500 mb-3 mx-auto" />;
+    return <FiImage className="h-16 w-16 text-blue-500 mb-3 mx-auto" />;
   };
 
   return (
@@ -119,6 +159,17 @@ export default function MediaLibrary() {
                 <p className="text-white/90 text-lg mt-1">Upload and manage your media files</p>
               </div>
             </div>
+            <div className="flex flex-wrap gap-4 mt-6">
+              <div className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-xl">
+                <span className="text-white font-bold">{media.length} Files</span>
+              </div>
+              <div className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-xl">
+                <span className="text-white font-bold">{formatFileSize(media.reduce((acc, item) => acc + (item.file_size || 0), 0))} Total</span>
+              </div>
+              <div className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-xl">
+                <span className="text-white font-bold">{user?.username || 'Guest'}</span>
+              </div>
+            </div>
           </div>
           <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
           <div className="absolute -top-6 -left-6 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
@@ -130,7 +181,7 @@ export default function MediaLibrary() {
         <div className="grid lg:grid-cols-2 gap-8">
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <label className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-3">
                 <div className="p-1.5 bg-purple-100 rounded-lg">
                   <FiFile className="h-4 w-4 text-purple-600" />
                 </div>
@@ -142,10 +193,15 @@ export default function MediaLibrary() {
                 onChange={(e) => setCaption(e.target.value)}
                 className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all text-gray-900 font-medium placeholder-gray-400"
                 placeholder="Enter a descriptive caption..."
+                disabled={uploading}
               />
+              <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
+                <FiInfo className="h-4 w-4" />
+                <span>Add "hero" to caption for hero section images</span>
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <label className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-3">
                 <div className="p-1.5 bg-purple-100 rounded-lg">
                   <FiUpload className="h-4 w-4 text-purple-600" />
                 </div>
@@ -157,17 +213,33 @@ export default function MediaLibrary() {
                   type="file"
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                   className="hidden"
+                  disabled={uploading}
+                  accept="image/*,video/*"
                 />
                 <label htmlFor="file-upload" className="cursor-pointer block">
-                  <div className="relative group flex items-center justify-center w-full px-6 py-16 border-3 border-dashed border-gray-300 rounded-2xl hover:border-purple-500 transition-all bg-gradient-to-br from-gray-50 to-purple-50/30 hover:from-purple-50 hover:to-purple-100/50">
+                  <div className={`relative group flex items-center justify-center w-full px-6 py-16 border-3 border-dashed rounded-2xl transition-all bg-gradient-to-br from-gray-50 to-purple-50/30 hover:from-purple-50 hover:to-purple-100/50 ${
+                    uploading 
+                      ? 'border-gray-300 cursor-not-allowed opacity-70' 
+                      : 'border-gray-300 hover:border-purple-500'
+                  }`}>
                     <div className="text-center">
-                      <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
-                        <FiUpload className="h-8 w-8 text-white" />
+                      <div className={`mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-transform ${
+                        uploading ? 'animate-pulse' : 'group-hover:scale-110'
+                      }`} style={{
+                        background: uploading 
+                          ? 'linear-gradient(135deg, #a855f7, #ec4899, #f43f5e)' 
+                          : 'linear-gradient(135deg, #8b5cf6, #ec4899)'
+                      }}>
+                        {uploading ? (
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                        ) : (
+                          <FiUpload className="h-8 w-8 text-white" />
+                        )}
                       </div>
                       <p className="text-base text-gray-700 font-semibold mb-2">
-                        <span className="text-purple-600">Click to upload</span> or drag and drop
+                        {uploading ? 'Uploading...' : <span className="text-purple-600">Click to upload</span>} or drag and drop
                       </p>
-                      <p className="text-sm text-gray-500">PNG, JPG, GIF, MP4 up to 10MB</p>
+                      <p className="text-sm text-gray-500">PNG, JPG, GIF, WebP, SVG, MP4 up to 10MB</p>
                     </div>
                   </div>
                 </label>
@@ -186,7 +258,8 @@ export default function MediaLibrary() {
                     </div>
                     <button 
                       onClick={() => setFile(null)}
-                      className="ml-4 p-2.5 text-red-600 hover:bg-red-100 rounded-xl transition-colors"
+                      disabled={uploading}
+                      className="ml-4 p-2.5 text-red-600 hover:bg-red-100 rounded-xl transition-colors disabled:opacity-50"
                     >
                       <FiX className="h-5 w-5" />
                     </button>
@@ -213,13 +286,19 @@ export default function MediaLibrary() {
                   <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                     <FiCheck className="h-3.5 w-3.5 text-white" />
                   </div>
-                  <span className="font-medium">Supported formats: JPG, PNG, GIF, MP4</span>
+                  <span className="font-medium">Supported formats: JPG, PNG, GIF, WebP, SVG, MP4</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                     <FiCheck className="h-3.5 w-3.5 text-white" />
                   </div>
                   <span className="font-medium">Add descriptive captions for better organization</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <FiCheck className="h-3.5 w-3.5 text-white" />
+                  </div>
+                  <span className="font-medium">Use "hero" in caption for hero section images</span>
                 </li>
               </ul>
             </div>
@@ -254,7 +333,7 @@ export default function MediaLibrary() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-gray-200 focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium"
-              placeholder="Search media by name or URL..."
+              placeholder="Search media by name, caption, or URL..."
             />
           </div>
         </div>
@@ -294,109 +373,191 @@ export default function MediaLibrary() {
         </div>
       </div>
 
-      {/* Media Grid */}
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 animate-fade-in" style={{animationDelay: '0.3s'}}>
-        {filteredMedia.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-6">
-            {filteredMedia.map((item) => (
-              <div key={item.id} className="group relative bg-white rounded-2xl border-2 border-gray-200 hover:border-purple-300 hover:shadow-2xl transition-all duration-300 overflow-hidden transform hover:scale-105">
-                <div className="aspect-w-4 aspect-h-3 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden relative">
-                  {item.media_type === 'image' ? (
-                    <img
-                      src={item.url}
-                      alt={item.caption || 'Media file'}
-                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-48 flex items-center justify-center bg-gradient-to-br from-gray-900 to-slate-800">
-                      <div className="text-center">
-                        <FiVideo className="h-16 w-16 text-white mb-3 mx-auto opacity-80" />
-                        <span className="text-white text-sm font-bold">Video File</span>
+      {/* Loading State */}
+      {isLoading ? (
+        <div className="bg-white rounded-2xl shadow-xl p-12 border border-gray-100 text-center animate-fade-in">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-purple-600 border-t-transparent mb-6"></div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">Loading Media Library</h3>
+          <p className="text-gray-600 text-lg">Fetching your media files...</p>
+        </div>
+      ) : (
+        /* Media Grid */
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 animate-fade-in" style={{animationDelay: '0.3s'}}>
+          {filteredMedia.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-6">
+              {filteredMedia.map((item) => (
+                <div key={item.id} className="group relative bg-white rounded-2xl border-2 border-gray-200 hover:border-purple-300 hover:shadow-2xl transition-all duration-300 overflow-hidden transform hover:scale-105">
+                  <div className="aspect-w-4 aspect-h-3 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden relative">
+                    {item.media_type === 'image' && item.url ? (
+                      <img
+                        src={item.thumbnail_url || item.url}
+                        alt={item.caption || 'Media file'}
+                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-48 flex items-center justify-center bg-gradient-to-br from-gray-900 to-slate-800">
+                        {getFileIcon(item)}
+                        {item.media_type === 'video' && (
+                          <span className="text-white text-sm font-bold">Video File</span>
+                        )}
                       </div>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                      {/* COPY URL */}
+                      <button
+                        onClick={() => copyToClipboard(item.url, item.id)}
+                        className={`p-2.5 rounded-xl backdrop-blur-sm font-bold transition-all shadow-lg ${
+                          copiedId === item.id 
+                            ? 'bg-green-500 text-white' 
+                            : 'bg-white/90 hover:bg-white text-gray-700'
+                        }`}
+                        title="Copy URL to clipboard"
+                      >
+                        {copiedId === item.id ? (
+                          <FiCheck className="h-4 w-4" />
+                        ) : (
+                          <FiCopy className="h-4 w-4" />
+                        )}
+                      </button>
 
-                    {/* ✅ COPY */}
-                    <button
-                      onClick={() => copyToClipboard(item.url, item.id)}
-                      className={`p-2.5 rounded-xl backdrop-blur-sm font-bold transition-all shadow-lg ${
-                        copiedId === item.id 
-                          ? 'bg-green-500 text-white' 
-                          : 'bg-white/90 hover:bg-white text-gray-700'
-                      }`}
-                    >
-                      {copiedId === item.id ? (
-                        <FiCheck className="h-4 w-4" />
-                      ) : (
-                        <FiCopy className="h-4 w-4" />
+                      {/* DELETE */}
+                      <button
+                        onClick={() => setItemToDelete(item)}
+                        className="p-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white shadow-lg transition-all"
+                        title="Delete Media"
+                      >
+                        <FiTrash2 className="h-4 w-4" />
+                      </button>
+
+                      {/* OPEN IN NEW TAB */}
+                      <button
+                        onClick={() => window.open(item.url, '_blank')}
+                        className="p-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all"
+                        title="Open in new tab"
+                      >
+                        <FiExternalLink className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="mb-3">
+                      <p className="font-bold text-gray-900 truncate text-base" title={item.caption}>
+                        {item.caption || 'Untitled'}
+                      </p>
+                      {item.caption?.toLowerCase().includes('hero') && (
+                        <span className="inline-block px-2 py-1 bg-gradient-to-r from-yellow-500 to-amber-500 text-white text-xs font-bold rounded-full mt-2">
+                          Hero Image
+                        </span>
                       )}
-                    </button>
-
-                    {/* ✅ DELETE */}
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="p-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white shadow-lg transition-all"
-                      title="Delete Media"
-                    >
-                      <FiTrash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="p-4">
-                  <div className="mb-3">
-                    <p className="font-bold text-gray-900 truncate text-base" title={item.caption}>
-                      {item.caption || 'Untitled'}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className={`px-3 py-1.5 text-xs font-bold rounded-full ${
-                      item.media_type === 'image' 
-                        ? 'bg-blue-100 text-blue-700' 
-                        : 'bg-pink-100 text-pink-700'
-                    }`}>
-                      {item.media_type}
-                    </span>
-                    <button
-                      onClick={() => window.open(item.url, '_blank')}
-                      className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                      title="Download"
-                    >
-                      <FiDownload className="h-4 w-4" />
-                    </button>
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-gray-100">
-                    <div className="text-xs text-gray-500 flex items-center gap-2">
-                      <FiCalendar className="h-3.5 w-3.5" />
-                      {new Date(item.created_at || '').toLocaleDateString()}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className={`px-3 py-1.5 text-xs font-bold rounded-full ${
+                        item.media_type === 'image' 
+                          ? 'bg-blue-100 text-blue-700' 
+                          : item.media_type === 'video'
+                          ? 'bg-pink-100 text-pink-700'
+                          : 'bg-gray-100 text-gray-700'
+                      }`}>
+                        {item.media_type}
+                      </span>
+                      <button
+                        onClick={() => window.open(item.url, '_blank')}
+                        className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                        title="Download"
+                      >
+                        <FiDownload className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
+                      <div className="text-xs text-gray-500 flex items-center gap-2">
+                        <FiCalendar className="h-3.5 w-3.5" />
+                        {new Date(item.created_at || '').toLocaleDateString()}
+                      </div>
+                      {item.file_size && (
+                        <div className="text-xs text-gray-500">
+                          Size: {formatFileSize(item.file_size)}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20">
-            <div className="mx-auto w-28 h-28 bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl flex items-center justify-center mb-6 shadow-inner">
-              <FiImage className="text-5xl text-purple-400" />
+              ))}
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">No media files found</h3>
-            <p className="text-gray-500 text-lg mb-6">
-              {search || filter !== 'all' ? 'Try adjusting your search or filter' : 'Upload your first media file to get started'}
-            </p>
-            {!search && filter === 'all' && (
-              <Button 
-                onClick={() => document.getElementById('file-upload')?.click()}
-                className="flex items-center gap-2 mx-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 text-lg font-bold shadow-xl"
+          ) : (
+            <div className="text-center py-20">
+              <div className="mx-auto w-28 h-28 bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl flex items-center justify-center mb-6 shadow-inner">
+                {search || filter !== 'all' ? (
+                  <FiAlertCircle className="text-5xl text-purple-400" />
+                ) : (
+                  <FiImage className="text-5xl text-purple-400" />
+                )}
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                {search || filter !== 'all' ? 'No matching media found' : 'No media files yet'}
+              </h3>
+              <p className="text-gray-500 text-lg mb-6">
+                {search || filter !== 'all' 
+                  ? 'Try adjusting your search or filter' 
+                  : 'Upload your first media file to get started'
+                }
+              </p>
+              {!search && filter === 'all' && (
+                <Button 
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                  className="flex items-center gap-2 mx-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 text-lg font-bold shadow-xl"
+                >
+                  <FiUpload />
+                  Upload Your First Media
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {itemToDelete && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FiTrash2 className="h-8 w-8 text-red-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Delete Media?</h3>
+              <p className="text-gray-600">
+                Are you sure you want to delete <span className="font-semibold">"{itemToDelete.caption || 'this media'}"</span>? 
+                This action cannot be undone.
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setItemToDelete(null)}
+                className="flex-1 py-3 px-4 border-2 border-gray-300 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-colors"
               >
-                <FiUpload />
-                Upload Media
-              </Button>
-            )}
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(itemToDelete)}
+                className="flex-1 py-3 px-4 bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold rounded-xl hover:opacity-90 transition-all"
+              >
+                Delete
+              </button>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Copy Success Toast */}
+      {copiedId && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-xl z-50 animate-fade-in">
+          <div className="flex items-center gap-2">
+            <FiCheck className="h-5 w-5" />
+            <span className="font-bold">URL copied to clipboard!</span>
+          </div>
+        </div>
+      )}
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes fade-in {
@@ -405,6 +566,14 @@ export default function MediaLibrary() {
         }
         .animate-fade-in {
           animation: fade-in 0.6s ease-out forwards;
+        }
+        @keyframes pulse-gradient {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+        .animate-pulse {
+          animation: pulse-gradient 2s ease-in-out infinite;
+          background-size: 200% 200%;
         }
       `}} />
     </div>

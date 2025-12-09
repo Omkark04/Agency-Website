@@ -35,7 +35,7 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
 
   const closeAuthModal = () => {
     setIsAuthModalOpen(false);
-    setUser(getCurrentUser()); // ✅ Refresh user after login
+    setUser(getCurrentUser()); 
   };
 
   const handleLogout = () => {
@@ -78,7 +78,7 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
     { name: 'Home', href: '#home' },
     { name: 'Services', href: '#services' },
     { name: 'Offers', href: '#offers' },
-    { name: 'Work', href: '#work' },
+    { name: 'Portfolio', href: '#portfolio' }, 
     { name: 'About', href: '#about' },
     { name: 'Testimonials', href: '#testimonials' },
     { name: 'Contact', href: '#contact' },
@@ -113,8 +113,9 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                   key={link.name}
                   href={link.href}
                   onClick={(e) => handleNavigation(e, link.href)}
-                  className="text-gray-700 hover:text-[#00C2A8]"
+                  className="text-gray-700 hover:text-[#00C2A8] transition-colors duration-300 flex items-center gap-1"
                 >
+                  {link.name === 'Portfolio'}
                   {link.name}
                 </a>
               ))}

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import type { PriceCard } from '../../../api/pricecards';
-import api from '../../../api/api';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
 import {
@@ -106,7 +105,7 @@ export default function PriceCardForm({ initial, services, onSaved }: PriceCardF
 
       {/* ✅ PLAN */}
       <div>
-        <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+        <label className="text-sm font-semibold mb-2 flex items-center gap-2">
           <FiGrid /> Plan Type *
         </label>
         <select
@@ -123,7 +122,7 @@ export default function PriceCardForm({ initial, services, onSaved }: PriceCardF
 
       {/* ✅ SERVICE */}
       <div>
-        <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+        <label className="text-sm font-semibold mb-2 flex items-center gap-2">
           <FiPackage /> Service *
         </label>
         <select
@@ -143,7 +142,7 @@ export default function PriceCardForm({ initial, services, onSaved }: PriceCardF
 
       {/* ✅ PRICE */}
       <div>
-        <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+        <label className="text-sm font-semibold mb-2 flex items-center gap-2">
           <FiDollarSign /> Price (₹) *
         </label>
         <Input

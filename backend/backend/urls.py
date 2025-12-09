@@ -5,12 +5,24 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
 from media.views import UploadMediaView
-# Viewsets
-from services.views import ServiceViewSet, DepartmentViewSet, PriceCardViewSet
+
+# Import all viewsets
+from services.views import (
+    ServiceViewSet, DepartmentViewSet, PriceCardViewSet,
+    PricingPlanViewSet, SpecialOfferViewSet, PricingComparisonListView,
+    PricingStatsView, CurrentDealView, OfferStatsView
+)
 from orders.views import OrderViewSet
-from portfolio.views import PortfolioProjectViewSet
+from portfolio.views import (
+    PortfolioProjectViewSet, CaseStudyViewSet, 
+    CaseStudyBySlugView, CaseStudyStatsView
+)
+from testimonials.views import TestimonialViewSet, TestimonialStatsView
 from tasks.views import TaskViewSet
 from media.views import MediaViewSet, UploadMediaView
+
+# Import stats views - ADD THIS
+from stats.views import CompanyStatsView, FeaturedClientsView
 
 # Contacts app
 from contacts.views import ContactSubmissionView
@@ -28,8 +40,12 @@ router.register(r'services', ServiceViewSet)
 router.register(r'price-cards', PriceCardViewSet)
 router.register(r'orders', OrderViewSet)
 router.register(r'portfolio', PortfolioProjectViewSet)
+router.register(r'case-studies', CaseStudyViewSet)
 router.register(r'tasks', TaskViewSet)
 router.register(r'media', MediaViewSet)
+router.register(r'pricing-plans', PricingPlanViewSet)
+router.register(r'special-offers', SpecialOfferViewSet)
+router.register(r'testimonials', TestimonialViewSet)
 
 urlpatterns = [
     # Django Admin
@@ -47,9 +63,22 @@ urlpatterns = [
     # Contact form
     path("api/contact/", include('contacts.urls')),
 
-    # JWT Endpoints (optional but recommended)
+    # JWT Endpoints
     path("auth/jwt/login/", TokenObtainPairView.as_view(), name="jwt-login"),
     path("auth/jwt/refresh/", TokenRefreshView.as_view(), name="jwt-refresh"),
+
+    # Additional endpoints
+    path('api/pricing/comparison/', PricingComparisonListView.as_view(), name='pricing-comparison'),
+    path('api/pricing/stats/', PricingStatsView.as_view(), name='pricing-stats'),
+    path('api/offers/current-deal/', CurrentDealView.as_view(), name='current-deal'),
+    path('api/offers/stats/', OfferStatsView.as_view(), name='offer-stats'),
+    path('api/case-studies/slug/<slug:slug>/', CaseStudyBySlugView.as_view(), name='case-study-by-slug'),
+    path('api/case-studies/stats/', CaseStudyStatsView.as_view(), name='case-study-stats'),
+    path('api/testimonials/stats/', TestimonialStatsView.as_view(), name='testimonial-stats'),
+    
+    # Add these missing endpoints - ADD THESE TWO LINES
+    path('api/company-stats/', CompanyStatsView.as_view(), name='company-stats'),
+    path('api/clients/featured/', FeaturedClientsView.as_view(), name='featured-clients'),
 
 ]
 

@@ -15,7 +15,6 @@ import {
 export default function ServiceForm({
   initial,
   onSaved,
-  departments = [],
 }: any) {
   const [department, setDepartments] = useState<any[]>([]);
   const [title, setTitle] = useState(initial?.title || '');
@@ -104,7 +103,7 @@ export default function ServiceForm({
 
       {/* ✅ TITLE */}
       <div>
-        <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+        <label className=" text-sm font-semibold mb-2 flex items-center gap-2">
           <FiPackage /> Service Title *
         </label>
         <Input
@@ -117,7 +116,7 @@ export default function ServiceForm({
 
       {/* ✅ SHORT DESCRIPTION */}
       <div>
-        <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+        <label className="text-sm font-semibold mb-2 flex items-center gap-2">
           <FiAlignLeft /> Short Description
         </label>
         <textarea
@@ -130,7 +129,7 @@ export default function ServiceForm({
 
       {/* ✅ LONG DESCRIPTION */}
       <div>
-        <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+        <label className="text-sm font-semibold mb-2 flex items-center gap-2">
           <FiFileText /> Long Description
         </label>
         <textarea
@@ -143,7 +142,7 @@ export default function ServiceForm({
 
       {/* ✅ LOGO UPLOAD */}
       <div>
-        <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+        <label className="text-sm font-semibold mb-2 flex items-center gap-2">
           <FiUpload /> Service Logo
         </label>
 
@@ -178,7 +177,7 @@ export default function ServiceForm({
 
       {/* ✅ DEPARTMENT */}
       <div>
-        <label className="block text-sm font-semibold mb-2 flex items-center gap-2">
+        <label className="text-sm font-semibold mb-2 flex items-center gap-2">
           <FiLayers /> Department *
         </label>
         <select

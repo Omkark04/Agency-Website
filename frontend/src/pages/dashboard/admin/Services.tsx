@@ -52,11 +52,6 @@ const Services = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const stats = {
-    total: services.length,
-    active: services.filter(s => s.is_active).length,
-    inactive: services.filter(s => !s.is_active).length,
-  };
 
   return (
     <div className="min-h-screen">

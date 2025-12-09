@@ -4,6 +4,8 @@ import { listOrders } from '../../../api/orders';
 import { listUsers } from '../../../api/users';
 import { listServices } from '../../../api/services';
 import { listDepartments } from '../../../api/departments';
+import { listPortfolios } from '../../../api/portfolio';
+import { FiBriefcase } from 'react-icons/fi';
 import { 
   FiShoppingCart, 
   FiUsers, 
@@ -25,6 +27,8 @@ export const AdminDashboard: React.FC = () => {
   const [departmentsCount, setDepartmentsCount] = useState(0);
   const [revenue, setRevenue] = useState(0);
   const [growth, setGrowth] = useState({ orders: 0, revenue: 0 });
+  const [portfolioCount, setPortfolioCount] = useState(0);
+
 
   useEffect(() => {
     (async () => {
@@ -33,18 +37,21 @@ export const AdminDashboard: React.FC = () => {
           { data: orders },
           { data: users },
           { data: services },
-          { data: departments }
+          { data: departments },
+          { data: portfolios }
         ] = await Promise.all([
           listOrders(),
           listUsers({ role: 'client' }),
           listServices(),
-          listDepartments()
+          listDepartments(),
+          listPortfolios()
         ]);
 
         setOrdersCount(orders.length);
         setClientsCount(users.length);
         setServicesCount(services.length);
         setDepartmentsCount(departments.length);
+        setPortfolioCount(portfolios.length);
         
         const totalRevenue = orders.reduce((sum: number, order: any) => sum + (order.price || 0), 0);
         setRevenue(totalRevenue);
@@ -60,8 +67,6 @@ export const AdminDashboard: React.FC = () => {
   }, []);
 
   return (
-    // REMOVED: <main className="lg:64 w-full min-h-screen">
-    // START DIRECTLY WITH CONTENT:
     <>
       {/* Animated Header with Gradient */}
       <div className="mb-8 animate-fade-in">
@@ -202,6 +207,13 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
         </div>
+        {/* PortFolio Crad */}
+        <div className="bg-white p-6 rounded-xl shadow border text-center">
+          <FiBriefcase className="text-3xl text-purple-600 mx-auto" />
+          <h3 className="text-xl font-bold mt-2">{portfolioCount}</h3>
+          <p className="text-gray-500">Portfolio Projects</p>
+        </div>
+
         
         {/* Performance Card */}
         <div className="rounded-2xl bg-white p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">

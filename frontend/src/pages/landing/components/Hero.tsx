@@ -1,19 +1,68 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle, Image as ImageIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { fetchHeroImages } from '../../../api/media';
+import type { MediaItem } from '../../../api/media';
 
 interface HeroProps {
   onGetStartedClick: () => void;
 }
 
 export const Hero = ({ onGetStartedClick }: HeroProps) => {
+  const [heroImages, setHeroImages] = useState<MediaItem[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
   const stats = [
     { value: '100+', label: 'Happy Clients' },
     { value: '250+', label: 'Projects Completed' },
     { value: '98%', label: 'Satisfaction Rate' },
   ];
 
+  // Fetch hero images on component mount
+  useEffect(() => {
+    loadHeroImages();
+  }, []);
+
+  // Auto-rotate images every 5 seconds
+  useEffect(() => {
+    if (heroImages.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentImageIndex((prevIndex) => 
+          (prevIndex + 1) % heroImages.length
+        );
+      }, 5000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [heroImages.length]);
+
+  const loadHeroImages = async () => {
+    try {
+      setIsLoading(true);
+      const images = await fetchHeroImages();
+      setHeroImages(images);
+    } catch (error) {
+      console.error('Failed to load hero images:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePrevImage = () => {
+    setCurrentImageIndex(prev => 
+      prev === 0 ? heroImages.length - 1 : prev - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex(prev => 
+      (prev + 1) % heroImages.length
+    );
+  };
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white py-20 md:py-32">
+    <section id='home' className="relative overflow-hidden bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white py-20 md:py-32">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
@@ -68,7 +117,7 @@ export const Hero = ({ onGetStartedClick }: HeroProps) => {
             </div>
           </motion.div>
 
-          {/* Right Content - Illustration */}
+          {/* Right Content - Dynamic Hero Image Gallery */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -76,17 +125,107 @@ export const Hero = ({ onGetStartedClick }: HeroProps) => {
             className="relative"
           >
             <div className="relative z-10">
-              <div className="bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-2xl p-1">
+              <div className="bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-2xl p-1 shadow-2xl">
                 <div className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden">
-                  <div className="h-80 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
-                    <span className="text-gray-400 dark:text-gray-600">Business Growth Illustration</span>
-                  </div>
+                  {isLoading ? (
+                    // Loading skeleton
+                    <div className="h-80 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00C2A8] mx-auto mb-4"></div>
+                        <span className="text-gray-400 dark:text-gray-600">Loading images...</span>
+                      </div>
+                    </div>
+                  ) : heroImages.length > 0 ? (
+                    // Image Gallery
+                    <div className="relative h-80 overflow-hidden group">
+                      {/* Main Image */}
+                      <motion.img
+                        key={currentImageIndex}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                        src={heroImages[currentImageIndex]?.url}
+                        alt={heroImages[currentImageIndex]?.caption || 'Hero Business Image'}
+                        className="w-full h-full object-cover"
+                      />
+                      
+                      {/* Image Navigation Arrows */}
+                      {heroImages.length > 1 && (
+                        <>
+                          <button
+                            onClick={handlePrevImage}
+                            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          >
+                            <ArrowRight className="h-5 w-5 rotate-180" />
+                          </button>
+                          <button
+                            onClick={handleNextImage}
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          >
+                            <ArrowRight className="h-5 w-5" />
+                          </button>
+                        </>
+                      )}
+                      
+                      {/* Image Counter */}
+                      {heroImages.length > 1 && (
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-4 py-1 rounded-full text-sm">
+                          {currentImageIndex + 1} / {heroImages.length}
+                        </div>
+                      )}
+                      
+                      {/* Image Caption */}
+                      {heroImages[currentImageIndex]?.caption && (
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                          <p className="text-white text-sm font-medium truncate">
+                            {heroImages[currentImageIndex].caption}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    // Fallback when no images are found
+                    <div className="h-80 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex flex-col items-center justify-center p-6">
+                      <ImageIcon className="h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
+                      <span className="text-gray-400 dark:text-gray-600 text-center">
+                        No hero images found. Upload images with 'hero' in caption.
+                      </span>
+                      <button 
+                        onClick={() => {
+                          // This would open an upload modal in a real app
+                          console.log('Upload hero images');
+                        }}
+                        className="mt-4 text-sm text-[#00C2A8] hover:text-[#0066FF] transition-colors"
+                      >
+                        Upload Hero Images →
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               
+              {/* Image Indicators (Dots) */}
+              {heroImages.length > 1 && (
+                <div className="flex justify-center space-x-2 mt-4">
+                  {heroImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        index === currentImageIndex 
+                          ? 'w-8 bg-gradient-to-r from-[#00C2A8] to-[#0066FF]' 
+                          : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'
+                      }`}
+                      aria-label={`Go to image ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+              
               {/* Floating elements */}
               <motion.div 
-                className="absolute -top-6 -left-6 bg-white dark:bg-gray-800 p-3 rounded-xl shadow-lg"
+                className="absolute -top-6 -left-6 bg-white dark:bg-gray-800 p-3 rounded-xl shadow-lg z-20"
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 3, repeat: Infinity }}
               >
@@ -96,7 +235,7 @@ export const Hero = ({ onGetStartedClick }: HeroProps) => {
               </motion.div>
               
               <motion.div 
-                className="absolute -bottom-6 -right-6 bg-white dark:bg-gray-800 p-3 rounded-xl shadow-lg"
+                className="absolute -bottom-6 -right-6 bg-white dark:bg-gray-800 p-3 rounded-xl shadow-lg z-20"
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 3, delay: 1, repeat: Infinity }}
               >
@@ -112,6 +251,29 @@ export const Hero = ({ onGetStartedClick }: HeroProps) => {
       {/* Background elements */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#00C2A8]/10 to-transparent -z-0" />
       <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#0B2545] to-transparent -z-0" />
+      
+      {/* Animated background dots */}
+      <div className="absolute inset-0 overflow-hidden -z-10">
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-white/10 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, Math.random() * 20 - 10, 0],
+              x: [0, Math.random() * 20 - 10, 0],
+            }}
+            transition={{
+              duration: Math.random() * 3 + 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
+      </div>
     </section>
   );
 };

@@ -13,7 +13,6 @@ export const logout = () => {
   localStorage.removeItem('access');
   localStorage.removeItem('refresh');
   localStorage.removeItem('user');
-  window.location.href = '/login';
 };
 
 export const refreshAuthToken = async (): Promise<boolean> => {

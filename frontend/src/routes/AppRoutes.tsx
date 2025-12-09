@@ -5,14 +5,7 @@ import DashboardLayout from '../pages/DashboardLayout';
 import ClientDashboard from '@/pages/dashboard/client/ClientDashboard';
 // Pages
 import { LandingPage } from '../pages/landing/LandingPage';
-
-// Auth
-import Login from '../pages/Login';
-import Register from '../pages/Register';
-
-// Client
-import Home from '../pages/dashboard/client/Home';
-
+import Portfolio from '@/pages/dashboard/admin/Portfolio';
 // Admin Pages
 import AdminDashboard from '../pages/dashboard/admin/AdminDashboard';
 import Departments from '../pages/dashboard/admin/Departments';
@@ -30,9 +23,6 @@ export const AppRoutes: React.FC = () => {
 
       {/* ✅ PUBLIC */}
       <Route path="/" element={<LandingPage />} />
-      <Route path="/home" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
 
       {/* ✅ PROTECTED DASHBOARD WITH LAYOUT */}
       <Route
@@ -51,6 +41,7 @@ export const AppRoutes: React.FC = () => {
           <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
             <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<AdminDashboard />} />
+            <Route path="/dashboard/portfolio" element={<Portfolio />} />
             <Route path="/dashboard/departments" element={<Departments />} />
             <Route path="/dashboard/services" element={<Services />} />
             <Route path="/dashboard/price-cards" element={<PriceCards />} />
