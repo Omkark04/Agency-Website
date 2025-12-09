@@ -1,3 +1,4 @@
+// components/Services.tsx - FIXED VERSION
 import { useState, useEffect } from 'react';
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -18,6 +19,8 @@ import {
 } from 'react-icons/fa';
 import { listServices } from '../../../api/services';
 import type { Service } from '../../../api/services';
+import { useAuth } from '../../../hooks/useAuth';
+import { AuthModal } from './AuthModal';
 import { FiClock, FiUsers, FiTrendingUp } from 'react-icons/fi';
 
 // Icon mapping from backend with more options
@@ -62,6 +65,8 @@ const bgColorMap = {
   'code': 'bg-gradient-to-br from-sky-50 to-blue-50',
   'mobile': 'bg-gradient-to-br from-rose-50 to-pink-50',
   'brush': 'bg-gradient-to-br from-gray-50 to-slate-50',
+  'users': 'bg-gradient-to-br from-purple-50 to-violet-50',
+  'user-tie': 'bg-gradient-to-br from-indigo-50 to-blue-50',
   'star': 'bg-gradient-to-br from-amber-50 to-yellow-50',
   'check-circle': 'bg-gradient-to-br from-orange-50 to-red-50',
 };
@@ -70,6 +75,8 @@ export const Services = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     fetchServices();
@@ -132,7 +139,8 @@ export const Services = () => {
   }
 
   return (
-    <section id="services" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <>
+      <section id="services" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Section Header */}
         <motion.div 
@@ -271,8 +279,13 @@ export const Services = () => {
                   {/* Action Button */}
                   <button 
                     onClick={() => {
-                      // Navigate to service detail page or open modal
-                      console.log('View service details:', service.id);
+                      // Require authentication for detailed view
+                      if (!isAuthenticated) {
+                        setShowAuthModal(true);
+                      } else {
+                        // Navigate to service detail page or open modal
+                        console.log('View service details:', service.id);
+                      }
                     }}
                     className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 text-gray-700 dark:text-gray-300 hover:from-[#00C2A8] hover:to-[#0066FF] hover:text-white transition-all duration-300 group-hover:shadow-lg"
                   >
@@ -349,6 +362,13 @@ export const Services = () => {
         </motion.div>
       </div>
     </section>
+
+    {/* Auth Modal */}
+    <AuthModal 
+      isOpen={showAuthModal} 
+      onClose={() => setShowAuthModal(false)} 
+    />
+  </>
   );
 };
 

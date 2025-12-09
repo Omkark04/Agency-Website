@@ -30,7 +30,7 @@ export const listServices = (params?: {
   is_active?: boolean;
   is_featured?: boolean;
   department?: number;
-}) => api.get<Service[]>('/api/services/', { params });
+}) => api.get<Service[]>('/api/public/services/', { params });
 
 export const getService = (id: number) => api.get<Service>(`/api/services/${id}/`);
 export const getServiceBySlug = (slug: string) => api.get<Service>(`/api/services/slug/${slug}/`);
