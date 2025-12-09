@@ -40,3 +40,24 @@ export const CardFooter: React.FC<{
 }> = ({ children, className = '' }) => {
   return <div className={`card-footer ${className}`}>{children}</div>;
 };
+
+export const CardContent: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+}> = ({ children, className = '' }) => {
+  return <div className={`card-content ${className}`}>{children}</div>;
+};
+
+export const CardTitle: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+}> = ({ children, className = '' }) => {
+  return <h3 className={`card-title ${className}`}>{children}</h3>;
+};
+
+export const CardDescription: React.FC<{
+  children: React.ReactNode;
+  className?: string;
+}> = ({ children, className = '' }) => {
+  return <p className={`card-description ${className}`}>{children}</p>;
+};
