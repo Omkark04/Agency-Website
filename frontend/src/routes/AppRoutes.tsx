@@ -8,6 +8,7 @@ import { LandingPage } from '../pages/landing/LandingPage';
 import Portfolio from '@/pages/dashboard/admin/Portfolio';
 // Admin Pages
 import AdminDashboard from '../pages/dashboard/admin/AdminDashboard';
+import Offers from '../../src/pages/dashboard/admin/Offers';
 import Departments from '../pages/dashboard/admin/Departments';
 import Services from '../pages/dashboard/admin/Services';
 import PriceCards from '../pages/dashboard/admin/PriceCards';
@@ -48,6 +49,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/dashboard" element={<AdminDashboard />} />
             <Route path="/dashboard/portfolio" element={<Portfolio />} />
             <Route path="/dashboard/departments" element={<Departments />} />
+            <Route path="/dashboard/offers" element={<Offers />} />
             <Route path="/dashboard/services" element={<Services />} />
             <Route path="/dashboard/price-cards" element={<PriceCards />} />
             <Route path="/dashboard/users" element={<Users />} />

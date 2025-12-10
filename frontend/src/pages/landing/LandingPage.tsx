@@ -6,7 +6,6 @@ import { Hero } from './components/Hero';
 import { TrustStrip } from './components/TrustStrip';
 import { Services } from '../landing/components/Services';
 import { Offers } from './components/Offers';
-import CaseStudies from './components/CaseStudies';
 import PortfolioSection from './components/PortfolioSection'; // Add this import
 import Process from './components/Process';
 import { Pricing } from './components/Pricing';
@@ -37,7 +36,6 @@ export const LandingPage = () => {
         <TrustStrip />
         <Services />
         <Offers />
-        <CaseStudies />
         <PortfolioSection /> 
         <Process />
         <Pricing />
