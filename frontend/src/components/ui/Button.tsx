@@ -1,5 +1,5 @@
 import React from 'react';
-type ButtonVariant = 'primary' | 'secondary' | 'outline';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & { 
   isLoading?: boolean; 
@@ -20,7 +20,8 @@ export const Button: React.FC<Props> = ({
   const variantClasses = {
     primary: 'bg-blue-600 hover:bg-blue-700 text-white',
     secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800',
-    outline: 'bg-transparent border border-gray-300 hover:bg-gray-50 text-gray-700'
+    outline: 'bg-transparent border border-gray-300 hover:bg-gray-50 text-gray-700',
+    ghost: 'bg-transparent hover:bg-gray-100 text-gray-700'
   };
 
   return (

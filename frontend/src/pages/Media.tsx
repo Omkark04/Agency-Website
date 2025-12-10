@@ -1,8 +1,8 @@
 import React from 'react';
 
-import api from '../api';
+import api from '../api/api';
 import { useEffect, useState } from 'react';
-import MediaDetail from './MediaDetail';
+import MediaDetail from '../../src/pages/MediaDetail'
 
 interface MediaItem {
   id: string;
@@ -21,8 +21,8 @@ const Media: React.FC = () => {
 
   const fetchMedia = () => {
     setLoading(true);
-    api.get('/media/')
-      .then(res => setMedia(res.data))
+    api.get<MediaItem[]>('/media/')
+      .then((res: { data: MediaItem[] }) => setMedia(res.data))
       .catch(() => setError('Failed to load media'))
       .finally(() => setLoading(false));
   };

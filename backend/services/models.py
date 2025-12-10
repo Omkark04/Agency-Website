@@ -35,7 +35,7 @@ class Service(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
-    logo = models.ImageField(upload_to="services/logos/", null=True, blank=True)
+    logo = models.URLField(null=True, blank=True)
 
     short_description = models.TextField(blank=True)
     long_description = models.TextField(blank=True)
@@ -108,3 +108,77 @@ class PriceCard(models.Model):
     class Meta:
         db_table = "price_cards"
         unique_together = ("title", "service")  # Basic/Medium/Premium must be unique per service
+from django.db import models
+
+# Add these models to your existing services/models.py
+
+class PricingPlan(models.Model):
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    price = models.CharField(max_length=50)  # Could be "Custom" or "$499"
+    price_numeric = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    billing_period = models.CharField(max_length=20, choices=[
+        ('monthly', 'Monthly'),
+        ('yearly', 'Yearly'),
+        ('one_time', 'One Time')
+    ], default='one_time')
+    is_popular = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    features = models.JSONField(default=list, blank=True)
+    gradient_colors = models.CharField(max_length=100, default='from-blue-500 to-purple-500')
+    button_text = models.CharField(max_length=50, default='Get Started')
+    service = models.ForeignKey('Service', on_delete=models.SET_NULL, null=True, blank=True, related_name='pricing_plans')
+    order_index = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = "pricing_plans"
+        ordering = ['order_index', 'price_numeric']
+    
+    def __str__(self):
+        return f"{self.title} - {self.price}"
+
+class PricingComparison(models.Model):
+    id = models.AutoField(primary_key=True)
+    feature = models.CharField(max_length=255)
+    basic = models.CharField(max_length=255)
+    growth = models.CharField(max_length=255)
+    enterprise = models.CharField(max_length=255)
+    is_important = models.BooleanField(default=False)
+    order_index = models.IntegerField(default=0)
+    
+    class Meta:
+        db_table = "pricing_comparisons"
+        ordering = ['order_index']
+    
+    def __str__(self):
+        return self.feature
+
+class SpecialOffer(models.Model):
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    short_description = models.CharField(max_length=200)
+    icon_name = models.CharField(max_length=50, default='star')
+    features = models.JSONField(default=list, blank=True)
+    discount_percentage = models.IntegerField(null=True, blank=True)
+    discount_code = models.CharField(max_length=50, blank=True)
+    valid_from = models.DateTimeField()
+    valid_until = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False)
+    is_limited_time = models.BooleanField(default=False)
+    conditions = models.JSONField(default=list, blank=True)
+    gradient_colors = models.CharField(max_length=100, default='from-red-500 to-orange-500')
+    button_text = models.CharField(max_length=50, default='Claim Offer')
+    button_url = models.URLField(blank=True)
+    order_index = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = "special_offers"
+        ordering = ['order_index', '-is_featured']
+    
+    def __str__(self):
+        return self.title

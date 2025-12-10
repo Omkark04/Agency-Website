@@ -1,12 +1,48 @@
-import { useState, useEffect, useRef, Fragment } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, X, LogIn, UserPlus, LogOut, User } from 'lucide-react';
+import { AuthModal } from './AuthModal';
+import logo from '../../../assets/UdyogWorks logo.png';
+import { getCurrentUser, logout } from '../../../utils/auth';
 
-export const Header = () => {
+const TOP_BAR_HEIGHT = 44;
+
+interface HeaderProps {
+  onAuthButtonClick?: () => void;
+}
+
+export const Header = ({ onAuthButtonClick }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const headerRef = useRef<HTMLElement>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const [user, setUser] = useState<any>(getCurrentUser());
+
+  const headerRef = useRef<HTMLHeadElement>(null);
   const lastScrollY = useRef(0);
+  const navigate = useNavigate();
+
+  const openAuthModal = (mode: 'login' | 'signup') => {
+    if (onAuthButtonClick) {
+      onAuthButtonClick();
+      return;
+    }
+    setAuthMode(mode);
+    setIsAuthModalOpen(true);
+    setIsMobileMenuOpen(false);
+  };
+
+  const closeAuthModal = () => {
+    setIsAuthModalOpen(false);
+    setUser(getCurrentUser()); 
+  };
+
+  const handleLogout = () => {
+    logout();
+    setUser(null);
+    navigate('/');
+  };
 
   const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
     e.preventDefault();
@@ -18,138 +54,157 @@ export const Header = () => {
   };
 
   useEffect(() => {
+    if (headerRef.current) {
+      const height = headerRef.current.offsetHeight;
+      setHeaderHeight(height);
+      document.documentElement.style.setProperty('--header-height', `${height}px`);
+    }
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
-      // Only update the state if the scroll position changes significantly
       if (Math.abs(currentScrollY - lastScrollY.current) > 5) {
         setIsScrolled(currentScrollY > 10);
         lastScrollY.current = currentScrollY;
       }
     };
 
-    const handleClickOutside = (event: MouseEvent) => {
-      if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-
-    // Add event listeners
     window.addEventListener('scroll', handleScroll, { passive: true });
-    document.addEventListener('mousedown', handleClickOutside);
-    
-    // Cleanup
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const navLinks = [
     { name: 'Home', href: '#home' },
     { name: 'Services', href: '#services' },
-    { name: 'Work', href: '#work' },
+    { name: 'Offers', href: '#offers' },
+    { name: 'Portfolio', href: '#portfolio' }, 
     { name: 'About', href: '#about' },
     { name: 'Testimonials', href: '#testimonials' },
     { name: 'Contact', href: '#contact' },
   ];
 
   return (
-    <Fragment>
-      {/* This div creates space to prevent content from being hidden behind fixed header */}
-      <div style={{ height: '120px' }} className="w-full md:hidden"></div>
-      <div style={{ height: '100px' }} className="hidden w-full md:block"></div>
-      
-      <header 
+    <>
+      <div style={{ height: `${headerHeight}px`, minHeight: '64px' }} />
+
+      <header
         ref={headerRef}
         className={`fixed w-full z-40 transition-all duration-300 ${
-          isScrolled ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-md' : 'bg-transparent'
+          isScrolled ? 'bg-white/90 backdrop-blur-md shadow-md' : 'bg-transparent'
         }`}
-        style={{ top: '44px' }} // Height of the TopBar
+        style={{ top: `${TOP_BAR_HEIGHT}px` }}
       >
         <div className="container mx-auto px-4 py-3 max-w-7xl">
           <div className="flex items-center justify-between">
-            {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">UW</span>
-              </div>
+
+            {/* ✅ LOGO */}
+            <Link to="/" className="flex items-center space-x-3">
+              <img src={logo} className="h-12" />
               <span className="text-xl font-bold bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent">
                 UdyogWorks
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
+            {/* ✅ NAV LINKS */}
             <nav className="hidden md:flex items-center space-x-8">
-              {navLinks.map((link) => (
+              {navLinks.map(link => (
                 <a
                   key={link.name}
                   href={link.href}
                   onClick={(e) => handleNavigation(e, link.href)}
-                  className="text-gray-700 dark:text-gray-300 hover:text-[#00C2A8] dark:hover:text-[#00C2A8] font-medium transition-colors duration-200 cursor-pointer"
+                  className="text-gray-700 hover:text-[#00C2A8] transition-colors duration-300 flex items-center gap-1"
                 >
+                  {link.name === 'Portfolio'}
                   {link.name}
                 </a>
               ))}
             </nav>
 
-            {/* CTA Button */}
-            <div className="hidden md:block">
-              <a
-                href="#contact"
-                onClick={(e) => handleNavigation(e, '#contact')}
-                className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-6 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity duration-200 cursor-pointer"
-              >
-                Get Started
-              </a>
+            {/* ✅ AUTH AREA (DESKTOP) */}
+            <div className="hidden md:flex items-center space-x-4">
+
+              {!user ? (
+                <>
+                  <button onClick={() => openAuthModal('login')} className="flex items-center gap-1">
+                    <LogIn size={18} /> Login
+                  </button>
+
+                  <button
+                    onClick={() => openAuthModal('signup')}
+                    className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-4 py-2 rounded-lg flex items-center gap-1"
+                  >
+                    <UserPlus size={18} /> Register
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 text-gray-700 font-medium">
+                    <User size={18} />
+                    Hi, {user.username}
+                  </div>
+
+                  <button
+                    onClick={handleLogout}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-1"
+                  >
+                    <LogOut size={16} /> Logout
+                  </button>
+                </>
+              )}
+
             </div>
 
-            {/* Mobile menu button */}
-            <div className="md:hidden flex items-center">
-              <button
-                className="text-gray-700 dark:text-gray-300 focus:outline-none"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                aria-label="Toggle menu"
-                aria-expanded={isMobileMenuOpen}
-              >
-                {isMobileMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
+            {/* ✅ MOBILE MENU TOGGLE */}
+            <div className="md:hidden">
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                {isMobileMenuOpen ? <X /> : <Menu />}
               </button>
             </div>
           </div>
 
-          {/* Mobile Navigation */}
-          <div 
-            className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
-              isMobileMenuOpen ? 'max-h-96 mt-4 pb-4' : 'max-h-0'
-            }`}
-          >
-            <div className="flex flex-col space-y-4">
-              {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={(e) => handleNavigation(e, link.href)}
-                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors duration-200 cursor-pointer"
-                >
+          {/* ✅ MOBILE MENU */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden mt-4 space-y-3">
+
+              {navLinks.map(link => (
+                <a key={link.name} href={link.href} onClick={(e) => handleNavigation(e, link.href)}>
                   {link.name}
                 </a>
               ))}
-              <a
-                href="#contact"
-                onClick={(e) => handleNavigation(e, '#contact')}
-                className="block text-center bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-4 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity duration-200 cursor-pointer"
-              >
-                Get Started
-              </a>
+
+              {!user ? (
+                <>
+                  <button onClick={() => openAuthModal('login')} className="w-full">
+                    Login
+                  </button>
+
+                  <button onClick={() => openAuthModal('signup')} className="w-full bg-blue-500 text-white py-2">
+                    Register
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="font-semibold text-center">Hi, {user.username}</p>
+
+                  <button onClick={handleLogout} className="w-full bg-red-500 text-white py-2">
+                    Logout
+                  </button>
+                </>
+              )}
             </div>
-          </div>
+          )}
+
         </div>
       </header>
-    </Fragment>
+
+      {/* ✅ AUTH MODAL */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+        defaultMode={authMode}
+      />
+    </>
   );
 };
 

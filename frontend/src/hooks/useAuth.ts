@@ -64,6 +64,8 @@ export const useAuth = () => {
       setAuth({ user, loading: false, error: null });
       navigate('/dashboard');
 
+      return { user };
+
     } catch (error: any) {
       const errorMsg = error.response?.data?.detail || 'Login failed';
       setAuth(prev => ({ ...prev, error: errorMsg, loading: false }));
@@ -72,7 +74,9 @@ export const useAuth = () => {
   };
 
   const register = async (userData: {
+    name: string;
     username: string;
+    phone: string;
     email: string;
     password: string;
     role: string;
@@ -91,6 +95,8 @@ export const useAuth = () => {
       
       setAuth({ user, loading: false, error: null });
       navigate('/dashboard');
+      
+      return { user };
     } catch (error: any) {
       const errorMsg = error.response?.data?.detail || 'Registration failed';
       setAuth(prev => ({ ...prev, error: errorMsg, loading: false }));

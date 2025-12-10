@@ -87,7 +87,9 @@ INSTALLED_APPS = [
     "portfolio",
     "tasks",
     "media",
+    'stats',
     "payments",
+    'testimonials',
     "contacts",
     "notifications",  # Phase 2
     "analytics",      # Phase 2

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { listUsers, deleteUser } from '../../../api/users';
 import { Button } from '../../../components/ui/Button';
+import Modal from '../../../components/ui/Modal';
+import UserForm from './UserForm';
 import { 
   FiUsers, 
   FiTrash2, 
@@ -8,7 +10,7 @@ import {
   FiKey, 
   FiCalendar,
   FiSearch,
-  FiUserPlus,
+  FiPlus,
   FiShield
 } from 'react-icons/fi';
 
@@ -17,6 +19,7 @@ export function Users() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'admin' | 'client' | 'service_head'>('all');
+  const [open, setOpen] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -84,9 +87,10 @@ export function Users() {
                   <p className="text-white/90 text-lg mt-1">Manage system users and their roles</p>
                 </div>
               </div>
-              <Button className="flex items-center gap-2 bg-white text-purple-600 hover:bg-gray-50 px-6 py-3 font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all rounded-xl">
-                <FiUserPlus className="text-xl" />
-                Add User
+              <Button
+                onClick={() => setOpen(true)}
+                className=" flex items-center gap-2 bg-white text-blue-700 px-6 py-3 font-bold rounded-xl"
+              ><FiPlus className='text-black'/> <p className='text-black'>Add User</p>
               </Button>
             </div>
           </div>
@@ -246,6 +250,15 @@ export function Users() {
           animation: fade-in 0.6s ease-out forwards;
         }
       `}} />
+      <Modal open={open} onClose={() => setOpen(false)} title="Create User">
+        <UserForm
+          onSaved={() => {
+            setOpen(false);
+            load(); // ✅ refresh user list
+          }}
+        />
+      </Modal>
+
     </div>
   );
 }
