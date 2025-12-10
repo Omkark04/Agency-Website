@@ -12,7 +12,7 @@ from services.views import (
     PricingPlanViewSet, SpecialOfferViewSet, PricingComparisonListView,
     PricingStatsView, CurrentDealView, OfferStatsView, PublicServiceListView
 )
-from orders.views import OrderViewSet
+from orders.views import OrderViewSet, OfferViewSet
 from portfolio.views import (
     PortfolioProjectViewSet, CaseStudyViewSet, 
     CaseStudyBySlugView, CaseStudyStatsView
@@ -51,7 +51,7 @@ router.register(r'notifications', NotificationViewSet, basename='notification')
 router.register(r'pricing-plans', PricingPlanViewSet)
 router.register(r'special-offers', SpecialOfferViewSet)
 router.register(r'testimonials', TestimonialViewSet)
-
+router.register(r'offers', OfferViewSet)
 urlpatterns = [
     # Django Admin
     path('admin/', admin.site.urls),
@@ -92,6 +92,10 @@ urlpatterns = [
     # Add these missing endpoints - ADD THESE TWO LINES
     path('api/company-stats/', CompanyStatsView.as_view(), name='company-stats'),
     path('api/clients/featured/', FeaturedClientsView.as_view(), name='featured-clients'),
+
+    #Offers
+    path('api/offers/stats/', OfferViewSet.as_view({'get': 'stats'}), name='offer-stats'),
+    path('api/offers/current-deal/', OfferViewSet.as_view({'get': 'current_deal'}), name='current-deal'),
 
 ]
 

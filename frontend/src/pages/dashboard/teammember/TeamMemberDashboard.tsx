@@ -444,14 +444,6 @@ const TeamMemberDashboard = () => {
             >
               <div className="p-4 border-b flex items-center justify-between">
                 <h2 className="text-xl font-bold">TeamMember</h2>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="md:hidden"
-                  onClick={toggleSidebar}
-                >
-                  <X className="h-5 w-5" />
-                </Button>
               </div>
               <nav className="px-2 space-y-1">
                 {menuItems.map((item) => (

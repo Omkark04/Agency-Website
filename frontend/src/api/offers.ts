@@ -1,4 +1,3 @@
-// services/api/offers.ts
 import api from './api';
 
 export interface SpecialOffer {
@@ -6,21 +5,26 @@ export interface SpecialOffer {
   title: string;
   description: string;
   short_description: string;
-  icon_name: string;
-  features: string[];
-  discount_percentage?: number;
+  discount_percent: number;
+  discount_percentage: number;  // Alias for compatibility
   discount_code?: string;
   valid_from: string;
-  valid_until: string;
+  valid_to: string;
+  valid_until: string;  // Alias for compatibility
   is_active: boolean;
   is_featured: boolean;
   is_limited_time: boolean;
-  conditions?: string[];
+  icon_name: string;
   gradient_colors: string;
   button_text: string;
   button_url?: string;
   order_index: number;
+  features: string[];
+  conditions?: string[];
+  remaining_days: number;
+  is_expired: boolean;
   created_at: string;
+  updated_at: string;
 }
 
 export interface LimitedTimeDeal {
@@ -39,14 +43,24 @@ export interface LimitedTimeDeal {
   button_url?: string;
 }
 
-export const listSpecialOffers = (params?: {
+// API Functions
+export const listOffers = (params?: {
   is_active?: boolean;
   is_featured?: boolean;
   is_limited_time?: boolean;
-}) => api.get<SpecialOffer[]>('/api/special-offers/', { params });
+}) => api.get<SpecialOffer[]>('/api/offers/', { params });
 
-export const getCurrentDeal = () => 
-  api.get<LimitedTimeDeal>('/api/offers/current-deal/');
+export const getOffer = (id: number) => 
+  api.get<SpecialOffer>(`/api/offers/${id}/`);
+
+export const createOffer = (data: Partial<SpecialOffer>) => 
+  api.post<SpecialOffer>('/api/offers/', data);
+
+export const updateOffer = (id: number, data: Partial<SpecialOffer>) => 
+  api.put<SpecialOffer>(`/api/offers/${id}/`, data);
+
+export const deleteOffer = (id: number) => 
+  api.delete(`/api/offers/${id}/`);
 
 export const getOfferStats = () =>
   api.get<{
@@ -54,3 +68,9 @@ export const getOfferStats = () =>
     limited_time_offers: number;
     average_discount: number;
   }>('/api/offers/stats/');
+
+export const getCurrentDeal = () => 
+  api.get<LimitedTimeDeal>('/api/offers/current-deal/');
+
+// For backward compatibility
+export const listSpecialOffers = listOffers;

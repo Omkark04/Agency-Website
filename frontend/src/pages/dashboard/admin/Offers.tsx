@@ -1,6 +1,10 @@
-// pages/Offers.tsx
 import { useEffect, useState } from 'react';
-import { listSpecialOffers, getOfferStats, type SpecialOffer } from '../../../api/offers';
+import { 
+  listOffers, 
+  getOfferStats, 
+  deleteOffer, 
+  type SpecialOffer 
+} from '../../../api/offers';
 import Modal from '../../../components/ui/Modal';
 import OffersForm from './OffersForm';
 import { Button } from '../../../components/ui/Button';
@@ -15,7 +19,9 @@ import {
   FiClock,
   FiSearch,
   FiImage,
-  FiExternalLink
+  FiExternalLink,
+  FiGift,
+  FiCheckCircle
 } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 
@@ -29,12 +35,13 @@ const Offers = () => {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'active' | 'featured' | 'limited'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'discount' | 'ending'>('newest');
+  const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
 
   const load = async () => {
     setLoading(true);
     try {
       const [offersRes, statsRes] = await Promise.all([
-        listSpecialOffers(),
+        listOffers(),
         getOfferStats()
       ]);
       setOffers(offersRes.data);
@@ -42,6 +49,10 @@ const Offers = () => {
       setStats(statsRes.data);
     } catch (error) {
       console.error('Failed to load offers:', error);
+      // Fallback to empty arrays
+      setOffers([]);
+      setFilteredOffers([]);
+      setStats({ active_offers: 0, limited_time_offers: 0, average_discount: 0 });
     } finally {
       setLoading(false);
     }
@@ -63,17 +74,18 @@ const Offers = () => {
       filtered = filtered.filter(offer =>
         offer.title.toLowerCase().includes(search.toLowerCase()) ||
         offer.description.toLowerCase().includes(search.toLowerCase()) ||
+        offer.short_description?.toLowerCase().includes(search.toLowerCase()) ||
         offer.discount_code?.toLowerCase().includes(search.toLowerCase())
       );
     }
 
     // Apply status filter
     if (filter === 'active') {
-      filtered = filtered.filter(offer => offer.is_active);
+      filtered = filtered.filter(offer => offer.is_active && !offer.is_expired);
     } else if (filter === 'featured') {
-      filtered = filtered.filter(offer => offer.is_featured);
+      filtered = filtered.filter(offer => offer.is_featured && offer.is_active && !offer.is_expired);
     } else if (filter === 'limited') {
-      filtered = filtered.filter(offer => offer.is_limited_time);
+      filtered = filtered.filter(offer => offer.is_limited_time && offer.is_active && !offer.is_expired);
     }
 
     // Apply sorting
@@ -82,9 +94,9 @@ const Offers = () => {
         case 'newest':
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         case 'discount':
-          return (b.discount_percentage || 0) - (a.discount_percentage || 0);
+          return (b.discount_percentage || b.discount_percent || 0) - (a.discount_percentage || a.discount_percent || 0);
         case 'ending':
-          return new Date(a.valid_until).getTime() - new Date(b.valid_until).getTime();
+          return new Date(a.valid_until || a.valid_to).getTime() - new Date(b.valid_until || b.valid_to).getTime();
         default:
           return 0;
       }
@@ -95,13 +107,20 @@ const Offers = () => {
 
   const onDelete = async (id: number) => {
     if (!confirm('Are you sure you want to delete this offer? This action cannot be undone.')) return;
+    
+    setDeleteLoading(id);
     try {
-      // TODO: Implement delete API call when backend is ready
-      console.log('Delete offer:', id);
-      load();
+      await deleteOffer(id);
+      // Remove from local state
+      setOffers(prev => prev.filter(offer => offer.id !== id));
+      // Reload stats
+      const statsRes = await getOfferStats();
+      setStats(statsRes.data);
     } catch (error) {
       console.error('Failed to delete offer:', error);
-      alert('Failed to delete offer');
+      alert('Failed to delete offer. Please try again.');
+    } finally {
+      setDeleteLoading(null);
     }
   };
 
@@ -122,10 +141,29 @@ const Offers = () => {
 
   const getStatusColor = (offer: SpecialOffer) => {
     if (!offer.is_active) return 'bg-gray-100 text-gray-700';
-    if (getRemainingDays(offer.valid_until) === 0) return 'bg-red-100 text-red-700';
+    if (offer.is_expired || getRemainingDays(offer.valid_until || offer.valid_to) === 0) {
+      return 'bg-red-100 text-red-700';
+    }
     if (offer.is_featured) return 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white';
     if (offer.is_limited_time) return 'bg-gradient-to-r from-pink-500 to-rose-500 text-white';
     return 'bg-green-100 text-green-700';
+  };
+
+  const getIconComponent = (iconName: string) => {
+    const icons: { [key: string]: React.ElementType } = {
+      FiTag: FiTag,
+      FiStar: FiStar,
+      FiClock: FiClock,
+      FiGift: FiGift,
+      FiPercent: FiPercent,
+      FiImage: FiImage,
+      FiCheckCircle: FiCheckCircle
+    };
+    return icons[iconName] || FiTag;
+  };
+
+  const getDiscountDisplay = (offer: SpecialOffer) => {
+    return offer.discount_percentage || offer.discount_percent || 0;
   };
 
   return (
@@ -182,7 +220,9 @@ const Offers = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Avg. Discount</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-1">{stats?.average_discount || 0}%</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">
+                    {stats?.average_discount ? stats.average_discount.toFixed(1) : 0}%
+                  </p>
                 </div>
                 <div className="p-3 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl">
                   <FiPercent className="text-white text-xl" />
@@ -302,126 +342,136 @@ const Offers = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredOffers.map((offer) => (
-              <motion.div
-                key={offer.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                whileHover={{ y: -5 }}
-                className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-200"
-              >
-                {/* Image Section */}
-                <div className="relative h-48 overflow-hidden">
-                  <div className={`w-full h-full bg-gradient-to-br ${offer.gradient_colors} flex items-center justify-center`}>
-                    {offer.icon_name && (
-                      <div className={`text-5xl text-white opacity-80`}>
-                        {offer.icon_name === 'FiImage' ? (
-                          <FiImage />
-                        ) : offer.icon_name === 'FiStar' ? (
-                          <FiStar />
-                        ) : offer.icon_name === 'FiClock' ? (
-                          <FiClock />
-                        ) : (
-                          <FiTag />
-                        )}
+            {filteredOffers.map((offer) => {
+              const IconComponent = getIconComponent(offer.icon_name);
+              const remainingDays = getRemainingDays(offer.valid_until || offer.valid_to);
+              const discount = getDiscountDisplay(offer);
+              
+              return (
+                <motion.div
+                  key={offer.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  whileHover={{ y: -5 }}
+                  className="group bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-200"
+                >
+                  {/* Image Section */}
+                  <div className="relative h-48 overflow-hidden">
+                    <div className={`w-full h-full bg-gradient-to-br ${offer.gradient_colors} flex items-center justify-center`}>
+                      <div className="text-6xl text-white opacity-90">
+                        <IconComponent />
+                      </div>
+                    </div>
+                    
+                    {/* Status Badge */}
+                    <div className="absolute top-4 left-4">
+                      <span className={`px-3 py-1.5 text-xs font-bold rounded-full shadow-lg ${getStatusColor(offer)}`}>
+                        {!offer.is_active ? 'Inactive' : 
+                         offer.is_expired || remainingDays === 0 ? 'Expired' :
+                         offer.is_featured ? 'Featured' :
+                         offer.is_limited_time ? 'Limited' : 'Active'}
+                      </span>
+                    </div>
+                    
+                    {/* Discount Badge */}
+                    <div className="absolute top-4 right-4">
+                      <span className="px-3 py-1.5 text-xs font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-lg">
+                        {discount}% OFF
+                      </span>
+                    </div>
+                    
+                    {/* Discount Code */}
+                    {offer.discount_code && (
+                      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                        <div className="px-4 py-2 bg-black/80 backdrop-blur-sm text-white rounded-lg font-mono text-sm">
+                          Code: {offer.discount_code}
+                        </div>
                       </div>
                     )}
                   </div>
-                  
-                  {/* Status Badge */}
-                  <div className="absolute top-4 left-4">
-                    <span className={`px-3 py-1.5 text-xs font-bold rounded-full shadow-lg ${getStatusColor(offer)}`}>
-                      {!offer.is_active ? 'Inactive' : 
-                       getRemainingDays(offer.valid_until) === 0 ? 'Expired' :
-                       offer.is_featured ? 'Featured' :
-                       offer.is_limited_time ? 'Limited' : 'Active'}
-                    </span>
-                  </div>
-                  
-                  {/* Discount Badge */}
-                  <div className="absolute top-4 right-4">
-                    <span className="px-3 py-1.5 text-xs font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-lg">
-                      {offer.discount_percentage}% OFF
-                    </span>
-                  </div>
-                </div>
 
-                {/* Content Section */}
-                <div className="p-6">
-                  {/* Title */}
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
-                    {offer.title}
-                  </h3>
-                  
-                  {/* Short Description */}
-                  <p className="text-gray-600 mb-4 line-clamp-2">
-                    {offer.short_description || offer.description}
-                  </p>
-                  
-                  {/* Features */}
-                  {offer.features && offer.features.length > 0 && (
-                    <div className="mb-4">
-                      <div className="text-sm font-semibold text-gray-700 mb-2">Features:</div>
-                      <div className="space-y-1">
-                        {offer.features.slice(0, 2).map((feature, index) => (
-                          <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
-                            <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
-                            <span className="line-clamp-1">{feature}</span>
-                          </div>
-                        ))}
-                        {offer.features.length > 2 && (
-                          <div className="text-xs text-orange-600 font-medium">
-                            +{offer.features.length - 2} more features
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Dates */}
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-6">
-                    <div className="flex items-center gap-1">
-                      <FiCalendar className="w-4 h-4" />
-                      <span>Ends: {formatDate(offer.valid_until)}</span>
-                    </div>
-                    {offer.is_limited_time && (
-                      <div className="text-red-600 font-semibold">
-                        {getRemainingDays(offer.valid_until)} days left
+                  {/* Content Section */}
+                  <div className="p-6">
+                    {/* Title */}
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
+                      {offer.title}
+                    </h3>
+                    
+                    {/* Short Description */}
+                    <p className="text-gray-600 mb-4 line-clamp-2">
+                      {offer.short_description || offer.description}
+                    </p>
+                    
+                    {/* Features */}
+                    {offer.features && offer.features.length > 0 && (
+                      <div className="mb-4">
+                        <div className="text-sm font-semibold text-gray-700 mb-2">Features:</div>
+                        <div className="space-y-1">
+                          {offer.features.slice(0, 2).map((feature, index) => (
+                            <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                              <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
+                              <span className="line-clamp-1">{feature}</span>
+                            </div>
+                          ))}
+                          {offer.features.length > 2 && (
+                            <div className="text-xs text-orange-600 font-medium">
+                              +{offer.features.length - 2} more features
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
-                  </div>
-                  
-                  {/* Actions */}
-                  <div className="flex items-center gap-2">
-                    <Button
-                      onClick={() => { setEdit(offer); setOpen(true); }}
-                      className="flex-1 flex items-center justify-center gap-2"
-                    >
-                      <FiEdit2 />
-                      Edit
-                    </Button>
-                    <Button
-                      onClick={() => onDelete(offer.id)}
-                      className="flex items-center gap-2 bg-red-50 text-red-600 hover:bg-red-100"
-                    >
-                      <FiTrash2 />
-                    </Button>
-                    {offer.button_url && (
-                      <a
-                        href={offer.button_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-                        title="View offer"
+                    
+                    {/* Dates */}
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-6">
+                      <div className="flex items-center gap-1">
+                        <FiCalendar className="w-4 h-4" />
+                        <span>Ends: {formatDate(offer.valid_until || offer.valid_to)}</span>
+                      </div>
+                      {offer.is_limited_time && (
+                        <div className={`font-semibold ${remainingDays <= 3 ? 'text-red-600' : 'text-green-600'}`}>
+                          {remainingDays} {remainingDays === 1 ? 'day' : 'days'} left
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Actions */}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={() => { setEdit(offer); setOpen(true); }}
+                        className="flex-1 flex items-center justify-center gap-2"
                       >
-                        <FiExternalLink className="w-5 h-5" />
-                      </a>
-                    )}
+                        <FiEdit2 />
+                        Edit
+                      </Button>
+                      <Button
+                        onClick={() => onDelete(offer.id)}
+                        disabled={deleteLoading === offer.id}
+                        className="flex items-center gap-2 bg-red-50 text-red-600 hover:bg-red-100 min-w-[40px]"
+                      >
+                        {deleteLoading === offer.id ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                        ) : (
+                          <FiTrash2 />
+                        )}
+                      </Button>
+                      {offer.button_url && (
+                        <a
+                          href={offer.button_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                          title="View offer"
+                        >
+                          <FiExternalLink className="w-5 h-5" />
+                        </a>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
         )}
 
