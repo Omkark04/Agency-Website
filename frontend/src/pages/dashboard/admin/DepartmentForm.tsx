@@ -91,7 +91,7 @@ export default function DepartmentForm({ initial, onSaved }: any) {
   return (
     <form onSubmit={submit} className="space-y-6 p-1">
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+        <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
           <FiLayers />
           Department Title *
         </label>
@@ -119,7 +119,7 @@ export default function DepartmentForm({ initial, onSaved }: any) {
 
       {/* Logo Upload */}
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+        <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
           <FiUpload />
           Department Logo
         </label>
@@ -162,7 +162,7 @@ export default function DepartmentForm({ initial, onSaved }: any) {
 
       {/* Team Head Selection */}
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+        <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
           <FiUsers />
           Assign Team Head
         </label>

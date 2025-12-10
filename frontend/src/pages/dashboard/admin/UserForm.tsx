@@ -3,7 +3,6 @@
 
   export default function UserForm({ onSaved }: { onSaved: () => void }) {
     const [loading, setLoading] = useState(false);
-    const [focusedField, setFocusedField] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
 
     const [form, setForm] = useState({

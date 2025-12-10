@@ -16,6 +16,8 @@ import Orders from '../pages/dashboard/admin/Orders';
 import Tasks from '../pages/dashboard/admin/Tasks';
 import MediaLibrary from '../pages/dashboard/admin/MediaLibrary';
 import TeamHeadDashboard from '@/pages/dashboard/teamhead/Teamhead';
+//Team Member
+import TeamMemberDashboard from '@/pages/dashboard/teammember/TeamMemberDashboard';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -35,6 +37,9 @@ export const AppRoutes: React.FC = () => {
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['team_head', 'admin']}/>}>
           <Route path='/team-head-dashboard' element={<TeamHeadDashboard/>}/>
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={['team_member', 'admin']}/>}>
+          <Route path='/team-member-dashboard' element={<TeamMemberDashboard/>}/>
         </Route>
 
           {/* ✅ ADMIN ONLY */}
