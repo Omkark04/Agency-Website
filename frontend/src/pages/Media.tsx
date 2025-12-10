@@ -2,7 +2,8 @@ import React from 'react';
 
 import api from '../api/api';
 import { useEffect, useState } from 'react';
-import MediaDetail from '../components/MediaDetail';
+
+import MediaDetail from '../../src/pages/MediaDetail'
 
 interface MediaItem {
   id: string;

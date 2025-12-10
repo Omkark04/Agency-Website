@@ -1,5 +1,6 @@
-// AdminDashboard.tsx - MODIFIED
+// AdminDashboard.tsx - WITH ANALYTICS
 import React, { useEffect, useState } from 'react';
+import { DashboardMetrics } from '../../../components/analytics/DashboardMetrics';
 import { listOrders } from '../../../api/orders';
 import { listUsers } from '../../../api/users';
 import { listServices } from '../../../api/services';
@@ -10,6 +11,7 @@ import {
   FiShoppingCart, 
   FiUsers, 
   FiPackage, 
+
   FiLayers,
   FiTrendingUp,
   FiDollarSign,
@@ -55,7 +57,7 @@ export const AdminDashboard: React.FC = () => {
         
         const totalRevenue = orders.reduce((sum: number, order: any) => sum + (order.price || 0), 0);
         setRevenue(totalRevenue);
-        
+
         setGrowth({
           orders: 12.5,
           revenue: 8.3
@@ -86,6 +88,12 @@ export const AdminDashboard: React.FC = () => {
           <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
           <div className="absolute -top-6 -left-6 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
         </div>
+      </div>
+
+
+      {/* NEW: Analytics Dashboard Metrics */}
+      <div className="mb-8">
+        <DashboardMetrics />
       </div>
 
       {/* Enhanced KPI Cards with Glassmorphism */}
@@ -277,7 +285,7 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Recent Orders Section - Enhanced */}
-      <div className="rounded-2xl bg-white shadow-xl border border-gray-100 overflow-hidden animate-fade-in" style={{animationDelay: '0.3s'}}>
+      <div className="rounded-2xl bg-white shadow-xl border border-gray-100 overflow-hidden animate-fade-in" style={{ animationDelay: '0.3s' }}>
         <div className="p-6 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
           <div className="flex items-center justify-between">
             <div>
@@ -323,7 +331,7 @@ const RecentOrdersPreview = () => {
   const [orders, setOrders] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     (async () => {
       setLoading(true);
       try {
@@ -366,7 +374,7 @@ const RecentOrdersPreview = () => {
       ) : (
         <div className="space-y-3">
           {orders.map((o, idx) => (
-            <div key={o.id} className="group p-5 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-xl transition-all duration-300 border-2 border-transparent hover:border-blue-200 hover:shadow-lg" style={{animationDelay: `${idx * 0.1}s`}}>
+            <div key={o.id} className="group p-5 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-xl transition-all duration-300 border-2 border-transparent hover:border-blue-200 hover:shadow-lg" style={{ animationDelay: `${idx * 0.1}s` }}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4 flex-1">
                   <div className="relative">
@@ -389,8 +397,8 @@ const RecentOrdersPreview = () => {
                   <div className="text-right hidden sm:block">
                     <div className="text-sm text-gray-500 flex items-center gap-2 justify-end">
                       <FiCalendar className="h-4 w-4" />
-                      {new Date(o.created_at).toLocaleDateString('en-US', { 
-                        month: 'short', 
+                      {new Date(o.created_at).toLocaleDateString('en-US', {
+                        month: 'short',
                         day: 'numeric',
                         year: 'numeric'
                       })}

@@ -11,6 +11,7 @@ from .views import (
     PasswordResetConfirmView,
     UserProfileView,
     GoogleOAuthView,
+    AdminEnvLoginView,
     AdminUserListView,
 )
 
@@ -18,6 +19,7 @@ urlpatterns = [
     path("token/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("google/", GoogleOAuthView.as_view(), name="google_oauth"),
+    path("admin/login/", AdminEnvLoginView.as_view(), name="admin_env_login"),
     path("register/client/", ClientRegisterView.as_view(), name="register_client"),
     path("register/service-head/", ServiceHeadRegisterView.as_view(), name="register_service_head"),
     path("register/team-member/", TeamMemberRegisterView.as_view(), name="register_team_member"),

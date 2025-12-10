@@ -22,6 +22,9 @@ import TaskManager from '@/pages/dashboard/teamhead/TaskManager';
 import TeamMemberDashboard from '@/pages/dashboard/teammember/TeamMemberDashboard';
 import TeamMemberPage from '@/pages/dashboard/teamhead/TeamMember';
 
+// New Pages
+import { NotificationsPage } from '../pages/Notifications';
+
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
@@ -47,6 +50,9 @@ export const AppRoutes: React.FC = () => {
         <Route element={<ProtectedRoute allowedRoles={['team_member', 'admin']}/>}>
           <Route path='/team-member-dashboard' element={<TeamMemberDashboard/>}/>
         </Route>
+
+          {/* ✅ ALL AUTHENTICATED USERS */}
+          <Route path="/notifications" element={<NotificationsPage />} />
 
           {/* ✅ ADMIN ONLY */}
           <Route element={<ProtectedRoute allowedRoles={['admin']} />}>

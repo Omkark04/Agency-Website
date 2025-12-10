@@ -20,12 +20,16 @@ from portfolio.views import (
 from testimonials.views import TestimonialViewSet, TestimonialStatsView
 from tasks.views import TaskViewSet
 from media.views import MediaViewSet, UploadMediaView
+from notifications.views import NotificationViewSet
 
 # Import stats views - ADD THIS
 from stats.views import CompanyStatsView, FeaturedClientsView
 
 # Contacts app
 from contacts.views import ContactSubmissionView
+
+# Health check
+from backend.health import health_check
 
 # JWT Auth
 from rest_framework_simplejwt.views import (
@@ -43,6 +47,7 @@ router.register(r'portfolio', PortfolioProjectViewSet)
 router.register(r'case-studies', CaseStudyViewSet)
 router.register(r'tasks', TaskViewSet)
 router.register(r'media', MediaViewSet)
+router.register(r'notifications', NotificationViewSet, basename='notification')
 router.register(r'pricing-plans', PricingPlanViewSet)
 router.register(r'special-offers', SpecialOfferViewSet)
 router.register(r'testimonials', TestimonialViewSet)
@@ -51,11 +56,17 @@ urlpatterns = [
     # Django Admin
     path('admin/', admin.site.urls),
 
+    # Health check
+    path('healthz', health_check, name='health_check'),
+
     # Public API Routes for regular modules
     path('api/', include(router.urls)),
 
     # Authentication (accounts app)
     path('auth/', include("accounts.urls")),
+
+    # Analytics
+    path('api/analytics/', include('analytics.urls')),
 
     # Image upload
     path("api/upload/", UploadMediaView.as_view()),
