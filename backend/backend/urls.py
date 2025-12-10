@@ -10,7 +10,7 @@ from media.views import UploadMediaView
 from services.views import (
     ServiceViewSet, DepartmentViewSet, PriceCardViewSet,
     PricingPlanViewSet, SpecialOfferViewSet, PricingComparisonListView,
-    PricingStatsView, CurrentDealView, OfferStatsView
+    PricingStatsView, CurrentDealView, OfferStatsView, PublicServiceListView
 )
 from orders.views import OrderViewSet
 from portfolio.views import (
@@ -67,6 +67,8 @@ urlpatterns = [
     path("auth/jwt/login/", TokenObtainPairView.as_view(), name="jwt-login"),
     path("auth/jwt/refresh/", TokenRefreshView.as_view(), name="jwt-refresh"),
 
+    #Public Services
+    path('api/public/services/', PublicServiceListView.as_view(), name='public-services'),
     # Additional endpoints
     path('api/pricing/comparison/', PricingComparisonListView.as_view(), name='pricing-comparison'),
     path('api/pricing/stats/', PricingStatsView.as_view(), name='pricing-stats'),

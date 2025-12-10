@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Mail, Lock, Eye, EyeOff, LogIn, UserPlus, Facebook, Twitter, Github } from 'lucide-react';
+import { X, Eye, EyeOff, LogIn, Facebook, Twitter, Github } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 

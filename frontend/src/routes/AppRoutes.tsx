@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/layout/ProtectedRoute';
 import DashboardLayout from '../pages/DashboardLayout';
-import ClientDashboard from '@/pages/dashboard/client/ClientDashboard';
+import ClientDashboard from '../pages/dashboard/client/clientdashboard';
 // Pages
 import { LandingPage } from '../pages/landing/LandingPage';
 import Portfolio from '@/pages/dashboard/admin/Portfolio';

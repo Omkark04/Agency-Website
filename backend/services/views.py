@@ -3,28 +3,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import Department, PriceCard, Service
 from .serializers import DepartmentSerializer, ServiceSerializer, PriceCardSerializer
 from accounts.permissions import IsAdmin
-
-
-class DepartmentViewSet(viewsets.ModelViewSet):
-    queryset = Department.objects.all().order_by("title")
-    serializer_class = DepartmentSerializer
-    permission_classes = [IsAdmin]
-
-
-class ServiceViewSet(viewsets.ModelViewSet):
-    queryset = Service.objects.all().order_by("department", "title")
-    serializer_class = ServiceSerializer
-    permission_classes = [IsAdmin]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["department"]
-
-
-class PriceCardViewSet(viewsets.ModelViewSet):
-    queryset = PriceCard.objects.all().order_by("service", "price")
-    serializer_class = PriceCardSerializer
-    permission_classes = [IsAdmin]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["service", "department"]
 from rest_framework import viewsets, generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -37,7 +15,26 @@ from .serializers import (
     PricingPlanSerializer, PricingComparisonSerializer, SpecialOfferSerializer
 )
 
-# ... your existing views ...
+class DepartmentViewSet(viewsets.ModelViewSet):
+    queryset = Department.objects.all().order_by("title")
+    serializer_class = DepartmentSerializer
+    permission_classes = [AllowAny]
+
+class ServiceViewSet(viewsets.ModelViewSet):
+    queryset = Service.objects.all().order_by("department", "title")
+    serializer_class = ServiceSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["department"]
+
+
+class PriceCardViewSet(viewsets.ModelViewSet):
+    queryset = PriceCard.objects.all().order_by("service", "price")
+    serializer_class = PriceCardSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["service", "department"]
+
 
 class PricingPlanViewSet(viewsets.ModelViewSet):
     queryset = PricingPlan.objects.filter(is_active=True)
@@ -164,3 +161,11 @@ class OfferStatsView(generics.GenericAPIView):
             'limited_time_offers': limited_time_offers,
             'average_discount': float(avg_discount)
         })
+
+class PublicServiceListView(generics.ListAPIView):
+    """Public endpoint for listing services (no auth required)"""
+    queryset = Service.objects.filter(is_active=True).order_by('department', 'title')
+    serializer_class = ServiceSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['department']
