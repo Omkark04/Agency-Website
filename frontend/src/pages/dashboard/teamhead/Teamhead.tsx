@@ -174,8 +174,8 @@ const TeamHeadDashboard = () => {
                     { id: 'dashboard', icon: <FiBarChart2 />, label: 'Dashboard', path: '' },
                     { id: 'tasks', icon: <FiCheck />, label: 'Task Manager', path: 'task-manager' },
                     { id: 'team', icon: <FiUsers />, label: 'Team Members', path: 'team-members' },
-                    { id: 'analytics', icon: <FiBarChart2 />, label: 'Workload Analytics', path: '#' },
-                    { id: 'approvals', icon: <FiCheck />, label: 'Submissions & Approvals', path: '#' },
+                    { id: 'analytics', icon: <FiBarChart2 />, label: 'Workload Analytics', path: 'workload-analytics' },
+                    { id: 'approvals', icon: <FiCheck />, label: 'Submissions & Approvals', path: 'submissions-approval' },
                   ].map((item) => {
                     const isActive = activeNav === item.id || 
                       (item.path && window.location.pathname.includes(item.path));
