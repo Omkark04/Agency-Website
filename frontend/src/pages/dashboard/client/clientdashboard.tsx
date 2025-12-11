@@ -69,8 +69,9 @@ const announcements = [
 ];
 
 const navigation = [
-  { name: 'Dashboard', href: '#', icon: Home, current: true },
-  { name: 'My Projects', href: '#', icon: Folder, current: false },
+  { name: 'Dashboard', href: '/client-dashboard', icon: Home, current: window.location.pathname === '/client-dashboard' },
+  { name: 'My Projects', href: '/client-dashboard/my-projects', icon: Folder, current: window.location.pathname === '/client-dashboard/my-projects' },
+  { name: 'Services', href: '/client-dashboard/services', icon: Plus, current: window.location.pathname === '/client-dashboard/services' },
   { name: 'Payments', href: '#', icon: CreditCard, current: false },
   { name: 'Messages', href: '#', icon: MessageSquare, current: false },
   { name: 'Downloads', href: '#', icon: Download, current: false },
