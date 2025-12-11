@@ -21,7 +21,9 @@ import {
   FiImage,
   FiExternalLink,
   FiGift,
-  FiCheckCircle
+  FiCheckCircle,
+  FiPackage,
+  FiZap
 } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 
@@ -33,15 +35,15 @@ const Offers = () => {
   const [edit, setEdit] = useState<SpecialOffer | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<'all' | 'active' | 'featured' | 'limited'>('all');
-  const [sortBy, setSortBy] = useState<'newest' | 'discount' | 'ending'>('newest');
+  const [filter, setFilter] = useState<'all' | 'active' | 'featured' | 'limited' | 'seasonal' | 'bundle' | 'launch'>('all');
+  const [sortBy, setSortBy] = useState<'priority' | 'newest' | 'discount' | 'ending'>('priority');
   const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
 
   const load = async () => {
     setLoading(true);
     try {
       const [offersRes, statsRes] = await Promise.all([
-        listOffers(),
+        listOffers({ show_expired: true }), // Show all including expired
         getOfferStats()
       ]);
       setOffers(offersRes.data);
@@ -85,16 +87,26 @@ const Offers = () => {
     } else if (filter === 'featured') {
       filtered = filtered.filter(offer => offer.is_featured && offer.is_active && !offer.is_expired);
     } else if (filter === 'limited') {
-      filtered = filtered.filter(offer => offer.is_limited_time && offer.is_active && !offer.is_expired);
+      filtered = filtered.filter(offer => (offer.is_limited_time || offer.offer_type === 'limited') && offer.is_active && !offer.is_expired);
+    } else if (filter === 'seasonal') {
+      filtered = filtered.filter(offer => offer.offer_type === 'seasonal');
+    } else if (filter === 'bundle') {
+      filtered = filtered.filter(offer => offer.offer_type === 'bundle');
+    } else if (filter === 'launch') {
+      filtered = filtered.filter(offer => offer.offer_type === 'launch');
     }
 
     // Apply sorting
     filtered.sort((a, b) => {
       switch (sortBy) {
+        case 'priority':
+          return (a.priority || 0) - (b.priority || 0);
         case 'newest':
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         case 'discount':
-          return (b.discount_percentage || b.discount_percent || 0) - (a.discount_percentage || a.discount_percent || 0);
+          const discountA = getDiscountDisplay(a);
+          const discountB = getDiscountDisplay(b);
+          return discountB - discountA;
         case 'ending':
           return new Date(a.valid_until || a.valid_to).getTime() - new Date(b.valid_until || b.valid_to).getTime();
         default:
@@ -145,7 +157,10 @@ const Offers = () => {
       return 'bg-red-100 text-red-700';
     }
     if (offer.is_featured) return 'bg-gradient-to-r from-yellow-500 to-amber-500 text-white';
-    if (offer.is_limited_time) return 'bg-gradient-to-r from-pink-500 to-rose-500 text-white';
+    if (offer.offer_type === 'limited') return 'bg-gradient-to-r from-pink-500 to-rose-500 text-white';
+    if (offer.offer_type === 'seasonal') return 'bg-gradient-to-r from-green-500 to-emerald-600 text-white';
+    if (offer.offer_type === 'bundle') return 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white';
+    if (offer.offer_type === 'launch') return 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white';
     return 'bg-green-100 text-green-700';
   };
 
@@ -157,13 +172,34 @@ const Offers = () => {
       FiGift: FiGift,
       FiPercent: FiPercent,
       FiImage: FiImage,
-      FiCheckCircle: FiCheckCircle
+      FiCheckCircle: FiCheckCircle,
+      FiPackage: FiPackage,
+      FiZap: FiZap
     };
     return icons[iconName] || FiTag;
   };
 
   const getDiscountDisplay = (offer: SpecialOffer) => {
-    return offer.discount_percentage || offer.discount_percent || 0;
+    if (offer.discount_percentage !== undefined) return offer.discount_percentage;
+    if (offer.discount_percent !== undefined) return offer.discount_percent;
+    if (offer.discount_type === 'percent') return offer.discount_value;
+    
+    // Calculate percentage from flat discount
+    if (offer.original_price && offer.discounted_price) {
+      return ((offer.original_price - offer.discounted_price) / offer.original_price) * 100;
+    }
+    
+    return 0;
+  };
+
+  const getOfferTypeLabel = (offer: SpecialOffer) => {
+    switch (offer.offer_type) {
+      case 'seasonal': return 'Seasonal';
+      case 'limited': return 'Limited Time';
+      case 'bundle': return 'Bundle';
+      case 'launch': return 'Launch';
+      default: return offer.offer_type;
+    }
   };
 
   return (
@@ -302,6 +338,16 @@ const Offers = () => {
                 <FiClock className="w-4 h-4" />
                 Limited Time
               </button>
+              <button
+                onClick={() => setFilter('seasonal')}
+                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  filter === 'seasonal'
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border'
+                }`}
+              >
+                Seasonal
+              </button>
             </div>
             
             <select
@@ -309,6 +355,7 @@ const Offers = () => {
               onChange={(e) => setSortBy(e.target.value as any)}
               className="border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             >
+              <option value="priority">Priority (Low to High)</option>
               <option value="newest">Newest First</option>
               <option value="discount">Highest Discount</option>
               <option value="ending">Ending Soon</option>
@@ -346,6 +393,7 @@ const Offers = () => {
               const IconComponent = getIconComponent(offer.icon_name);
               const remainingDays = getRemainingDays(offer.valid_until || offer.valid_to);
               const discount = getDiscountDisplay(offer);
+              const offerType = getOfferTypeLabel(offer);
               
               return (
                 <motion.div
@@ -358,26 +406,33 @@ const Offers = () => {
                 >
                   {/* Image Section */}
                   <div className="relative h-48 overflow-hidden">
-                    <div className={`w-full h-full bg-gradient-to-br ${offer.gradient_colors} flex items-center justify-center`}>
-                      <div className="text-6xl text-white opacity-90">
-                        <IconComponent />
+                    {offer.image ? (
+                      <img
+                        src={offer.image}
+                        alt={offer.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className={`w-full h-full bg-gradient-to-br ${offer.gradient_colors} flex items-center justify-center`}>
+                        <div className="text-6xl text-white opacity-90">
+                          <IconComponent />
+                        </div>
                       </div>
-                    </div>
+                    )}
                     
                     {/* Status Badge */}
                     <div className="absolute top-4 left-4">
                       <span className={`px-3 py-1.5 text-xs font-bold rounded-full shadow-lg ${getStatusColor(offer)}`}>
                         {!offer.is_active ? 'Inactive' : 
                          offer.is_expired || remainingDays === 0 ? 'Expired' :
-                         offer.is_featured ? 'Featured' :
-                         offer.is_limited_time ? 'Limited' : 'Active'}
+                         offer.is_featured ? 'Featured' : offerType}
                       </span>
                     </div>
                     
                     {/* Discount Badge */}
                     <div className="absolute top-4 right-4">
                       <span className="px-3 py-1.5 text-xs font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full shadow-lg">
-                        {discount}% OFF
+                        {discount.toFixed(1)}% OFF
                       </span>
                     </div>
                     
@@ -397,6 +452,25 @@ const Offers = () => {
                     <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
                       {offer.title}
                     </h3>
+                    
+                    {/* Offer Type & Price */}
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                        {offerType}
+                      </span>
+                      {offer.discounted_price && (
+                        <div className="text-right">
+                          <span className="text-lg font-bold text-gray-900">
+                            ₹{offer.discounted_price.toLocaleString()}
+                          </span>
+                          {offer.original_price && (
+                            <span className="text-sm text-gray-500 line-through ml-2">
+                              ₹{offer.original_price.toLocaleString()}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
                     
                     {/* Short Description */}
                     <p className="text-gray-600 mb-4 line-clamp-2">
@@ -429,7 +503,7 @@ const Offers = () => {
                         <FiCalendar className="w-4 h-4" />
                         <span>Ends: {formatDate(offer.valid_until || offer.valid_to)}</span>
                       </div>
-                      {offer.is_limited_time && (
+                      {offer.offer_type === 'limited' && (
                         <div className={`font-semibold ${remainingDays <= 3 ? 'text-red-600' : 'text-green-600'}`}>
                           {remainingDays} {remainingDays === 1 ? 'day' : 'days'} left
                         </div>
@@ -456,9 +530,9 @@ const Offers = () => {
                           <FiTrash2 />
                         )}
                       </Button>
-                      {offer.button_url && (
+                      {(offer.cta_link || offer.button_url) && (
                         <a
-                          href={offer.button_url}
+                          href={offer.cta_link || offer.button_url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"

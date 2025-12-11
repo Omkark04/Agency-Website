@@ -67,7 +67,7 @@ class PriceCardSerializer(serializers.ModelSerializer):
         model = PriceCard
         fields = "__all__"
 from rest_framework import serializers
-from .models import PricingPlan, PricingComparison, SpecialOffer
+from .models import PricingPlan, PricingComparison
 
 # Your existing serializers...
 
@@ -97,16 +97,3 @@ class PricingComparisonSerializer(serializers.ModelSerializer):
         model = PricingComparison
         fields = ['id', 'feature', 'basic', 'growth', 'enterprise', 'is_important', 'order_index']
 
-class SpecialOfferSerializer(serializers.ModelSerializer):
-    features = serializers.JSONField()
-    conditions = serializers.JSONField(required=False)
-    
-    class Meta:
-        model = SpecialOffer
-        fields = [
-            'id', 'title', 'description', 'short_description', 'icon_name',
-            'features', 'discount_percentage', 'discount_code', 'valid_from',
-            'valid_until', 'is_active', 'is_featured', 'is_limited_time',
-            'conditions', 'gradient_colors', 'button_text', 'button_url',
-            'order_index', 'created_at'
-        ]

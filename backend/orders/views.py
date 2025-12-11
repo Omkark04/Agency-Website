@@ -1,25 +1,22 @@
+# orders/views.py
 from django.shortcuts import render
-
-from rest_framework import viewsets
-from .models import Order
-from .serializers import OrderSerializer
+from rest_framework import viewsets, status, serializers
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
+from django.db.models import Avg, Q
+from django.utils import timezone
+from .models import Order, Offer
+from .serializers import OrderSerializer, OfferSerializer
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
-from django.shortcuts import render
-from rest_framework import viewsets, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from django.db.models import Avg, Count, Q
-from django.utils import timezone
-from .models import Offer
-from .serializers import OfferSerializer
-
 class OfferViewSet(viewsets.ModelViewSet):
     queryset = Offer.objects.all()
     serializer_class = OfferSerializer
+    parser_classes = [MultiPartParser, FormParser]  # Add this for file uploads
     
     def get_queryset(self):
         queryset = Offer.objects.all()
@@ -34,16 +31,26 @@ class OfferViewSet(viewsets.ModelViewSet):
         if is_featured is not None:
             queryset = queryset.filter(is_featured=is_featured.lower() == 'true')
         
-        # Filter by limited time
+        # Filter by offer type
+        offer_type = self.request.query_params.get('offer_type')
+        if offer_type:
+            queryset = queryset.filter(offer_type=offer_type)
+        
+        # Filter by limited time (legacy support)
         is_limited_time = self.request.query_params.get('is_limited_time')
         if is_limited_time is not None:
-            queryset = queryset.filter(is_limited_time=is_limited_time.lower() == 'true')
+            if is_limited_time.lower() == 'true':
+                queryset = queryset.filter(offer_type='limited')
         
-        # Filter active offers (valid dates)
-        now = timezone.now()
-        queryset = queryset.filter(valid_from__lte=now, valid_to__gte=now)
+        # Filter active offers (valid dates) unless explicitly disabled
+        show_expired = self.request.query_params.get('show_expired')
+        if show_expired is None or show_expired.lower() == 'false':
+            now = timezone.now()
+            queryset = queryset.filter(
+                Q(valid_to__gte=now) | Q(valid_to__isnull=True)
+            )
         
-        return queryset.order_by('order_index', '-created_at')
+        return queryset.order_by('priority', '-created_at')
     
     @action(detail=False, methods=['get'])
     def stats(self, request):
@@ -58,18 +65,27 @@ class OfferViewSet(viewsets.ModelViewSet):
         
         # Limited time offers
         limited_time_offers = Offer.objects.filter(
-            is_limited_time=True,
+            offer_type='limited',
             is_active=True,
             valid_from__lte=now,
             valid_to__gte=now
         ).count()
         
         # Average discount
-        avg_discount = Offer.objects.filter(
+        active_qs = Offer.objects.filter(
             is_active=True,
             valid_from__lte=now,
             valid_to__gte=now
-        ).aggregate(avg=Avg('discount_percent'))['avg'] or 0
+        )
+        
+        avg_discount = 0
+        if active_qs.exists():
+            total_percentage = 0
+            count = 0
+            for offer in active_qs:
+                total_percentage += offer.discount_percentage
+                count += 1
+            avg_discount = total_percentage / count if count > 0 else 0
         
         return Response({
             'active_offers': active_offers,
@@ -94,7 +110,7 @@ class OfferViewSet(viewsets.ModelViewSet):
                 is_active=True,
                 valid_from__lte=now,
                 valid_to__gte=now
-            ).order_by('-discount_percent', '-created_at').first()
+            ).order_by('-priority', '-created_at').first()
         
         if current_deal:
             serializer = self.get_serializer(current_deal)
@@ -109,6 +125,39 @@ class OfferViewSet(viewsets.ModelViewSet):
             'remaining_days': 0,
             'is_active': False,
             'features': ['Subscribe for updates'],
-            'button_text': 'Subscribe',
-            'button_url': '/newsletter'
+            'cta_text': 'Subscribe',
+            'cta_link': '/newsletter'
         })
+
+    def create(self, request, *args, **kwargs):
+        print("=== CREATE OFFER REQUEST ===")
+        print("Request data:", request.data)
+        print("Files:", request.FILES)
+        print("Request content type:", request.content_type)
+        
+        # Handle multipart form data
+        if request.content_type.startswith('multipart/form-data'):
+            # For file uploads, data is in request.data (not request.data)
+            pass
+        
+        # Add serializer validation debug
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            print("=== SERIALIZER ERRORS ===")
+            print("Errors:", serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Save the offer
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except Exception as e:
+            print("=== CREATE ERROR ===")
+            print("Error:", str(e))
+            import traceback
+            traceback.print_exc()
+            return Response(
+                {"error": str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

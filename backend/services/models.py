@@ -155,30 +155,3 @@ class PricingComparison(models.Model):
     def __str__(self):
         return self.feature
 
-class SpecialOffer(models.Model):
-    id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    short_description = models.CharField(max_length=200)
-    icon_name = models.CharField(max_length=50, default='star')
-    features = models.JSONField(default=list, blank=True)
-    discount_percentage = models.IntegerField(null=True, blank=True)
-    discount_code = models.CharField(max_length=50, blank=True)
-    valid_from = models.DateTimeField()
-    valid_until = models.DateTimeField()
-    is_active = models.BooleanField(default=True)
-    is_featured = models.BooleanField(default=False)
-    is_limited_time = models.BooleanField(default=False)
-    conditions = models.JSONField(default=list, blank=True)
-    gradient_colors = models.CharField(max_length=100, default='from-red-500 to-orange-500')
-    button_text = models.CharField(max_length=50, default='Claim Offer')
-    button_url = models.URLField(blank=True)
-    order_index = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        db_table = "special_offers"
-        ordering = ['order_index', '-is_featured']
-    
-    def __str__(self):
-        return self.title

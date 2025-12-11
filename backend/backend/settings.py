@@ -76,8 +76,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "rest_framework_simplejwt.token_blacklist",
-    "django_filters",  # For filtering
-    #cloudinary
+    "django_filters", 
     'cloudinary',
 
     # local apps
@@ -91,14 +90,14 @@ INSTALLED_APPS = [
     "payments",
     'testimonials',
     "contacts",
-    "notifications",  # Phase 2
-    "analytics",      # Phase 2
+    "notifications",
+    "analytics",     
 ]
 
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",           # cors first (important)
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -174,9 +173,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Google OAuth
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
-
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
 
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True

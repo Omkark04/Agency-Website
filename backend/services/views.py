@@ -9,10 +9,10 @@ from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg, Count, Sum
 from django.utils import timezone
-from .models import Department, PriceCard, Service, PricingPlan, PricingComparison, SpecialOffer
+from .models import Department, PriceCard, Service, PricingPlan, PricingComparison
 from .serializers import (
     DepartmentSerializer, ServiceSerializer, PriceCardSerializer,
-    PricingPlanSerializer, PricingComparisonSerializer, SpecialOfferSerializer
+    PricingPlanSerializer, PricingComparisonSerializer
 )
 
 class DepartmentViewSet(viewsets.ModelViewSet):
@@ -78,89 +78,7 @@ class PricingStatsView(generics.GenericAPIView):
             'average_price': float(avg_price)
         })
 
-class SpecialOfferViewSet(viewsets.ModelViewSet):
-    queryset = SpecialOffer.objects.filter(is_active=True)
-    serializer_class = SpecialOfferSerializer
-    permission_classes = [AllowAny]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['is_active', 'is_featured', 'is_limited_time']
-    
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        # Show only current offers
-        now = timezone.now()
-        queryset = queryset.filter(valid_from__lte=now, valid_until__gte=now)
-        queryset = queryset.order_by('order_index', '-is_featured')
-        return queryset
 
-class CurrentDealView(generics.RetrieveAPIView):
-    permission_classes = [AllowAny]
-    
-    def get(self, request):
-        now = timezone.now()
-        
-        # Find the most relevant limited time offer
-        deal = SpecialOffer.objects.filter(
-            is_active=True,
-            is_limited_time=True,
-            valid_from__lte=now,
-            valid_until__gte=now
-        ).order_by('-is_featured', 'valid_until').first()
-        
-        if not deal:
-            return Response({})
-        
-        # Calculate remaining days
-        remaining_days = (deal.valid_until - now).days
-        if remaining_days < 0:
-            remaining_days = 0
-        
-        return Response({
-            'id': deal.id,
-            'title': deal.title,
-            'subtitle': 'Limited Time Offer',
-            'description': deal.description,
-            'discount_percentage': deal.discount_percentage,
-            'valid_until': deal.valid_until,
-            'remaining_days': remaining_days,
-            'is_active': deal.is_active,
-            'features': deal.features,
-            'button_text': deal.button_text,
-            'button_url': deal.button_url
-        })
-
-class OfferStatsView(generics.GenericAPIView):
-    permission_classes = [AllowAny]
-    
-    def get(self, request):
-        now = timezone.now()
-        
-        active_offers = SpecialOffer.objects.filter(
-            is_active=True,
-            valid_from__lte=now,
-            valid_until__gte=now
-        ).count()
-        
-        limited_time_offers = SpecialOffer.objects.filter(
-            is_active=True,
-            is_limited_time=True,
-            valid_from__lte=now,
-            valid_until__gte=now
-        ).count()
-        
-        # Calculate average discount
-        avg_discount = SpecialOffer.objects.filter(
-            is_active=True,
-            discount_percentage__isnull=False,
-            valid_from__lte=now,
-            valid_until__gte=now
-        ).aggregate(avg=Avg('discount_percentage'))['avg'] or 0
-        
-        return Response({
-            'active_offers': active_offers,
-            'limited_time_offers': limited_time_offers,
-            'average_discount': float(avg_discount)
-        })
 
 class PublicServiceListView(generics.ListAPIView):
     """Public endpoint for listing services (no auth required)"""

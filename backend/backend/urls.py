@@ -9,8 +9,8 @@ from media.views import UploadMediaView
 # Import all viewsets
 from services.views import (
     ServiceViewSet, DepartmentViewSet, PriceCardViewSet,
-    PricingPlanViewSet, SpecialOfferViewSet, PricingComparisonListView,
-    PricingStatsView, CurrentDealView, OfferStatsView, PublicServiceListView
+    PricingPlanViewSet, PricingComparisonListView,
+    PricingStatsView,  PublicServiceListView
 )
 from orders.views import OrderViewSet, OfferViewSet
 from portfolio.views import (
@@ -49,7 +49,6 @@ router.register(r'tasks', TaskViewSet)
 router.register(r'media', MediaViewSet)
 router.register(r'notifications', NotificationViewSet, basename='notification')
 router.register(r'pricing-plans', PricingPlanViewSet)
-router.register(r'special-offers', SpecialOfferViewSet)
 router.register(r'testimonials', TestimonialViewSet)
 router.register(r'offers', OfferViewSet)
 urlpatterns = [
@@ -83,8 +82,6 @@ urlpatterns = [
     # Additional endpoints
     path('api/pricing/comparison/', PricingComparisonListView.as_view(), name='pricing-comparison'),
     path('api/pricing/stats/', PricingStatsView.as_view(), name='pricing-stats'),
-    path('api/offers/current-deal/', CurrentDealView.as_view(), name='current-deal'),
-    path('api/offers/stats/', OfferStatsView.as_view(), name='offer-stats'),
     path('api/case-studies/slug/<slug:slug>/', CaseStudyBySlugView.as_view(), name='case-study-by-slug'),
     path('api/case-studies/stats/', CaseStudyStatsView.as_view(), name='case-study-stats'),
     path('api/testimonials/stats/', TestimonialStatsView.as_view(), name='testimonial-stats'),
@@ -95,6 +92,7 @@ urlpatterns = [
 
     #Offers
     path('api/offers/stats/', OfferViewSet.as_view({'get': 'stats'}), name='offer-stats'),
+    path('api/offers/', OfferViewSet.as_view({'create': 'offers'}), name='offers'),
     path('api/offers/current-deal/', OfferViewSet.as_view({'get': 'current_deal'}), name='current-deal'),
 
 ]

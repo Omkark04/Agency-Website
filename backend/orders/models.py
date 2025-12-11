@@ -1,4 +1,7 @@
+# orders/models.py
 from django.db import models
+from django.utils import timezone
+import json
 
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -34,44 +37,74 @@ class Review(models.Model):
     class Meta:
         db_table = "reviews"
 
-import json
-
-from django.db import models
-from django.utils import timezone
-import json
-
 class Offer(models.Model):
+    OFFER_TYPES = [
+        ("seasonal", "Seasonal Offer"),
+        ("limited", "Limited Time"),
+        ("bundle", "Bundle Offer"),
+        ("launch", "Launch Offer"),
+    ]
+    
+    DISCOUNT_TYPES = [
+        ("percent", "Percentage"),
+        ("flat", "Flat Amount"),
+    ]
+    
     id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=200)
     description = models.TextField()
     short_description = models.CharField(max_length=500, blank=True, default='')
-    discount_percent = models.DecimalField(max_digits=5, decimal_places=2)
+    image = models.ImageField(upload_to="offers/", null=True, blank=True)
+    
+    offer_type = models.CharField(max_length=20, choices=OFFER_TYPES, default="seasonal")
+    
+    original_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    discounted_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    
+    discount_type = models.CharField(max_length=20, choices=DISCOUNT_TYPES, default="percent")
+    discount_value = models.DecimalField(max_digits=10, decimal_places=2)
+    
     discount_code = models.CharField(max_length=50, blank=True, default='')
+    terms = models.TextField(blank=True, default='')
+    
     valid_from = models.DateTimeField()
     valid_to = models.DateTimeField()
+    
     is_active = models.BooleanField(default=True)
     is_featured = models.BooleanField(default=False)
-    is_limited_time = models.BooleanField(default=False)
-    icon_name = models.CharField(max_length=50, default='FiTag')
-    gradient_colors = models.CharField(max_length=100, default='from-red-500 to-orange-500')
-    button_text = models.CharField(max_length=50, default='Claim Offer')
+    priority = models.IntegerField(default=0)
+    
+    cta_text = models.CharField(max_length=100, default="Claim Offer")
+    cta_link = models.URLField(blank=True, default='')
+    
+    # Design fields (optional, for backward compatibility)
+    icon_name = models.CharField(max_length=50, default='FiTag', blank=True)
+    gradient_colors = models.CharField(max_length=100, default='from-red-500 to-orange-500', blank=True)
+    button_text = models.CharField(max_length=50, default='Claim Offer', blank=True)
     button_url = models.URLField(blank=True, default='')
-    order_index = models.IntegerField(default=0)
     features = models.TextField(default='[]')  # Store as JSON string
     conditions = models.TextField(default='[]')  # Store as JSON string
     
-    # REMOVE auto_now_add and auto_now for now, add them in a separate migration
-    created_at = models.DateTimeField(default=timezone.now)  # Changed from auto_now_add
-    updated_at = models.DateTimeField(default=timezone.now)  # Changed from auto_now
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         db_table = "offers"
-        ordering = ['order_index', '-created_at']
+        ordering = ['priority', '-created_at']
     
     def save(self, *args, **kwargs):
         # Auto-update updated_at on save
         if self.pk:
             self.updated_at = timezone.now()
+        
+        # Calculate discounted price if not set
+        if self.original_price and not self.discounted_price:
+            if self.discount_type == 'percent':
+                discount_amount = (self.original_price * self.discount_value) / 100
+                self.discounted_price = self.original_price - discount_amount
+            elif self.discount_type == 'flat':
+                self.discounted_price = self.original_price - self.discount_value
+        
         super().save(*args, **kwargs)
     
     def get_features(self):
@@ -103,3 +136,14 @@ class Offer(models.Model):
     @property
     def is_expired(self):
         return self.valid_to < timezone.now()
+    
+    @property
+    def discount_percentage(self):
+        if self.discount_type == 'percent':
+            return float(self.discount_value)
+        elif self.original_price and self.discounted_price:
+            return float(((self.original_price - self.discounted_price) / self.original_price) * 100)
+        return 0
+    
+    def __str__(self):
+        return self.title
