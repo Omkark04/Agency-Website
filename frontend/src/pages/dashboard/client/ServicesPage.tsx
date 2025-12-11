@@ -96,7 +96,7 @@ const ServicesPage = () => {
   // Animation variants are defined inline where used
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div id='Services' className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-20 md:py-32">
         <div className="absolute inset-0 bg-grid-white/10" />

@@ -91,7 +91,7 @@ const ProjectCard = ({ project }: { project: typeof projects[0] }) => {
   const priority = priorities[project.priority as keyof typeof priorities];
   
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div id='Projects' className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-200 dark:border-gray-700 overflow-hidden">
       <div className="p-5">
         <div className="flex justify-between items-start mb-3">
           <div className="flex items-center space-x-2">

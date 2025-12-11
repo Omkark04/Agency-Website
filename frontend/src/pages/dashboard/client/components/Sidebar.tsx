@@ -1,23 +1,31 @@
 import { Link } from 'react-router-dom';
 import { 
-  Home, Folder, Settings, CreditCard, ChevronLeft, Code
+  Home, Folder, Settings, CreditCard, ChevronLeft,ChevronRight, Code
 } from 'lucide-react';
-
-const navigation = [
-  { name: 'Dashboard', href: '#', icon: Home, current: true },
-  { name: 'My Projects', href: '#', icon: Folder, current: false },
-  { name: 'Payments', href: '#', icon: CreditCard, current: false },
-  { name: 'Services', href: '#', icon: Code, current: false },
-  { name: 'Settings', href: '#', icon: Settings, current: false },
-];
 
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
   mobileOpen: boolean;
 }
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+  userRole: string;
+  mobileOpen: boolean;
+}
 
-export default function Sidebar({ isOpen, onToggle, mobileOpen }: SidebarProps) {
+export default function Sidebar({ isOpen,onClose ,onToggle, userRole ,mobileOpen }: SidebarProps) {
+  const navigation = [
+    { title: 'Dashboard', path: '/client-dashboard', roles: ['admin','client'], icon: Home, gradient: 'from-blue-500 to-indigo-600', current: true },
+    { title: 'My Projects', path: '/client-dashboard/my-projects', roles: ['admin','client'], icon: Folder, gradient: 'from-blue-500 to-indigo-600', current: false },
+    { title: 'Payments', path: '/client-dashboard', roles: ['admin','client'], icon: CreditCard, gradient: 'from-blue-500 to-indigo-600' , current: false},
+    { title: 'Services', path: '/client-dashboard', roles: ['admin','client'], icon: Code, gradient: 'from-blue-500 to-indigo-600' , current: false},
+    { title: 'Settins', path: '/client-dashboard', roles: ['admin','client'], icon: Settings, gradient: 'from-blue-500 to-indigo-600', current: false },
+  ];
+  const filteredMenuItems = navigation.filter(item =>
+      item.roles.includes(userRole)
+    );
   return (
     <div className={`fixed inset-y-0 left-0 z-40 w-64 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} ${mobileOpen ? 'translate-x-0' : ''} lg:translate-x-0 transition-transform duration-300 ease-in-out bg-white border-r border-gray-200 flex flex-col`}>
       <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
@@ -30,27 +38,41 @@ export default function Sidebar({ isOpen, onToggle, mobileOpen }: SidebarProps) 
         </div>
         
         {/* Navigation */}
-        <nav className="mt-8 flex-1 px-2 space-y-1">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              to={item.href}
-              className={`group flex items-center px-4 py-3 text-sm font-medium rounded-md ${
-                item.current
-                  ? 'bg-gradient-to-r from-teal-50 to-blue-50 text-teal-600 border-l-4 border-teal-500'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <item.icon
-                className={`mr-3 flex-shrink-0 h-5 w-5 ${
-                  item.current ? 'text-teal-500' : 'text-gray-400 group-hover:text-gray-500'
-                }`}
-                aria-hidden="true"
-              />
-              {item.name}
-            </Link>
-          ))}
-        </nav>
+          <nav className="px-4 py-6 space-y-1.5">
+            {filteredMenuItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              const Icon = item.icon;
+  
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={onClose}
+                  className={`group relative flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 ${
+                    isActive
+                      ? 'bg-gradient-to-r from-white/15 to-white/5 text-white shadow-lg'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {isActive && (
+                    <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b ${item.gradient} rounded-r-full`} />
+                  )}
+  
+                  <div className={`p-2.5 rounded-xl ${
+                    isActive ? `bg-gradient-to-br ${item.gradient}` : 'bg-white/5'
+                  }`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+  
+                  <span className="flex-1 font-semibold text-[15px]">
+                    {item.title}
+                  </span>
+  
+                  <ChevronRight className={`${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+                </Link>
+              );
+            })}
+          </nav>
       </div>
       
       {/* User Profile */}

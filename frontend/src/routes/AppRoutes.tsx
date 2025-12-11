@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from '../components/layout/ProtectedRoute';
 import DashboardLayout from '../pages/DashboardLayout';
 import ClientDashboard from '../pages/dashboard/client/clientdashboard';
-import ServicesPage from '../pages/dashboard/client/services';
+import ServicesPage from '../pages/dashboard/client/ServicesPage';
 import MyProjects from '../pages/dashboard/client/MyProjects';
 // Pages
 import { LandingPage } from '../pages/landing/LandingPage';
@@ -43,15 +43,15 @@ export const AppRoutes: React.FC = () => {
       >
         <Route element={<ProtectedRoute allowedRoles={['client', 'admin']}/>}>
           <Route path='/client-dashboard' element={<ClientDashboard/>}>
-            <Route path='services' element={<ServicesPage/>}/>
-            <Route path='my-projects' element={<MyProjects/>}/>
+            <Route path='/client-dashboard/services' element={<ServicesPage/>}/>
+            <Route path='/client-dashboard/my-projects' element={<MyProjects/>}/>
           </Route>
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['team_head', 'admin']}/>}>
           <Route path='/team-head-dashboard' element={<TeamHeadDashboard/>}>
-            <Route path='task-manager' element={<TaskManager/>}/>
-            <Route path='team-members' element={<TeamMemberPage/>}/>
-            <Route path='submissions-approval' element={<SubmissionsApproval/>}/>
+            <Route path='/team-head-dashboard/task-manager' element={<TaskManager/>}/>
+            <Route path='/team-head-dashboard/team-members' element={<TeamMemberPage/>}/>
+            <Route path='team-head-dashboard/submissions-approval' element={<SubmissionsApproval/>}/>
           </Route>
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['team_member', 'admin']}/>}>
