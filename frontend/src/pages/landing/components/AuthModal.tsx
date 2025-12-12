@@ -58,7 +58,8 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
           localStorage.getItem('role');
 
         if (userRole === 'admin') navigate('/dashboard');
-        else if (userRole === 'team_head') navigate('/team-head-dashboard');
+        else if (userRole === 'service_head' || userRole === 'team_head') navigate('/team-head-dashboard');
+        else if (userRole === 'team_member') navigate('/team-member-dashboard');
         else navigate('/client-dashboard');
 
       } else {
@@ -95,7 +96,7 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
   if (showFAB) {
     return (
       <div className="fixed bottom-8 right-8 z-50">
-        <button 
+        <button
           onClick={() => {
             setMode('login');
             if (!isControlled) setInternalIsOpen(true);

@@ -4,84 +4,68 @@ import { useState, useEffect } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMenu, FiX, FiSearch, FiBell, FiMessageSquare, FiChevronDown, FiLogOut, FiSun, FiMoon, FiChevronRight, FiCheck, FiClock, FiAlertCircle, FiUsers, FiFileText, FiBarChart2, FiPlus } from 'react-icons/fi';
+import {
+  getTeamProjects,
+  getTeamTasks,
+  getTeamMembers,
+  getRecentActivity,
+} from '@/api/teamHeadApi';
+import type { TeamStats, Project, Task, Activity, APITeamMember } from '@/types/teamhead';
 
-// Types (same as before)
-type Project = {
-  id: number;
-  name: string;
-  progress: number;
-  deadline: string;
-  members: string[];
-  status: 'on-track' | 'at-risk' | 'delayed';
-};
 
-type Task = {
-  id: number;
-  title: string;
-  dueDate: string;
-  priority: 'high' | 'medium' | 'low';
-  status: 'todo' | 'in-progress' | 'completed';
-  assignedTo: string;
-};
-
-type TeamMember = {
-  id: number;
-  name: string;
-  role: string;
-  avatar: string;
-  tasks: number;
-  performance: number;
-  status: 'online' | 'offline' | 'away';
-};
-
-type Activity = {
-  id: number;
-  type: 'task' | 'project' | 'approval' | 'message';
-  title: string;
-  description: string;
-  time: string;
-  user: string;
-};
 
 const TeamHeadDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [activeNav, setActiveNav] = useState('dashboard');
   const [isMobile, setIsMobile] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data (same as before)
-  const stats = [
-    { id: 1, title: 'Active Projects', value: 12, change: '+2.5%', icon: <FiFileText /> },
-    { id: 2, title: 'Tasks Assigned', value: 48, change: '+15%', icon: <FiCheck /> },
-    { id: 3, title: 'Tasks Completed', value: 36, change: '+8.3%', icon: <FiCheck /> },
-    { id: 4, title: 'Pending Approvals', value: 7, change: '-2', icon: <FiClock /> },
-    { id: 5, title: 'Team Performance', value: 87, change: '+4.2%', icon: <FiBarChart2 />, isPercentage: true },
-  ];
 
-  const projects: Project[] = [
-    { id: 1, name: 'E-commerce Platform Redesign', progress: 75, deadline: '2023-12-15', members: ['JD', 'AS', 'MP'], status: 'on-track' },
-    { id: 2, name: 'Mobile App Development', progress: 45, deadline: '2024-01-20', members: ['RB', 'TS', 'KL'], status: 'at-risk' },
-    { id: 3, name: 'Marketing Website', progress: 90, deadline: '2023-12-05', members: ['JD', 'MP'], status: 'on-track' },
-  ];
+  // Data states
+  const [stats, setStats] = useState<TeamStats | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [teamMembers, setTeamMembers] = useState<APITeamMember[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
 
-  const tasks: Task[] = [
-    { id: 1, title: 'Review UI Components', dueDate: '2023-12-10', priority: 'high', status: 'in-progress', assignedTo: 'John D.' },
-    { id: 2, title: 'API Integration', dueDate: '2023-12-08', priority: 'high', status: 'todo', assignedTo: 'Sarah K.' },
-    { id: 3, title: 'Client Meeting', dueDate: '2023-12-07', priority: 'medium', status: 'completed', assignedTo: 'You' },
-  ];
 
-  const teamMembers: TeamMember[] = [
-    { id: 1, name: 'John Doe', role: 'Senior Developer', avatar: 'JD', tasks: 8, performance: 92, status: 'online' },
-    { id: 2, name: 'Sarah Kim', role: 'UI/UX Designer', avatar: 'SK', tasks: 5, performance: 88, status: 'away' },
-    { id: 3, name: 'Mike Patel', role: 'Full Stack Dev', avatar: 'MP', tasks: 6, performance: 85, status: 'online' },
-    { id: 4, name: 'Alex Smith', role: 'QA Engineer', avatar: 'AS', tasks: 4, performance: 90, status: 'offline' },
-  ];
+  // Fetch all dashboard data
+  const fetchDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-  const activities: Activity[] = [
-    { id: 1, type: 'task', title: 'Task Completed', description: 'John completed the dashboard UI', time: '10 min ago', user: 'John D.' },
-    { id: 2, type: 'project', title: 'Project Update', description: 'E-commerce platform 75% complete', time: '2 hours ago', user: 'You' },
-    { id: 3, type: 'approval', title: 'Approval Needed', description: '3 designs pending your approval', time: '5 hours ago', user: 'Sarah K.' },
-  ];
+      const [statsData, projectsData, tasksData, membersData, activitiesData] = await Promise.all([
+        getTeamHeadStats(),
+        getTeamProjects(),
+        getTeamTasks(),
+        getTeamMembers(),
+        getRecentActivity()
+      ]);
+
+      setStats(statsData);
+      setProjects(projectsData);
+      setTasks(tasksData);
+      setTeamMembers(membersData);
+      setActivities(activitiesData);
+    } catch (err: any) {
+      console.error('Error fetching dashboard data:', err);
+      setError(err.response?.data?.error || 'Failed to load dashboard data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchDashboardData();
+
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchDashboardData, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Effects
   useEffect(() => {
@@ -106,6 +90,7 @@ const TeamHeadDashboard = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [darkMode]);
+
 
   // Helper functions (same as before)
   const getStatusColor = (status: string) => {
@@ -141,14 +126,13 @@ const TeamHeadDashboard = () => {
       {/* Sidebar */}
       <AnimatePresence>
         {(isSidebarOpen || !isMobile) && (
-          <motion.div 
+          <motion.div
             initial={{ x: isMobile ? -300 : 0 }}
             animate={{ x: 0 }}
             exit={{ x: -300 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className={`fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-800 shadow-lg ${
-              !isMobile ? 'relative' : ''
-            } ${isSidebarOpen && isMobile ? 'z-50' : ''}`}
+            className={`fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-800 shadow-lg ${!isMobile ? 'relative' : ''
+              } ${isSidebarOpen && isMobile ? 'z-50' : ''}`}
           >
             <div className="flex flex-col h-full">
               {/* Logo */}
@@ -159,7 +143,7 @@ const TeamHeadDashboard = () => {
                   </div>
                   <span className="ml-3 text-xl font-semibold text-gray-800 dark:text-white">TeamFlow</span>
                 </div>
-                <button 
+                <button
                   onClick={() => setIsSidebarOpen(false)}
                   className="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 >
@@ -177,19 +161,18 @@ const TeamHeadDashboard = () => {
                     { id: 'analytics', icon: <FiBarChart2 />, label: 'Workload Analytics', path: 'workload-analytics' },
                     { id: 'approvals', icon: <FiCheck />, label: 'Submissions & Approvals', path: 'submissions-approval' },
                   ].map((item) => {
-                    const isActive = activeNav === item.id || 
+                    const isActive = activeNav === item.id ||
                       (item.path && window.location.pathname.includes(item.path));
-                    
+
                     return (
                       <Link
                         key={item.id}
                         to={item.path}
                         onClick={() => setActiveNav(item.id)}
-                        className={`flex items-center w-full px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                          isActive
-                            ? 'bg-gradient-to-r from-teal-500 to-blue-500 text-white'
-                            : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
-                        }`}
+                        className={`flex items-center w-full px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${isActive
+                          ? 'bg-gradient-to-r from-teal-500 to-blue-500 text-white'
+                          : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                          }`}
                       >
                         <span className="mr-3">{item.icon}</span>
                         {item.label}
@@ -226,7 +209,7 @@ const TeamHeadDashboard = () => {
           <div className="flex items-center justify-between h-16 px-4 md:px-6">
             {/* Left side */}
             <div className="flex items-center">
-              <button 
+              <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 lg:hidden mr-3"
               >
@@ -253,7 +236,7 @@ const TeamHeadDashboard = () => {
                 <FiBell size={20} />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
-              <button 
+              <button
                 onClick={() => setDarkMode(!darkMode)}
                 className="p-2 text-gray-500 rounded-lg hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
               >
@@ -284,34 +267,38 @@ const TeamHeadDashboard = () => {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-            {stats.map((stat, index) => (
+            {stats ? [
+              { id: 1, title: 'Active Projects', value: stats.active_projects, change: '+2.5%', icon: <FiFileText /> },
+              { id: 2, title: 'Tasks Assigned', value: stats.tasks_assigned, change: '+15%', icon: <FiCheck /> },
+              { id: 3, title: 'Tasks Completed', value: stats.tasks_completed, change: '+8.3%', icon: <FiCheck /> },
+              { id: 4, title: 'Pending Approvals', value: stats.pending_approvals, change: '-2', icon: <FiClock /> },
+              { id: 5, title: 'Team Performance', value: Math.round(stats.team_performance), change: '+4.2%', icon: <FiBarChart2 />, isPercentage: true },
+            ].map((stat, index) => (
               <motion.div
                 key={stat.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 md:p-6 border border-gray-100 dark:border-gray-700"
+                className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-4 md:p-6 border border-gray-200/50 dark:border-gray-700/50 hover:scale-105 hover:border-teal-200 dark:hover:border-teal-800"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400">{stat.title}</p>
-                    <div className="flex items-baseline mt-1">
-                      <span className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                    <p className="text-xs md:text-sm font-semibold text-gray-500 dark:text-gray-400">{stat.title}</p>
+                    <div className="flex items-baseline mt-2">
+                      <span className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-200 bg-clip-text text-transparent">
                         {stat.value}{stat.isPercentage ? '%' : ''}
                       </span>
-                      <span className={`ml-2 text-xs md:text-sm font-medium ${
-                        stat.change.startsWith('+') ? 'text-green-500' : 'text-red-500'
-                      }`}>
+                      <span className={`ml-2 text-xs md:text-sm font-semibold px-2 py-0.5 rounded-full ${stat.change.startsWith('+') ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'}`}>
                         {stat.change}
                       </span>
                     </div>
                   </div>
-                  <div className="p-2 md:p-3 rounded-lg bg-gradient-to-br from-teal-100 to-blue-100 dark:from-teal-900/30 dark:to-blue-900/30 text-teal-600 dark:text-teal-400">
+                  <div className="p-3 md:p-4 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-500 dark:from-teal-600 dark:to-cyan-600 text-white shadow-lg shadow-teal-500/30">
                     {stat.icon}
                   </div>
                 </div>
               </motion.div>
-            ))}
+            )) : <p className="col-span-5 text-center text-gray-500">Loading stats...</p>}
           </div>
 
           {/* Projects Section */}
@@ -339,7 +326,7 @@ const TeamHeadDashboard = () => {
                       <span>{project.progress}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2 mb-3 dark:bg-gray-700">
-                      <div 
+                      <div
                         className={`h-2 rounded-full ${getStatusColor(project.status)}`}
                         style={{ width: `${project.progress}%` }}
                       ></div>
@@ -347,7 +334,7 @@ const TeamHeadDashboard = () => {
                     <div className="flex items-center justify-between text-xs md:text-sm">
                       <div className="flex -space-x-2">
                         {project.members.map((member, i) => (
-                          <div 
+                          <div
                             key={i}
                             className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-r from-teal-500 to-blue-500 flex items-center justify-center text-white text-xs font-semibold border-2 border-white dark:border-gray-800"
                           >
@@ -384,9 +371,9 @@ const TeamHeadDashboard = () => {
                       <div className="ml-3 flex-1 min-w-0">
                         <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate">{task.title}</h4>
                         <div className="flex items-center mt-1 text-xs text-gray-500 dark:text-gray-400 flex-wrap">
-                          <span>Assigned to {task.assignedTo}</span>
+                          <span>Assigned to {task.assignee?.name || 'Unassigned'}</span>
                           <span className="mx-2 hidden sm:inline">•</span>
-                          <span className="mt-1 sm:mt-0">Due {task.dueDate}</span>
+                          <span className="mt-1 sm:mt-0">Due {task.due_date}</span>
                         </div>
                       </div>
                       <button className="ml-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 flex-shrink-0">
@@ -404,7 +391,7 @@ const TeamHeadDashboard = () => {
                     </span>
                   </div>
                   <div className="space-y-3">
-                    {tasks.filter(t => t.dueDate === new Date().toISOString().split('T')[0]).map((task) => (
+                    {tasks.filter(t => t.due_date === new Date().toISOString().split('T')[0]).map((task) => (
                       <div key={task.id} className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
                         <div className="flex items-center">
                           <div className="flex-shrink-0">
@@ -412,7 +399,7 @@ const TeamHeadDashboard = () => {
                           </div>
                           <div className="ml-3 min-w-0">
                             <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200 truncate">{task.title}</p>
-                            <p className="text-xs text-yellow-700 dark:text-yellow-300 truncate">Due today • {task.assignedTo}</p>
+                            <p className="text-xs text-yellow-700 dark:text-yellow-300 truncate">Due today • {task.assignee?.name || 'Unassigned'}</p>
                           </div>
                         </div>
                       </div>
@@ -498,20 +485,20 @@ const TeamHeadDashboard = () => {
                   <div key={member.id} className="flex items-center p-2 md:p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors">
                     <div className="relative">
                       <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-teal-500 to-blue-500 flex items-center justify-center text-white font-semibold">
-                        {member.avatar}
+                        {member.username?.substring(0, 2).toUpperCase() || 'TM'}
                       </div>
                       <span className={`absolute bottom-0 right-0 block w-2 h-2 md:w-2.5 md:h-2.5 rounded-full ring-2 ring-white dark:ring-gray-800 ${getStatusIcon(member.status)}`}></span>
                     </div>
                     <div className="ml-3 min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{member.name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{member.role}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{member.username}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{member.email}</p>
                     </div>
                     <div className="ml-2 text-right">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{member.tasks} tasks</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{member.pending_tasks || 0} tasks</p>
                       <div className="w-16 md:w-20 bg-gray-200 rounded-full h-1.5 dark:bg-gray-700 mt-1">
-                        <div 
+                        <div
                           className="bg-gradient-to-r from-teal-500 to-blue-500 h-1.5 rounded-full"
-                          style={{ width: `${member.performance}%` }}
+                          style={{ width: `${member.performance || 0}%` }}
                         ></div>
                       </div>
                     </div>
@@ -539,9 +526,9 @@ const TeamHeadDashboard = () => {
                   <div key={activity.id} className="flex items-start pb-3 md:pb-4 border-b border-gray-100 dark:border-gray-700 last:border-0 last:pb-0">
                     <div className="flex-shrink-0 mt-0.5">
                       <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center text-teal-600 dark:text-teal-400">
-                        {activity.type === 'task' ? <FiCheck size={14} /> : 
-                         activity.type === 'project' ? <FiFileText size={14} /> : 
-                         activity.type === 'approval' ? <FiCheck size={14} /> : <FiMessageSquare size={14} />}
+                        {activity.type === 'task' ? <FiCheck size={14} /> :
+                          activity.type === 'project' ? <FiFileText size={14} /> :
+                            activity.type === 'approval' ? <FiCheck size={14} /> : <FiMessageSquare size={14} />}
                       </div>
                     </div>
                     <div className="ml-3 min-w-0 flex-1">

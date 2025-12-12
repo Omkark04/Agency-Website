@@ -1,0 +1,65 @@
+# Add these imports at the top
+from tasks.serializers import TaskSerializer
+
+
+# Add these new view classes at the end of team_head_views.py
+
+class TeamTaskCreateView(generics.CreateAPIView):
+    """
+    Create a new task for the team head's service
+    """
+    serializer_class = TaskSerializer
+    permission_classes = [IsTeamHead]
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        service = user.service
+
+        if not service:
+            raise ValueError("Team head must be assigned to a service")
+
+        # Get the order from request data
+        order_id = self.request.data.get('order')
+        if not order_id:
+            raise ValueError("Order ID is required")
+
+        # Verify the order belongs to this service
+        try:
+            order = Order.objects.get(id=order_id, service=service)
+        except Order.DoesNotExist:
+            raise ValueError("Order not found or doesn't belong to your service")
+
+        serializer.save(order=order)
+
+
+class TeamTaskDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Get, update, or delete a specific task
+    """
+    serializer_class = TaskSerializer
+    permission_classes = [IsTeamHead]
+
+    def get_queryset(self):
+        user = self.request.user
+        service = user.service
+
+        if not service:
+            return Task.objects.none()
+
+        # Only return tasks for orders in this service
+        return Task.objects.filter(order__service=service).select_related('assignee', 'order')
+
+    def perform_update(self, serializer):
+        # Ensure the task still belongs to the service
+        task = self.get_object()
+        if task.order.service != self.request.user.service:
+            raise ValueError("Cannot update task from another service")
+        
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        # Ensure the task belongs to the service
+        if instance.order.service != self.request.user.service:
+            raise ValueError("Cannot delete task from another service")
+        
+        instance.delete()

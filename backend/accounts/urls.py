@@ -14,6 +14,17 @@ from .views import (
     AdminEnvLoginView,
     AdminUserListView,
 )
+from .team_head_views import (
+    TeamHeadStatsView,
+    TeamMembersListView,
+    TeamMemberDetailView,
+    TeamProjectsListView,
+    TeamTasksListView,
+    TeamTaskCreateView,
+    TeamTaskDetailView,
+    TeamPerformanceView,
+    RecentActivityView,
+)
 
 urlpatterns = [
     path("token/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
@@ -27,4 +38,15 @@ urlpatterns = [
     path("password/reset/confirm/<uidb64>/<token>/", PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("profile/", UserProfileView.as_view(), name="user_profile"),
     path("admin/users/", AdminUserListView.as_view()),
+    
+    # Team Head Dashboard Routes
+    path("team-head/stats/", TeamHeadStatsView.as_view(), name="team_head_stats"),
+    path("team-head/members/", TeamMembersListView.as_view(), name="team_members_list"),
+    path("team-head/members/<int:pk>/", TeamMemberDetailView.as_view(), name="team_member_detail"),
+    path("team-head/projects/", TeamProjectsListView.as_view(), name="team_projects"),
+    path("team-head/tasks/", TeamTasksListView.as_view(), name="team_tasks"),
+    path("team-head/tasks/create/", TeamTaskCreateView.as_view(), name="team_task_create"),
+    path("team-head/tasks/<int:pk>/", TeamTaskDetailView.as_view(), name="team_task_detail"),
+    path("team-head/performance/", TeamPerformanceView.as_view(), name="team_performance"),
+    path("team-head/activity/", RecentActivityView.as_view(), name="recent_activity"),
 ]
