@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 import cloudinary.uploader
 from .models import Media
@@ -34,7 +34,7 @@ class MediaViewSet(viewsets.ModelViewSet):
         return queryset
 
 class UploadMediaView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]  # Allow public uploads for form submissions
 
     def post(self, request):
         file = request.FILES.get("file")
@@ -96,7 +96,7 @@ class UploadMediaView(APIView):
                 file_name=file.name,
                 file_size=file.size,
                 mime_type=file.content_type,
-                owner=request.user,
+                owner=request.user if request.user.is_authenticated else None,
                 public_id=upload_result.get('public_id'),
                 project_id=request.data.get('project'),
                 service_id=request.data.get('service')

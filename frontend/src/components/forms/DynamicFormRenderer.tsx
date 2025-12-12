@@ -111,12 +111,8 @@ const DynamicFormRenderer = ({ serviceId, onSuccess }: DynamicFormRendererProps)
         const urls: string[] = [];
         
         for (const file of files) {
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('caption', `Form submission - ${form?.title}`);
-          
           try {
-            const response = await uploadMedia(formData);
+            const response = await uploadMedia(file, `Form submission - ${form?.title}`);
             urls.push(response.data.url);
           } catch (error) {
             console.error('Error uploading file:', error);

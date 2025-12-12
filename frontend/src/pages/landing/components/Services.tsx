@@ -216,16 +216,24 @@ export const Services = () => {
 
                 {/* Service Content */}
                 <div className="p-8">
-                  {/* Service Title */}
+                  {/* Service Title & Department */}
                   <div className="mb-4">
-                    <h3 className="text-xl font-bold text-gray-800 dark:text-white line-clamp-1">
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-white line-clamp-1 mb-2">
                       {service.title}
                     </h3>
-                    {service.department_title && (
-                      <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 text-gray-600 dark:text-gray-300 mt-2 inline-block">
-                        {service.department_title}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {service.department_title && (
+                        <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 text-gray-600 dark:text-gray-300">
+                          {service.department_title}
+                        </span>
+                      )}
+                      {/* Pricing Badge */}
+                      {service.original_price && service.original_price > 0 && (
+                        <span className="px-3 py-1 text-xs font-bold rounded-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white">
+                          Starting at ₹{service.original_price.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Short Description */}
@@ -279,7 +287,7 @@ export const Services = () => {
                     </div>
                   </div>
 
-                  {/* Action Button */}
+                  {/* Action Button - Enhanced */}
                   <button 
                     onClick={() => {
                       // Require authentication to fill form
@@ -291,9 +299,9 @@ export const Services = () => {
                         setShowFormModal(true);
                       }
                     }}
-                    className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 text-gray-700 dark:text-gray-300 hover:from-[#00C2A8] hover:to-[#0066FF] hover:text-white transition-all duration-300 group-hover:shadow-lg"
+                    className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white font-semibold hover:shadow-xl hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-[1.02]"
                   >
-                    <span className="font-semibold">Learn More</span>
+                    <span>Get Started</span>
                     <FaChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>
@@ -375,20 +383,31 @@ export const Services = () => {
 
     {/* Form Modal */}
     {showFormModal && selectedServiceId && (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto my-8">
-          <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between z-10">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent">
-              Service Inquiry Form
-            </h2>
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto my-8 shadow-2xl">
+          {/* Enhanced Modal Header */}
+          <div className="sticky top-0 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] p-6 flex items-center justify-between z-10 rounded-t-2xl">
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-white mb-1">
+                {services.find(s => s.id === selectedServiceId)?.title || 'Service'} Request
+              </h2>
+              <p className="text-white/90 text-sm">
+                Fill out the form below to get started with this service
+              </p>
+              {services.find(s => s.id === selectedServiceId)?.original_price && (
+                <div className="mt-2 inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-semibold">
+                  Starting at ₹{services.find(s => s.id === selectedServiceId)?.original_price?.toLocaleString()}
+                </div>
+              )}
+            </div>
             <button
               onClick={() => {
                 setShowFormModal(false);
                 setSelectedServiceId(null);
               }}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors ml-4"
             >
-              <FiX className="h-6 w-6 text-gray-500" />
+              <FiX className="h-6 w-6 text-white" />
             </button>
           </div>
           

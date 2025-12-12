@@ -20,6 +20,7 @@ export interface Service {
   gradient_colors: string; // e.g., "from-[#00C2A8] to-[#00A5C2]"
   is_featured: boolean;
   is_active: boolean;
+  original_price?: number; // Pricing for the service
   features: ServiceFeature[];
   created_by?: any | null;
   created_at?: string;

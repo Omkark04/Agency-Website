@@ -167,7 +167,8 @@ class ServiceFormSubmissionSerializer(serializers.ModelSerializer):
                 user=admin,
                 title="New Form Submission",
                 message=f"New submission for {submission.service.title} - {submission.form.title}. Order #{order.id} created.",
-                link=f"/dashboard/orders"
+                notification_type='order_update',
+                order=order
             )
         
         # Notify service/department head
@@ -177,7 +178,8 @@ class ServiceFormSubmissionSerializer(serializers.ModelSerializer):
                 user=team_head,
                 title="New Form Submission",
                 message=f"New submission for {submission.service.title}. Order #{order.id} created.",
-                link=f"/dashboard/orders"
+                notification_type='order_update',
+                order=order
             )
         
         # TODO: Send email notifications

@@ -17,9 +17,12 @@ export interface MediaItem {
 }
 
 export const listMedia = (params?: any) => api.get<MediaItem[]>('/api/media/', { params });
-export const uploadMedia = (file: File) => {
+export const uploadMedia = (file: File, caption?: string) => {
   const data = new FormData();
   data.append('file', file);
+  if (caption) {
+    data.append('caption', caption);
+  }
   return api.post('/api/upload/', data, { headers: { 'Content-Type': 'multipart/form-data' } });
 };
 export const createMedia = (payload: Partial<MediaItem>) => api.post('/api/media/', payload);
