@@ -3,6 +3,7 @@ import { ArrowRight, CheckCircle, Image as ImageIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { fetchHeroImages } from '../../../api/media';
 import type { MediaItem } from '../../../api/media';
+import { getTestimonialStats } from '../../../api/testinomials';
 
 interface HeroProps {
   onGetStartedClick: () => void;
@@ -12,16 +13,16 @@ export const Hero = ({ onGetStartedClick }: HeroProps) => {
   const [heroImages, setHeroImages] = useState<MediaItem[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState({
+    clients: 100,
+    projects: 250,
+    satisfaction: 98
+  });
 
-  const stats = [
-    { value: '100+', label: 'Happy Clients' },
-    { value: '250+', label: 'Projects Completed' },
-    { value: '98%', label: 'Satisfaction Rate' },
-  ];
-
-  // Fetch hero images on component mount
+  // Fetch hero images and stats on component mount
   useEffect(() => {
     loadHeroImages();
+    loadStats();
   }, []);
 
   // Auto-rotate images every 5 seconds
@@ -46,6 +47,22 @@ export const Hero = ({ onGetStartedClick }: HeroProps) => {
       console.error('Failed to load hero images:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadStats = async () => {
+    try {
+      console.log('Hero: Fetching stats...');
+      const response = await getTestimonialStats();
+      console.log('Hero: Stats response:', response.data);
+      setStats({
+        clients: response.data.total,
+        projects: response.data.total * 2, // Approximate: 2 projects per client
+        satisfaction: Math.round((response.data.average_rating / 5) * 100)
+      });
+      console.log('Hero: Stats updated');
+    } catch (error) {
+      console.error('Hero: Failed to load stats:', error);
     }
   };
 
@@ -102,18 +119,33 @@ export const Hero = ({ onGetStartedClick }: HeroProps) => {
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 mt-12">
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 * index }}
-                  className="text-center"
-                >
-                  <div className="text-3xl font-bold text-[#00C2A8]">{stat.value}</div>
-                  <div className="text-sm text-gray-300">{stat.label}</div>
-                </motion.div>
-              ))}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0 }}
+                className="text-center"
+              >
+                <div className="text-3xl font-bold text-[#00C2A8]">{stats.clients}+</div>
+                <div className="text-sm text-gray-300">Happy Clients</div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-center"
+              >
+                <div className="text-3xl font-bold text-[#00C2A8]">{stats.projects}+</div>
+                <div className="text-sm text-gray-300">Projects Completed</div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-center"
+              >
+                <div className="text-3xl font-bold text-[#00C2A8]">{stats.satisfaction}%</div>
+                <div className="text-sm text-gray-300">Satisfaction Rate</div>
+              </motion.div>
             </div>
           </motion.div>
 

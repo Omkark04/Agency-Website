@@ -3,6 +3,7 @@
 // ============================================
 import { useEffect, useState } from 'react';
 import { listOrders } from '../../../api/orders';
+import { listSubmissions } from '../../../api/forms';
 import { useAuth } from '../../../hooks/useAuth';
 import {
   FiShoppingCart,
@@ -12,21 +13,32 @@ import {
   FiTrendingUp,
   FiSearch,
   FiCalendar,
-  FiPackage
+  FiPackage,
+  FiFileText,
+  FiDownload,
+  FiX,
+  FiEye
 } from 'react-icons/fi';
 
 export function Orders() {
   const [orders, setOrders] = useState<any[]>([]);
+  const [submissions, setSubmissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'pending' | 'in_progress' | 'completed' | 'cancelled'>('all');
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'regular' | 'form'>('all');
+  const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
   useAuth();
 
   const loadOrders = async () => {
     setLoading(true);
     try {
-      const res = await listOrders();
-      setOrders(res.data);
+      const [ordersRes, submissionsRes] = await Promise.all([
+        listOrders(),
+        listSubmissions().catch(() => ({ data: [] }))
+      ]);
+      setOrders(ordersRes.data);
+      setSubmissions(submissionsRes.data);
     } catch (error) {
       console.error('Failed to load orders:', error);
     } finally {
@@ -66,10 +78,21 @@ export function Orders() {
     }
   };
 
+  const getSubmissionForOrder = (orderId: number) => {
+    return submissions.find(sub => sub.order_id === orderId);
+  };
+
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.title.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = order.title.toLowerCase().includes(search.toLowerCase()) ||
+                         (order.client_email && order.client_email.toLowerCase().includes(search.toLowerCase()));
     const matchesFilter = filter === 'all' || order.status === filter;
-    return matchesSearch && matchesFilter;
+    
+    const hasSubmission = getSubmissionForOrder(order.id);
+    const matchesSource = sourceFilter === 'all' || 
+                         (sourceFilter === 'form' && hasSubmission) ||
+                         (sourceFilter === 'regular' && !hasSubmission);
+    
+    return matchesSearch && matchesFilter && matchesSource;
   });
 
   const stats = {
@@ -156,6 +179,26 @@ export function Orders() {
             </button>
           ))}
         </div>
+        <div className="flex gap-2">
+          {[
+            { key: 'all', label: 'All Sources' },
+            { key: 'regular', label: 'Regular', icon: FiShoppingCart },
+            { key: 'form', label: 'Form Submissions', icon: FiFileText }
+          ].map(btn => (
+            <button
+              key={btn.key}
+              onClick={() => setSourceFilter(btn.key as any)}
+              className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 text-sm ${
+                sourceFilter === btn.key
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {btn.icon && <btn.icon className="h-4 w-4" />}
+              {btn.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Orders Table */}
@@ -174,13 +217,17 @@ export function Orders() {
                 <thead className="bg-gradient-to-r from-gray-50 to-orange-50">
                   <tr>
                     <th className="px-8 py-5 text-left text-xs font-black text-gray-700 uppercase tracking-wider">Order Details</th>
+                    <th className="px-8 py-5 text-left text-xs font-black text-gray-700 uppercase tracking-wider">Source</th>
                     <th className="px-8 py-5 text-left text-xs font-black text-gray-700 uppercase tracking-wider">Status</th>
                     <th className="px-8 py-5 text-left text-xs font-black text-gray-700 uppercase tracking-wider">Price</th>
                     <th className="px-8 py-5 text-left text-xs font-black text-gray-700 uppercase tracking-wider">Created Date</th>
+                    <th className="px-8 py-5 text-left text-xs font-black text-gray-700 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredOrders.map((order) => (
+                  {filteredOrders.map((order) => {
+                    const submission = getSubmissionForOrder(order.id);
+                    return (
                     <tr key={order.id} className="group hover:bg-gradient-to-r hover:from-orange-50/50 hover:to-rose-50/50 transition-all duration-300">
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-4">
@@ -189,13 +236,31 @@ export function Orders() {
                           </div>
                           <div>
                             <div className="font-bold text-gray-900 text-lg">{order.title}</div>
-                            {order.description && (
-                              <div className="text-sm text-gray-500 mt-1 truncate max-w-md">
-                                {order.description}
+                            {submission && (
+                              <div className="text-xs text-indigo-600 mt-1 font-medium">
+                                📋 {submission.submission_summary}
+                              </div>
+                            )}
+                            {order.client_email && (
+                              <div className="text-sm text-gray-500 mt-1">
+                                {order.client_email}
                               </div>
                             )}
                           </div>
                         </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        {submission ? (
+                          <span className="px-3 py-1 bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
+                            <FiFileText className="h-3 w-3" />
+                            Form
+                          </span>
+                        ) : (
+                          <span className="px-3 py-1 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded-full text-xs font-semibold flex items-center gap-1 w-fit">
+                            <FiShoppingCart className="h-3 w-3" />
+                            Regular
+                          </span>
+                        )}
                       </td>
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-3">
@@ -216,8 +281,19 @@ export function Orders() {
                           {new Date(order.created_at).toLocaleDateString()}
                         </div>
                       </td>
+                      <td className="px-8 py-6">
+                        {submission && (
+                          <button
+                            onClick={() => setSelectedSubmission(submission)}
+                            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2 text-sm font-medium"
+                          >
+                            <FiEye className="h-4 w-4" />
+                            View
+                          </button>
+                        )}
+                      </td>
                     </tr>
-                  ))}
+                  )})}
                 </tbody>
               </table>
             </div>
@@ -236,6 +312,88 @@ export function Orders() {
           </>
         )}
       </div>
+
+      {/* Submission Detail Modal */}
+      {selectedSubmission && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Form Submission Details
+              </h2>
+              <button
+                onClick={() => setSelectedSubmission(null)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <FiX className="h-6 w-6 text-gray-500" />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Form</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">{selectedSubmission.form_title}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Service</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">{selectedSubmission.service_title}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Submitted By</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">
+                    {selectedSubmission.submitted_by_name || selectedSubmission.client_email || 'Guest'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Date</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">
+                    {new Date(selectedSubmission.created_at).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Submission Data</h3>
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-3">
+                  {Object.entries(selectedSubmission.data || {}).map(([key, value]: [string, any]) => (
+                    <div key={key} className="border-b border-gray-200 dark:border-gray-700 pb-2 last:border-0">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Field {key}</p>
+                      <p className="text-gray-900 dark:text-white">
+                        {Array.isArray(value) ? value.join(', ') : String(value)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {selectedSubmission.files && Object.keys(selectedSubmission.files).length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Uploaded Files</h3>
+                  <div className="space-y-2">
+                    {Object.entries(selectedSubmission.files).map(([fieldId, urls]: [string, any]) => (
+                      <div key={fieldId}>
+                        {(urls as string[]).map((url, index) => (
+                          <a
+                            key={index}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                          >
+                            <FiDownload className="h-4 w-4" />
+                            <span className="text-sm font-medium">Download File {index + 1}</span>
+                          </a>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes fade-in {

@@ -8,7 +8,7 @@ class Media(models.Model):
     ]
 
     id = models.AutoField(primary_key=True)
-    owner = models.ForeignKey('accounts.User', on_delete=models.CASCADE)
+    owner = models.ForeignKey('accounts.User', on_delete=models.CASCADE, null=True, blank=True)
     project = models.ForeignKey("portfolio.PortfolioProject", null=True, blank=True, on_delete=models.SET_NULL)
     service = models.ForeignKey("services.Service", null=True, blank=True, on_delete=models.SET_NULL)
     

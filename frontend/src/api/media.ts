@@ -17,9 +17,12 @@ export interface MediaItem {
 }
 
 export const listMedia = (params?: any) => api.get<MediaItem[]>('/api/media/', { params });
-export const uploadMedia = (file: File) => {
+export const uploadMedia = (file: File, caption?: string) => {
   const data = new FormData();
   data.append('file', file);
+  if (caption) {
+    data.append('caption', caption);
+  }
   return api.post('/api/upload/', data, { headers: { 'Content-Type': 'multipart/form-data' } });
 };
 export const createMedia = (payload: Partial<MediaItem>) => api.post('/api/media/', payload);
@@ -61,4 +64,20 @@ export const uploadHeroImage = async (file: File, caption: string = 'Hero Image'
   
   const result = await createMedia(mediaData);
   return result.data;
+};
+
+export const fetchAboutImages = async (): Promise<MediaItem[]> => {
+  try {
+    const response = await api.get<MediaItem[]>('/api/media/', {
+      params: {
+        caption__icontains: 'about',
+        media_type: 'image',
+        ordering: '-created_at'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching about images:', error);
+    return [];
+  }
 };

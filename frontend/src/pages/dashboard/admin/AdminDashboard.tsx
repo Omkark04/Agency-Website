@@ -11,7 +11,6 @@ import {
   FiShoppingCart, 
   FiUsers, 
   FiPackage, 
-
   FiLayers,
   FiTrendingUp,
   FiDollarSign,

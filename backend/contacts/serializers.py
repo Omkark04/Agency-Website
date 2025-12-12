@@ -25,3 +25,12 @@ class ContactSubmissionSerializer(serializers.ModelSerializer):
             'created_at'
         ]
         read_only_fields = ['id', 'created_at']
+
+
+class ContactSubmissionAdminSerializer(serializers.ModelSerializer):
+    """Admin serializer with additional fields for dashboard"""
+    service_title = serializers.CharField(source='service.title', read_only=True)
+    
+    class Meta:
+        model = ContactSubmission
+        fields = '__all__'

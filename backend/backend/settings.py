@@ -91,7 +91,8 @@ INSTALLED_APPS = [
     'testimonials',
     "contacts",
     "notifications",
-    "analytics",     
+    "analytics",
+    "forms",  # New: Dynamic form builder
 ]
 
 
@@ -126,6 +127,10 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
 
 ROOT_URLCONF = "backend.urls"

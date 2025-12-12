@@ -17,11 +17,11 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen,onClose ,onToggle, userRole ,mobileOpen }: SidebarProps) {
   const navigation = [
-    { title: 'Dashboard', path: '/client-dashboard', roles: ['admin','client'], icon: Home, gradient: 'from-blue-500 to-indigo-600', current: true },
-    { title: 'My Projects', path: '/client-dashboard/my-projects', roles: ['admin','client'], icon: Folder, gradient: 'from-blue-500 to-indigo-600', current: false },
-    { title: 'Payments', path: '/client-dashboard', roles: ['admin','client'], icon: CreditCard, gradient: 'from-blue-500 to-indigo-600' , current: false},
-    { title: 'Services', path: '/client-dashboard', roles: ['admin','client'], icon: Code, gradient: 'from-blue-500 to-indigo-600' , current: false},
-    { title: 'Settins', path: '/client-dashboard', roles: ['admin','client'], icon: Settings, gradient: 'from-blue-500 to-indigo-600', current: false },
+    { title: 'Dashboard', path: '/client-dashboard', roles: ['admin','client'], icon: Home, gradient: 'from-blue-500 to-indigo-600', current: location.pathname === '/client-dashboard' },
+    { title: 'My Projects', path: '/client-dashboard/my-projects', roles: ['admin','client'], icon: Folder, gradient: 'from-blue-500 to-indigo-600', current: location.pathname === '/client-dashboard/my-projects' },
+    { title: 'Payments', path: '/client-dashboard', roles: ['admin','client'], icon: CreditCard, gradient: 'from-blue-500 to-indigo-600', current: false },
+    { title: 'Services', path: '/client-dashboard/services', roles: ['admin','client'], icon: Code, gradient: 'from-blue-500 to-indigo-600', current: location.pathname === '/client-dashboard/services' },
+    { title: 'Settings', path: '/client-dashboard/settings', roles: ['admin','client'], icon: Settings, gradient: 'from-blue-500 to-indigo-600', current: location.pathname === '/client-dashboard/settings' },
   ];
   const filteredMenuItems = navigation.filter(item =>
       item.roles.includes(userRole)
