@@ -5,12 +5,12 @@ import { Link, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMenu, FiX, FiSearch, FiBell, FiMessageSquare, FiChevronDown, FiLogOut, FiSun, FiMoon, FiChevronRight, FiCheck, FiClock, FiAlertCircle, FiUsers, FiFileText, FiBarChart2, FiPlus } from 'react-icons/fi';
 import {
+  getTeamHeadStats,
   getTeamProjects,
   getTeamTasks,
   getTeamMembers,
   getRecentActivity,
 } from '@/api/teamHeadApi';
-import type { TeamStats, Project, Task, Activity, APITeamMember } from '@/types/teamhead';
 
 
 
