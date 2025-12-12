@@ -23,9 +23,6 @@ import {
   FileText,
   PieChart,
   ChevronDown,
-  MoreVertical,
-  Sparkles,
-  Target,
   Activity
 } from 'lucide-react';
 

@@ -9,7 +9,8 @@ interface Pricing {
 import { motion } from 'framer-motion';
 import { 
   MessageSquare, 
-  Code, 
+  Code,
+  Star, 
   PenTool, 
   BookOpen,
   ArrowRight,
@@ -18,15 +19,9 @@ import {
   Users,
   DollarSign,
   FileText,
-  TrendingUp,
-  Shield,
-  Calendar,
-  Star,
-  Filter,
   Search,
   ChevronDown,
-  X,
-  Sparkles
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
