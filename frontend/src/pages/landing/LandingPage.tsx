@@ -5,7 +5,7 @@ import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { TrustStrip } from './components/TrustStrip';
 import { Services } from '../landing/components/Services';
-import { Offers } from './components/Offers';
+import Offers from '../landing/components/Offers';
 import PortfolioSection from './components/PortfolioSection'; // Add this import
 import Process from './components/Process';
 import { Pricing } from './components/Pricing';
