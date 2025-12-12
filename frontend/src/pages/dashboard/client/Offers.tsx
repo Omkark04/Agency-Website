@@ -62,7 +62,7 @@ export default function Offers() {
               transition={{ delay: index * 0.1 }}
               className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group"
             >
-              <div className={`h-2 bg-gradient-to-r ${offer.gradient_colors || 'from-blue-500 to-purple-500'}`} />
+              <div className="h-2 bg-gradient-to-r from-blue-500 to-purple-500" />
               
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
@@ -103,7 +103,7 @@ export default function Offers() {
                   ))}
                 </div>
 
-                <button className={`w-full py-3 rounded-xl font-medium text-white shadow-lg shadow-blue-500/25 transition-transform active:scale-95 bg-gradient-to-r ${offer.gradient_colors || 'from-blue-600 to-blue-700'}`}>
+                <button className="w-full py-3 rounded-xl font-medium text-white shadow-lg shadow-blue-500/25 transition-transform active:scale-95 bg-gradient-to-r from-blue-600 to-blue-700">
                   {offer.cta_text || 'Claim Offer'}
                 </button>
               </div>
