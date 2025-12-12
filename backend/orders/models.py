@@ -15,7 +15,14 @@ class Order(models.Model):
         ("revision", "Revision"),
     ]
     id = models.AutoField(primary_key=True)
-    client = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name="orders")
+    client = models.ForeignKey(
+        "accounts.User", 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name="orders"
+    )
+    client_email = models.EmailField(blank=True)  # For guest orders from forms
     service = models.ForeignKey("services.Service", on_delete=models.CASCADE, related_name="orders")
     pricing_plan = models.ForeignKey("services.PriceCard", null=True, on_delete=models.SET_NULL, related_name="orders")
     title = models.CharField(max_length=255)

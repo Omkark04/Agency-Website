@@ -12,6 +12,7 @@ import {
   FiCheckSquare,
   FiImage,
   FiBriefcase,
+  FiMessageSquare,
   FiBarChart2,
   FiX,
   FiChevronRight
@@ -33,7 +34,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, userRole }) =
     { title: 'Services', path: '/dashboard/services', roles: ['admin','team_head','client'], icon: FiPackage, gradient: 'from-cyan-500 to-blue-600' },
     { title: 'Departments', path: '/dashboard/departments', roles: ['admin'], icon: FiLayers, gradient: 'from-indigo-500 to-purple-600' },
     { title: 'Price Cards', path: '/dashboard/price-cards', roles: ['admin'], icon: FiCreditCard, gradient: 'from-pink-500 to-rose-600' },
-    { title: 'Tesimonials', path: '/dashboard/testimonials', roles: ['admin'], icon: FiCreditCard, gradient: 'from-pink-500 to-rose-600' },
+    { title: 'Testimonials', path: '/dashboard/testimonials', roles: ['admin'], icon: FiMessageSquare, gradient: 'from-purple-500 to-pink-600' },
+    { title: 'Inquiries', path: '/dashboard/contacts', roles: ['admin'], icon: FiUsers, gradient: 'from-green-500 to-teal-600' },
+    { title: 'Form Builder', path: '/dashboard/forms/new', roles: ['admin','team_head'], icon: FiCheckSquare, gradient: 'from-indigo-500 to-blue-600' },
     { title: 'Offers', path: '/dashboard/offers', roles: ['admin','team_head'], icon: FiGift, gradient: 'from-pink-500 to-rose-600' },
     { title: 'Portfolio', path: '/dashboard/portfolio', roles: ['admin'], icon: FiBriefcase, gradient: 'from-purple-500 to-indigo-600' },
     { title: 'Users', path: '/dashboard/users', roles: ['admin','team_head'], icon: FiUsers, gradient: 'from-purple-500 to-pink-600' },

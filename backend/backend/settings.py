@@ -91,7 +91,8 @@ INSTALLED_APPS = [
     'testimonials',
     "contacts",
     "notifications",
-    "analytics",     
+    "analytics",
+    "forms",  # New: Dynamic form builder
 ]
 
 

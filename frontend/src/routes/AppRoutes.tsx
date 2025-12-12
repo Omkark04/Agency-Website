@@ -25,6 +25,8 @@ import SubmissionsApproval from '@/pages/dashboard/teamhead/SubmissionsApproval'
 import TeamMemberDashboard from '@/pages/dashboard/teammember/TeamMemberDashboard';
 import TeamMemberPage from '@/pages/dashboard/teamhead/TeamMember';
 import TestimonialsManagement from '../pages/dashboard/admin/TestimonialsManagement';
+import ContactsManagement from '../pages/dashboard/admin/ContactsManagement';
+import FormBuilder from '../pages/dashboard/admin/FormBuilder';
 
 // New Pages
 import { NotificationsPage } from '../pages/Notifications';
@@ -76,6 +78,9 @@ export const AppRoutes: React.FC = () => {
             <Route path="/dashboard/tasks" element={<Tasks />} />
             <Route path="/dashboard/media" element={<MediaLibrary />} />
             <Route path="/dashboard/testimonials" element={<TestimonialsManagement />} />
+            <Route path="/dashboard/contacts" element={<ContactsManagement />} />
+            <Route path="/dashboard/forms/new" element={<FormBuilder />} />
+            <Route path="/dashboard/forms/:id" element={<FormBuilder />} />
           </Route>
 
         </Route>

@@ -26,7 +26,8 @@ from tasks.views import TaskViewSet
 from media.views import MediaViewSet
 from notifications.views import NotificationViewSet
 from stats.views import CompanyStatsView, FeaturedClientsView
-from contacts.views import ContactSubmissionView
+from contacts.views import ContactSubmissionView, ContactSubmissionViewSet
+from forms.views import ServiceFormViewSet, ServiceFormFieldViewSet, ServiceFormSubmissionViewSet
 from backend.health import health_check
 
 # JWT
@@ -48,6 +49,10 @@ router.register(r"notifications", NotificationViewSet, basename="notification")
 router.register(r"pricing-plans", PricingPlanViewSet)
 router.register(r"testimonials", TestimonialViewSet)
 router.register(r"offers", OfferViewSet)   # FULL CRUD enabled
+router.register(r"contacts", ContactSubmissionViewSet, basename="contact")
+router.register(r"forms", ServiceFormViewSet, basename="form")
+router.register(r"form-fields", ServiceFormFieldViewSet, basename="form-field")
+router.register(r"form-submissions", ServiceFormSubmissionViewSet, basename="form-submission")
 
 schema_view = get_schema_view(
     openapi.Info(

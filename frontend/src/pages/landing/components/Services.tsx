@@ -17,11 +17,12 @@ import {
   FaStar,
   FaCheckCircle
 } from 'react-icons/fa';
+import { FiClock, FiUsers as FiUsersIcon, FiTrendingUp, FiX } from 'react-icons/fi';
 import { listServices } from '../../../api/services';
 import type { Service } from '../../../api/services';
 import { useAuth } from '../../../hooks/useAuth';
 import { AuthModal } from './AuthModal';
-import { FiClock, FiUsers, FiTrendingUp } from 'react-icons/fi';
+import DynamicFormRenderer from '../../../components/forms/DynamicFormRenderer';
 
 // Icon mapping from backend with more options
 const iconMap = {
@@ -76,6 +77,8 @@ export const Services = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -262,7 +265,7 @@ export const Services = () => {
                     </div>
                     <div className="text-center">
                       <div className="text-lg font-bold text-gray-800 dark:text-white">
-                        <FiUsers className="inline-block w-4 h-4 mr-1 text-[#0066FF]" />
+                        <FiUsersIcon className="inline-block w-4 h-4 mr-1 text-[#0066FF]" />
                         Expert
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">Team</div>
@@ -279,12 +282,13 @@ export const Services = () => {
                   {/* Action Button */}
                   <button 
                     onClick={() => {
-                      // Require authentication for detailed view
+                      // Require authentication to fill form
                       if (!isAuthenticated) {
                         setShowAuthModal(true);
                       } else {
-                        // Navigate to service detail page or open modal
-                        console.log('View service details:', service.id);
+                        // Open form modal
+                        setSelectedServiceId(service.id);
+                        setShowFormModal(true);
                       }
                     }}
                     className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 text-gray-700 dark:text-gray-300 hover:from-[#00C2A8] hover:to-[#0066FF] hover:text-white transition-all duration-300 group-hover:shadow-lg"
@@ -368,6 +372,42 @@ export const Services = () => {
       isOpen={showAuthModal} 
       onClose={() => setShowAuthModal(false)} 
     />
+
+    {/* Form Modal */}
+    {showFormModal && selectedServiceId && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto my-8">
+          <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between z-10">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent">
+              Service Inquiry Form
+            </h2>
+            <button
+              onClick={() => {
+                setShowFormModal(false);
+                setSelectedServiceId(null);
+              }}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            >
+              <FiX className="h-6 w-6 text-gray-500" />
+            </button>
+          </div>
+          
+          <div className="p-6">
+            <DynamicFormRenderer 
+              serviceId={selectedServiceId}
+              onSuccess={(orderId) => {
+                console.log('Order created:', orderId);
+                // Close modal after successful submission
+                setTimeout(() => {
+                  setShowFormModal(false);
+                  setSelectedServiceId(null);
+                }, 3000);
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    )}
   </>
   );
 };
