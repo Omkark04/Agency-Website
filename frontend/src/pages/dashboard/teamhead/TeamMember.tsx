@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
-  UserPlus, 
-  Search, 
+import {
+  UserPlus,
+  Search,
   Edit,
   Trash2,
   XCircle,
@@ -47,104 +47,62 @@ const TeamMemberPage = () => {
   // Sort config state (unused but kept for future use)
   const [_sortConfig, _setSortConfig] = useState<{ key: keyof TeamMember; direction: 'asc' | 'desc' } | null>(null);
 
-  // Mock data - in a real app, this would come from an API
+  // Fetch team members from API
   useEffect(() => {
-    // Simulate API call
-    const fetchTeamMembers = async () => {
-      setIsLoading(true);
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockMembers: TeamMember[] = [
-        {
-          id: '1',
-          name: 'Alex Johnson',
-          email: 'alex.johnson@example.com',
-          role: 'Senior Developer',
-          status: 'active',
-          avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-          phone: '+1 (555) 123-4567',
-          joinDate: '2022-03-15',
-          lastActive: '2023-10-20T14:30:00Z',
-          projects: 8,
-          completedTasks: 124,
-          pendingTasks: 5
-        },
-        {
-          id: '2',
-          name: 'Maria Garcia',
-          email: 'maria.g@example.com',
-          role: 'UI/UX Designer',
-          status: 'active',
-          avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-          phone: '+1 (555) 234-5678',
-          joinDate: '2022-05-10',
-          lastActive: '2023-10-20T10:15:00Z',
-          projects: 6,
-          completedTasks: 98,
-          pendingTasks: 3
-        },
-        {
-          id: '3',
-          name: 'James Wilson',
-          email: 'james.w@example.com',
-          role: 'Project Manager',
-          status: 'on_leave',
-          avatar: 'https://randomuser.me/api/portraits/men/67.jpg',
-          phone: '+1 (555) 345-6789',
-          joinDate: '2021-11-05',
-          lastActive: '2023-10-15T09:45:00Z',
-          projects: 12,
-          completedTasks: 210,
-          pendingTasks: 2
-        },
-        {
-          id: '4',
-          name: 'Sarah Chen',
-          email: 'sarah.chen@example.com',
-          role: 'Frontend Developer',
-          status: 'active',
-          avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
-          phone: '+1 (555) 456-7890',
-          joinDate: '2023-01-20',
-          lastActive: '2023-10-19T16:20:00Z',
-          projects: 5,
-          completedTasks: 76,
-          pendingTasks: 4
-        },
-        {
-          id: '5',
-          name: 'David Kim',
-          email: 'david.kim@example.com',
-          role: 'Backend Developer',
-          status: 'inactive',
-          avatar: 'https://randomuser.me/api/portraits/men/29.jpg',
-          phone: '+1 (555) 567-8901',
-          joinDate: '2022-08-12',
-          lastActive: '2023-09-28T11:30:00Z',
-          projects: 7,
-          completedTasks: 112,
-          pendingTasks: 8
-        },
-      ];
+    fetchTeamMembers();
+  }, []);
+  const fetchTeamMembers = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('http://localhost:8000/auth/team-head/members/', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access')}`
+        }
+      });
 
-      setTeamMembers(mockMembers);
-      setFilteredMembers(mockMembers);
+      if (!response.ok) throw new Error('Failed to fetch');
+
+      const data = await response.json();
+
+      // Transform API data
+      const transformed: TeamMember[] = data.map((m: any) => ({
+        id: m.id.toString(),
+        name: m.username,
+        email: m.email,
+        role: m.role || 'Team Member',
+        status: m.is_active ? 'active' : 'inactive',
+        avatar: m.avatar || '',
+        phone: m.phone || '',
+        joinDate: m.date_joined?.split('T')[0] || '',
+        lastActive: m.last_login || new Date().toISOString(),
+        projects: m.projects || 0,
+        completedTasks: m.completed_tasks || 0,
+        pendingTasks: m.pending_tasks || 0
+      }));
+
+      setTeamMembers(transformed);
+    } catch (error) {
+      console.error('Error:', error);
+      setTeamMembers([]);
+    } finally {
       setIsLoading(false);
-    };
+    }
+  };
 
+  // Fetch team members from API
+  useEffect(() => {
     fetchTeamMembers();
   }, []);
 
   // Filter and search functionality
   useEffect(() => {
     let result = [...teamMembers];
-    
+
     // Apply status filter
     if (_activeTab !== 'all') {
       result = result.filter(member => member.status === _activeTab);
     }
-    
+
     // Apply search
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -155,56 +113,74 @@ const TeamMemberPage = () => {
           member.role.toLowerCase().includes(query)
       );
     }
-    
+
     setFilteredMembers(result);
   }, [searchQuery, _activeTab, teamMembers]);
 
-  /* Commented out unused functions for future use
-  const handleSort = (key: keyof TeamMember) => {
-    let direction: 'asc' | 'desc' = 'asc';
-    if (_sortConfig?.key === key && _sortConfig?.direction === 'asc') {
-      direction = 'desc';
-    }
-    _setSortConfig({ key, direction });
-  };
+  // Commented out unused functions for future use
 
-  const getStatusBadge = (status: TeamMember['status']) => {
-    const statusMap = {
-      active: { text: 'Active', color: 'bg-green-100 text-green-800' },
-      inactive: { text: 'Inactive', color: 'bg-gray-100 text-gray-800' },
-      on_leave: { text: 'On Leave', color: 'bg-yellow-100 text-yellow-800' }
-    };
-    
-    const { text, color } = statusMap[status];
-    return <Badge className={`${color} hover:${color}`}>{text}</Badge>;
-  };
 
-  const handleDeleteMember = (member: TeamMember) => {
-    setSelectedMember(member);
-    setIsDeleteDialogOpen(true);
-  };
 
-  const confirmDeleteMember = () => {
-    if (selectedMember) {
-      setTeamMembers(prev => prev.filter(member => member.id !== selectedMember.id));
+
+  const handleDeleteMember = async () => {
+    if (!selectedMember) return;
+
+    try {
+      const response = await fetch(`http://localhost:8000/auth/team-head/members/${selectedMember.id}/`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access')}`
+        }
+      });
+
+      if (!response.ok) throw new Error('Failed to delete');
+
+      // Refresh the list
+      fetchTeamMembers();
       setIsDeleteDialogOpen(false);
       setSelectedMember(null);
+    } catch (error) {
+      console.error('Error deleting member:', error);
+      alert('Failed to delete team member');
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+
+
+  const handleAddMember = async (newMemberData: { name: string; email: string; phone?: string }) => {
+    try {
+      const response = await fetch('http://localhost:8000/auth/team-head/members/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('access')}`
+        },
+        body: JSON.stringify({
+          username: newMemberData.name,
+          email: newMemberData.email,
+          password: 'Welcome123!', // Default password - user should change
+          phone: newMemberData.phone || ''
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to add member');
+
+      // Refresh the list
+      await fetchTeamMembers();
+      setIsAddMemberOpen(false);
+
+
+      alert('Team member added successfully! Default password: Welcome123!');
+    } catch (error) {
+      console.error('Error adding member:', error);
+      alert('Failed to add team member');
+    }
   };
 
-  const getSortIcon = (key: keyof TeamMember) => {
-    if (_sortConfig?.key !== key) return null;
-    return _sortConfig.direction === 'asc' ? '↑' : '↓';
-  };
-  */
+
+
+
+
 
   // MailIcon is used in the JSX for displaying email icons
 
@@ -343,7 +319,7 @@ const TeamMemberPage = () => {
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Add Team Member</h2>
-              <button 
+              <button
                 onClick={() => setIsAddMemberOpen(false)}
                 className="text-gray-400 hover:text-gray-500"
               >
@@ -396,8 +372,15 @@ const TeamMemberPage = () => {
                 </Button>
                 <Button
                   onClick={() => {
-                    // Handle add member logic
-                    setIsAddMemberOpen(false);
+                    const nameInput = document.getElementById('name') as HTMLInputElement;
+                    const emailInput = document.getElementById('email') as HTMLInputElement;
+
+                    if (nameInput?.value && emailInput?.value) {
+                      handleAddMember({
+                        name: nameInput.value,
+                        email: emailInput.value
+                      });
+                    }
                   }}
                 >
                   Add Member
@@ -431,11 +414,7 @@ const TeamMemberPage = () => {
               <button
                 type="button"
                 className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-                onClick={() => {
-                  setTeamMembers(prev => prev.filter(m => m.id !== selectedMember.id));
-                  setIsDeleteDialogOpen(false);
-                  setSelectedMember(null);
-                }}
+                onClick={handleDeleteMember}
               >
                 Remove
               </button>

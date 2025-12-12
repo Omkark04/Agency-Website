@@ -49,10 +49,10 @@ export const useAuth = () => {
   const login = async (identifier: string, password: string) => {
     try {
       setAuth(prev => ({ ...prev, loading: true, error: null }));
-      
-      const response = await api.post('/auth/token/', { 
+
+      const response = await api.post('/auth/token/', {
         email: identifier,
-        password 
+        password
       });
 
       const { access, refresh, user } = response.data;
@@ -60,6 +60,7 @@ export const useAuth = () => {
       localStorage.setItem('access', access);
       localStorage.setItem('refresh', refresh);
       localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('role', user.role); // Store role separately
 
       setAuth({ user, loading: false, error: null });
       navigate('/dashboard');
@@ -88,14 +89,14 @@ export const useAuth = () => {
         password2: userData.password
       });
       const { access, refresh, user } = response.data;
-      
+
       localStorage.setItem('access', access);
       localStorage.setItem('refresh', refresh);
       localStorage.setItem('user', JSON.stringify(user));
-      
+
       setAuth({ user, loading: false, error: null });
       navigate('/dashboard');
-      
+
       return { user };
     } catch (error: any) {
       const errorMsg = error.response?.data?.detail || 'Registration failed';
