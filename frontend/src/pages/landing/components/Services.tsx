@@ -17,10 +17,11 @@ import {
   FaStar,
   FaCheckCircle
 } from 'react-icons/fa';
-import { FiClock, FiUsers as FiUsersIcon, FiTrendingUp, FiX } from 'react-icons/fi';
+import { FiX } from 'react-icons/fi';
 import { listServices } from '../../../api/services';
 import type { Service } from '../../../api/services';
-import { useAuth } from '../../../hooks/useAuth';
+import { listDepartments } from '../../../api/departments';
+import type { Department } from '../../../api/departments';
 import { AuthModal } from './AuthModal';
 import DynamicFormRenderer from '../../../components/forms/DynamicFormRenderer';
 
@@ -56,30 +57,16 @@ const iconColorMap = {
   'check-circle': 'text-[#FB5607]',
 };
 
-// Background color mapping
-const bgColorMap = {
-  'palette': 'bg-gradient-to-br from-red-50 to-pink-50',
-  'laptop-code': 'bg-gradient-to-br from-teal-50 to-cyan-50',
-  'graduation-cap': 'bg-gradient-to-br from-blue-50 to-cyan-50',
-  'megaphone': 'bg-gradient-to-br from-yellow-50 to-orange-50',
-  'chart-line': 'bg-gradient-to-br from-green-50 to-emerald-50',
-  'code': 'bg-gradient-to-br from-sky-50 to-blue-50',
-  'mobile': 'bg-gradient-to-br from-rose-50 to-pink-50',
-  'brush': 'bg-gradient-to-br from-gray-50 to-slate-50',
-  'users': 'bg-gradient-to-br from-purple-50 to-violet-50',
-  'user-tie': 'bg-gradient-to-br from-indigo-50 to-blue-50',
-  'star': 'bg-gradient-to-br from-amber-50 to-yellow-50',
-  'check-circle': 'bg-gradient-to-br from-orange-50 to-red-50',
-};
+
 
 export const Services = () => {
   const [services, setServices] = useState<Service[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showFormModal, setShowFormModal] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
-  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     fetchServices();
@@ -88,11 +75,15 @@ export const Services = () => {
   const fetchServices = async () => {
     try {
       setLoading(true);
-      const response = await listServices({ 
-        is_active: true,
-        is_featured: true 
-      });
-      setServices(response.data);
+      const [servicesResponse, departmentsResponse] = await Promise.all([
+        listServices({ 
+          is_active: true,
+          is_featured: true 
+        }),
+        listDepartments({ is_active: true })
+      ]);
+      setServices(servicesResponse.data);
+      setDepartments(departmentsResponse.data);
     } catch (err) {
       setError('Failed to load services. Please try again later.');
       console.error('Error fetching services:', err);
@@ -165,16 +156,24 @@ export const Services = () => {
           </p>
         </motion.div>
 
-        {/* Services Grid */}
+        {/* Services Grid - Department Based */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => {
-            const IconComponent = iconMap[service.icon_name as keyof typeof iconMap] || iconMap['palette'];
-            const iconColor = iconColorMap[service.icon_name as keyof typeof iconColorMap] || 'text-[#00C2A8]';
-            const bgColor = bgColorMap[service.icon_name as keyof typeof bgColorMap] || 'bg-gradient-to-br from-gray-50 to-slate-50';
+          {departments.map((department, index) => {
+            // Get ALL services from this department
+            const departmentServices = services.filter(s => s.department === department.id);
+            
+            // Use first service for icon/color theming, or defaults if no services
+            const firstService = departmentServices[0];
+            const IconComponent = firstService 
+              ? (iconMap[firstService.icon_name as keyof typeof iconMap] || iconMap['palette'])
+              : iconMap['palette'];
+            const iconColor = firstService
+              ? (iconColorMap[firstService.icon_name as keyof typeof iconColorMap] || 'text-[#00C2A8]')
+              : 'text-[#00C2A8]';
             
             return (
               <motion.div
-                key={service.id}
+                key={department.id}
                 className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -182,128 +181,117 @@ export const Services = () => {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 whileHover={{ y: -8 }}
               >
-                {/* Service Logo/Header */}
-                <div className={`relative h-48 ${bgColor} dark:opacity-90 overflow-hidden`}>
-                  {service.logo ? (
-                    <div className="absolute inset-0 flex items-center justify-center p-8">
+                {/* Department Content */}
+                <div className="p-8">
+                  {/* Department Name & Logo - Same Line */}
+                  <div className="flex items-center gap-4 mb-4">
+                    {department.logo ? (
                       <img
-                        src={service.logo}
-                        alt={service.title}
-                        className="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-500"
+                        src={department.logo}
+                        alt={department.title}
+                        className="w-16 h-16 object-contain rounded-xl flex-shrink-0"
                       />
-                    </div>
-                  ) : (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-                      <div className={`w-20 h-20 rounded-2xl flex items-center justify-center ${iconColor.replace('text-', 'bg-')}/10 mb-4`}>
+                    ) : (
+                      <div className={`w-16 h-16 rounded-xl flex items-center justify-center ${iconColor.replace('text-', 'bg-')}/10 flex-shrink-0`}>
                         {React.cloneElement(IconComponent, { 
-                          className: `text-4xl ${iconColor}`
+                          className: `text-3xl ${iconColor}`
                         })}
                       </div>
-                      <div className={`h-1 w-16 rounded-full ${service.gradient_colors || 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF]'}`}></div>
+                    )}
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-bold text-gray-800 dark:text-white">
+                        {department.title}
+                      </h3>
+                    </div>
+                  </div>
+
+                  {/* Department Description */}
+                  {department.short_description && (
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-6 line-clamp-2">
+                      {department.short_description}
+                    </p>
+                  )}
+
+                  {/* All Services from this Department */}
+                  {departmentServices.length > 0 ? (
+                    <div className="mb-6 space-y-4">
+                      {departmentServices.map((service) => {
+                        const serviceIcon = iconMap[service.icon_name as keyof typeof iconMap] || iconMap['palette'];
+                        const serviceIconColor = iconColorMap[service.icon_name as keyof typeof iconColorMap] || 'text-[#00C2A8]';
+                        
+                        return (
+                          <div key={service.id} className="p-4 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800">
+                            <div className="flex items-start gap-4 mb-3">
+                              {service.logo ? (
+                                <img
+                                  src={service.logo}
+                                  alt={service.title}
+                                  className="w-14 h-14 object-contain rounded-lg flex-shrink-0"
+                                />
+                              ) : (
+                                <div className={`w-14 h-14 rounded-lg flex items-center justify-center ${serviceIconColor.replace('text-', 'bg-')}/10 flex-shrink-0`}>
+                                  {React.cloneElement(serviceIcon, { 
+                                    className: `text-2xl ${serviceIconColor}`
+                                  })}
+                                </div>
+                              )}
+                              <div className="flex-1">
+                                <h4 className="font-bold text-gray-800 dark:text-white text-base mb-1">
+                                  {service.title}
+                                </h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                  {service.short_description}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            {/* Service Features Preview */}
+                            {service.features && service.features.length > 0 && (
+                              <div className="space-y-1 ml-[4.5rem]">
+                                {service.features.slice(0, 2).map((feature) => (
+                                  <div key={feature.id} className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
+                                    <div className="w-1 h-1 rounded-full bg-[#00C2A8] mt-1.5 flex-shrink-0"></div>
+                                    <span className="line-clamp-1">{feature.title}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 text-center">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        No services available yet
+                      </p>
                     </div>
                   )}
-                  
-                  {/* Featured Badge */}
-                  {service.is_featured && (
-                    <div className="absolute top-4 right-4">
-                      <div className="px-3 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 text-white text-xs font-bold flex items-center gap-1">
-                        <FaStar className="w-3 h-3" />
-                        Featured
-                      </div>
-                    </div>
-                  )}
-                </div>
 
-                {/* Service Content */}
-                <div className="p-8">
-                  {/* Service Title & Department */}
-                  <div className="mb-4">
-                    <h3 className="text-xl font-bold text-gray-800 dark:text-white line-clamp-1 mb-2">
-                      {service.title}
-                    </h3>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {service.department_title && (
-                        <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 text-gray-600 dark:text-gray-300">
-                          {service.department_title}
-                        </span>
-                      )}
-                      {/* Pricing Badge */}
-                      {service.original_price && service.original_price > 0 && (
-                        <span className="px-3 py-1 text-xs font-bold rounded-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white">
-                          Starting at ₹{service.original_price.toLocaleString()}
-                        </span>
-                      )}
-                    </div>
+                  {/* Action Buttons */}
+                  <div className="flex flex-col gap-3">
+                    <button
+                      onClick={() => {
+                        window.location.href = '/client-dashboard/services';
+                      }}
+                      className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white font-semibold hover:shadow-xl hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-[1.02]"
+                    >
+                      <span>Check Services</span>
+                      <FaChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                    
+                    <button
+                      onClick={() => {
+                        const contactSection = document.getElementById('contact');
+                        if (contactSection) {
+                          contactSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
+                      className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold hover:border-[#00C2A8] hover:text-[#00C2A8] dark:hover:text-[#00C2A8] transition-all duration-300"
+                    >
+                      <span>Make Custom Order</span>
+                    </button>
                   </div>
-
-                  {/* Short Description */}
-                  <p className="text-gray-600 dark:text-gray-300 mb-6 line-clamp-3">
-                    {service.short_description}
-                  </p>
-
-                  {/* Key Features */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
-                      <FaCheckCircle className="w-4 h-4 text-[#00C2A8]" />
-                      Key Features
-                    </h4>
-                    <ul className="space-y-2">
-                      {(service.features || []).slice(0, 3).map((feature) => (
-                        <li key={feature.id} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                          <div className="w-1.5 h-1.5 rounded-full bg-[#00C2A8] mt-1.5 flex-shrink-0"></div>
-                          <span className="line-clamp-1">{feature.title}</span>
-                        </li>
-                      ))}
-                      {(service.features || []).length > 3 && (
-                        <li className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                          +{(service.features || []).length - 3} more features
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-
-                  {/* Service Stats */}
-                  <div className="grid grid-cols-3 gap-3 p-3 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 mb-6">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-gray-800 dark:text-white">
-                        <FiClock className="inline-block w-4 h-4 mr-1 text-[#00C2A8]" />
-                        Quick
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">Delivery</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-gray-800 dark:text-white">
-                        <FiUsersIcon className="inline-block w-4 h-4 mr-1 text-[#0066FF]" />
-                        Expert
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">Team</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-gray-800 dark:text-white">
-                        <FiTrendingUp className="inline-block w-4 h-4 mr-1 text-[#00C2A8]" />
-                        Results
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">Driven</div>
-                    </div>
-                  </div>
-
-                  {/* Action Button - Enhanced */}
-                  <button 
-                    onClick={() => {
-                      // Require authentication to fill form
-                      if (!isAuthenticated) {
-                        setShowAuthModal(true);
-                      } else {
-                        // Open form modal
-                        setSelectedServiceId(service.id);
-                        setShowFormModal(true);
-                      }
-                    }}
-                    className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white font-semibold hover:shadow-xl hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-[1.02]"
-                  >
-                    <span>Get Started</span>
-                    <FaChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </button>
                 </div>
 
                 {/* Hover Effect Border */}

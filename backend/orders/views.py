@@ -12,7 +12,7 @@ from .models import Order, Offer
 from .serializers import OrderSerializer, OfferSerializer
 
 # Import your role-based permission helpers
-from accounts.permissions import IsAdmin, IsServiceHead
+from accounts.permissions import IsAdmin, IsTeamHead
 
 # Simple permission class used for public read-only access
 class AllowAnyReadOnly(drf_permissions.BasePermission):
