@@ -5,6 +5,8 @@ import DashboardLayout from '../pages/DashboardLayout';
 import ClientDashboard from '../pages/dashboard/client/clientdashboard';
 import ServicesPage from '../pages/dashboard/client/ServicesPage';
 import MyProjects from '../pages/dashboard/client/MyProjects';
+import OrdersPage from '../pages/dashboard/client/OrdersPage';
+import Notifications from '../pages/dashboard/client/Notifications';
 // Pages
 import { LandingPage } from '../pages/landing/LandingPage';
 import Portfolio from '@/pages/dashboard/admin/Portfolio';
@@ -48,6 +50,8 @@ export const AppRoutes: React.FC = () => {
           <Route path='/client-dashboard' element={<ClientDashboard />}>
             <Route path='/client-dashboard/services' element={<ServicesPage />} />
             <Route path='/client-dashboard/my-projects' element={<MyProjects />} />
+            <Route path='/client-dashboard/orders' element={<OrdersPage />} />
+            <Route path='/client-dashboard/notifications' element={<Notifications />} />
           </Route>
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['team_head', 'service_head', 'admin']} />}>

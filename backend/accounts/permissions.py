@@ -24,3 +24,11 @@ class IsTeamHeadOrAdmin(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.role in ['service_head', 'admin']
+
+
+class IsServiceHead(permissions.BasePermission):
+    """
+    Alias for IsTeamHead for backward compatibility.
+    """
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role == 'service_head'

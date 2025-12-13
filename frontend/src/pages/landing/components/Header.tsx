@@ -5,23 +5,23 @@ import { AuthModal } from './AuthModal';
 import logo from '../../../assets/UdyogWorks logo.png';
 import { getCurrentUser, logout } from '../../../utils/auth';
 
-const TOP_BAR_HEIGHT = 44;
 
 interface HeaderProps {
   onAuthButtonClick?: () => void;
 }
+
 
 export const Header = ({ onAuthButtonClick }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
-  const [headerHeight, setHeaderHeight] = useState(0);
   const [user, setUser] = useState<any>(getCurrentUser());
 
-  const headerRef = useRef<HTMLHeadElement>(null);
+
   const lastScrollY = useRef(0);
   const navigate = useNavigate();
+
 
   const openAuthModal = (mode: 'login' | 'signup') => {
     if (onAuthButtonClick) {
@@ -33,16 +33,19 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
     setIsMobileMenuOpen(false);
   };
 
+
   const closeAuthModal = () => {
     setIsAuthModalOpen(false);
-    setUser(getCurrentUser()); 
+    setUser(getCurrentUser());
   };
+
 
   const handleLogout = () => {
     logout();
     setUser(null);
     navigate('/');
   };
+
 
   const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
     e.preventDefault();
@@ -53,13 +56,6 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
     }
   };
 
-  useEffect(() => {
-    if (headerRef.current) {
-      const height = headerRef.current.offsetHeight;
-      setHeaderHeight(height);
-      document.documentElement.style.setProperty('--header-height', `${height}px`);
-    }
-  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -70,135 +66,204 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
       }
     };
 
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
 
   const navLinks = [
     { name: 'Home', href: '#home' },
     { name: 'Services', href: '#services' },
     { name: 'Offers', href: '#offers' },
-    { name: 'Portfolio', href: '#portfolio' }, 
+    { name: 'Portfolio', href: '#portfolio' },
     { name: 'About', href: '#about' },
     { name: 'Testimonials', href: '#testimonials' },
     { name: 'Contact', href: '#contact' },
   ];
 
+
   return (
     <>
-      <div style={{ height: `${headerHeight}px`, minHeight: '64px' }} />
-
       <header
-        ref={headerRef}
-        className={`fixed w-full z-40 transition-all duration-300 ${
-          isScrolled ? 'bg-white/90 backdrop-blur-md shadow-md' : 'bg-transparent'
-        }`}
-        style={{ top: `${TOP_BAR_HEIGHT}px` }}
+        className={`fixed top-0 left-0 w-full z-40 transition-all duration-300 ${isScrolled
+          ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg shadow-lg'
+          : 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm'
+          }`}
       >
-        <div className="container mx-auto px-4 py-3 max-w-7xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 max-w-7xl">
           <div className="flex items-center justify-between">
 
-            {/* ✅ LOGO */}
-            <Link to="/" className="flex items-center space-x-3">
-              <img src={logo} className="h-12" />
-              <span className="text-xl font-bold bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent">
+
+            {/* Logo */}
+            <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group">
+              <img
+                src={logo}
+                alt="UdyogWorks Logo"
+                className="h-10 sm:h-12 transition-transform duration-300 group-hover:scale-105"
+              />
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent">
                 UdyogWorks
               </span>
             </Link>
 
-            {/* ✅ NAV LINKS */}
-            <nav className="hidden md:flex items-center space-x-8">
+
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
               {navLinks.map(link => (
                 <a
                   key={link.name}
                   href={link.href}
                   onClick={(e) => handleNavigation(e, link.href)}
-                  className="text-gray-700 hover:text-[#00C2A8] transition-colors duration-300 flex items-center gap-1"
+                  className="text-gray-700 dark:text-gray-300 hover:text-[#00C2A8] dark:hover:text-[#00C2A8]
+                    transition-all duration-300 font-medium relative group"
                 >
-                  {link.name === 'Portfolio'}
                   {link.name}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#00C2A8] to-[#0066FF]
+                    transition-all duration-300 group-hover:w-full"></span>
                 </a>
               ))}
             </nav>
 
-            {/* ✅ AUTH AREA (DESKTOP) */}
-            <div className="hidden md:flex items-center space-x-4">
 
+            {/* Desktop Auth Buttons */}
+            <div className="hidden lg:flex items-center space-x-3 xl:space-x-4">
               {!user ? (
                 <>
-                  <button onClick={() => openAuthModal('login')} className="flex items-center gap-1">
-                    <LogIn size={18} /> Login
+                  <button
+                    onClick={() => openAuthModal('login')}
+                    className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-[#00C2A8]
+                      dark:hover:text-[#00C2A8] transition-colors duration-300 font-medium px-4 py-2 rounded-lg
+                      hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <LogIn size={18} />
+                    <span>Login</span>
                   </button>
+
 
                   <button
                     onClick={() => openAuthModal('signup')}
-                    className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-4 py-2 rounded-lg flex items-center gap-1"
+                    className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-5 py-2.5 rounded-lg
+                      flex items-center gap-2 font-medium shadow-md hover:shadow-xl transition-all duration-300
+                      transform hover:scale-105"
                   >
-                    <UserPlus size={18} /> Register
+                    <UserPlus size={18} />
+                    <span>Register</span>
                   </button>
                 </>
               ) : (
                 <>
-                  <div className="flex items-center gap-2 text-gray-700 font-medium">
+                  <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium px-3">
                     <User size={18} />
-                    Hi, {user.username}
+                    <span>Hi, {user.username}</span>
                   </div>
+
 
                   <button
                     onClick={handleLogout}
-                    className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-1"
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center
+                      gap-2 font-medium shadow-md hover:shadow-lg transition-all duration-300"
                   >
-                    <LogOut size={16} /> Logout
+                    <LogOut size={16} />
+                    <span>Logout</span>
                   </button>
                 </>
               )}
-
             </div>
 
-            {/* ✅ MOBILE MENU TOGGLE */}
-            <div className="md:hidden">
-              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-                {isMobileMenuOpen ? <X /> : <Menu />}
+
+            {/* Mobile Menu Toggle */}
+            <div className="lg:hidden">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300"
+                aria-label="Toggle menu"
+              >
+                {isMobileMenuOpen ? (
+                  <X size={24} className="text-gray-700 dark:text-gray-300" />
+                ) : (
+                  <Menu size={24} className="text-gray-700 dark:text-gray-300" />
+                )}
               </button>
             </div>
           </div>
 
-          {/* ✅ MOBILE MENU */}
-          {isMobileMenuOpen && (
-            <div className="md:hidden mt-4 space-y-3">
 
+          {/* Mobile Menu */}
+          <div
+            className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-[600px] opacity-100 mt-4' : 'max-h-0 opacity-0'
+              }`}
+          >
+            <div className="py-4 space-y-1 border-t border-gray-200 dark:border-gray-700">
+              {/* Mobile Navigation Links */}
               {navLinks.map(link => (
-                <a key={link.name} href={link.href} onClick={(e) => handleNavigation(e, link.href)}>
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={(e) => handleNavigation(e, link.href)}
+                  className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r
+                    hover:from-[#00C2A8]/10 hover:to-[#0066FF]/10 hover:text-[#00C2A8]
+                    rounded-lg transition-all duration-300 font-medium"
+                >
                   {link.name}
                 </a>
               ))}
 
-              {!user ? (
-                <>
-                  <button onClick={() => openAuthModal('login')} className="w-full">
-                    Login
-                  </button>
 
-                  <button onClick={() => openAuthModal('signup')} className="w-full bg-blue-500 text-white py-2">
-                    Register
-                  </button>
-                </>
-              ) : (
-                <>
-                  <p className="font-semibold text-center">Hi, {user.username}</p>
+              {/* Mobile Auth Section */}
+              <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+                {!user ? (
+                  <>
+                    <button
+                      onClick={() => openAuthModal('login')}
+                      className="w-full px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100
+                        dark:hover:bg-gray-800 rounded-lg transition-all duration-300 font-medium
+                        flex items-center justify-center gap-2"
+                    >
+                      <LogIn size={18} />
+                      <span>Login</span>
+                    </button>
 
-                  <button onClick={handleLogout} className="w-full bg-red-500 text-white py-2">
-                    Logout
-                  </button>
-                </>
-              )}
+
+                    <button
+                      onClick={() => openAuthModal('signup')}
+                      className="w-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-4 py-3
+                        rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300
+                        flex items-center justify-center gap-2"
+                    >
+                      <UserPlus size={18} />
+                      <span>Register</span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-semibold text-center text-gray-700 dark:text-gray-300 py-2 flex items-center justify-center gap-2">
+                      <User size={18} />
+                      <span>Hi, {user.username}</span>
+                    </p>
+
+
+                    <button
+                      onClick={handleLogout}
+                      className="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-lg
+                        font-medium shadow-md hover:shadow-lg transition-all duration-300
+                        flex items-center justify-center gap-2"
+                    >
+                      <LogOut size={18} />
+                      <span>Logout</span>
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
-          )}
+          </div>
+
 
         </div>
       </header>
 
-      {/* ✅ AUTH MODAL */}
+
+      {/* Auth Modal */}
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={closeAuthModal}
@@ -207,5 +272,6 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
     </>
   );
 };
+
 
 export default Header;

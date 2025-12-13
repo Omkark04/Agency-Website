@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-
 import { TopBar } from './components/TopBar';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
@@ -16,9 +15,11 @@ import { Footer } from './components/Footer';
 import AuthModal from './components/AuthModal';
 import WhatsappFloat from './components/WhatsappFloat';
 
+
 export const LandingPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
 
   useEffect(() => {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -26,17 +27,19 @@ export const LandingPage = () => {
     document.documentElement.classList.toggle('dark', prefersDark);
   }, []);
 
+
   return (
     <div className={`min-h-screen ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <TopBar />
       <Header onAuthButtonClick={() => setIsAuthModalOpen(true)} />
 
-      <main className="pt-[120px]">
+
+      <main className="pt-20">
         <Hero onGetStartedClick={() => setIsAuthModalOpen(true)} />
         <TrustStrip />
         <Services />
         <Offers />
-        <PortfolioSection /> 
+        <PortfolioSection />
         <Process />
         <Pricing />
         <Testimonials />
@@ -44,11 +47,13 @@ export const LandingPage = () => {
         <Contact />
       </main>
 
+
       <Footer />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
       <WhatsappFloat />
     </div>
   );
 };
+
 
 export default LandingPage;

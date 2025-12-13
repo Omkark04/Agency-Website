@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
+import { listOrders } from '../../../api/orders';
 import { 
   Home, 
   Folder, 
   Settings, 
   Bell, 
-  MessageSquare, 
   Download, 
   Search,
   CreditCard,
@@ -26,66 +26,12 @@ import {
   Activity
 } from 'lucide-react';
 
-// Enhanced mock data
-const stats = [
-  { 
-    id: 1, 
-    name: 'Active Projects', 
-    value: '12', 
-    icon: Folder, 
-    change: '+2', 
-    changeType: 'increase',
-    description: 'Ongoing work',
-    color: 'from-blue-500 to-blue-600',
-    bgColor: 'bg-gradient-to-br from-blue-50 to-blue-100'
-  },
-  { 
-    id: 2, 
-    name: 'Pending Tasks', 
-    value: '8', 
-    icon: Clock, 
-    change: '-3', 
-    changeType: 'decrease',
-    description: 'Require attention',
-    color: 'from-amber-500 to-orange-500',
-    bgColor: 'bg-gradient-to-br from-amber-50 to-orange-100'
-  },
-  { 
-    id: 3, 
-    name: 'Payments Due', 
-    value: '$2,450', 
-    icon: CreditCard, 
-    change: '+$450', 
-    changeType: 'increase',
-    description: 'Overdue payments',
-    color: 'from-emerald-500 to-green-600',
-    bgColor: 'bg-gradient-to-br from-emerald-50 to-green-100'
-  },
-  { 
-    id: 4, 
-    name: 'Completed', 
-    value: '24', 
-    icon: CheckCircle, 
-    change: '+5', 
-    changeType: 'increase',
-    description: 'This month',
-    color: 'from-purple-500 to-purple-600',
-    bgColor: 'bg-gradient-to-br from-purple-50 to-purple-100'
-  },
-];
-
-const recentActivity = [
-  { id: 1, action: 'Project approved', project: 'Website Redesign', time: '10 min ago', status: 'completed' },
-  { id: 2, action: 'Feedback requested', project: 'Mobile App', time: '1 hour ago', status: 'pending' },
-  { id: 3, action: 'Payment received', project: 'Brand Identity', time: '2 hours ago', status: 'completed' },
-  { id: 4, action: 'New task assigned', project: 'SEO Optimization', time: '1 day ago', status: 'in-progress' },
-];
-
 export default function ClientDashboard() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [orders, setOrders] = useState<any[]>([]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,6 +40,80 @@ export default function ClientDashboard() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      const ordersResponse = await listOrders();
+      setOrders(ordersResponse.data || []);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    }
+  };
+
+  // Calculate stats from real data
+  const stats = [
+    { 
+      id: 1, 
+      name: 'Total Orders', 
+      value: orders.length.toString(), 
+      icon: Folder, 
+      change: '+' + orders.filter(o => {
+        const createdDate = new Date(o.created_at);
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return createdDate > weekAgo;
+      }).length, 
+      changeType: 'increase' as const,
+      description: 'All time',
+      color: 'from-blue-500 to-blue-600',
+      bgColor: 'bg-gradient-to-br from-blue-50 to-blue-100'
+    },
+    { 
+      id: 2, 
+      name: 'In Progress', 
+      value: orders.filter(o => o.status === 'in_progress').length.toString(), 
+      icon: Clock, 
+      change: '', 
+      changeType: 'increase' as const,
+      description: 'Active orders',
+      color: 'from-amber-500 to-orange-500',
+      bgColor: 'bg-gradient-to-br from-amber-50 to-orange-100'
+    },
+    { 
+      id: 3, 
+      name: 'Total Spent', 
+      value: '₹' + orders.reduce((sum, o) => sum + (o.total_price || 0), 0).toLocaleString(), 
+      icon: CreditCard, 
+      change: '', 
+      changeType: 'increase' as const,
+      description: 'All payments',
+      color: 'from-emerald-500 to-green-600',
+      bgColor: 'bg-gradient-to-br from-emerald-50 to-green-100'
+    },
+    { 
+      id: 4, 
+      name: 'Completed', 
+      value: orders.filter(o => o.status === 'completed').length.toString(), 
+      icon: CheckCircle, 
+      change: '', 
+      changeType: 'increase' as const,
+      description: 'Finished orders',
+      color: 'from-purple-500 to-purple-600',
+      bgColor: 'bg-gradient-to-br from-purple-50 to-purple-100'
+    },
+  ];
+
+  const recentActivity = orders.slice(0, 4).map(order => ({
+    id: order.id,
+    action: `Order ${order.status === 'completed' ? 'completed' : order.status === 'in_progress' ? 'in progress' : 'placed'}`,
+    project: order.service_title || 'Service Order',
+    time: new Date(order.created_at).toLocaleDateString(),
+    status: order.status
+  }));
 
   const getPageTitle = () => {
     if (location.pathname === '/client-dashboard') return 'Dashboard Overview';
@@ -151,28 +171,20 @@ export default function ClientDashboard() {
               </div>
               <input
                 type="text"
-                placeholder="Search projects, messages..."
+                placeholder="Search orders, projects..."
                 className="pl-10 pr-4 py-2.5 w-64 bg-gray-50/80 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               />
             </div>
 
             {/* Notification */}
-            <button 
+            <Link
+              to="/client-dashboard/notifications"
               className="relative p-2.5 rounded-xl hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 group"
               aria-label="Notifications"
             >
               <Bell className="h-5 w-5 text-gray-600 group-hover:text-gray-900 transition-colors" />
               <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full ring-2 ring-white"></span>
-            </button>
-
-            {/* Messages */}
-            <button 
-              className="relative p-2.5 rounded-xl hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 group"
-              aria-label="Messages"
-            >
-              <MessageSquare className="h-5 w-5 text-gray-600 group-hover:text-gray-900 transition-colors" />
-              <span className="absolute top-2 right-2 h-2 w-2 bg-blue-500 rounded-full ring-2 ring-white"></span>
-            </button>
+            </Link>
 
             {/* Profile Dropdown */}
             <div className="relative">
@@ -302,11 +314,11 @@ export default function ClientDashboard() {
                 badge: null
               },
               { 
-                path: '/client-dashboard/messages', 
-                icon: MessageSquare, 
-                label: 'Messages', 
-                active: location.pathname.includes('messages'),
-                badge: 3 
+                path: '/client-dashboard/orders', 
+                icon: CreditCard, 
+                label: 'Orders & Payments', 
+                active: location.pathname.includes('orders'),
+                badge: null
               },
               { 
                 path: '/client-dashboard/documents', 
@@ -423,6 +435,72 @@ export default function ClientDashboard() {
           {/* Dashboard Content */}
           {location.pathname === '/client-dashboard' && (
             <>
+              {/* Quick Actions */}
+              <div className="mb-8">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Link
+                    to="/client-dashboard/services"
+                    className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 hover:shadow-md transition-all duration-200 group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-600 rounded-lg">
+                        <Box className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">Browse Services</p>
+                        <p className="text-xs text-gray-600">Explore our offerings</p>
+                      </div>
+                    </div>
+                  </Link>
+
+                  <Link
+                    to="/client-dashboard/orders"
+                    className="p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200 hover:shadow-md transition-all duration-200 group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-green-600 rounded-lg">
+                        <CreditCard className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">View Orders</p>
+                        <p className="text-xs text-gray-600">Track your purchases</p>
+                      </div>
+                    </div>
+                  </Link>
+
+                  <Link
+                    to="/client-dashboard/notifications"
+                    className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200 hover:shadow-md transition-all duration-200 group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-purple-600 rounded-lg">
+                        <Bell className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">Notifications</p>
+                        <p className="text-xs text-gray-600">Stay updated</p>
+                      </div>
+                    </div>
+                  </Link>
+
+                  <Link
+                    to="/client-dashboard/settings"
+                    className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl border border-amber-200 hover:shadow-md transition-all duration-200 group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-amber-600 rounded-lg">
+                        <Settings className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">Settings</p>
+                        <p className="text-xs text-gray-600">Manage account</p>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+
               {/* Stats Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
                 {stats.map((stat) => (

@@ -3,9 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Save, Eye, Plus, Trash2, GripVertical, Settings,
-  Type, Hash, AlignLeft, FileText, ChevronDown, CheckSquare, Upload
+  Type, Hash, AlignLeft, FileText, ChevronDown, CheckSquare, Upload,
+  Search, Edit, Copy, List
 } from 'lucide-react';
-import { createForm, updateForm, getForm, createField, updateField, deleteField } from '../../../api/forms';
+import { createForm, updateForm, getForm, createField, updateField, deleteField, listForms, deleteForm } from '../../../api/forms';
 import type { ServiceForm, FormField } from '../../../api/forms';
 import { listServices } from '../../../api/services';
 
@@ -35,11 +36,21 @@ const FormBuilder = () => {
   const [editingField, setEditingField] = useState<FormField | null>(null);
   const [showFieldEditor, setShowFieldEditor] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  
+  // Form History State
+  const [allForms, setAllForms] = useState<ServiceForm[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [formToDelete, setFormToDelete] = useState<ServiceForm | null>(null);
+  const [showHistory, setShowHistory] = useState(true);
 
   useEffect(() => {
     loadServices();
+    loadAllForms();
     if (id) {
       loadForm(parseInt(id));
+      setShowHistory(false);
     }
   }, [id]);
 
@@ -63,6 +74,62 @@ const FormBuilder = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadAllForms = async () => {
+    try {
+      const response = await listForms();
+      setAllForms(response.data || []);
+    } catch (error) {
+      console.error('Error loading forms:', error);
+    }
+  };
+
+  const handleDeleteForm = async () => {
+    if (!formToDelete) return;
+    
+    try {
+      await deleteForm(formToDelete.id!);
+      setShowDeleteModal(false);
+      setFormToDelete(null);
+      await loadAllForms();
+      alert('Form deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting form:', error);
+      alert('Error deleting form');
+    }
+  };
+
+  const handleDuplicateForm = async (formToDuplicate: ServiceForm) => {
+    try {
+      const duplicatedForm = {
+        ...formToDuplicate,
+        title: `${formToDuplicate.title} (Copy)`,
+        is_active: false
+      };
+      delete duplicatedForm.id;
+      delete duplicatedForm.created_at;
+      delete duplicatedForm.updated_at;
+      
+      const response = await createForm(duplicatedForm);
+      alert('Form duplicated successfully!');
+      navigate(`/dashboard/forms/${response.data.id}`);
+    } catch (error) {
+      console.error('Error duplicating form:', error);
+      alert('Error duplicating form');
+    }
+  };
+
+  const handleCreateNew = () => {
+    setForm({
+      title: '',
+      description: '',
+      service: 0,
+      is_active: false
+    });
+    setFields([]);
+    setShowHistory(false);
+    navigate('/dashboard/forms/new');
   };
 
   const handleSaveForm = async () => {
@@ -151,31 +218,194 @@ const FormBuilder = () => {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {form.id ? 'Edit Form' : 'Create New Form'}
+            {form.id ? 'Edit Form' : showHistory ? 'Form Builder' : 'Create New Form'}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Build custom forms for your services
+            {showHistory ? 'Manage your service forms' : 'Build custom forms for your services'}
           </p>
         </div>
         <div className="flex gap-3">
-          <button
-            onClick={() => setShowPreview(!showPreview)}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
-          >
-            <Eye className="h-5 w-5" />
-            {showPreview ? 'Hide' : 'Show'} Preview
-          </button>
-          <button
-            onClick={handleSaveForm}
-            disabled={loading || !form.service}
-            className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:opacity-90 disabled:opacity-50"
-          >
-            <Save className="h-5 w-5" />
-            Save Form
-          </button>
+          {!showHistory && (
+            <>
+              <button
+                onClick={() => setShowHistory(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+              >
+                <List className="h-5 w-5" />
+                View All Forms
+              </button>
+              <button
+                onClick={() => setShowPreview(!showPreview)}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+              >
+                <Eye className="h-5 w-5" />
+                {showPreview ? 'Hide' : 'Show'} Preview
+              </button>
+              <button
+                onClick={handleSaveForm}
+                disabled={loading || !form.service}
+                className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:opacity-90 disabled:opacity-50"
+              >
+                <Save className="h-5 w-5" />
+                Save Form
+              </button>
+            </>
+          )}
+          {showHistory && (
+            <button
+              onClick={handleCreateNew}
+              className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:opacity-90"
+            >
+              <Plus className="h-5 w-5" />
+              Create New Form
+            </button>
+          )}
         </div>
       </div>
 
+      {/* Form History Section */}
+      {showHistory && (
+        <div className="mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+            {/* Search and Filters */}
+            <div className="mb-6 flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search forms..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as any)}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              >
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+
+            {/* Forms Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 dark:bg-gray-900">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                      Form Title
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                      Service
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                      Created
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {allForms
+                    .filter(f => {
+                      const matchesSearch = f.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                          f.service_title?.toLowerCase().includes(searchQuery.toLowerCase());
+                      const matchesStatus = statusFilter === 'all' ||
+                                          (statusFilter === 'active' && f.is_active) ||
+                                          (statusFilter === 'inactive' && !f.is_active);
+                      return matchesSearch && matchesStatus;
+                    })
+                    .map((formItem) => (
+                      <tr key={formItem.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {formItem.title}
+                          </div>
+                          {formItem.description && (
+                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                              {formItem.description}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900 dark:text-white">
+                            {formItem.service_title || `Service #${formItem.service}`}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            formItem.is_active
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                          }`}>
+                            {formItem.is_active ? 'Active' : 'Inactive'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                          {formItem.created_at ? new Date(formItem.created_at).toLocaleDateString() : 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => navigate(`/dashboard/forms/${formItem.id}`)}
+                              className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
+                              title="Edit"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDuplicateForm(formItem)}
+                              className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded"
+                              title="Duplicate"
+                            >
+                              <Copy className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setFormToDelete(formItem);
+                                setShowDeleteModal(true);
+                              }}
+                              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                              title="Delete"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+              
+              {allForms.filter(f => {
+                const matchesSearch = f.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                    f.service_title?.toLowerCase().includes(searchQuery.toLowerCase());
+                const matchesStatus = statusFilter === 'all' ||
+                                    (statusFilter === 'active' && f.is_active) ||
+                                    (statusFilter === 'inactive' && !f.is_active);
+                return matchesSearch && matchesStatus;
+              }).length === 0 && (
+                <div className="text-center py-12">
+                  <FileText className="h-12 w-12 mx-auto mb-3 text-gray-400 opacity-50" />
+                  <p className="text-gray-500 dark:text-gray-400">
+                    {searchQuery || statusFilter !== 'all' ? 'No forms match your filters' : 'No forms created yet'}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Form Editor Section */}
+      {!showHistory && (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Form Settings */}
         <div className="lg:col-span-2 space-y-6">
@@ -341,6 +571,38 @@ const FormBuilder = () => {
           </div>
         </div>
       </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && formToDelete && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              Delete Form?
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Are you sure you want to delete "{formToDelete.title}"? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleDeleteForm}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setFormToDelete(null);
+                }}
+                className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Field Editor Modal */}
       {showFieldEditor && editingField && (
