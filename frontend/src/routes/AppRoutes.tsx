@@ -54,7 +54,7 @@ export const AppRoutes: React.FC = () => {
           <Route path='/team-head-dashboard' element={<TeamHeadDashboard />}>
             <Route path='/team-head-dashboard/task-manager' element={<TaskManager />} />
             <Route path='/team-head-dashboard/team-members' element={<TeamMemberPage />} />
-            <Route path='team-head-dashboard/submissions-approval' element={<SubmissionsApproval />} />
+            <Route path='/team-head-dashboard/submissions-approval' element={<SubmissionsApproval />} />
           </Route>
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['team_member', 'admin']} />}>

@@ -71,8 +71,14 @@ class TeamMembersListView(generics.ListCreateAPIView):
     """
     List and create team members for the service head's service
     """
-    serializer_class = TeamMemberSerializer
     permission_classes = [IsTeamHead]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            from .serializers import TeamMemberCreateSerializer
+            return TeamMemberCreateSerializer
+        from .serializers import TeamMemberSerializer
+        return TeamMemberSerializer
 
     def get_queryset(self):
         user = self.request.user
@@ -94,6 +100,7 @@ class TeamMembersListView(generics.ListCreateAPIView):
         serializer.save(service=self.request.user.service, role='team_member')
 
 
+
 class TeamMemberDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Get, update, or delete a specific team member
@@ -113,6 +120,23 @@ class TeamMemberDetailView(generics.RetrieveUpdateDestroyAPIView):
         ).filter(
             role='team_member'
         ).distinct()
+    
+    def perform_update(self, serializer):
+        """Ensure team member stays in the same service"""
+        instance = self.get_object()
+        # Prevent changing the service
+        serializer.save(service=instance.service, role='team_member')
+    
+    def perform_destroy(self, instance):
+        """Delete team member with validation"""
+        # Check if user has permission
+        if instance.service != self.request.user.service:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You can only delete team members from your service")
+        
+        # Perform the deletion
+        instance.delete()
+
 
 
 class TeamProjectsListView(generics.ListAPIView):
@@ -193,46 +217,68 @@ class TeamTasksListView(generics.ListAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Get all tasks for this service
-        tasks = Task.objects.filter(order__service=service).select_related(
-            'assignee', 'order'
-        )
+        try:
+            # Get all tasks for this service
+            tasks = Task.objects.filter(order__service=service).select_related(
+                'assignee', 'order'
+            )
 
-        # Apply filters
-        status_filter = request.query_params.get('status')
-        priority_filter = request.query_params.get('priority')
-        assignee_filter = request.query_params.get('assignee')
+            # Apply filters
+            status_filter = request.query_params.get('status')
+            priority_filter = request.query_params.get('priority')
+            assignee_filter = request.query_params.get('assignee')
 
-        if status_filter:
-            tasks = tasks.filter(status=status_filter)
-        if priority_filter:
-            tasks = tasks.filter(priority=priority_filter)
-        if assignee_filter:
-            tasks = tasks.filter(assignee_id=assignee_filter)
+            if status_filter:
+                tasks = tasks.filter(status=status_filter)
+            if priority_filter:
+                tasks = tasks.filter(priority=priority_filter)
+            if assignee_filter:
+                tasks = tasks.filter(assignee_id=assignee_filter)
 
-        # Format tasks data
-        tasks_data = []
-        for task in tasks:
-            tasks_data.append({
-                'id': task.id,
-                'title': task.title,
-                'description': task.description,
-                'status': task.status,
-                'priority': task.get_priority_display(),
-                'priority_value': task.priority,
-                'due_date': task.due_date.isoformat() if task.due_date else None,
-                'assignee': {
-                    'id': task.assignee.id if task.assignee else None,
-                    'name': task.assignee.username if task.assignee else 'Unassigned',
-                    'avatar': task.assignee.avatar_url if task.assignee else ''
+            # Format tasks data
+            tasks_data = []
+            for task in tasks:
+                try:
+                    # Safely get avatar URL
+                    avatar_url = ''
+                    if task.assignee and hasattr(task.assignee, 'avatar_url'):
+                        avatar_url = task.assignee.avatar_url or ''
+                    
+                    tasks_data.append({
+                        'id': task.id,
+                        'title': task.title,
+                        'description': task.description or '',
+                        'status': task.status,
+                        'priority': task.get_priority_display() if hasattr(task, 'get_priority_display') else str(task.priority),
+                        'priority_value': task.priority,
+                        'due_date': task.due_date.isoformat() if task.due_date else None,
+                        'assignee': {
+                            'id': task.assignee.id if task.assignee else None,
+                            'name': task.assignee.username if task.assignee else 'Unassigned',
+                            'avatar': avatar_url
+                        },
+                        'order': {
+                            'id': task.order.id,
+                            'title': task.order.title
+                        }
+                    })
+                except Exception as e:
+                    # Log the error but continue processing other tasks
+                    print(f"Error processing task {task.id}: {str(e)}")
+                    continue
+
+            return Response(tasks_data)
+        
+        except Exception as e:
+            # Return a more helpful error message
+            return Response(
+                {
+                    "error": "Failed to load tasks",
+                    "detail": str(e)
                 },
-                'order': {
-                    'id': task.order.id,
-                    'title': task.order.title
-                }
-            })
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
-        return Response(tasks_data)
 
 
 class TeamPerformanceView(APIView):
