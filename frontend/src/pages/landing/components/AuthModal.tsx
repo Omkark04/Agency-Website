@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { X, Eye, EyeOff, LogIn, Facebook, Twitter, Github } from 'lucide-react';
+import { X, Eye, EyeOff, Facebook, Twitter, Github } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 
+
 type AuthMode = 'login' | 'signup';
+
 
 interface AuthModalProps {
   isOpen?: boolean;
@@ -11,14 +13,17 @@ interface AuthModalProps {
   defaultMode?: AuthMode;
 }
 
+
 export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalProps) => {
   const { login, register, loading } = useAuth();
   const navigate = useNavigate();
+
 
   const [mode, setMode] = useState<AuthMode>(defaultMode);
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+
 
   const [formData, setFormData] = useState({
     name: '',
@@ -28,39 +33,47 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
     password: '',
   });
 
+
   const isControlled = isOpen !== undefined;
+
 
   useEffect(() => {
     if (defaultMode) setMode(defaultMode);
   }, [defaultMode]);
+
 
   const toggleModal = () => {
     if (!isControlled) setInternalIsOpen(!internalIsOpen);
     else if (onClose) onClose();
   };
 
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+
 
   // ✅ FULLY FIXED SUBMIT HANDLER
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
+
     try {
       if (mode === 'login') {
         const res = await login(formData.email, formData.password);
+
 
         const userRole =
           res?.user?.role ||
           localStorage.getItem('role');
 
+
         if (userRole === 'admin') navigate('/dashboard');
-        else if (userRole === 'service_head' || userRole === 'team_head') navigate('/team-head-dashboard');
-        else if (userRole === 'team_member') navigate('/team-member-dashboard');
+        else if (userRole === 'team_head') navigate('/team-head-dashboard');
         else navigate('/client-dashboard');
+
 
       } else {
         await register({
@@ -72,10 +85,13 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
           role: 'client',
         });
 
+
         navigate('/client-dashboard');
       }
 
+
       toggleModal();
+
 
       // ✅ RESET FORM AFTER SUCCESS
       setFormData({
@@ -86,36 +102,20 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
         password: '',
       });
 
+
     } catch (err: any) {
       setError(err.message || 'Authentication failed');
     }
   };
 
-  const showFAB = isControlled ? !isOpen : !internalIsOpen;
-
-  if (showFAB) {
-    return (
-      <div className="fixed bottom-8 right-8 z-50">
-        <button
-          onClick={() => {
-            setMode('login');
-            if (!isControlled) setInternalIsOpen(true);
-            else if (onClose) onClose();
-          }}
-          className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-          aria-label="Open login"
-        >
-          <LogIn size={22} />
-        </button>
-      </div>
-    );
-  }
 
   if (isControlled && !isOpen) return null;
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={toggleModal}>
       <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+
 
         {/* HEADER */}
         <div className="flex justify-between items-center p-4 border-b">
@@ -127,6 +127,7 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
           </button>
         </div>
 
+
         {/* TABS */}
         <div className="flex border-b">
           <button onClick={() => setMode('login')} className={`flex-1 py-3 ${mode === 'login' && 'border-b-2 border-[#00C2A8]'}`}>
@@ -137,8 +138,10 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
           </button>
         </div>
 
+
         {/* FORM */}
         <form onSubmit={handleSubmit} className="p-6">
+
 
           {mode === 'signup' && (
             <>
@@ -147,10 +150,12 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
                 <input type="text" name="name" value={formData.name} onChange={handleInputChange} className="w-full border p-2 rounded" required />
               </div>
 
+
               <div className="mb-3">
                 <label>Username</label>
                 <input type="text" name="username" value={formData.username} onChange={handleInputChange} className="w-full border p-2 rounded" required />
               </div>
+
 
               <div className="mb-3">
                 <label>Phone Number</label>
@@ -159,10 +164,12 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
             </>
           )}
 
+
           <div className="mb-3">
             <label>Email</label>
             <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full border p-2 rounded" required />
           </div>
+
 
           <div className="mb-3 relative">
             <label>Password</label>
@@ -172,12 +179,15 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
             </button>
           </div>
 
+
           {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
+
 
           <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white py-2 rounded">
             {loading ? 'Processing...' : mode === 'login' ? 'Sign In' : 'Create Account'}
           </button>
         </form>
+
 
         {/* FOOTER */}
         <div className="p-4 text-center">
@@ -187,6 +197,7 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
           </button>
         </div>
 
+
         {/* SOCIALS */}
         <div className="px-6 pb-6 grid grid-cols-3 gap-3">
           <button className="border p-2 rounded"><Github /></button>
@@ -194,9 +205,11 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
           <button className="border p-2 rounded"><Twitter /></button>
         </div>
 
+
       </div>
     </div>
   );
 };
+
 
 export default AuthModal;
