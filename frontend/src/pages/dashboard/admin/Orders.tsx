@@ -2,6 +2,7 @@
 // Orders.tsx - Enhanced
 // ============================================
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { listOrders } from '../../../api/orders';
 import { listSubmissions } from '../../../api/forms';
 import { useAuth } from '../../../hooks/useAuth';
@@ -17,7 +18,10 @@ import {
   FiFileText,
   FiDownload,
   FiX,
-  FiEye
+  FiEye,
+  FiSettings,
+  FiPhone,
+  FiImage
 } from 'react-icons/fi';
 
 export function Orders() {
@@ -33,14 +37,25 @@ export function Orders() {
   const loadOrders = async () => {
     setLoading(true);
     try {
+      console.log('Orders.tsx: Starting to load orders...');
       const [ordersRes, submissionsRes] = await Promise.all([
         listOrders(),
         listSubmissions().catch(() => ({ data: [] }))
       ]);
-      setOrders(ordersRes.data);
+      console.log('Orders.tsx: Raw ordersRes:', ordersRes);
+      console.log('Orders.tsx: ordersRes.data:', ordersRes.data);
+      console.log('Orders.tsx: Is array?', Array.isArray(ordersRes.data));
+      
+      // Ensure orders is always an array
+      const ordersData = Array.isArray(ordersRes.data) ? ordersRes.data : ((ordersRes.data as any)?.results || []);
+      console.log('Orders.tsx: Final ordersData:', ordersData);
+      console.log('Orders.tsx: ordersData length:', ordersData.length);
+      
+      setOrders(ordersData);
       setSubmissions(submissionsRes.data);
     } catch (error) {
-      console.error('Failed to load orders:', error);
+      console.error('Orders.tsx: Failed to load orders:', error);
+      setOrders([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -234,16 +249,35 @@ export function Orders() {
                           <div className="p-3 bg-gradient-to-br from-orange-500 to-rose-600 rounded-2xl shadow-lg">
                             <FiPackage className="h-6 w-6 text-white" />
                           </div>
-                          <div>
+                          <div className="space-y-2">
                             <div className="font-bold text-gray-900 text-lg">{order.title}</div>
+                            
+                            {/* Client Email */}
+                            {order.client_email && (
+                              <div className="text-sm text-gray-600">{order.client_email}</div>
+                            )}
+                            
+                            {/* WhatsApp Number */}
+                            {order.whatsapp_number && (
+                              <div className="flex items-center text-sm text-green-600">
+                                <FiPhone className="h-4 w-4 mr-1" />
+                                {order.whatsapp_number}
+                              </div>
+                            )}
+                            
+                            {/* Price Plan Badge */}
+                            {order.price_card_title && (
+                              <div className="inline-block">
+                                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+                                  Plan: {order.price_card_title} (₹{order.price_card_price})
+                                </span>
+                              </div>
+                            )}
+                            
+                            {/* Form Submission Indicator */}
                             {submission && (
                               <div className="text-xs text-indigo-600 mt-1 font-medium">
                                 📋 {submission.submission_summary}
-                              </div>
-                            )}
-                            {order.client_email && (
-                              <div className="text-sm text-gray-500 mt-1">
-                                {order.client_email}
                               </div>
                             )}
                           </div>
@@ -282,15 +316,36 @@ export function Orders() {
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        {submission && (
-                          <button
-                            onClick={() => setSelectedSubmission(submission)}
-                            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2 text-sm font-medium"
+                        <div className="flex items-center gap-2">
+                          <Link
+                            to={`/dashboard/orders/${order.id}`}
+                            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center gap-2 text-sm font-medium shadow-lg"
                           >
-                            <FiEye className="h-4 w-4" />
-                            View
-                          </button>
-                        )}
+                            <FiSettings className="h-4 w-4" />
+                            Manage
+                          </Link>
+                          
+                          {/* Show media count if form has files */}
+                          {order.form_submission_data?.files && Object.keys(order.form_submission_data.files).length > 0 && (
+                            <button
+                              onClick={() => setSelectedSubmission(order.form_submission_data)}
+                              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2 text-sm font-medium"
+                            >
+                              <FiImage className="h-4 w-4" />
+                              {Object.keys(order.form_submission_data.files).length} Files
+                            </button>
+                          )}
+                          
+                          {submission && (
+                            <button
+                              onClick={() => setSelectedSubmission(submission)}
+                              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2 text-sm font-medium"
+                            >
+                              <FiEye className="h-4 w-4" />
+                              View
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   )})}
@@ -356,40 +411,56 @@ export function Orders() {
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Submission Data</h3>
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-3">
-                  {Object.entries(selectedSubmission.data || {}).map(([key, value]: [string, any]) => (
-                    <div key={key} className="border-b border-gray-200 dark:border-gray-700 pb-2 last:border-0">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Field {key}</p>
-                      <p className="text-gray-900 dark:text-white">
-                        {Array.isArray(value) ? value.join(', ') : String(value)}
-                      </p>
-                    </div>
-                  ))}
+                  {Object.entries(selectedSubmission.data || {}).map(([key, value]: [string, any]) => {
+                    // Try to get field label from form fields
+                    const fieldLabel = `Field ${key}`;
+                    return (
+                      <div key={key} className="border-b border-gray-200 dark:border-gray-700 pb-2 last:border-0">
+                        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{fieldLabel}</p>
+                        <p className="text-gray-900 dark:text-white mt-1">
+                          {Array.isArray(value) ? value.join(', ') : String(value)}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
-              {selectedSubmission.files && Object.keys(selectedSubmission.files).length > 0 && (
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Uploaded Files</h3>
-                  <div className="space-y-2">
-                    {Object.entries(selectedSubmission.files).map(([fieldId, urls]: [string, any]) => (
-                      <div key={fieldId}>
-                        {(urls as string[]).map((url, index) => (
-                          <a
-                            key={index}
-                            href={url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
-                          >
-                            <FiDownload className="h-4 w-4" />
-                            <span className="text-sm font-medium">Download File {index + 1}</span>
-                          </a>
-                        ))}
-                      </div>
-                    ))}
+              {/* Uploaded Files Section - Check both files object and individual file fields */}
+              {(() => {
+                const hasFiles = selectedSubmission.files && Object.keys(selectedSubmission.files).length > 0;
+                const fileEntries = hasFiles ? Object.entries(selectedSubmission.files) : [];
+                
+                if (!hasFiles) return null;
+                
+                return (
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Uploaded Files</h3>
+                    <div className="space-y-3">
+                      {fileEntries.map(([fieldId, urls]: [string, any]) => {
+                        const urlArray = Array.isArray(urls) ? urls : [urls];
+                        return (
+                          <div key={fieldId} className="space-y-2">
+                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Field {fieldId}</p>
+                            {urlArray.filter(Boolean).map((url, index) => (
+                              <a
+                                key={index}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                              >
+                                <FiDownload className="h-4 w-4" />
+                                <span className="text-sm font-medium truncate">{url.split('/').pop() || `File ${index + 1}`}</span>
+                              </a>
+                            ))}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
           </div>
         </div>

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { listOrders } from '../../../api/orders';
+import { useAuth } from '../../../hooks/useAuth';
 import { 
   Home, 
   Folder, 
   Settings, 
   Bell, 
-  Download, 
   Search,
   CreditCard,
   CheckCircle,
@@ -21,13 +21,13 @@ import {
   LogOut,
   HelpCircle,
   FileText,
-  PieChart,
   ChevronDown,
   Activity
 } from 'lucide-react';
 
 export default function ClientDashboard() {
   const location = useLocation();
+  const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -157,7 +157,7 @@ export default function ClientDashboard() {
             <div className="flex items-center space-x-3">
               <div className="hidden sm:block">
                 <h1 className="text-lg font-semibold text-gray-900">{getPageTitle()}</h1>
-                <p className="text-xs text-gray-500 mt-0.5">Welcome back, Alex</p>
+                <p className="text-xs text-gray-500 mt-0.5">Welcome back, {user?.username || user?.email?.split('@')[0]}</p>
               </div>
             </div>
           </div>
@@ -198,8 +198,8 @@ export default function ClientDashboard() {
                   <User className="h-4.5 w-4.5 text-white" />
                 </div>
                 <div className="hidden md:block text-left">
-                  <p className="text-sm font-medium text-gray-900">Alex Johnson</p>
-                  <p className="text-xs text-gray-500">Premium Client</p>
+                  <p className="text-sm font-medium text-gray-900">{user?.username || 'User'}</p>
+                  <p className="text-xs text-gray-500">{user?.role || 'Client'}</p>
                 </div>
                 <ChevronDown 
                   className={`h-4 w-4 text-gray-400 hidden md:block transition-transform duration-200 ${
@@ -214,8 +214,8 @@ export default function ClientDashboard() {
                   role="menu"
                 >
                   <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm font-semibold text-gray-900">Alex Johnson</p>
-                    <p className="text-xs text-gray-500 truncate">alex.johnson@example.com</p>
+                    <p className="text-sm font-semibold text-gray-900">{user?.username || 'User'}</p>
+                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                   </div>
                   <div className="py-1">
                     <Link
@@ -291,6 +291,15 @@ export default function ClientDashboard() {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-3 py-6">
           <div className="space-y-1">
+            {/* Back to Homepage */}
+            <Link
+              to="/"
+              className="flex items-center px-4 py-3 mb-4 rounded-xl text-sm font-medium transition-all duration-200 group bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
+            >
+              <ChevronDown className="h-5 w-5 text-gray-600 rotate-90" />
+              {sidebarOpen && <span className="ml-3">Back to Homepage</span>}
+            </Link>
+
             {[
               { 
                 path: '/client-dashboard', 
@@ -304,7 +313,7 @@ export default function ClientDashboard() {
                 icon: Folder, 
                 label: 'Projects', 
                 active: location.pathname.includes('my-projects'),
-                badge: 3
+                badge: orders.filter(o => o.status === 'in_progress' || o.status === '25_done' || o.status === '50_done' || o.status === '75_done').length || null
               },
               { 
                 path: '/client-dashboard/services', 
@@ -325,20 +334,6 @@ export default function ClientDashboard() {
                 icon: FileText, 
                 label: 'Documents',
                 active: location.pathname.includes('documents'),
-                badge: null
-              },
-              { 
-                path: '/client-dashboard/analytics', 
-                icon: PieChart, 
-                label: 'Analytics',
-                active: location.pathname.includes('analytics'),
-                badge: null
-              },
-              { 
-                path: '/client-dashboard/downloads', 
-                icon: Download, 
-                label: 'Downloads',
-                active: location.pathname.includes('downloads'),
                 badge: null
               },
             ].map((item) => (
@@ -409,16 +404,8 @@ export default function ClientDashboard() {
             </div>
             {sidebarOpen && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">Alex Johnson</p>
-                <div className="flex items-center mt-1">
-                  <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-1000"
-                      style={{ width: '85%' }}
-                    ></div>
-                  </div>
-                  <span className="text-xs text-gray-500 ml-2">85%</span>
-                </div>
+                <p className="text-sm font-medium text-gray-900 truncate">{user?.username || 'User'}</p>
+                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
               </div>
             )}
           </div>
@@ -599,24 +586,35 @@ export default function ClientDashboard() {
                   </div>
                   
                   <div className="space-y-5">
-                    {[
-                      { label: 'Project Completion', value: 78, color: 'from-white to-blue-100' },
-                      { label: 'On-time Delivery', value: 92, color: 'from-white to-blue-100' },
-                      { label: 'Client Satisfaction', value: 96, color: 'from-white to-blue-100' },
-                    ].map((metric, index) => (
-                      <div key={index}>
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm text-blue-100">{metric.label}</span>
-                          <span className="font-semibold">{metric.value}%</span>
+                    {(() => {
+                      const totalOrders = orders.length;
+                      const completedOrders = orders.filter(o => o.status === 'completed' || o.status === 'closed' || o.status === 'payment_done').length;
+                      const deliveredOrders = orders.filter(o => o.status === 'delivered' || o.status === 'closed' || o.status === 'payment_done').length;
+                      
+                      const completionRate = totalOrders > 0 ? Math.round((completedOrders / totalOrders) * 100) : 0;
+                      const deliveryRate = totalOrders > 0 ? Math.round((deliveredOrders / totalOrders) * 100) : 0;
+                      
+                      return [
+                        { label: 'Project Completion', value: completionRate, color: 'from-white to-blue-100' },
+                        { label: 'On-time Delivery', value: deliveryRate, color: 'from-white to-blue-100' },
+                        { label: 'Active Projects', value: orders.filter(o => o.status === 'in_progress' || o.status === '25_done' || o.status === '50_done' || o.status === '75_done').length, color: 'from-white to-blue-100', isCount: true },
+                      ].map((metric, index) => (
+                        <div key={index}>
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm text-blue-100">{metric.label}</span>
+                            <span className="font-semibold">{metric.isCount ? metric.value : `${metric.value}%`}</span>
+                          </div>
+                          {!metric.isCount && (
+                            <div className="h-2 bg-blue-400/30 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full bg-gradient-to-r ${metric.color} rounded-full transition-all duration-1000`}
+                                style={{ width: `${metric.value}%` }}
+                              ></div>
+                            </div>
+                          )}
                         </div>
-                        <div className="h-2 bg-blue-400/30 rounded-full overflow-hidden">
-                          <div 
-                            className={`h-full bg-gradient-to-r ${metric.color} rounded-full transition-all duration-1000`}
-                            style={{ width: `${metric.value}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    ))}
+                      ));
+                    })()}
                   </div>
                   
                   <button className="mt-8 w-full py-3 bg-white/20 hover:bg-white/30 rounded-xl font-medium transition-colors text-sm">
@@ -635,7 +633,7 @@ export default function ClientDashboard() {
       </main>
 
       {/* Custom Animations */}
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

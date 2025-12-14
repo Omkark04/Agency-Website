@@ -5,8 +5,9 @@ import DashboardLayout from '../pages/DashboardLayout';
 import ClientDashboard from '../pages/dashboard/client/clientdashboard';
 import ServicesPage from '../pages/dashboard/client/ServicesPage';
 import MyProjects from '../pages/dashboard/client/MyProjects';
-import OrdersPage from '../pages/dashboard/client/OrdersPage';
 import Notifications from '../pages/dashboard/client/Notifications';
+import Documents from '../pages/dashboard/client/Documents';
+import OrdersPage from '../pages/dashboard/client/OrdersPage';
 // Pages
 import { LandingPage } from '../pages/landing/LandingPage';
 import Portfolio from '@/pages/dashboard/admin/Portfolio';
@@ -29,6 +30,8 @@ import TeamMemberPage from '@/pages/dashboard/teamhead/TeamMember';
 import TestimonialsManagement from '../pages/dashboard/admin/TestimonialsManagement';
 import ContactsManagement from '../pages/dashboard/admin/ContactsManagement';
 import FormBuilder from '../pages/dashboard/admin/FormBuilder';
+import OrdersDetailPage from '../pages/dashboard/client/OrdersDetailPage';
+import OrderManagementPage from '../pages/dashboard/admin/OrderManagementPage';
 
 // New Pages
 import { NotificationsPage } from '../pages/Notifications';
@@ -51,7 +54,9 @@ export const AppRoutes: React.FC = () => {
             <Route path='/client-dashboard/services' element={<ServicesPage />} />
             <Route path='/client-dashboard/my-projects' element={<MyProjects />} />
             <Route path='/client-dashboard/orders' element={<OrdersPage />} />
+            <Route path='/client-dashboard/orders/:orderId' element={<OrdersDetailPage />} />
             <Route path='/client-dashboard/notifications' element={<Notifications />} />
+            <Route path='/client-dashboard/documents' element={<Documents />} />
           </Route>
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['team_head', 'service_head', 'admin']} />}>
@@ -85,6 +90,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/dashboard/contacts" element={<ContactsManagement />} />
             <Route path="/dashboard/forms/new" element={<FormBuilder />} />
             <Route path="/dashboard/forms/:id" element={<FormBuilder />} />
+            <Route path="/dashboard/orders/:orderId" element={<OrderManagementPage />} />
           </Route>
 
         </Route>

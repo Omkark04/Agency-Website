@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { listOrders } from '../../../api/orders';
 import {
   Search,
   Filter,
   Plus,
   MoreVertical,
-  Clock,
   CheckCircle2,
   AlertCircle,
   FileText,
@@ -14,25 +14,16 @@ import {
   FolderOpen,
   Calendar,
   FileBarChart2,
-  Users,
-  Target,
   TrendingUp,
   TrendingDown,
-  Download,
   Eye,
   Edit2,
-  Trash2,
-  Star,
-  Zap,
-  Sparkles,
   BarChart3,
-  PieChart,
   Globe,
   Smartphone,
   Palette,
   Code,
   Activity,
-  RefreshCw
 } from 'lucide-react';
 
 // Define types
@@ -64,153 +55,6 @@ type Project = {
   category: string;
 };
 
-// Enhanced mock data for projects
-const projects: Project[] = [
-  {
-    id: 1,
-    name: 'E-commerce Website Redesign',
-    description: 'Complete redesign of the online store with new payment integration and mobile optimization',
-    status: 'in-progress',
-    progress: 75,
-    startDate: '2023-10-15',
-    dueDate: '2024-02-28',
-    team: [
-      { name: 'Alex Johnson', role: 'Lead Developer', avatarColor: 'bg-gradient-to-br from-blue-500 to-cyan-400' },
-      { name: 'Sarah Miller', role: 'UI/UX Designer', avatarColor: 'bg-gradient-to-br from-purple-500 to-pink-400' },
-      { name: 'Mike Chen', role: 'Backend Developer', avatarColor: 'bg-gradient-to-br from-emerald-500 to-green-400' },
-    ],
-    lastUpdated: '2023-12-10T14:30:00Z',
-    files: 24,
-    tasks: {
-      total: 18,
-      completed: 14,
-    },
-    budget: 25000,
-    spent: 18250,
-    priority: 'high',
-    tags: ['web', 'ecommerce', 'redesign'],
-    category: 'web-development'
-  },
-  {
-    id: 2,
-    name: 'Mobile Banking App',
-    description: 'New mobile banking application with biometric authentication',
-    status: 'in-review',
-    progress: 95,
-    startDate: '2023-11-01',
-    dueDate: '2024-01-15',
-    team: [
-      { name: 'Emma Wilson', role: 'Product Manager', avatarColor: 'bg-gradient-to-br from-amber-500 to-orange-400' },
-      { name: 'David Kim', role: 'Mobile Developer', avatarColor: 'bg-gradient-to-br from-blue-500 to-indigo-400' },
-    ],
-    lastUpdated: '2023-12-08T09:15:00Z',
-    files: 42,
-    tasks: {
-      total: 32,
-      completed: 30,
-    },
-    budget: 45000,
-    spent: 43200,
-    priority: 'high',
-    tags: ['mobile', 'finance', 'security'],
-    category: 'mobile'
-  },
-  {
-    id: 3,
-    name: 'Brand Identity System',
-    description: 'Complete brand overhaul including logo, colors, and guidelines',
-    status: 'completed',
-    progress: 100,
-    startDate: '2023-09-01',
-    dueDate: '2023-11-30',
-    team: [
-      { name: 'Lisa Park', role: 'Creative Director', avatarColor: 'bg-gradient-to-br from-purple-500 to-pink-400' },
-      { name: 'Tom Lee', role: 'Brand Designer', avatarColor: 'bg-gradient-to-br from-rose-500 to-red-400' },
-    ],
-    lastUpdated: '2023-11-28T16:45:00Z',
-    files: 18,
-    tasks: {
-      total: 24,
-      completed: 24,
-    },
-    budget: 18000,
-    spent: 17500,
-    priority: 'medium',
-    tags: ['branding', 'design', 'identity'],
-    category: 'design'
-  },
-  {
-    id: 4,
-    name: 'SEO Optimization Campaign',
-    description: 'Comprehensive SEO strategy implementation and content optimization',
-    status: 'in-progress',
-    progress: 45,
-    startDate: '2023-12-01',
-    dueDate: '2024-03-31',
-    team: [
-      { name: 'James Wilson', role: 'SEO Specialist', avatarColor: 'bg-gradient-to-br from-emerald-500 to-teal-400' },
-    ],
-    lastUpdated: '2023-12-09T11:20:00Z',
-    files: 36,
-    tasks: {
-      total: 28,
-      completed: 13,
-    },
-    budget: 12000,
-    spent: 5400,
-    priority: 'medium',
-    tags: ['seo', 'marketing', 'analytics'],
-    category: 'marketing'
-  },
-  {
-    id: 5,
-    name: 'CRM System Integration',
-    description: 'Integrating new CRM with existing sales and marketing platforms',
-    status: 'planning',
-    progress: 20,
-    startDate: '2024-01-15',
-    dueDate: '2024-04-30',
-    team: [
-      { name: 'Robert Chen', role: 'System Architect', avatarColor: 'bg-gradient-to-br from-gray-600 to-gray-400' },
-      { name: 'Sophia Martinez', role: 'Integration Specialist', avatarColor: 'bg-gradient-to-br from-blue-500 to-indigo-400' },
-    ],
-    lastUpdated: '2023-12-05T13:40:00Z',
-    files: 8,
-    tasks: {
-      total: 16,
-      completed: 3,
-    },
-    budget: 32000,
-    spent: 6400,
-    priority: 'low',
-    tags: ['crm', 'integration', 'enterprise'],
-    category: 'development'
-  },
-  {
-    id: 6,
-    name: 'Social Media Dashboard',
-    description: 'Analytics dashboard for monitoring social media performance',
-    status: 'on-hold',
-    progress: 35,
-    startDate: '2023-10-01',
-    dueDate: '2024-01-31',
-    team: [
-      { name: 'Anna Davis', role: 'Data Analyst', avatarColor: 'bg-gradient-to-br from-violet-500 to-purple-400' },
-      { name: 'Michael Brown', role: 'Frontend Developer', avatarColor: 'bg-gradient-to-br from-amber-500 to-yellow-400' },
-    ],
-    lastUpdated: '2023-11-20T10:10:00Z',
-    files: 15,
-    tasks: {
-      total: 22,
-      completed: 8,
-    },
-    budget: 28000,
-    spent: 9800,
-    priority: 'medium',
-    tags: ['analytics', 'dashboard', 'social'],
-    category: 'analytics'
-  },
-];
 
 // Enhanced status configuration
 const statuses = {
@@ -656,11 +500,90 @@ const StatsCard = ({ title, value, icon: Icon, change, color }: any) => (
 );
 
 export default function MyProjects() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [priorityFilter, setPriorityFilter] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [activeFilter, setActiveFilter] = useState('all');
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    setLoading(true);
+    try {
+      const response = await listOrders();
+      const orders = Array.isArray(response.data) ? response.data : [];
+      
+      // Transform orders into projects
+      const transformedProjects: Project[] = orders.map((order: any) => ({
+        id: order.id,
+        name: order.service_title || `Order #${order.id}`,
+        description: order.requirements || 'No description provided',
+        status: mapOrderStatusToProjectStatus(order.status),
+        progress: getProgressFromStatus(order.status),
+        startDate: order.created_at,
+        dueDate: order.delivery_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        team: [],
+        lastUpdated: order.updated_at || order.created_at,
+        files: 0,
+        tasks: {
+          total: 10,
+          completed: Math.floor(getProgressFromStatus(order.status) / 10)
+        },
+        budget: order.total_price || 0,
+        spent: order.status === 'completed' || order.status === 'closed' ? order.total_price || 0 : Math.floor((order.total_price || 0) * (getProgressFromStatus(order.status) / 100)),
+        priority: order.status === 'pending' ? 'high' : 'medium',
+        tags: [order.service_title || 'service'],
+        category: 'web-development'
+      }));
+      
+      setProjects(transformedProjects);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const mapOrderStatusToProjectStatus = (status: string): string => {
+    const statusMap: Record<string, string> = {
+      'pending': 'planning',
+      'approved': 'in-progress',
+      'in_progress': 'in-progress',
+      '25_done': 'in-progress',
+      '50_done': 'in-progress',
+      '75_done': 'in-progress',
+      'ready_for_delivery': 'in-review',
+      'delivered': 'completed',
+      'completed': 'completed',
+      'closed': 'completed',
+      'payment_done': 'completed'
+    };
+    return statusMap[status] || 'planning';
+  };
+
+  const getProgressFromStatus = (status: string): number => {
+    const progressMap: Record<string, number> = {
+      'pending': 0,
+      'approved': 10,
+      'estimation_sent': 15,
+      'in_progress': 25,
+      '25_done': 25,
+      '50_done': 50,
+      '75_done': 75,
+      'ready_for_delivery': 90,
+      'delivered': 95,
+      'payment_pending': 97,
+      'payment_done': 100,
+      'completed': 100,
+      'closed': 100
+    };
+    return progressMap[status] || 0;
+  };
 
   // Calculate stats
   const totalProjects = projects.length;
@@ -823,7 +746,7 @@ export default function MyProjects() {
       )}
 
       {/* Import CSS module for animations */}
-      <style jsx global>{`
+      <style>{`
         /* Global styles can go here if needed */
         
         .animate-fadeIn {

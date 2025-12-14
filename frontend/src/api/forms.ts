@@ -95,3 +95,7 @@ export const submitFormMultipart = (formId: number, formData: FormData) => {
     }
   });
 };
+
+// Get service form by service ID
+export const getServiceForm = (serviceId: number) => 
+  api.get<ServiceForm>(`/api/services/${serviceId}/form/`);

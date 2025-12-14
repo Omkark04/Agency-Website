@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
 import { listServices } from '../../../api/services';
+import { getFormByService } from '../../../api/forms';
 import type { Service } from '../../../api/services';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import EmptyState from '../../../components/EmptyState';
+import PriceCardSelector from '../../../components/PriceCardSelector';
+// Use existing DynamicFormRenderer component
+import DynamicFormRenderer from '../../../components/forms/DynamicFormRenderer';
 
 import { motion } from 'framer-motion';
 import { 
@@ -12,11 +16,11 @@ import {
   DollarSign,
   Search,
   ChevronDown,
-  X
+  X,
+  ArrowLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -34,6 +38,11 @@ const ServicesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  
+  // Form integration states
+  const [modalStep, setModalStep] = useState<'select-plan' | 'fill-form'>('select-plan');
+  const [selectedPriceCard, setSelectedPriceCard] = useState<any>(null);
+  const [formLoading, setFormLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -52,9 +61,55 @@ const ServicesPage = () => {
     }
   };
 
-  const openServiceModal = (service: Service) => {
-    setSelectedService(service);
-    setIsModalOpen(true);
+  const openServiceModal = async (service: Service) => {
+    try {
+      setSelectedService(service);
+      setFormLoading(true);
+      setIsModalOpen(true);
+      
+      // Type guard to ensure service.id exists
+      if (!service.id) {
+        throw new Error('Service ID is required');
+      }
+      
+      console.log('Fetching form for service ID:', service.id);
+      
+      // Fetch form for this service using the same API as FormBuilder
+      const response = await getFormByService(service.id);
+      console.log('Form fetch response:', response);
+      
+      // Start with price card selection
+      setModalStep('select-plan');
+    } catch (error: any) {
+      console.error('Failed to fetch service form:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.detail ||
+                          'No custom form available for this service. Please contact support.';
+      alert(errorMessage);
+      setIsModalOpen(false);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handlePriceCardSelect = (priceCard: any) => {
+    setSelectedPriceCard(priceCard);
+    setModalStep('fill-form');
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setModalStep('select-plan');
+    setSelectedPriceCard(null);
+    setSelectedService(null);
+  };
+
+  const handleBackToPriceSelection = () => {
+    setModalStep('select-plan');
+    setSelectedPriceCard(null);
   };
 
   const filteredServices = services.filter(service => {
@@ -267,9 +322,9 @@ const ServicesPage = () => {
         </div>
       </div>
 
-      {/* Service Request Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      {/* Service Request Modal with 2-Step Flow */}
+      <Dialog open={isModalOpen} onOpenChange={handleCloseModal}>
+        <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
           {selectedService && (
             <>
               <DialogHeader>
@@ -279,102 +334,69 @@ const ServicesPage = () => {
                       {selectedService.title}
                     </DialogTitle>
                     <DialogDescription className="text-gray-600 mt-1">
-                      Request this service for your project
+                      {modalStep === 'select-plan' ? 'Choose your pricing plan' : 'Fill out the service request form'}
                     </DialogDescription>
                   </div>
                   {selectedService.is_featured && (
                     <div className="flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm">
-                      <Star className="w-4 w-4 mr-1" />
+                      <Star className="w-4 h-4 mr-1" />
                       Featured
                     </div>
                   )}
                 </div>
               </DialogHeader>
 
-              {/* Service Details */}
-              <div className="space-y-6">
-                {/* Service Overview */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-900 mb-2">Service Overview</h4>
-                  <p className="text-gray-600 text-sm">{selectedService.long_description || selectedService.short_description}</p>
+              {formLoading ? (
+                <div className="py-12">
+                  <LoadingSpinner size="md" text="Loading form..." />
                 </div>
-
-                {/* Pricing */}
-                {selectedService.original_price && (
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Pricing</h4>
-                    <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
-                      <div className="text-sm font-medium text-gray-500 mb-1">Starting Price</div>
-                      <div className="text-lg font-bold text-gray-900">₹{selectedService.original_price.toLocaleString()}</div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Key Features */}
-                {selectedService.features && selectedService.features.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Key Features</h4>
-                    <div className="space-y-2">
-                      {selectedService.features.map((feature, index) => (
-                        <div key={index} className="flex items-center">
-                          <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                          <span className="text-gray-700 text-sm">{feature.title}</span>
+              ) : (
+                <div className="mt-4">
+                  {modalStep === 'select-plan' ? (
+                    /* Step 1: Price Card Selection */
+                    <PriceCardSelector
+                      serviceId={selectedService.id}
+                      onSelect={handlePriceCardSelect}
+                      onCancel={handleCloseModal}
+                    />
+                  ) : (
+                    /* Step 2: Custom Form */
+                    <div>
+                      {/* Selected Plan Summary */}
+                      <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="font-semibold text-blue-900">Selected Plan: {selectedPriceCard?.title}</h3>
+                            <p className="text-blue-700 text-sm mt-1">Price: ₹{selectedPriceCard?.price?.toLocaleString()}</p>
+                          </div>
+                          <button
+                            onClick={handleBackToPriceSelection}
+                            className="flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium"
+                          >
+                            <ArrowLeft className="w-4 h-4 mr-1" />
+                            Change Plan
+                          </button>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Request Form */}
-                <div className="border-t pt-6">
-                  <h4 className="font-semibold text-gray-900 mb-4">Request Service</h4>
-                  <form className="space-y-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Project Description</label>
-                      <Textarea 
-                        placeholder="Describe your project requirements in detail..."
-                        rows={4}
-                        className="text-sm"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Additional Requirements</label>
-                      <Textarea 
-                        placeholder="Any specific requirements or preferences..."
-                        rows={3}
-                        className="text-sm"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Attachments</label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                        <div className="text-sm text-gray-500">Drag & drop files or click to upload</div>
-                        <div className="text-xs text-gray-400 mt-1">Max file size: 10MB</div>
                       </div>
-                    </div>
 
-                    <div className="flex justify-end space-x-3 pt-4">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        onClick={() => setIsModalOpen(false)}
-                        className="text-sm"
-                      >
-                        Cancel
-                      </Button>
-                      <Button 
-                        type="submit" 
-                        className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-sm"
-                      >
-                        Submit Request
-                        <ArrowRight className="ml-2 w-4 h-4" />
-                      </Button>
+                      {/* Custom Form from Form Builder */}
+                      {selectedService && selectedService.id ? (
+                        <DynamicFormRenderer
+                          serviceId={selectedService.id}
+                          onSuccess={(orderId) => {
+                            alert(`Service request submitted successfully! Order #${orderId} created.`);
+                            handleCloseModal();
+                          }}
+                        />
+                      ) : (
+                        <div className="text-center py-8">
+                          <p className="text-gray-500">No form available for this service</p>
+                        </div>
+                      )}
                     </div>
-                  </form>
+                  )}
                 </div>
-              </div>
+              )}
             </>
           )}
         </DialogContent>

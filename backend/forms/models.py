@@ -93,7 +93,7 @@ class ServiceFormSubmission(models.Model):
         on_delete=models.SET_NULL, 
         null=True, 
         blank=True,
-        related_name='form_submission'
+        related_name='submission'
     )
     created_at = models.DateTimeField(auto_now_add=True)
     

@@ -40,10 +40,10 @@ router = routers.DefaultRouter()
 router.register(r"departments", DepartmentViewSet)
 router.register(r"services", ServiceViewSet)
 router.register(r"price-cards", PriceCardViewSet)
-router.register(r"orders", OrderViewSet)
+# router.register(r"orders", OrderViewSet)  # Commented out - already registered in orders/urls.py with custom endpoints
 router.register(r"portfolio", PortfolioProjectViewSet)
 router.register(r"case-studies", CaseStudyViewSet)
-router.register(r"tasks", TaskViewSet)
+router.register(r"tasks", TaskViewSet, basename="task")
 router.register(r"media", MediaViewSet)
 router.register(r"notifications", NotificationViewSet, basename="notification")
 router.register(r"pricing-plans", PricingPlanViewSet)
@@ -84,9 +84,21 @@ urlpatterns = [
 
     # Upload
     path("api/upload/", UploadMediaView.as_view()),
+    
+    # Cloudinary Media Management
+    path("api/cloudinary-media/", include("cloudinary_media.urls")),
 
     # Contact
     path("api/contact/", include("contacts.urls")),
+
+    # Payment System
+    path("api/payments/", include("payments.urls")),
+    
+    # Orders (includes estimations, invoices, workflow)
+    path("api/orders/", include("orders.urls")),
+    
+    # Tasks (includes order tasks and attachments)
+    path("api/tasks/", include("tasks.urls")),
 
     # Public services
     path("api/public/services/", PublicServiceListView.as_view()),

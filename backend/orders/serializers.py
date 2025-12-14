@@ -14,9 +14,42 @@ except Exception:
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    # Add new fields
+    whatsapp_number = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    price_card_title = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    price_card_price = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True)
+    total_paid = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    remaining_amount = serializers.SerializerMethodField()
+    
+    # Form submission details
+    form_submission_data = serializers.SerializerMethodField()
+    
     class Meta:
         model = Order
-        fields = '__all__'
+        fields = [
+            'id', 'client', 'client_email', 'service', 'pricing_plan',
+            'title', 'details', 'price', 'status', 'due_date',
+            'whatsapp_number', 'price_card_title', 'price_card_price',
+            'form_submission', 'total_paid', 'remaining_amount',
+            'form_submission_data', 'deliverables',
+            'status_updated_at', 'status_updated_by',
+            'created_at', 'updated_at'
+        ]
+    
+    def get_remaining_amount(self, obj):
+        """Calculate remaining amount to be paid"""
+        return float(obj.price) - float(obj.total_paid or 0)
+    
+    def get_form_submission_data(self, obj):
+        """Get form submission details if exists"""
+        if obj.form_submission:
+            return {
+                'id': obj.form_submission.id,
+                'data': obj.form_submission.data,
+                'files': obj.form_submission.files,
+                'summary': obj.form_submission.submission_summary
+            }
+        return None
 
 
 class OfferSerializer(serializers.ModelSerializer):

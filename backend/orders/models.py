@@ -9,10 +9,17 @@ import math
 class Order(models.Model):
     STATUS_CHOICES = [
         ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("estimation_sent", "Estimation Sent"),
         ("in_progress", "In Progress"),
-        ("completed", "Completed"),
-        ("cancelled", "Cancelled"),
-        ("revision", "Revision"),
+        ("25_done", "25% Complete"),
+        ("50_done", "50% Complete"),
+        ("75_done", "75% Complete"),
+        ("ready_for_delivery", "Ready for Delivery"),
+        ("delivered", "Delivered"),
+        ("payment_pending", "Payment Pending"),
+        ("payment_done", "Payment Done"),
+        ("closed", "Closed"),
     ]
     id = models.AutoField(primary_key=True)
     client = models.ForeignKey(
@@ -28,13 +35,98 @@ class Order(models.Model):
     title = models.CharField(max_length=255)
     details = models.TextField(blank=True)
     price = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default="pending")
     due_date = models.DateField(null=True, blank=True)
+    
+    # Additional order details
+    whatsapp_number = models.CharField(max_length=20, blank=True, null=True, help_text="Client WhatsApp number")
+    price_card_title = models.CharField(max_length=200, blank=True, null=True, help_text="Selected price plan title")
+    price_card_price = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, help_text="Selected price plan price")
+    
+    # Form submission reference
+    form_submission = models.ForeignKey(
+        "forms.ServiceFormSubmission",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="related_order",
+        help_text="Reference to form submission if order was created via form"
+    )
+    
+    # Payment tracking for partial payments
+    total_paid = models.DecimalField(
+        max_digits=12, 
+        decimal_places=2, 
+        default=0,
+        validators=[MinValueValidator(0)],
+        help_text="Total amount paid so far (for partial payments)"
+    )
+    
+    # Deliverables - List of Cloudinary URLs for final files
+    deliverables = models.JSONField(
+        default=list, 
+        blank=True,
+        help_text="List of Cloudinary URLs for final deliverable files"
+    )
+    
+    # Status tracking
+    status_updated_at = models.DateTimeField(null=True, blank=True)
+    status_updated_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="updated_orders"
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "orders"
+    
+    def __str__(self):
+        return f"Order #{self.id} - {self.title}"
+    
+    def can_transition_to(self, new_status):
+        """
+        Validate if transition to new status is allowed.
+        Returns (is_valid, error_message)
+        """
+        # Import here to avoid circular dependency
+        from orders.workflow import OrderWorkflow
+        return OrderWorkflow.validate_transition(self.status, new_status)
+    
+    def update_status(self, new_status, user, notes=""):
+        """
+        Update order status with history tracking
+        """
+        from orders.workflow_models import OrderStatusHistory
+        
+        # Validate transition
+        is_valid, error_msg = self.can_transition_to(new_status)
+        if not is_valid:
+            raise ValueError(error_msg)
+        
+        # Store old status
+        old_status = self.status
+        
+        # Update status
+        self.status = new_status
+        self.status_updated_at = timezone.now()
+        self.status_updated_by = user
+        self.save()
+        
+        # Create history record
+        OrderStatusHistory.objects.create(
+            order=self,
+            from_status=old_status,
+            to_status=new_status,
+            changed_by=user,
+            notes=notes
+        )
+        
+        return True
 
 
 class Review(models.Model):

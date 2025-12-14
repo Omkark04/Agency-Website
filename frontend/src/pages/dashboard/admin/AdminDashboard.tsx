@@ -35,7 +35,7 @@ export const AdminDashboard: React.FC = () => {
     (async () => {
       try {
         const [
-          { data: orders },
+          { data: ordersData },
           { data: users },
           { data: services },
           { data: departments },
@@ -48,13 +48,16 @@ export const AdminDashboard: React.FC = () => {
           listPortfolios()
         ]);
 
+        // Ensure orders is always an array
+        const orders = Array.isArray(ordersData) ? ordersData : ((ordersData as any)?.results || []);
+
         setOrdersCount(orders.length);
         setClientsCount(users.length);
         setServicesCount(services.length);
         setDepartmentsCount(departments.length);
         setPortfolioCount(portfolios.length);
         
-        const totalRevenue = orders.reduce((sum: number, order: any) => sum + (order.price || 0), 0);
+        const totalRevenue = orders.reduce((sum: number, order: any) => sum + (parseFloat(order.price) || 0), 0);
         setRevenue(totalRevenue);
 
         setGrowth({
@@ -335,9 +338,12 @@ const RecentOrdersPreview = () => {
       setLoading(true);
       try {
         const res = await listOrders({ ordering: '-created_at', page_size: 5 });
-        setOrders(res.data);
+        // Ensure orders is always an array
+        const ordersData = Array.isArray(res.data) ? res.data : ((res.data as any)?.results || []);
+        setOrders(ordersData);
       } catch (err) {
         console.error(err);
+        setOrders([]); // Set empty array on error
       } finally {
         setLoading(false);
       }

@@ -187,3 +187,34 @@ CORS_ALLOW_CREDENTIALS = True
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@udyogworks.local")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+# ============================================
+# PAYMENT GATEWAY CONFIGURATION
+# ============================================
+
+# Razorpay (Indian Payments)
+RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "")
+RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "")
+RAZORPAY_WEBHOOK_SECRET = os.getenv("RAZORPAY_WEBHOOK_SECRET", "")
+
+# PayPal (International Payments)
+PAYPAL_CLIENT_ID = os.getenv("PAYPAL_CLIENT_ID", "")
+PAYPAL_CLIENT_SECRET = os.getenv("PAYPAL_CLIENT_SECRET", "")
+PAYPAL_MODE = os.getenv("PAYPAL_MODE", "sandbox")  # 'sandbox' or 'live'
+
+# ============================================
+# COMPANY INFORMATION (for PDFs)
+# ============================================
+
+COMPANY_NAME = os.getenv("COMPANY_NAME", "UdyogWorks")
+COMPANY_ADDRESS = os.getenv("COMPANY_ADDRESS", "")
+COMPANY_EMAIL = os.getenv("COMPANY_EMAIL", "contact@udyogworks.com")
+COMPANY_PHONE = os.getenv("COMPANY_PHONE", "")
+COMPANY_TAX_ID = os.getenv("COMPANY_TAX_ID", "")
+
+# ============================================
+# PDF GENERATION
+# ============================================
+
+# Base URL for WeasyPrint (used for loading assets in PDFs)
+WEASYPRINT_BASEURL = os.getenv("WEASYPRINT_BASEURL", "http://localhost:8000")
