@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   UserPlus,
   Search,
@@ -8,7 +9,7 @@ import {
   Trash2,
   XCircle,
   Loader2,
-  Mail as MailIcon
+  MailIcon
 } from 'lucide-react';
 
 // Import components from shadcn
@@ -149,6 +150,9 @@ const TeamMemberPage = () => {
 
   const handleAddMember = async (newMemberData: { name: string; email: string; phone?: string }) => {
     try {
+      // Generate username from email (part before @)
+      const username = newMemberData.email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+
       const response = await fetch('http://localhost:8000/auth/team-head/members/', {
         method: 'POST',
         headers: {
@@ -156,26 +160,32 @@ const TeamMemberPage = () => {
           'Authorization': `Bearer ${localStorage.getItem('access')}`
         },
         body: JSON.stringify({
-          username: newMemberData.name,
+          username: username,
           email: newMemberData.email,
-          password: 'Welcome123!', // Default password - user should change
+          first_name: newMemberData.name.split(' ')[0] || '',
+          last_name: newMemberData.name.split(' ').slice(1).join(' ') || '',
+          password: 'Welcome123!',
           phone: newMemberData.phone || ''
         })
       });
 
-      if (!response.ok) throw new Error('Failed to add member');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.username?.[0] || errorData.email?.[0] || 'Failed to add member';
+        throw new Error(errorMessage);
+      }
 
       // Refresh the list
       await fetchTeamMembers();
       setIsAddMemberOpen(false);
 
-
       alert('Team member added successfully! Default password: Welcome123!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding member:', error);
-      alert('Failed to add team member');
+      alert(`Failed to add team member: ${error.message || 'Unknown error'}`);
     }
   };
+
 
 
 
@@ -186,25 +196,36 @@ const TeamMemberPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Team Members</h1>
-          <p className="text-gray-500">Manage your team members and their permissions</p>
+          <h1 className="text-3xl font-bold text-gray-900">Team Members</h1>
+          <p className="text-gray-600 mt-1">Manage your team members and their permissions</p>
         </div>
-        <div className="flex gap-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <div className="flex gap-3">
+          <div className="relative flex-1 md:flex-initial">
+            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
             <Input
               type="text"
-              placeholder="Search team members..."
-              className="pl-10 w-full md:w-64"
+              placeholder="Search by name, email, or role..."
+              className="pl-10 pr-10 w-full md:w-80 h-11 bg-white border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <XCircle className="h-4 w-4" />
+              </button>
+            )}
           </div>
-          <Button className="gap-2" onClick={() => setIsAddMemberOpen(true)}>
-            <UserPlus className="h-4 w-4" />
-            Add Member
+          <Button
+            className="gap-2 h-11 px-5 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all hover:shadow-md"
+            onClick={() => setIsAddMemberOpen(true)}
+          >
+            <UserPlus className="h-5 w-5" />
+            <span className="hidden sm:inline">Add Member</span>
           </Button>
         </div>
       </div>
@@ -314,124 +335,155 @@ const TeamMemberPage = () => {
       )}
 
       {/* Add Member Modal */}
-      {isAddMemberOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Add Team Member</h2>
-              <button
-                onClick={() => setIsAddMemberOpen(false)}
-                className="text-gray-400 hover:text-gray-500"
-              >
-                <XCircle className="h-6 w-6" />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Full Name
-                </label>
-                <Input
-                  id="name"
-                  type="text"
-                  className="mt-1 block w-full"
-                  placeholder="John Doe"
-                />
-              </div>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Email
-                </label>
-                <Input
-                  id="email"
-                  type="email"
-                  className="mt-1 block w-full"
-                  placeholder="john@example.com"
-                />
-              </div>
-              <div>
-                <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                  Role
-                </label>
-                <select
-                  id="role"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                >
-                  <option value="developer">Developer</option>
-                  <option value="designer">Designer</option>
-                  <option value="manager">Project Manager</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-              <div className="flex justify-end space-x-3 pt-4">
-                <Button
-                  variant="outline"
+      <AnimatePresence>
+        {isAddMemberOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Add Team Member</h2>
+                  <p className="text-sm text-gray-500 mt-1">Invite a new member to your team</p>
+                </div>
+                <button
                   onClick={() => setIsAddMemberOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
                 >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={() => {
-                    const nameInput = document.getElementById('name') as HTMLInputElement;
-                    const emailInput = document.getElementById('email') as HTMLInputElement;
-
-                    if (nameInput?.value && emailInput?.value) {
-                      handleAddMember({
-                        name: nameInput.value,
-                        email: emailInput.value
-                      });
-                    }
-                  }}
-                >
-                  Add Member
-                </Button>
+                  <XCircle className="h-6 w-6" />
+                </button>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Dialog */}
-      {isDeleteDialogOpen && selectedMember && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <div className="sm:flex sm:items-start">
-              <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                <Trash2 className="h-6 w-6 text-red-600" />
-              </div>
-              <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  Remove team member
-                </h3>
-                <div className="mt-2">
-                  <p className="text-sm text-gray-500">
-                    Are you sure you want to remove {selectedMember.name} from the team? This action cannot be undone.
+              <div className="space-y-5">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Full Name <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    id="name"
+                    type="text"
+                    className="block w-full h-11 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                    placeholder="Enter full name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    id="email"
+                    type="email"
+                    className="block w-full h-11 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                    placeholder="email@example.com"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Phone Number
+                  </label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    className="block w-full h-11 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                    placeholder="+1 (555) 000-0000"
+                  />
+                </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-sm text-blue-800">
+                    <strong>Note:</strong> Default password will be <code className="bg-blue-100 px-1.5 py-0.5 rounded">Welcome123!</code>
                   </p>
                 </div>
+                <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsAddMemberOpen(false)}
+                    className="px-5 h-11"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      const nameInput = document.getElementById('name') as HTMLInputElement;
+                      const emailInput = document.getElementById('email') as HTMLInputElement;
+                      const phoneInput = document.getElementById('phone') as HTMLInputElement;
+
+                      if (nameInput?.value && emailInput?.value) {
+                        handleAddMember({
+                          name: nameInput.value,
+                          email: emailInput.value,
+                          phone: phoneInput?.value
+                        });
+                      } else {
+                        alert('Please fill in all required fields');
+                      }
+                    }}
+                    className="px-5 h-11 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all hover:shadow-md"
+                  >
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Add Member
+                  </Button>
+                </div>
               </div>
-            </div>
-            <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-              <button
-                type="button"
-                className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-                onClick={handleDeleteMember}
-              >
-                Remove
-              </button>
-              <button
-                type="button"
-                className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
-                onClick={() => {
-                  setIsDeleteDialogOpen(false);
-                  setSelectedMember(null);
-                }}
-              >
-                Cancel
-              </button>
-            </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Dialog */}
+      <AnimatePresence>
+        {isDeleteDialogOpen && selectedMember && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md"
+            >
+              <div className="sm:flex sm:items-start">
+                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <Trash2 className="h-6 w-6 text-red-600" />
+                </div>
+                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                  <h3 className="text-lg leading-6 font-bold text-gray-900">
+                    Remove Team Member
+                  </h3>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-600">
+                      Are you sure you want to remove <strong>{selectedMember.name}</strong> from the team? This action cannot be undone.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse gap-3">
+                <button
+                  type="button"
+                  className="w-full inline-flex justify-center items-center rounded-lg border border-transparent shadow-sm px-5 py-2.5 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all sm:w-auto sm:text-sm"
+                  onClick={handleDeleteMember}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Remove
+                </button>
+                <button
+                  type="button"
+                  className="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-5 py-2.5 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all sm:mt-0 sm:w-auto sm:text-sm"
+                  onClick={() => {
+                    setIsDeleteDialogOpen(false);
+                    setSelectedMember(null);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

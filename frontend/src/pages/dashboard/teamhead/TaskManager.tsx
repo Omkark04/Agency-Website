@@ -41,7 +41,7 @@ const DraggableItem = ({ provided, snapshot, children, ...props }: DraggableItem
 
 // Types
 type Priority = 'low' | 'medium' | 'high';
-type Status = 'todo' | 'in-progress' | 'review' | 'done';
+type Status = 'todo' | 'in-progress' | 'review' | 'completed';
 
 interface Task {
   id: string;
@@ -58,7 +58,7 @@ const statuses: { id: Status; name: string; color: string }[] = [
   { id: 'todo', name: 'To Do', color: 'bg-gray-200' },
   { id: 'in-progress', name: 'In Progress', color: 'bg-blue-200' },
   { id: 'review', name: 'Review', color: 'bg-yellow-200' },
-  { id: 'done', name: 'Done', color: 'bg-green-200' },
+  { id: 'completed', name: 'Completed', color: 'bg-green-200' },
 ];
 
 const priorityColors = {
@@ -185,13 +185,16 @@ const TaskManager = () => {
         await updateTask(parseInt(draggableId), {
           status: newStatus.replace('-', '_')
         });
-      } catch (err) {
+      } catch (err: any) {
         // Revert on error
         setTasks(tasks.map(t => (t.id === draggableId ? task : t)));
-        alert('Failed to update task status');
+        console.error('Task update error:', err);
+        const errorMessage = err.response?.data?.detail || err.response?.data?.status?.[0] || err.message || 'Failed to update task status';
+        alert(`Failed to update task: ${errorMessage}`);
       }
     }
   };
+
 
   // Add new task
   const handleAddTask = async (e: React.FormEvent) => {
@@ -343,10 +346,10 @@ const TaskManager = () => {
 
           {/* Task Board */}
           <DragDropContext onDragEnd={onDragEnd}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-h-[calc(100vh-16rem)]">
               {tasksByStatus.map((statusGroup) => (
-                <div key={statusGroup.id} className="bg-white rounded-lg shadow">
-                  <div className={`${statusGroup.color} px-4 py-2 rounded-t-lg flex items-center`}>
+                <div key={statusGroup.id} className="bg-white rounded-lg shadow flex flex-col max-h-full">
+                  <div className={`${statusGroup.color} px-4 py-2 rounded-t-lg flex items-center flex-shrink-0`}>
                     <h3 className="font-medium text-gray-800">{statusGroup.name}</h3>
                     <span className="ml-2 bg-white bg-opacity-30 rounded-full px-2 py-0.5 text-xs font-semibold">
                       {statusGroup.items.length}
@@ -357,7 +360,7 @@ const TaskManager = () => {
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className="p-4 min-h-[200px]"
+                        className="p-4 min-h-[200px] max-h-[calc(100vh-20rem)] overflow-y-auto flex-1"
                       >
                         <AnimatePresence>
                           {statusGroup.items.map((task, index) => (
@@ -417,7 +420,7 @@ const TaskManager = () => {
                                       </div>
                                     </div>
                                     <div className="text-xs text-gray-500">
-                                      {task.status === 'done' ? (
+                                      {task.status === 'completed' ? (
                                         <span className="flex items-center text-green-600">
                                           <FiCheck className="mr-1 h-3.5 w-3.5" /> Completed
                                         </span>
@@ -508,7 +511,7 @@ const TaskManager = () => {
                         <option value="todo">To Do</option>
                         <option value="in-progress">In Progress</option>
                         <option value="review">Review</option>
-                        <option value="done">Done</option>
+                        <option value="completed">Completed</option>
                       </select>
                     </div>
 
@@ -673,7 +676,7 @@ const TaskManager = () => {
                         <option value="todo">To Do</option>
                         <option value="in-progress">In Progress</option>
                         <option value="review">Review</option>
-                        <option value="done">Done</option>
+                        <option value="completed">Completed</option>
                       </select>
                     </div>
 

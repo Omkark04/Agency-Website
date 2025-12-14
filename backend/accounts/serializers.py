@@ -153,6 +153,33 @@ class TeamMemberSerializer(serializers.ModelSerializer):
         return obj.avatar_url or ''
 
 
+class TeamMemberCreateSerializer(serializers.ModelSerializer):
+    '''Serializer for creating team members'''
+    password = serializers.CharField(write_only=True, required=False)
+    
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password', 'first_name', 'last_name', 'phone']
+        extra_kwargs = {
+            'username': {'required': True},
+            'email': {'required': True},
+            'first_name': {'required': False},
+            'last_name': {'required': False},
+            'phone': {'required': False},
+        }
+    
+    def create(self, validated_data):
+        # Generate default password if not provided
+        password = validated_data.pop('password', 'Welcome123!')
+        
+        # Create user
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        
+        return user
+
+
 class TeamStatsSerializer(serializers.Serializer):
     '''Dashboard statistics for team head'''
     active_projects = serializers.IntegerField()

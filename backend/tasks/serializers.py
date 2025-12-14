@@ -21,6 +21,7 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = [
+<<<<<<< HEAD
             'id', 'order', 'order_title', 'order_details', 'title', 'description',
             'assignee', 'assignee_name', 'assignee_details', 'status', 'status_label',
             'priority', 'priority_label', 'due_date', 'due_date_formatted',
@@ -35,6 +36,26 @@ class TaskSerializer(serializers.ModelSerializer):
             return obj.assignee.get_full_name() or obj.assignee.email
         return None
     
+=======
+            'id', 'title', 'description', 'assignee', 'status', 'priority',
+            'due_date', 'attachments', 'created_at', 'order',
+            'assignee_details', 'order_details', 'priority_label', 
+            'status_label', 'due_date_formatted'
+        ]
+        read_only_fields = ['id', 'created_at', 'assignee_details', 'order_details', 
+                           'priority_label', 'status_label', 'due_date_formatted']
+        extra_kwargs = {
+            'order': {'required': False},  # Make order optional for updates
+            'title': {'required': False},  # Make title optional for updates
+            'description': {'required': False},
+        }
+
+    def get_fields(self):
+        fields = super().get_fields()
+        # Add extra fields to the field list
+        return fields
+
+>>>>>>> 2b16e7b61637de933e1d42ddb282d1df42f24344
     def get_assignee_details(self, obj):
         """Get detailed assignee info"""
         if obj.assignee:

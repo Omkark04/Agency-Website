@@ -35,7 +35,12 @@ class Order(models.Model):
     title = models.CharField(max_length=255)
     details = models.TextField(blank=True)
     price = models.DecimalField(max_digits=12, decimal_places=2, validators=[MinValueValidator(0)])
+<<<<<<< HEAD
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default="pending")
+=======
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    progress = models.IntegerField(default=0)  # Progress percentage 0-100
+>>>>>>> 2b16e7b61637de933e1d42ddb282d1df42f24344
     due_date = models.DateField(null=True, blank=True)
     
     # Additional order details
