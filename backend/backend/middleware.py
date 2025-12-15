@@ -28,3 +28,13 @@ class RequestLoggingMiddleware(MiddlewareMixin):
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
+
+
+class DisableCSRFForAPIMiddleware(MiddlewareMixin):
+    """
+    Disable CSRF for API endpoints that use JWT authentication.
+    This middleware must be placed BEFORE CsrfViewMiddleware in settings.
+    """
+    def process_request(self, request):
+        if request.path.startswith('/api/'):
+            setattr(request, '_dont_enforce_csrf_checks', True)

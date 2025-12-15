@@ -1,6 +1,6 @@
 // frontend/src/components/tasks/TaskCard.tsx
 import React from 'react';
-import { Task } from '../../api/tasks';
+import type { Task } from '../../types/task';
 import { Calendar, User, Paperclip, MoreVertical } from 'lucide-react';
 import { format } from 'date-fns';
 

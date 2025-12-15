@@ -109,12 +109,14 @@ class Estimation(models.Model):
         return f"Estimation for Order #{self.order_id} - {self.title}"
     
     def calculate_totals(self):
-        """Calculate subtotal, tax, and total from cost breakdown"""
-        self.subtotal = sum(
-            float(item.get("amount", 0)) 
-            for item in self.cost_breakdown
-        )
-        self.tax_amount = (self.subtotal * self.tax_percentage) / 100
+        """Calculate subtotal, tax, and total amounts"""
+        from decimal import Decimal
+        
+        # Calculate subtotal from cost breakdown
+        self.subtotal = sum(item.get('amount', 0) for item in self.cost_breakdown)
+        
+        # Calculate tax amount - convert subtotal to Decimal to match tax_percentage type
+        self.tax_amount = (Decimal(str(self.subtotal)) * self.tax_percentage) / 100
         self.total_amount = self.subtotal + self.tax_amount
     
     def save(self, *args, **kwargs):
@@ -252,11 +254,14 @@ class Invoice(models.Model):
     
     def calculate_totals(self):
         """Calculate subtotal, tax, and total from line items"""
+        from decimal import Decimal
+        
         self.subtotal = sum(
             float(item.get("amount", 0)) 
             for item in self.line_items
         )
-        self.tax_amount = (self.subtotal * self.tax_percentage) / 100
+        # Convert subtotal to Decimal to match tax_percentage type
+        self.tax_amount = (Decimal(str(self.subtotal)) * self.tax_percentage) / 100
         self.total_amount = self.subtotal + self.tax_amount - self.discount_amount
     
     def save(self, *args, **kwargs):

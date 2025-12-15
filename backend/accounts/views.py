@@ -197,4 +197,27 @@ class AdminEnvLoginView(APIView):
 class AdminUserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        """
+        Filter users based on role:
+        - Admin: sees all users
+        - Service Head: sees only users from their department
+        """
+        user = self.request.user
+        queryset = User.objects.all()
+        
+        # Service heads can only see users from their department
+        if user.role == 'service_head':
+            if user.department:
+                # Show team members and the service head themselves from their department
+                queryset = queryset.filter(department=user.department)
+            else:
+                # No department assigned, return empty queryset
+                queryset = queryset.none()
+        elif user.role != 'admin':
+            # Other roles cannot access this endpoint
+            queryset = queryset.none()
+        
+        return queryset.order_by('-date_joined')

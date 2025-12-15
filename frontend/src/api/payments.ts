@@ -1,13 +1,11 @@
 // frontend/src/api/payments.ts
 import api from './api';
-import {
-  PaymentOrder,
-  Transaction,
-  PaymentOrderCreateData,
-  PaymentVerificationData,
-  RazorpayCheckoutData,
-  PayPalCheckoutData,
-} from '../types/payments';
+import type { PaymentOrder } from '../types/payments';
+import type { Transaction } from '../types/payments';
+import type { PaymentOrderCreateData } from '../types/payments';
+import type { PaymentVerificationData } from '../types/payments';
+import type { RazorpayCheckoutData } from '../types/payments';
+import type { PayPalCheckoutData } from '../types/payments';
 
 // Create payment order
 export const createPaymentOrder = (data: PaymentOrderCreateData) =>

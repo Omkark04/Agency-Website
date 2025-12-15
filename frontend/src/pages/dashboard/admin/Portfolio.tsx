@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
-import { listPortfolios, deletePortfolio } from '../../../api/portfolio';
+import { fetchPortfolioProjects, deletePortfolioProject } from '../../../api/portfolio';
 import Modal from '../../../components/ui/Modal';
 import { Button } from '../../../components/ui/Button';
 import PortfolioForm from './PortfolioForm';
+import { useAuth } from '../../../hooks/useAuth';
 import { FiBriefcase, FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { NoDepartmentMessage } from '../../../components/dashboard/NoDepartmentMessage';
 
 export default function Portfolio() {
+  const { user } = useAuth();
+  const isServiceHeadWithoutDept = user?.role === 'service_head' && !(user as any).department;
   const [items, setItems] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
   const [edit, setEdit] = useState<any>(null);
@@ -13,16 +17,30 @@ export default function Portfolio() {
 
   const load = async () => {
     setLoading(true);
-    const res = await listPortfolios();
-    setItems(res.data);
+    // Add department filter for service_head users
+    const params: any = {};
+    if (user?.role === 'service_head' && (user as any).department) {
+      const dept = (user as any).department;
+      params.service__department = typeof dept === 'object' ? dept.id : dept;
+    }
+    const res = await fetchPortfolioProjects(params);
+    setItems(Array.isArray(res) ? res : res.data || []);
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { 
+    if (!isServiceHeadWithoutDept && user) {
+      load(); 
+    }
+  }, [user?.role, (user as any)?.department?.id]); // Only re-run if role or department ID changes
+
+  if (isServiceHeadWithoutDept) {
+    return <NoDepartmentMessage />;
+  }
 
   const onDelete = async (id: number) => {
     if (!confirm('Delete this portfolio?')) return;
-    await deletePortfolio(id);
+    await deletePortfolioProject(id);
     load();
   };
 

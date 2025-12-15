@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { listOrders } from '../../../api/orders';
 import { listSubmissions } from '../../../api/forms';
 import { useAuth } from '../../../hooks/useAuth';
+import { NoDepartmentMessage } from '../../../components/dashboard/NoDepartmentMessage';
 import {
   FiShoppingCart,
   FiCheckCircle,
@@ -24,7 +25,9 @@ import {
   FiImage
 } from 'react-icons/fi';
 
-export function Orders() {
+export default function Orders() {
+  const { user } = useAuth();
+  const isServiceHeadWithoutDept = user?.role === 'service_head' && !(user as any).department;
   const [orders, setOrders] = useState<any[]>([]);
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,14 +35,21 @@ export function Orders() {
   const [filter, setFilter] = useState<'all' | 'pending' | 'in_progress' | 'completed' | 'cancelled'>('all');
   const [sourceFilter, setSourceFilter] = useState<'all' | 'regular' | 'form'>('all');
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
-  useAuth();
 
   const loadOrders = async () => {
     setLoading(true);
     try {
       console.log('Orders.tsx: Starting to load orders...');
+      
+      // Add department filter for service_head users
+      const params: any = {};
+      if (user?.role === 'service_head' && (user as any).department) {
+        const dept = (user as any).department;
+        params.service__department = typeof dept === 'object' ? dept.id : dept;
+      }
+      
       const [ordersRes, submissionsRes] = await Promise.all([
-        listOrders(),
+        listOrders(params),
         listSubmissions().catch(() => ({ data: [] }))
       ]);
       console.log('Orders.tsx: Raw ordersRes:', ordersRes);
@@ -62,9 +72,12 @@ export function Orders() {
   };
 
   useEffect(() => { 
-    loadOrders(); 
-  }, []);
+    if (!isServiceHeadWithoutDept && user) {
+      loadOrders(); 
+    }
+  }, [user?.role, (user as any)?.department?.id]); // Only re-run if role or department ID changes
 
+  // Helper functions - MUST be before early return
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -97,6 +110,11 @@ export function Orders() {
     return submissions.find(sub => sub.order_id === orderId);
   };
 
+  // Early return AFTER helper functions
+  if (isServiceHeadWithoutDept) {
+    return <NoDepartmentMessage />;
+  }
+
   const filteredOrders = orders.filter(order => {
     const matchesSearch = order.title.toLowerCase().includes(search.toLowerCase()) ||
                          (order.client_email && order.client_email.toLowerCase().includes(search.toLowerCase()));
@@ -112,7 +130,7 @@ export function Orders() {
 
   const stats = {
     total: orders.length,
-    revenue: orders.reduce((sum, order) => sum + (order.price || 0), 0),
+    revenue: orders.reduce((sum, order) => sum + (parseFloat(order.total_paid) || 0), 0),
     completed: orders.filter(o => o.status === 'completed').length,
     pending: orders.filter(o => o.status === 'pending').length,
   };
@@ -478,5 +496,3 @@ export function Orders() {
     </div>
   );
 }
-
-export default Orders;

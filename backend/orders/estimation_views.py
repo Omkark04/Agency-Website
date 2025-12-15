@@ -1,8 +1,9 @@
 # orders/estimation_views.py
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, filters
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.utils import timezone
@@ -49,6 +50,10 @@ class InvoiceViewSet(viewsets.ModelViewSet):
     """
     serializer_class = InvoiceSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['order', 'status']
+    ordering_fields = ['created_at', 'invoice_date', 'due_date']
+    ordering = ['-created_at']
     
     def get_queryset(self):
         """Filter invoices based on user role"""
@@ -122,8 +127,14 @@ def generate_estimation_pdf(request, estimation_id):
     Generate PDF for estimation
     POST /api/estimations/<estimation_id>/generate-pdf/
     """
+    import traceback
+    import logging
+    logger = logging.getLogger(__name__)
+    
     try:
+        logger.info(f"Attempting to generate PDF for estimation {estimation_id}")
         estimation = Estimation.objects.get(id=estimation_id)
+        logger.info(f"Found estimation: {estimation.title}")
         
         # Check permissions
         user = request.user
@@ -134,15 +145,43 @@ def generate_estimation_pdf(request, estimation_id):
             )
         
         # Generate and upload PDF
-        pdf_generator = EstimationPDFGenerator(estimation)
-        result = pdf_generator.upload_to_cloudinary()
-        
-        return Response({
-            'success': True,
-            'message': 'PDF generated successfully',
-            'pdf_url': result['url'],
-            'pdf_public_id': result['public_id']
-        })
+        try:
+            logger.info("Creating PDF generator...")
+            pdf_generator = EstimationPDFGenerator(estimation)
+            
+            logger.info("Uploading to Cloudinary...")
+            result = pdf_generator.upload_to_cloudinary()
+            
+            logger.info(f"PDF generated successfully: {result['url']}")
+            return Response({
+                'success': True,
+                'message': 'PDF generated successfully',
+                'pdf_url': result['url'],
+                'pdf_public_id': result['public_id']
+            })
+        except RuntimeError as e:
+            # WeasyPrint not available
+            logger.error(f"WeasyPrint RuntimeError: {str(e)}")
+            return Response(
+                {
+                    'error': 'PDF generation is not available',
+                    'message': str(e),
+                    'details': 'WeasyPrint requires GTK+ libraries to be installed on Windows'
+                },
+                status=status.HTTP_503_SERVICE_UNAVAILABLE
+            )
+        except Exception as e:
+            # Log the full traceback
+            logger.error(f"Error generating PDF: {str(e)}")
+            logger.error(traceback.format_exc())
+            return Response(
+                {
+                    'error': 'Failed to generate PDF',
+                    'message': str(e),
+                    'traceback': traceback.format_exc()
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     except Estimation.DoesNotExist:
         return Response(
@@ -150,8 +189,13 @@ def generate_estimation_pdf(request, estimation_id):
             status=status.HTTP_404_NOT_FOUND
         )
     except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        logger.error(traceback.format_exc())
         return Response(
-            {'error': str(e)},
+            {
+                'error': str(e),
+                'traceback': traceback.format_exc()
+            },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
@@ -163,6 +207,9 @@ def send_estimation(request, estimation_id):
     Send estimation to client
     POST /api/estimations/<estimation_id>/send/
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     try:
         estimation = Estimation.objects.get(id=estimation_id)
         
@@ -174,12 +221,18 @@ def send_estimation(request, estimation_id):
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Generate PDF if not already generated
+        # Try to generate PDF if not already generated (optional - won't block if it fails)
         if not estimation.pdf_url:
-            pdf_generator = EstimationPDFGenerator(estimation)
-            pdf_generator.upload_to_cloudinary()
+            try:
+                logger.info(f"Attempting to generate PDF for estimation {estimation_id}")
+                pdf_generator = EstimationPDFGenerator(estimation)
+                pdf_generator.upload_to_cloudinary()
+                logger.info("PDF generated successfully")
+            except Exception as e:
+                # Log the error but don't block sending
+                logger.warning(f"PDF generation failed, but continuing to send estimation: {str(e)}")
         
-        # Update status
+        # Update status to sent
         estimation.status = 'sent'
         estimation.sent_at = timezone.now()
         estimation.save()
@@ -196,8 +249,9 @@ def send_estimation(request, estimation_id):
         
         return Response({
             'success': True,
-            'message': 'Estimation sent to client successfully',
-            'estimation': EstimationSerializer(estimation).data
+            'message': 'Estimation sent to client successfully' + (' (PDF generation failed - will be available later)' if not estimation.pdf_url else ''),
+            'estimation': EstimationSerializer(estimation).data,
+            'pdf_generated': bool(estimation.pdf_url)
         })
     
     except Estimation.DoesNotExist:
@@ -206,6 +260,7 @@ def send_estimation(request, estimation_id):
             status=status.HTTP_404_NOT_FOUND
         )
     except Exception as e:
+        logger.error(f"Error sending estimation: {str(e)}")
         return Response(
             {'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR

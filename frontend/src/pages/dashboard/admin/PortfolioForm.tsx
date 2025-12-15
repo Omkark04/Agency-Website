@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import api from '../../../api/api';
 import { createPortfolio, updatePortfolio } from '../../../api/portfolio';
 import { listServices } from '../../../api/services';
+import { useAuth } from '../../../hooks/useAuth';
 import { Button } from '../../../components/ui/Button';
 import { FiUpload, FiVideo, FiPlus, FiX, FiImage } from 'react-icons/fi';
 
@@ -40,6 +41,8 @@ interface FormErrors {
 // MAIN COMPONENT
 // ===========================
 export default function PortfolioForm({ initial, onSaved }: PortfolioFormProps) {
+  const { user } = useAuth();
+  
   // Form fields
   const [title, setTitle] = useState(initial?.title || '');
   const [client, setClient] = useState(initial?.client_name || '');
@@ -85,8 +88,18 @@ export default function PortfolioForm({ initial, onSaved }: PortfolioFormProps) 
     const loadServices = async () => {
       try {
         setServicesLoading(true);
-        const res = await listServices();
+        
+        // Add department filter for service_head users
+        const params: any = {};
+        if (user?.role === 'service_head' && (user as any).department) {
+          const dept = (user as any).department;
+          params.department = typeof dept === 'object' ? dept.id : dept;
+          console.log('📋 PortfolioForm: Filtering services by department', params.department);
+        }
+        
+        const res = await listServices(params);
         setServices(res.data);
+        console.log('📦 PortfolioForm: Services loaded:', res.data.length);
       } catch (error) {
         console.error('Failed to load services:', error);
         setErrors(prev => ({ ...prev, general: 'Failed to load services' }));
@@ -95,8 +108,10 @@ export default function PortfolioForm({ initial, onSaved }: PortfolioFormProps) 
       }
     };
 
-    loadServices();
-  }, []);
+    if (user) {
+      loadServices();
+    }
+  }, [user]);
 
   // ===========================
   // CLEANUP PREVIEW URLs

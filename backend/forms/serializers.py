@@ -142,18 +142,41 @@ class ServiceFormSubmissionSerializer(serializers.ModelSerializer):
         if client and not client_email:
             client_email = client.email
         
-        # Get service price (use original_price or 0)
-        price = getattr(submission.service, 'original_price', 0) or 0
+        # Get price from submission data (price_card_id should be in data)
+        price = 0
+        price_card = None
+        price_card_title = None
+        price_card_price = None
+        
+        # Check if price_card_id is in submission data
+        if 'price_card_id' in submission.data:
+            try:
+                from services.models import PriceCard
+                price_card_id = submission.data['price_card_id']
+                price_card = PriceCard.objects.get(id=price_card_id, service=submission.service)
+                price = price_card.price
+                price_card_title = price_card.title
+                price_card_price = price_card.price
+            except (PriceCard.DoesNotExist, ValueError):
+                # Fallback to service original_price
+                price = getattr(submission.service, 'original_price', 0) or 0
+        else:
+            # Fallback to service original_price
+            price = getattr(submission.service, 'original_price', 0) or 0
         
         # Create order
         order = Order.objects.create(
             service=submission.service,
+            pricing_plan=price_card,
             client=client,
             client_email=client_email,
             title=f"{submission.form.title} - {submission.submission_summary[:50]}",
             details=f"Form submission ID: {submission.id}\n\nSubmission: {submission.submission_summary}",
             status='pending',
             price=price,
+            price_card_title=price_card_title,
+            price_card_price=price_card_price,
+            form_submission=submission,
         )
         
         return order

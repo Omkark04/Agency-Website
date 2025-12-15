@@ -7,10 +7,15 @@ from . import views
 from . import estimation_views
 from . import workflow_views
 
-router = DefaultRouter()
-router.register(r'', views.OrderViewSet, basename='order')  # Empty string since already at /api/orders/
-router.register(r'estimations', estimation_views.EstimationViewSet, basename='estimation')
-router.register(r'invoices', estimation_views.InvoiceViewSet, basename='invoice')
+# Create separate routers to avoid conflicts
+order_router = DefaultRouter()
+order_router.register(r'', views.OrderViewSet, basename='order')
+
+estimation_router = DefaultRouter()
+estimation_router.register(r'', estimation_views.EstimationViewSet, basename='estimation')
+
+invoice_router = DefaultRouter()
+invoice_router.register(r'', estimation_views.InvoiceViewSet, basename='invoice')
 
 urlpatterns = [
     # IMPORTANT: Custom endpoints MUST come BEFORE router.urls
@@ -31,9 +36,16 @@ urlpatterns = [
     path('<int:order_id>/invoices/generate/', estimation_views.generate_invoice, name='generate-invoice'),
     path('invoices/<int:invoice_id>/download/', estimation_views.download_invoice, name='download-invoice'),
     
+    # Tasks endpoint (for consistency with other order-related endpoints)
+    path('<int:order_id>/tasks/', include('tasks.urls_order_tasks')),
+    
     # Service form endpoint
     path('services/<int:service_id>/form/', views.get_service_form, name='get-service-form'),
     
-    # Router URLs (MUST be last)
-    path('', include(router.urls)),
+    # ViewSet routers - these provide list/detail endpoints
+    path('estimations/', include(estimation_router.urls)),
+    path('invoices/', include(invoice_router.urls)),
+    
+    # Order router (MUST be last to avoid catching everything)
+    path('', include(order_router.urls)),
 ]

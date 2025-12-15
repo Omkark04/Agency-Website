@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { listUsers, deleteUser } from '../../../api/users';
+import api from '../../../api/api';
 import { Button } from '../../../components/ui/Button';
 import Modal from '../../../components/ui/Modal';
 import UserForm from './UserForm';
+import { useAuth } from '../../../hooks/useAuth';
+import { NoDepartmentMessage } from '../../../components/dashboard/NoDepartmentMessage';
 import { 
   FiUsers, 
   FiTrash2, 
@@ -15,6 +18,8 @@ import {
 } from 'react-icons/fi';
 
 export function Users() {
+  const { user } = useAuth();
+  const isServiceHeadWithoutDept = user?.role === 'service_head' && !(user as any).department;
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -24,18 +29,45 @@ export function Users() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await listUsers();
+      console.log('👥 Users: Loading users for role:', user?.role);
+      
+      // Use different endpoint for service heads
+      let res;
+      if (user?.role === 'service_head') {
+        // Use dedicated department team members endpoint
+        console.log('👥 Users: Using department/team-members endpoint');
+        res = await api.get('/auth/department/team-members/');
+      } else {
+        // Admin uses the general users endpoint
+        console.log('👥 Users: Using admin/users endpoint');
+        res = await api.get('/auth/admin/users/');
+      }
+      
+      console.log('👥 Users: API response:', res.data);
       setUsers(res.data);
     } catch (error) {
-      console.error('Failed to load users:', error);
+      console.error('❌ Users: Failed to load users:', error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => { 
-    load(); 
-  }, []);
+    console.log('👥 Users: useEffect triggered', {
+      isServiceHeadWithoutDept,
+      hasUser: !!user,
+      role: user?.role,
+      department: (user as any)?.department
+    });
+    
+    if (!isServiceHeadWithoutDept && user) {
+      load(); 
+    }
+  }, [user?.role, (user as any)?.department?.id, isServiceHeadWithoutDept]); // Added isServiceHeadWithoutDept to dependencies
+
+  if (isServiceHeadWithoutDept) {
+    return <NoDepartmentMessage />;
+  }
 
   const onDelete = async (id: number) => {
     if (!confirm('Are you sure you want to delete this user?')) return;
@@ -68,7 +100,11 @@ export function Users() {
     admin: users.filter(u => u.role === 'admin').length,
     client: users.filter(u => u.role === 'client').length,
     service_head: users.filter(u => u.role === 'service_head').length,
+    team_member: users.filter(u => u.role === 'team_member').length,
   };
+
+  // Determine if current user is service head
+  const isServiceHead = user?.role === 'service_head';
 
   return (
     <div className="min-h-screen">
@@ -83,8 +119,14 @@ export function Users() {
                   <FiUsers className="h-8 w-8 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold text-white drop-shadow-lg">Users Management</h1>
-                  <p className="text-white/90 text-lg mt-1">Manage system users and their roles</p>
+                  <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+                    {isServiceHead ? 'Team Members' : 'Users Management'}
+                  </h1>
+                  <p className="text-white/90 text-lg mt-1">
+                    {isServiceHead 
+                      ? 'Manage your department team members' 
+                      : 'Manage system users and their roles'}
+                  </p>
                 </div>
               </div>
               <Button
@@ -100,12 +142,17 @@ export function Users() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 animate-fade-in" style={{animationDelay: '0.1s'}}>
-        {[
+        {(isServiceHead ? [
+          { label: 'Total Users', value: roleCounts.all, icon: FiUsers, color: 'from-gray-500 to-slate-600', bg: 'from-gray-500/10 to-slate-500/10' },
+          { label: 'Team Members', value: roleCounts.team_member, icon: FiUsers, color: 'from-blue-500 to-indigo-600', bg: 'from-blue-500/10 to-indigo-500/10' },
+          { label: 'Service Heads', value: roleCounts.service_head, icon: FiKey, color: 'from-purple-500 to-pink-600', bg: 'from-purple-500/10 to-pink-500/10' },
+          { label: 'Clients', value: roleCounts.client, icon: FiMail, color: 'from-green-500 to-emerald-600', bg: 'from-green-500/10 to-emerald-500/10' },
+        ] : [
           { label: 'Total Users', value: roleCounts.all, icon: FiUsers, color: 'from-gray-500 to-slate-600', bg: 'from-gray-500/10 to-slate-500/10' },
           { label: 'Admins', value: roleCounts.admin, icon: FiShield, color: 'from-purple-500 to-pink-600', bg: 'from-purple-500/10 to-pink-500/10' },
           { label: 'Clients', value: roleCounts.client, icon: FiMail, color: 'from-green-500 to-emerald-600', bg: 'from-green-500/10 to-emerald-500/10' },
           { label: 'Service Heads', value: roleCounts.service_head, icon: FiKey, color: 'from-blue-500 to-indigo-600', bg: 'from-blue-500/10 to-indigo-500/10' }
-        ].map((stat, idx) => (
+        ]).map((stat, idx) => (
           <div key={idx} className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-100">
             <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${stat.bg} rounded-full blur-2xl`}></div>
             <div className="relative z-10">

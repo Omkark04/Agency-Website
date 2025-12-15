@@ -1,19 +1,23 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Department, PriceCard, Service
 from .serializers import DepartmentSerializer, ServiceSerializer, PriceCardSerializer
 from accounts.permissions import IsAdmin
 from rest_framework import viewsets, generics
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg, Count, Sum
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from .models import Department, PriceCard, Service, PricingPlan, PricingComparison
 from .serializers import (
     DepartmentSerializer, ServiceSerializer, PriceCardSerializer,
     PricingPlanSerializer, PricingComparisonSerializer
 )
+
+User = get_user_model()
 
 class DepartmentViewSet(viewsets.ModelViewSet):
     queryset = Department.objects.all().order_by("title")
@@ -87,3 +91,37 @@ class PublicServiceListView(generics.ListAPIView):
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['department']
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_department(request):
+    """
+    Get department where the authenticated user is assigned as team_head.
+    Returns department data or null if user is not a team head of any department.
+    """
+    user = request.user
+    
+    # Find department where this user is the team_head
+    try:
+        department = Department.objects.get(team_head=user)
+        serializer = DepartmentSerializer(department)
+        return Response({
+            'department': serializer.data,
+            'has_department': True
+        })
+    except Department.DoesNotExist:
+        return Response({
+            'department': None,
+            'has_department': False,
+            'message': 'No department assigned to this user as team head'
+        })
+    except Department.MultipleObjectsReturned:
+        # If somehow user is team_head of multiple departments, return the first one
+        department = Department.objects.filter(team_head=user).first()
+        serializer = DepartmentSerializer(department)
+        return Response({
+            'department': serializer.data,
+            'has_department': True,
+            'warning': 'User is team head of multiple departments, returning first one'
+        })

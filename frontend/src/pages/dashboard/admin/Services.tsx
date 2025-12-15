@@ -3,6 +3,8 @@ import { listServices, deleteService } from '../../../api/services';
 import Modal from '../../../components/ui/Modal';
 import { Button } from '../../../components/ui/Button';
 import ServiceForm from './ServiceForm';
+import { useAuth } from '../../../hooks/useAuth';
+import { NoDepartmentMessage } from '../../../components/dashboard/NoDepartmentMessage';
 import {
   FiPackage,
   FiEdit2,
@@ -14,6 +16,7 @@ import {
 } from 'react-icons/fi';
 
 const Services = () => {
+  const { user } = useAuth();
   const [services, setServices] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
   const [edit, setEdit] = useState<any | null>(null);
@@ -21,17 +24,47 @@ const Services = () => {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
 
+  // ✅ Check if service_head has no department
+  const isServiceHeadWithoutDept = user?.role === 'service_head' && !(user as any).department;
+
   const load = async () => {
     setLoading(true);
     try {
-      const res = await listServices();
+      console.log('🔍 Services: Loading services...');
+      console.log('👤 Current user:', user);
+      console.log('🏢 User department:', (user as any)?.department);
+      
+      // Add department filter for service_head users
+      const params: any = {};
+      if (user?.role === 'service_head' && (user as any).department) {
+        const dept = (user as any).department;
+        params.department = typeof dept === 'object' ? dept.id : dept;
+        console.log('✅ Adding department filter:', params.department);
+      } else if (user?.role === 'service_head') {
+        console.log('⚠️ Service head has no department - no filter applied');
+      } else {
+        console.log('ℹ️ User is not service_head - no filter applied');
+      }
+      
+      console.log('📡 API call params:', params);
+      const res = await listServices(params);
+      console.log('📦 Services received:', res.data.length, 'services');
       setServices(res.data);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (!isServiceHeadWithoutDept && user) {
+      load();
+    }
+  }, [user?.role, (user as any)?.department?.id]); // Only re-run if role or department ID changes
+
+  // ✅ Show empty state if service_head has no department
+  if (isServiceHeadWithoutDept) {
+    return <NoDepartmentMessage />;
+  }
 
   const onDelete = async (id: number) => {
     if (!confirm('Are you sure you want to delete this service?')) return;

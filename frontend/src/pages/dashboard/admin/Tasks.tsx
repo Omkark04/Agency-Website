@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 import { listTasks } from '../../../api/tasks';
+import { useAuth } from '../../../hooks/useAuth';
+import { NoDepartmentMessage } from '../../../components/dashboard/NoDepartmentMessage';
 import { FiCheckCircle, FiClock, FiList, FiPlus, FiCalendar } from 'react-icons/fi';
 
 export function Tasks() {
+  const { user } = useAuth();
+  const isServiceHeadWithoutDept = user?.role === 'service_head' && !(user as any).department;
   const [tasks, setTasks] = useState<any[]>([]);
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('all');
   const [loading, setLoading] = useState(true);
@@ -10,7 +14,13 @@ export function Tasks() {
   const loadTasks = async () => {
     setLoading(true);
     try {
-      const res = await listTasks();
+      // Add department filter for service_head users
+      const params: any = {};
+      if (user?.role === 'service_head' && (user as any).department) {
+        const dept = (user as any).department;
+        params.order__service__department = typeof dept === 'object' ? dept.id : dept;
+      }
+      const res = await listTasks(params);
       setTasks(res.data);
     } catch (error) {
       console.error('Failed to load tasks:', error);
@@ -20,8 +30,14 @@ export function Tasks() {
   };
 
   useEffect(() => {
-    loadTasks();
-  }, []);
+    if (!isServiceHeadWithoutDept && user) {
+      loadTasks();
+    }
+  }, [user?.role, (user as any)?.department?.id]); // Only re-run if role or department ID changes
+
+  if (isServiceHeadWithoutDept) {
+    return <NoDepartmentMessage />;
+  }
 
   const filteredTasks = tasks.filter(task => {
     if (filter === 'all') return true;

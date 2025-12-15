@@ -4,9 +4,13 @@ import { listServices } from '../../../api/services';
 import Modal from '../../../components/ui/Modal';
 import PriceCardForm from './PriceCardForm';
 import { Button } from '../../../components/ui/Button';
+import { useAuth } from '../../../hooks/useAuth';
+import { NoDepartmentMessage } from '../../../components/dashboard/NoDepartmentMessage';
 import { FiEdit2, FiTrash2, FiPlus, FiDollarSign, FiPackage, FiGrid } from 'react-icons/fi';
 
 export default function PriceCards() {
+  const { user } = useAuth();
+  const isServiceHeadWithoutDept = user?.role === 'service_head' && !(user as any).department;
   const [cards, setCards] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
@@ -16,17 +20,44 @@ export default function PriceCards() {
   const load = async () => {
     setLoading(true);
     try {
-      const [r1, r2] = await Promise.all([listPriceCards(), listServices()]);
+      console.log('🔍 PriceCards: Loading...');
+      console.log('👤 Current user:', user);
+      console.log('🏢 User department:', (user as any)?.department);
+      
+      // Add department filter for service_head users
+      const params: any = {};
+      if (user?.role === 'service_head' && (user as any).department) {
+        const dept = (user as any).department;
+        params.department = typeof dept === 'object' ? dept.id : dept;
+        console.log('✅ Adding department filter:', params.department);
+      } else if (user?.role === 'service_head') {
+        console.log('⚠️ Service head has no department');
+      } else {
+        console.log('ℹ️ User is not service_head');
+      }
+      
+      console.log('📡 API call params:', params);
+      const [r1, r2] = await Promise.all([listPriceCards(params), listServices(params)]);
+      console.log('📦 Price cards received:', r1.data.length);
+      console.log('📦 Services received:', r2.data.length);
       setCards(r1.data);
       setServices(r2.data);
     } catch (error) {
-      console.error('Failed to load data:', error);
+      console.error('❌ Failed to load data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { 
+    if (!isServiceHeadWithoutDept && user) {
+      load(); 
+    }
+  }, [user?.role, (user as any)?.department?.id]); // Only re-run if role or department ID changes
+
+  if (isServiceHeadWithoutDept) {
+    return <NoDepartmentMessage />;
+  }
 
   const onEdit = (c: any) => { setEdit(c); setOpen(true); }
   const onDelete = async (id: number) => {

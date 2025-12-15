@@ -7,10 +7,11 @@ import type { ServiceForm, FormField } from '../../api/forms';
 
 interface DynamicFormRendererProps {
   serviceId: number;
+  priceCardId?: number; // Optional price card ID
   onSuccess?: (orderId: number) => void;
 }
 
-const DynamicFormRenderer = ({ serviceId, onSuccess }: DynamicFormRendererProps) => {
+const DynamicFormRenderer = ({ serviceId, priceCardId, onSuccess }: DynamicFormRendererProps) => {
   const [form, setForm] = useState<ServiceForm | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -156,11 +157,19 @@ const DynamicFormRenderer = ({ serviceId, onSuccess }: DynamicFormRendererProps)
       }
       
       // Submit form
-      const response = await submitForm(form!.id!, {
+      const submissionData: any = {
         data: formData,
         files: uploadedFiles,
         client_email: formData['email'] || ''
-      });
+      };
+      
+      // Include price_card_id if provided
+      if (priceCardId) {
+        submissionData.data.price_card_id = priceCardId;
+        console.log('📋 Including price_card_id in submission:', priceCardId);
+      }
+      
+      const response = await submitForm(form!.id!, submissionData);
       
       setSubmitStatus({
         success: true,

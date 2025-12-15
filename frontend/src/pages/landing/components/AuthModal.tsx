@@ -68,10 +68,11 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
         const userRole =
           res?.user?.role ||
           localStorage.getItem('role');
+          console.log(userRole);
 
 
         if (userRole === 'admin') navigate('/dashboard');
-        else if (userRole === 'team_head') navigate('/team-head-dashboard');
+        else if (userRole === 'service_head') navigate('/dashboard/service-head');
         else navigate('/client-dashboard');
 
 

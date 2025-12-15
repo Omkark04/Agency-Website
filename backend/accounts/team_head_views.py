@@ -486,3 +486,62 @@ class TeamTaskDetailView(generics.RetrieveUpdateDestroyAPIView):
             raise ValueError("Cannot delete task from another service")
         
         instance.delete()
+
+
+class DepartmentTeamMembersView(generics.ListAPIView):
+    """
+    List team members filtered by service head's department
+    This is specifically for the Team Members page in the admin dashboard
+    """
+    serializer_class = UserSerializer
+    permission_classes = [IsTeamHeadOrAdmin]
+
+    def get_queryset(self):
+        """
+        Return team members from the service head's department
+        """
+        user = self.request.user
+        
+        print(f"👥 DepartmentTeamMembersView: User role: {user.role}")
+        print(f"👥 DepartmentTeamMembersView: User email: {user.email}")
+        
+        # Admin sees all team members
+        if user.role == 'admin':
+            queryset = User.objects.filter(role='team_member').order_by('-date_joined')
+            print(f"👥 DepartmentTeamMembersView: Admin - returning {queryset.count()} team members")
+            return queryset
+        
+        # Service head sees only team members from their department
+        if user.role == 'service_head':
+            # Get department where this user is team_head (same logic as /api/user/department/)
+            try:
+                from services.models import Department
+                department = Department.objects.get(team_head=user)
+                print(f"👥 DepartmentTeamMembersView: Found department {department.title} (ID: {department.id})")
+            except Department.DoesNotExist:
+                print("👥 DepartmentTeamMembersView: Service head is not team_head of any department")
+                return User.objects.none()
+            except Department.MultipleObjectsReturned:
+                department = Department.objects.filter(team_head=user).first()
+                print(f"👥 DepartmentTeamMembersView: Multiple departments found, using first: {department.title}")
+            
+            # Filter team members by department
+            queryset = User.objects.filter(
+                role='team_member',
+                department=department
+            ).order_by('-date_joined')
+            
+            print(f"👥 DepartmentTeamMembersView: Found {queryset.count()} team members in department")
+            
+            # Debug: Show all team members in database
+            all_team_members = User.objects.filter(role='team_member')
+            print(f"👥 DepartmentTeamMembersView: Total team members in DB: {all_team_members.count()}")
+            for tm in all_team_members:
+                print(f"  - {tm.username} (email: {tm.email}, dept_id: {tm.department_id})")
+            
+            return queryset
+        
+        # Other roles cannot access this endpoint
+        print(f"👥 DepartmentTeamMembersView: Role {user.role} not allowed")
+        return User.objects.none()
+

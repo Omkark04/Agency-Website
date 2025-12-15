@@ -3,6 +3,7 @@ import { createService, updateService } from '../../../api/services';
 import api from '../../../api/api';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
+import { useAuth } from '../../../hooks/useAuth';
 import {
   FiPackage,
   FiAlignLeft,
@@ -16,6 +17,7 @@ export default function ServiceForm({
   initial,
   onSaved,
 }: any) {
+  const { user } = useAuth();
   const [department, setDepartments] = useState<any[]>([]);
   const [title, setTitle] = useState(initial?.title || '');
   const [shortDesc, setShortDesc] = useState(initial?.short_description || '');
@@ -32,7 +34,18 @@ export default function ServiceForm({
   );
 
   const [loading, setLoading] = useState(false);
-    useEffect(() => {
+  
+  // Auto-select department for service_head users
+  useEffect(() => {
+    if (user?.role === 'service_head' && (user as any).department && !initial) {
+      const dept = (user as any).department;
+      const deptId = typeof dept === 'object' ? dept.id : dept;
+      setDepartmentId(deptId);
+      console.log('✅ Auto-selected department for service_head:', deptId);
+    }
+  }, [user, initial]);
+  
+  useEffect(() => {
     api.get('/api/departments/')
       .then(res => setDepartments(res.data))
       .catch(err => console.error(err));
@@ -185,6 +198,7 @@ export default function ServiceForm({
           onChange={e => setDepartmentId(Number(e.target.value))}
           className="w-full border rounded p-3"
           required
+          disabled={user?.role === 'service_head'} // Read-only for service heads
         >
           <option value="">Select Department</option>
           {department.map((d: any) => (
@@ -193,6 +207,11 @@ export default function ServiceForm({
             </option>
           ))}
         </select>
+        {user?.role === 'service_head' && (
+          <p className="text-xs text-gray-500 mt-1">
+            ℹ️ You can only create services for your assigned department
+          </p>
+        )}
       </div>
 
       {/* ✅ STATUS */}

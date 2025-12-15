@@ -1,6 +1,6 @@
 // frontend/src/api/workflow.ts
 import api from './api';
-import { WorkflowInfo, OrderStatusHistory, StatusUpdateData, Deliverable } from '../types/workflow';
+import type { WorkflowInfo, OrderStatusHistory, StatusUpdateData, Deliverable } from '../types/workflow';
 
 // Get workflow information for an order
 export const getWorkflowInfo = (orderId: number) =>

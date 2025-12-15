@@ -1,7 +1,9 @@
-  import { useState } from 'react';
+  import { useState, useEffect } from 'react';
   import api from '../../../api/api';
+  import { useAuth } from '../../../hooks/useAuth';
 
   export default function UserForm({ onSaved }: { onSaved: () => void }) {
+    const { user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -10,8 +12,15 @@
       email: '',
       password: '',
       phone: '',
-      role: 'service_head',
+      role: user?.role === 'service_head' ? 'team_member' : 'service_head',
     });
+
+    // Auto-set role to team_member for service heads
+    useEffect(() => {
+      if (user?.role === 'service_head') {
+        setForm(prev => ({ ...prev, role: 'team_member' }));
+      }
+    }, [user]);
 
     const submit = async () => {
       setLoading(true);
@@ -28,15 +37,25 @@
           return;
         }
 
-        // ✅ REAL BACKEND CALL
-        await api.post(endpoint, {
+        // Prepare payload
+        const payload: any = {
           username: form.username,
           email: form.email,
           password: form.password,
           password2: form.password,
           phone: form.phone,
           role: form.role,
-        });
+        };
+
+        // Auto-assign department for service heads creating team members
+        if (user?.role === 'service_head' && form.role === 'team_member' && (user as any).department) {
+          const dept = (user as any).department;
+          payload.department = typeof dept === 'object' ? dept.id : dept;
+          console.log('👥 Auto-assigning department to team member:', payload.department);
+        }
+
+        // ✅ REAL BACKEND CALL
+        await api.post(endpoint, payload);
 
         alert('User created successfully ✅');
         onSaved();
@@ -61,7 +80,11 @@
             {/* HEADER */}
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold text-gray-800 mb-1">Create New User</h2>
-              <p className="text-gray-600 text-sm">Admin can create team members & service heads</p>
+              <p className="text-gray-600 text-sm">
+                {user?.role === 'service_head' 
+                  ? 'Create team members for your department' 
+                  : 'Admin can create team members & service heads'}
+              </p>
             </div>
 
             <div className="space-y-5">
@@ -73,11 +96,17 @@
                   className="w-full border p-3 rounded"
                   value={form.role}
                   onChange={e => setForm({ ...form, role: e.target.value })}
+                  disabled={user?.role === 'service_head'} // Disable for service heads
                   required
                 >
-                  <option value="service_head">Service Head</option>
+                  {user?.role === 'admin' && <option value="service_head">Service Head</option>}
                   <option value="team_member">Team Member</option>
                 </select>
+                {user?.role === 'service_head' && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    ℹ️ You can only create Team Members for your department
+                  </p>
+                )}
               </div>
 
               {/* ✅ USERNAME */}

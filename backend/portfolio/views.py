@@ -11,17 +11,11 @@ class PortfolioProjectViewSet(viewsets.ModelViewSet):
     queryset = PortfolioProject.objects.all()
     serializer_class = PortfolioProjectSerializer
     permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['is_featured', 'service', 'service__department']
     
     def get_serializer_context(self):
         return {"request": self.request}
-    
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        # Add filtering
-        is_featured = self.request.query_params.get('is_featured')
-        if is_featured:
-            queryset = queryset.filter(is_featured=is_featured.lower() == 'true')
-        return queryset
 
 class CaseStudyViewSet(viewsets.ModelViewSet):
     queryset = CaseStudy.objects.filter(is_published=True)

@@ -30,6 +30,7 @@ import {
 export default function MediaLibrary() {
   const [resources, setResources] = useState<CloudinaryResource[]>([]);
   const [file, setFile] = useState<File | null>(null);
+  const [caption, setCaption] = useState('');
   const [uploading, setUploading] = useState(false);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'image' | 'video' | 'raw'>('all');
@@ -62,10 +63,11 @@ export default function MediaLibrary() {
     
     setUploading(true);
     try {
-      await uploadMedia(file);
+      await uploadMedia(file, caption || file.name);
       await loadResources();
       
       setFile(null);
+      setCaption('');
       const fileInput = document.getElementById('file-upload') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
       
@@ -226,6 +228,27 @@ export default function MediaLibrary() {
                 </div>
               )}
             </div>
+            
+            {/* Caption Input Field */}
+            {file && (
+              <div className="mt-4">
+                <label className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-2">
+                  <div className="p-1.5 bg-purple-100 rounded-lg">
+                    <FiInfo className="h-4 w-4 text-purple-600" />
+                  </div>
+                  Caption (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={caption}
+                  onChange={(e) => setCaption(e.target.value)}
+                  placeholder="Enter a caption for this media..."
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium"
+                  disabled={uploading}
+                />
+                <p className="text-xs text-gray-500 mt-2">Add a descriptive caption to help identify this media later</p>
+              </div>
+            )}
           </div>
           
           <div className="flex flex-col justify-between">

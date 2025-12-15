@@ -14,7 +14,7 @@ from media.views import UploadMediaView
 from services.views import (
     ServiceViewSet, DepartmentViewSet, PriceCardViewSet,
     PricingPlanViewSet, PricingComparisonListView,
-    PricingStatsView, PublicServiceListView
+    PricingStatsView, PublicServiceListView, get_user_department
 )
 from orders.views import OrderViewSet, OfferViewSet
 from portfolio.views import (
@@ -118,6 +118,9 @@ urlpatterns = [
     # Offers special endpoints
     path("api/offers/stats/", OfferViewSet.as_view({"get": "stats"})),
     path("api/offers/current-deal/", OfferViewSet.as_view({"get": "current_deal"})),
+    
+    # Department lookup by team_head
+    path("api/user/department/", get_user_department, name="user-department"),
 ]
 
 urlpatterns += [

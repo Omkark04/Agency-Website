@@ -38,6 +38,21 @@ def update_order_status(request, order_id):
                 status=status.HTTP_403_FORBIDDEN
             )
         
+        # Service heads can only update orders for their department's services
+        if user.role == 'service_head':
+            from services.models import Department
+            user_dept = Department.objects.filter(team_head=user).first()
+            if not user_dept:
+                return Response(
+                    {'error': 'You are not assigned to any department'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            if order.service.department != user_dept:
+                return Response(
+                    {'error': 'You can only update orders for services in your department'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+        
         # Validate and update status
         serializer = OrderStatusUpdateSerializer(
             data=request.data,
@@ -160,6 +175,21 @@ def upload_deliverable(request, order_id):
                 {'error': 'Only admins and service heads can upload deliverables'},
                 status=status.HTTP_403_FORBIDDEN
             )
+        
+        # Service heads can only upload for their department's services
+        if user.role == 'service_head':
+            from services.models import Department
+            user_dept = Department.objects.filter(team_head=user).first()
+            if not user_dept:
+                return Response(
+                    {'error': 'You are not assigned to any department'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            if order.service.department != user_dept:
+                return Response(
+                    {'error': 'You can only upload deliverables for services in your department'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
         
         # Validate file
         serializer = OrderDeliverableSerializer(data=request.data)

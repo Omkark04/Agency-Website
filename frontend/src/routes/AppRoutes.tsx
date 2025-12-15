@@ -21,12 +21,10 @@ import Users from '../pages/dashboard/admin/Users';
 import Orders from '../pages/dashboard/admin/Orders';
 import Tasks from '../pages/dashboard/admin/Tasks';
 import MediaLibrary from '../pages/dashboard/admin/MediaLibrary';
-import TeamHeadDashboard from '@/pages/dashboard/teamhead/Teamhead';
-import TaskManager from '@/pages/dashboard/teamhead/TaskManager';
-import SubmissionsApproval from '@/pages/dashboard/teamhead/SubmissionsApproval';
+// Team Head - NEW: Reuses admin components
+import TeamHeadDashboard from '@/pages/dashboard/teamhead/TeamHeadDashboard';
 //Team Member
 import TeamMemberDashboard from '@/pages/dashboard/teammember/TeamMemberDashboard';
-import TeamMemberPage from '@/pages/dashboard/teamhead/TeamMember';
 import TestimonialsManagement from '../pages/dashboard/admin/TestimonialsManagement';
 import ContactsManagement from '../pages/dashboard/admin/ContactsManagement';
 import FormBuilder from '../pages/dashboard/admin/FormBuilder';
@@ -46,7 +44,7 @@ export const AppRoutes: React.FC = () => {
       {/* ✅ PROTECTED DASHBOARD WITH LAYOUT */}
       <Route
         element={
-          <ProtectedRoute allowedRoles={['admin', 'team_head', 'service_head', 'team_member', 'client']} />
+          <ProtectedRoute allowedRoles={['admin', 'service_head', 'team_member', 'client']} />
         }
       >
         <Route element={<ProtectedRoute allowedRoles={['client', 'admin']} />}>
@@ -59,13 +57,17 @@ export const AppRoutes: React.FC = () => {
             <Route path='/client-dashboard/documents' element={<Documents />} />
           </Route>
         </Route>
+        
+        {/* ✅ SERVICE HEAD (Team Head) - Uses DashboardLayout and Admin Components */}
         <Route element={<ProtectedRoute allowedRoles={['team_head', 'service_head', 'admin']} />}>
-          <Route path='/team-head-dashboard' element={<TeamHeadDashboard />}>
-            <Route path='/team-head-dashboard/task-manager' element={<TaskManager />} />
-            <Route path='/team-head-dashboard/team-members' element={<TeamMemberPage />} />
-            <Route path='/team-head-dashboard/submissions-approval' element={<SubmissionsApproval />} />
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard/service-head/*" element={<TeamHeadDashboard />} />
+            <Route path="/dashboard/forms/new" element={<FormBuilder />} />
+            <Route path="/dashboard/forms/:id" element={<FormBuilder />} />
+            <Route path="/dashboard/orders/:orderId" element={<OrderManagementPage />} />
           </Route>
         </Route>
+        
         <Route element={<ProtectedRoute allowedRoles={['team_member', 'admin']} />}>
           <Route path='/team-member-dashboard' element={<TeamMemberDashboard />} />
         </Route>

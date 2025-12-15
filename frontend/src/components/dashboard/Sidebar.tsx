@@ -29,20 +29,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, userRole }) =
   const { user } = useAuth();
 
   const menuItems = [
-    { title: 'Dashboard', path: '/dashboard', roles: ['admin','team_head','team_member','client'], icon: FiHome, gradient: 'from-blue-500 to-indigo-600' },
-    { title: 'Orders', path: '/dashboard/orders', roles: ['admin','team_head','client'], icon: FiShoppingCart, gradient: 'from-orange-500 to-rose-600' },
-    { title: 'Services', path: '/dashboard/services', roles: ['admin','team_head','client'], icon: FiPackage, gradient: 'from-cyan-500 to-blue-600' },
+    { title: 'Dashboard', path: '/dashboard', roles: ['admin'], icon: FiHome, gradient: 'from-blue-500 to-indigo-600' },
+    { title: 'Dashboard', path: '/dashboard/service-head', roles: ['service_head'], icon: FiHome, gradient: 'from-blue-500 to-indigo-600' },
+    { title: 'Orders', path: '/dashboard/orders', roles: ['admin'], icon: FiShoppingCart, gradient: 'from-orange-500 to-rose-600' },
+    { title: 'Orders', path: '/dashboard/service-head/orders', roles: ['service_head'], icon: FiShoppingCart, gradient: 'from-orange-500 to-rose-600' },
+    { title: 'Services', path: '/dashboard/services', roles: ['admin'], icon: FiPackage, gradient: 'from-cyan-500 to-blue-600' },
+    { title: 'Services', path: '/dashboard/service-head/services', roles: ['service_head'], icon: FiPackage, gradient: 'from-cyan-500 to-blue-600' },
     { title: 'Departments', path: '/dashboard/departments', roles: ['admin'], icon: FiLayers, gradient: 'from-indigo-500 to-purple-600' },
     { title: 'Price Cards', path: '/dashboard/price-cards', roles: ['admin'], icon: FiCreditCard, gradient: 'from-pink-500 to-rose-600' },
+    { title: 'Price Cards', path: '/dashboard/service-head/price-cards', roles: ['service_head'], icon: FiCreditCard, gradient: 'from-pink-500 to-rose-600' },
     { title: 'Testimonials', path: '/dashboard/testimonials', roles: ['admin'], icon: FiMessageSquare, gradient: 'from-purple-500 to-pink-600' },
+    { title: 'Testimonials', path: '/dashboard/service-head/testimonials', roles: ['service_head'], icon: FiMessageSquare, gradient: 'from-purple-500 to-pink-600' },
     { title: 'Inquiries', path: '/dashboard/contacts', roles: ['admin'], icon: FiUsers, gradient: 'from-green-500 to-teal-600' },
-    { title: 'Form Builder', path: '/dashboard/forms/new', roles: ['admin','team_head'], icon: FiCheckSquare, gradient: 'from-indigo-500 to-blue-600' },
-    { title: 'Offers', path: '/dashboard/offers', roles: ['admin','team_head'], icon: FiGift, gradient: 'from-pink-500 to-rose-600' },
+    { title: 'Form Builder', path: '/dashboard/forms/new', roles: ['admin'], icon: FiCheckSquare, gradient: 'from-indigo-500 to-blue-600' },
+    { title: 'Form Builder', path: '/dashboard/service-head/forms', roles: ['service_head'], icon: FiCheckSquare, gradient: 'from-indigo-500 to-blue-600' },
+    { title: 'Offers', path: '/dashboard/offers', roles: ['admin'], icon: FiGift, gradient: 'from-pink-500 to-rose-600' },
     { title: 'Portfolio', path: '/dashboard/portfolio', roles: ['admin'], icon: FiBriefcase, gradient: 'from-purple-500 to-indigo-600' },
-    { title: 'Users', path: '/dashboard/users', roles: ['admin','team_head'], icon: FiUsers, gradient: 'from-purple-500 to-pink-600' },
-    { title: 'Tasks', path: '/dashboard/tasks', roles: ['admin','team_head','team_member'], icon: FiCheckSquare, gradient: 'from-green-500 to-emerald-600' },
-    { title: 'Media', path: '/dashboard/media', roles: ['admin','team_head','team_member'], icon: FiImage, gradient: 'from-violet-500 to-purple-600' },
-    { title: 'Analytics', path: '/dashboard/analytics', roles: ['admin','team_head'], icon: FiBarChart2, gradient: 'from-teal-500 to-cyan-600' },
+    { title: 'Portfolio', path: '/dashboard/service-head/portfolio', roles: ['service_head'], icon: FiBriefcase, gradient: 'from-purple-500 to-indigo-600' },
+    { title: 'Team Members', path: '/dashboard/users', roles: ['admin'], icon: FiUsers, gradient: 'from-purple-500 to-pink-600' },
+    { title: 'Team Members', path: '/dashboard/service-head/team-members', roles: ['service_head'], icon: FiUsers, gradient: 'from-purple-500 to-pink-600' },
+    { title: 'Tasks', path: '/dashboard/tasks', roles: ['admin','team_member'], icon: FiCheckSquare, gradient: 'from-green-500 to-emerald-600' },
+    { title: 'Tasks', path: '/dashboard/service-head/tasks', roles: ['service_head'], icon: FiCheckSquare, gradient: 'from-green-500 to-emerald-600' },
+    { title: 'Media', path: '/dashboard/media', roles: ['admin','team_member'], icon: FiImage, gradient: 'from-violet-500 to-purple-600' },
+    { title: 'Analytics', path: '/dashboard/analytics', roles: ['admin'], icon: FiBarChart2, gradient: 'from-teal-500 to-cyan-600' },
   ];
 
   const filteredMenuItems = menuItems.filter(item =>

@@ -29,6 +29,15 @@ class User(AbstractUser):
         blank=True,
         related_name="team_heads"
     )
+    
+    department = models.ForeignKey(
+        "services.Department",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="members",
+        help_text="Department assignment for service_head and team_member roles"
+    )
 
     # Account lockout fields
     failed_login_attempts = models.IntegerField(default=0)

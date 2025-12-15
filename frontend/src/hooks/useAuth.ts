@@ -55,22 +55,63 @@ export const useAuth = () => {
         password
       });
 
-      const { access, refresh, user } = response.data;
+      const { access, refresh } = response.data;
+      let { user } = response.data; // Use 'let' to allow modification
 
       localStorage.setItem('access', access);
       localStorage.setItem('refresh', refresh);
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('role', user.role); // Store role separately
 
+      // ✅ Fetch department for service_head users
+      if (user.role === 'service_head') {
+        console.log('🔍 User is service_head, fetching department...');
+        try {
+          const deptResponse = await api.get('/api/user/department/');
+          const { department, has_department } = deptResponse.data;
+          
+          console.log('📦 Department API Response:', deptResponse.data);
+          
+          if (has_department && department) {
+            // Store department in localStorage
+            localStorage.setItem('userDepartment', JSON.stringify(department));
+            // Add department to user object
+            user = { ...user, department }; // Update the user object
+            localStorage.setItem('user', JSON.stringify(user));
+            console.log('✅ Department assigned:', department);
+            console.log('✅ Updated user object:', user);
+          } else {
+            // No department assigned
+            localStorage.setItem('userDepartment', 'null');
+            console.log('⚠️ No department assigned to this service_head');
+          }
+        } catch (error) {
+          console.error('❌ Failed to fetch department:', error);
+          localStorage.setItem('userDepartment', 'null');
+        }
+      }
+
       setAuth({ user, loading: false, error: null });
-      navigate('/dashboard');
+      
+      // Role-based redirect
+      if (user.role === 'admin') {
+        navigate('/dashboard');
+      } else if (user.role === 'service_head') {
+        navigate('/dashboard/service-head');
+      } else if (user.role === 'team_member') {
+        navigate('/team-member-dashboard');
+      } else if (user.role === 'client') {
+        navigate('/client-dashboard');
+      } else {
+        navigate('/dashboard'); 
+      }
 
       return { user };
 
     } catch (error: any) {
-      const errorMsg = error.response?.data?.detail || 'Login failed';
-      setAuth(prev => ({ ...prev, error: errorMsg, loading: false }));
-      throw new Error(errorMsg);
+      const errorMessage = error.response?.data?.detail || 'Login failed';
+      setAuth({ user: null, loading: false, error: errorMessage });
+      throw error;
     }
   };
 
@@ -93,9 +134,12 @@ export const useAuth = () => {
       localStorage.setItem('access', access);
       localStorage.setItem('refresh', refresh);
       localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('role', user.role);
 
       setAuth({ user, loading: false, error: null });
-      navigate('/dashboard');
+      
+      // Clients always go to client dashboard after registration
+      navigate('/client-dashboard');
 
       return { user };
     } catch (error: any) {

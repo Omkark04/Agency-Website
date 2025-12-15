@@ -1,6 +1,6 @@
 // frontend/src/api/invoices.ts
 import api from './api';
-import { Invoice, InvoiceGenerateData } from '../types/invoices';
+import type { Invoice, InvoiceGenerateData } from '../types/invoices';
 
 // Generate invoice for an order
 export const generateInvoice = (orderId: number, data: InvoiceGenerateData) =>
@@ -27,4 +27,4 @@ export const downloadInvoice = (invoiceId: number) =>
 
 // List all invoices (admin/service head)
 export const listInvoices = (params?: any) =>
-  api.get<Invoice[]>('/api/invoices/', { params });
+  api.get<Invoice[]>('/api/orders/invoices/', { params });

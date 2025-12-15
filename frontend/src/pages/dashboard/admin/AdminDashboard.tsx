@@ -1,4 +1,3 @@
-// AdminDashboard.tsx - WITH ANALYTICS
 import React, { useEffect, useState } from 'react';
 import { DashboardMetrics } from '../../../components/analytics/DashboardMetrics';
 import { listOrders } from '../../../api/orders';
@@ -6,6 +5,7 @@ import { listUsers } from '../../../api/users';
 import { listServices } from '../../../api/services';
 import { listDepartments } from '../../../api/departments';
 import { listPortfolios } from '../../../api/portfolio';
+import { useAuth } from '../../../hooks/useAuth';
 import { FiBriefcase } from 'react-icons/fi';
 import { 
   FiShoppingCart, 
@@ -22,6 +22,7 @@ import {
 } from 'react-icons/fi';
 
 export const AdminDashboard: React.FC = () => {
+  const { user } = useAuth();
   const [ordersCount, setOrdersCount] = useState(0);
   const [clientsCount, setClientsCount] = useState(0);
   const [servicesCount, setServicesCount] = useState(0);
@@ -34,6 +35,14 @@ export const AdminDashboard: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
+        // Add department filter for service heads
+        const params: any = {};
+        if (user?.role === 'service_head' && (user as any).department) {
+          const dept = (user as any).department;
+          params.service__department = typeof dept === 'object' ? dept.id : dept;
+          console.log('📊 Dashboard: Filtering by department', params.service__department);
+        }
+
         const [
           { data: ordersData },
           { data: users },
@@ -41,11 +50,11 @@ export const AdminDashboard: React.FC = () => {
           { data: departments },
           { data: portfolios }
         ] = await Promise.all([
-          listOrders(),
-          listUsers({ role: 'client' }),
-          listServices(),
+          listOrders(params),
+          listUsers({ role: 'client', ...params }),
+          listServices(params),
           listDepartments(),
-          listPortfolios()
+          listPortfolios() // Portfolio API doesn't support params
         ]);
 
         // Ensure orders is always an array
@@ -57,7 +66,13 @@ export const AdminDashboard: React.FC = () => {
         setDepartmentsCount(departments.length);
         setPortfolioCount(portfolios.length);
         
-        const totalRevenue = orders.reduce((sum: number, order: any) => sum + (parseFloat(order.price) || 0), 0);
+        // Calculate revenue from total_paid (actual payments received)
+        const totalRevenue = orders.reduce((sum: number, order: any) => {
+          const paid = parseFloat(order.total_paid) || 0;
+          return sum + paid;
+        }, 0);
+        
+        console.log('💰 Total Revenue (from payments):', totalRevenue);
         setRevenue(totalRevenue);
 
         setGrowth({
@@ -68,7 +83,7 @@ export const AdminDashboard: React.FC = () => {
         console.error('Dashboard Stats Error:', err);
       }
     })();
-  }, []);
+  }, [user]);
 
   return (
     <>

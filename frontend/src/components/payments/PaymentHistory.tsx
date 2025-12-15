@@ -1,8 +1,8 @@
 // frontend/src/components/payments/PaymentHistory.tsx
 import React, { useEffect, useState } from 'react';
+import { CheckCircle, XCircle, Clock, AlertCircle, RefreshCw } from 'lucide-react';
 import { getOrderTransactions, retryPayment } from '../../api/payments';
-import { Transaction } from '../../types/payments';
-import { RefreshCw, Download, CheckCircle, XCircle, Clock, AlertCircle } from 'lucide-react';
+import type { Transaction } from '../../types/payments';
 import { format } from 'date-fns';
 
 interface PaymentHistoryProps {

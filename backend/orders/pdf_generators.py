@@ -287,11 +287,31 @@ class EstimationPDFGenerator:
                 "See: https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#windows"
             )
         
-        html_content = self.get_html_content()
-        pdf_file = BytesIO()
-        HTML(string=html_content).write_pdf(pdf_file)
-        pdf_file.seek(0)
-        return pdf_file
+        try:
+            html_content = self.get_html_content()
+            pdf_file = BytesIO()
+            
+            # Generate PDF
+            HTML(string=html_content).write_pdf(pdf_file)
+            
+            # Validate PDF was generated
+            pdf_file.seek(0)
+            pdf_content = pdf_file.read()
+            
+            if len(pdf_content) == 0:
+                raise RuntimeError("Generated PDF is empty")
+            
+            # Check if it's a valid PDF (starts with %PDF)
+            if not pdf_content.startswith(b'%PDF'):
+                raise RuntimeError("Generated file is not a valid PDF")
+            
+            # Reset file pointer
+            pdf_file = BytesIO(pdf_content)
+            pdf_file.seek(0)
+            
+            return pdf_file
+        except Exception as e:
+            raise RuntimeError(f"PDF generation failed: {str(e)}")
     
     def upload_to_cloudinary(self):
         """
@@ -300,26 +320,45 @@ class EstimationPDFGenerator:
         Returns:
             dict: Cloudinary upload response with 'url' and 'public_id'
         """
-        pdf_file = self.generate()
-        
-        # Upload to Cloudinary
-        upload_result = cloudinary.uploader.upload(
-            pdf_file,
-            folder="estimations",
-            resource_type="raw",
-            public_id=f"estimation_{self.estimation.uuid}",
-            format="pdf"
-        )
-        
-        # Update estimation with PDF URL
-        self.estimation.pdf_url = upload_result["secure_url"]
-        self.estimation.pdf_public_id = upload_result["public_id"]
-        self.estimation.save()
-        
-        return {
-            "url": upload_result["secure_url"],
-            "public_id": upload_result["public_id"]
-        }
+        try:
+            pdf_file = self.generate()
+            
+            # Verify PDF file is valid before upload
+            pdf_file.seek(0)
+            pdf_content = pdf_file.read()
+            
+            if len(pdf_content) < 100:  # PDF should be at least 100 bytes
+                raise RuntimeError(f"PDF file too small ({len(pdf_content)} bytes), likely corrupted")
+            
+            # Reset for upload
+            pdf_file = BytesIO(pdf_content)
+            pdf_file.seek(0)
+            
+            # Upload to Cloudinary
+            upload_result = cloudinary.uploader.upload(
+                pdf_file,
+                folder="estimations",
+                resource_type="raw",
+                public_id=f"estimation_{self.estimation.uuid}",
+                format="pdf",
+                invalidate=True  # Invalidate CDN cache
+            )
+            
+            # Verify upload was successful
+            if 'secure_url' not in upload_result:
+                raise RuntimeError("Cloudinary upload failed - no URL returned")
+            
+            # Update estimation with PDF URL
+            self.estimation.pdf_url = upload_result["secure_url"]
+            self.estimation.pdf_public_id = upload_result["public_id"]
+            self.estimation.save()
+            
+            return {
+                "url": upload_result["secure_url"],
+                "public_id": upload_result["public_id"]
+            }
+        except Exception as e:
+            raise RuntimeError(f"PDF upload failed: {str(e)}")
 
 
 class InvoicePDFGenerator:

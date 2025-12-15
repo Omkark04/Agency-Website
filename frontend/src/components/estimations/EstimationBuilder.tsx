@@ -1,7 +1,7 @@
 // frontend/src/components/estimations/EstimationBuilder.tsx
 import React, { useState } from 'react';
 import { createEstimation } from '../../api/estimations';
-import { CostBreakdownItem, EstimationCreateData } from '../../types/estimations';
+import type { CostBreakdownItem, EstimationCreateData } from '../../types/estimations';
 import { Plus, Trash2, Calculator, Loader2, CheckCircle } from 'lucide-react';
 
 interface EstimationBuilderProps {

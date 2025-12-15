@@ -25,15 +25,15 @@ export const deleteEstimation = (estimationId: number) =>
 // Generate PDF for estimation
 export const generateEstimationPDF = (estimationId: number) =>
   api.post<{ success: boolean; message: string; pdf_url: string; pdf_public_id: string }>(
-    `/api/estimations/${estimationId}/generate-pdf/`
+    `/api/orders/estimations/${estimationId}/generate-pdf/`
   );
 
 // Send estimation to client
 export const sendEstimation = (estimationId: number) =>
   api.post<{ success: boolean; message: string; estimation: Estimation }>(
-    `/api/estimations/${estimationId}/send/`
+    `/api/orders/estimations/${estimationId}/send/`
   );
 
 // List all estimations (admin/service head)
 export const listEstimations = (params?: any) =>
-  api.get<Estimation[]>('/api/estimations/', { params });
+  api.get<Estimation[]>('/api/orders/estimations/', { params });

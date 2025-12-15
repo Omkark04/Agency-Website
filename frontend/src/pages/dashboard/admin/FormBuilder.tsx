@@ -9,6 +9,8 @@ import {
 import { createForm, updateForm, getForm, createField, updateField, deleteField, listForms, deleteForm } from '../../../api/forms';
 import type { ServiceForm, FormField } from '../../../api/forms';
 import { listServices } from '../../../api/services';
+import { useAuth } from '../../../hooks/useAuth';
+import { NoDepartmentMessage } from '../../../components/dashboard/NoDepartmentMessage';
 
 const FIELD_TYPES = [
   { type: 'text', label: 'Text', icon: Type },
@@ -24,6 +26,8 @@ const FIELD_TYPES = [
 const FormBuilder = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isServiceHeadWithoutDept = user?.role === 'service_head' && !(user as any).department;
   const [loading, setLoading] = useState(false);
   const [services, setServices] = useState<any[]>([]);
   const [form, setForm] = useState<Partial<ServiceForm>>({
@@ -46,20 +50,36 @@ const FormBuilder = () => {
   const [showHistory, setShowHistory] = useState(true);
 
   useEffect(() => {
-    loadServices();
-    loadAllForms();
-    if (id) {
-      loadForm(parseInt(id));
-      setShowHistory(false);
+    if (!isServiceHeadWithoutDept && user) {
+      loadServices();
+      loadAllForms();
+      if (id) {
+        loadForm(parseInt(id));
+        setShowHistory(false);
+      }
     }
-  }, [id]);
+  }, [id, user?.role, (user as any)?.department?.id]); // Re-run when user or department changes
 
   const loadServices = async () => {
     try {
-      const response = await listServices();
+      console.log('🔍 FormBuilder: Loading services...');
+      console.log('👤 Current user:', user);
+      console.log('🏢 User department:', (user as any)?.department);
+      
+      // Add department filter for service_head users
+      const params: any = {};
+      if (user?.role === 'service_head' && (user as any).department) {
+        const dept = (user as any).department;
+        params.department = typeof dept === 'object' ? dept.id : dept;
+        console.log('✅ Adding department filter:', params.department);
+      }
+      
+      console.log('📡 API call params:', params);
+      const response = await listServices(params);
+      console.log('📦 Services received:', response.data.length);
       setServices(response.data);
     } catch (error) {
-      console.error('Error loading services:', error);
+      console.error('❌ Error loading services:', error);
     }
   };
 
@@ -211,6 +231,11 @@ const FormBuilder = () => {
     setShowFieldEditor(false);
     setEditingField(null);
   };
+
+  // Show empty state if service_head has no department
+  if (isServiceHeadWithoutDept) {
+    return <NoDepartmentMessage />;
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto">

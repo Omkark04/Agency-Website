@@ -1,7 +1,7 @@
 // frontend/src/components/invoices/InvoiceViewer.tsx
 import React from 'react';
-import { Invoice } from '../../types/invoices';
-import { Download, FileText, Calendar, DollarSign, AlertCircle } from 'lucide-react';
+import type { Invoice } from '../../types/invoices';
+import { Download, FileText, Calendar, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface InvoiceViewerProps {

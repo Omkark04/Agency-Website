@@ -9,24 +9,48 @@ import {
 import type { TestimonialAdmin } from '../../../api/testinomials';
 import { Button } from '../../../components/ui/Button';
 import { FiCheck, FiX, FiTrash2, FiStar, FiPhone, FiMail } from 'react-icons/fi';
+import { useAuth } from '../../../hooks/useAuth';
+import { NoDepartmentMessage } from '../../../components/dashboard/NoDepartmentMessage';
 
 export default function TestimonialsManagement() {
+  const { user } = useAuth();
+  const isServiceHeadWithoutDept = user?.role === 'service_head' && !(user as any).department;
   const [testimonials, setTestimonials] = useState<TestimonialAdmin[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved'>('all');
 
   useEffect(() => {
-    fetchTestimonials();
-  }, [filter]);
+    if (!isServiceHeadWithoutDept && user) {
+      fetchTestimonials();
+    }
+  }, [filter, user?.role, (user as any)?.department?.id]); // Re-run when filter or department changes
 
   const fetchTestimonials = async () => {
     try {
       setLoading(true);
-      const params = filter === 'all' ? {} : { is_approved: filter === 'approved' };
+      console.log('🔍 Testimonials: Loading...');
+      console.log('👤 Current user:', user);
+      console.log('🏢 User department:', (user as any)?.department);
+      
+      const params: any = filter === 'all' ? {} : { is_approved: filter === 'approved' };
+      
+      // Add department filter for service_head users
+      if (user?.role === 'service_head' && (user as any).department) {
+        const dept = (user as any).department;
+        params.service__department = typeof dept === 'object' ? dept.id : dept;
+        console.log('✅ Adding department filter:', params.service__department);
+      } else if (user?.role === 'service_head') {
+        console.log('⚠️ Service head has no department');
+      } else {
+        console.log('ℹ️ User is not service_head');
+      }
+      
+      console.log('📡 API call params:', params);
       const response = await getAllTestimonials(params);
+      console.log('📦 Testimonials received:', response.data.length);
       setTestimonials(response.data);
     } catch (error) {
-      console.error('Error fetching testimonials:', error);
+      console.error('❌ Error fetching testimonials:', error);
     } finally {
       setLoading(false);
     }
@@ -72,6 +96,10 @@ export default function TestimonialsManagement() {
       alert('Failed to toggle featured status');
     }
   };
+
+  if (isServiceHeadWithoutDept) {
+    return <NoDepartmentMessage />;
+  }
 
   if (loading) {
     return (

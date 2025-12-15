@@ -24,6 +24,7 @@ from .team_head_views import (
     TeamTaskDetailView,
     TeamPerformanceView,
     RecentActivityView,
+    DepartmentTeamMembersView,
 )
 
 urlpatterns = [
@@ -38,6 +39,7 @@ urlpatterns = [
     path("password/reset/confirm/<uidb64>/<token>/", PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("profile/", UserProfileView.as_view(), name="user_profile"),
     path("admin/users/", AdminUserListView.as_view()),
+    path("department/team-members/", DepartmentTeamMembersView.as_view(), name="department_team_members"),
     
     # Team Head Dashboard Routes
     path("team-head/stats/", TeamHeadStatsView.as_view(), name="team_head_stats"),

@@ -35,6 +35,10 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
+    # Disable CSRF for API views (JWT handles authentication)
+    "DEFAULT_RENDERER_CLASSES": (
+        "rest_framework.renderers.JSONRenderer",
+    ),
 }
 
 SIMPLE_JWT = {
@@ -101,6 +105,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "backend.middleware.DisableCSRFForAPIMiddleware",  # Custom: Disable CSRF for API
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -132,6 +137,10 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+
+# Exempt API endpoints from CSRF (using JWT authentication)
+CSRF_COOKIE_HTTPONLY = False
+CSRF_USE_SESSIONS = False
 
 ROOT_URLCONF = "backend.urls"
 

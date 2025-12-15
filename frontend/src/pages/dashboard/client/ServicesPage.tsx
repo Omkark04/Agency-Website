@@ -383,6 +383,7 @@ const ServicesPage = () => {
                       {selectedService && selectedService.id ? (
                         <DynamicFormRenderer
                           serviceId={selectedService.id}
+                          priceCardId={selectedPriceCard?.id}
                           onSuccess={(orderId) => {
                             alert(`Service request submitted successfully! Order #${orderId} created.`);
                             handleCloseModal();

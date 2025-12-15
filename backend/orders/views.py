@@ -5,6 +5,7 @@ from rest_framework import permissions as drf_permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
+from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
 from django.utils import timezone
 
@@ -60,6 +61,8 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [drf_permissions.IsAuthenticated]  # tune this as your project requires
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['status', 'service__department']
 
 
 class OfferViewSet(viewsets.ModelViewSet):

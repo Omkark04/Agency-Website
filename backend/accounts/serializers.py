@@ -7,20 +7,41 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
+    department = serializers.SerializerMethodField()
+    
     class Meta:
         model = User
-        fields = ["id", "username", "email", "role", "is_active", "date_joined", "service"]
+        fields = ["id", "username", "email", "role", "is_active", "date_joined", "service", "department"]
         read_only_fields = ["is_active", "date_joined"]
+    
+    def get_department(self, obj):
+        """Return department data if user has one"""
+        if obj.department:
+            return {
+                "id": obj.department.id,
+                "title": obj.department.title,
+            }
+        return None
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password], style={"input_type":"password"})
     password2 = serializers.CharField(write_only=True, required=True, style={"input_type":"password"})
     role = serializers.ChoiceField(choices=User._meta.get_field("role").choices, default="client")
+    # Use IntegerField for department to avoid circular import issues
+    department = serializers.IntegerField(required=False, allow_null=True)
 
     class Meta:
         model = User
-        fields = ["username", "email", "password", "password2", "role"]
+        fields = ["username", "email", "password", "password2", "role", "phone", "department"]
         extra_kwargs = {"email": {"required": True}, "username": {"required": True}}
+
+    def validate_department(self, value):
+        """Validate that the department exists"""
+        if value is not None:
+            from services.models import Department
+            if not Department.objects.filter(id=value).exists():
+                raise serializers.ValidationError("Invalid department ID")
+        return value
 
     def validate(self, attrs):
         if attrs.get("password") != attrs.get("password2"):
@@ -30,8 +51,21 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop("password2", None)
         password = validated_data.pop("password")
+        
+        # Handle department ID
+        department_id = validated_data.pop("department", None)
+        
         user = User(**validated_data)
         user.set_password(password)
+        
+        # Set department if provided
+        if department_id is not None:
+            from services.models import Department
+            try:
+                user.department = Department.objects.get(id=department_id)
+            except Department.DoesNotExist:
+                pass  # Already validated, should not happen
+        
         user.save()
         return user
 
