@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, LogIn, UserPlus, LogOut, User } from 'lucide-react';
+import { Menu, X, LogIn, UserPlus, LogOut, User, Home } from 'lucide-react';
 import { AuthModal } from './AuthModal';
 import logo from '../../../assets/UdyogWorks logo.png';
 import { getCurrentUser, logout } from '../../../utils/auth';
@@ -91,12 +91,11 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
           : 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm'
           }`}
       >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 max-w-7xl">
-          <div className="flex items-center justify-between">
+        <div className="container mx-auto pr-6 lg:pr-12 py-4 max-w-7xl">
+          <div className="flex items-center justify-between gap-8 pl-6 lg:pl-12">
 
-
-            {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group">
+            {/* Logo - Left Side */}
+            <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group flex-shrink-0">
               <img
                 src={logo}
                 alt="UdyogWorks Logo"
@@ -107,16 +106,15 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
               </span>
             </Link>
 
-
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
+            {/* Desktop Navigation - Left aligned */}
+            <nav className="hidden lg:flex items-center justify-start space-x-6 xl:space-x-8 flex-grow">
               {navLinks.map(link => (
                 <a
                   key={link.name}
                   href={link.href}
                   onClick={(e) => handleNavigation(e, link.href)}
                   className="text-gray-700 dark:text-gray-300 hover:text-[#00C2A8] dark:hover:text-[#00C2A8]
-                    transition-all duration-300 font-medium relative group"
+                    transition-all duration-300 font-medium relative group whitespace-nowrap"
                 >
                   {link.name}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#00C2A8] to-[#0066FF]
@@ -125,9 +123,8 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
               ))}
             </nav>
 
-
-            {/* Desktop Auth Buttons */}
-            <div className="hidden lg:flex items-center space-x-3 xl:space-x-4">
+            {/* Auth Buttons - Right Side (flex-shrink-0 to maintain size) */}
+            <div className="hidden lg:flex items-center space-x-3 xl:space-x-4 flex-shrink-0">
               {!user ? (
                 <>
                   <button
@@ -158,6 +155,14 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                     <span>Hi, {user.username}</span>
                   </div>
 
+                  <button
+                    onClick={() => navigate('/client-dashboard')}
+                    className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-4 py-2 rounded-lg flex items-center
+                      gap-2 font-medium shadow-md hover:shadow-lg transition-all duration-300"
+                  >
+                    <Home size={16} />
+                    <span>Dashboard</span>
+                  </button>
 
                   <button
                     onClick={handleLogout}
@@ -242,6 +247,18 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                       <span>Hi, {user.username}</span>
                     </p>
 
+                    <button
+                      onClick={() => {
+                        navigate('/client-dashboard');
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-4 py-3 rounded-lg
+                        font-medium shadow-md hover:shadow-lg transition-all duration-300
+                        flex items-center justify-center gap-2"
+                    >
+                      <Home size={18} />
+                      <span>Dashboard</span>
+                    </button>
 
                     <button
                       onClick={handleLogout}

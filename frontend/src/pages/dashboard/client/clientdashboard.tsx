@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { listOrders } from '../../../api/orders';
 import { useAuth } from '../../../hooks/useAuth';
+import logo from '../../../assets/UdyogWorks logo.png';
 import { 
   Home, 
   Folder, 
@@ -273,11 +274,15 @@ export default function ClientDashboard() {
         <div className={`flex items-center ${sidebarOpen ? 'px-6' : 'justify-center px-0'} h-16 border-b border-gray-100`}>
           {sidebarOpen ? (
             <div className="flex items-center space-x-3">
-              <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold text-lg">A</span>
+              <div className="flex items-center justify-center shadow-sm">
+                <img
+                  src={logo}
+                  alt="UdyogWorks Logo"
+                  className="h-10 sm:h-12 transition-transform duration-300 group-hover:scale-105"
+                />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-gray-900">AgencyPro</h1>
+                <h1 className="text-lg font-bold text-gray-900">UdyogWorks</h1>
                 <p className="text-xs text-gray-500">Client Portal</p>
               </div>
             </div>

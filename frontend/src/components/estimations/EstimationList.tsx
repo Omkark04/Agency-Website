@@ -64,9 +64,28 @@ const EstimationList: React.FC<EstimationListProps> = ({ orderId, onEstimationCl
     }
   };
 
-  const handleDownloadPDF = (e: React.MouseEvent, pdfUrl: string) => {
+  const handleDownloadPDF = (e: React.MouseEvent, pdfUrl: string, estimationTitle?: string) => {
     e.stopPropagation();
-    window.open(pdfUrl, '_blank');
+    
+    try {
+      // Dropbox URLs are direct download links
+      // No transformation needed - just trigger download
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = estimationTitle 
+        ? `${estimationTitle.replace(/[^a-z0-9]/gi, '_')}_estimation.pdf`
+        : 'estimation.pdf';
+      link.target = '_blank';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('✅ PDF download initiated from Dropbox');
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Failed to download PDF');
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -159,7 +178,7 @@ const EstimationList: React.FC<EstimationListProps> = ({ orderId, onEstimationCl
               {/* Download PDF Button */}
               {estimation.pdf_url && (
                 <button
-                  onClick={(e) => handleDownloadPDF(e, estimation.pdf_url!)}
+                  onClick={(e) => handleDownloadPDF(e, estimation.pdf_url!, estimation.title)}
                   className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <Download className="w-4 h-4 mr-2" />

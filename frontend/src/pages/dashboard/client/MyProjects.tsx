@@ -589,7 +589,6 @@ export default function MyProjects() {
   const totalProjects = projects.length;
   const activeProjects = projects.filter(p => p.status === 'in-progress').length;
   const completedProjects = projects.filter(p => p.status === 'completed').length;
-  const totalBudget = projects.reduce((sum, p) => sum + p.budget, 0);
   const totalSpent = projects.reduce((sum, p) => sum + p.spent, 0);
   const avgProgress = Math.round(projects.reduce((sum, p) => sum + p.progress, 0) / projects.length);
 

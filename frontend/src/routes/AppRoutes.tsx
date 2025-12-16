@@ -21,6 +21,8 @@ import Users from '../pages/dashboard/admin/Users';
 import Orders from '../pages/dashboard/admin/Orders';
 import Tasks from '../pages/dashboard/admin/Tasks';
 import MediaLibrary from '../pages/dashboard/admin/MediaLibrary';
+import Estimations from '../pages/dashboard/admin/Estimations';
+import Invoices from '../pages/dashboard/admin/Invoices';
 // Team Head - NEW: Reuses admin components
 import TeamHeadDashboard from '@/pages/dashboard/teamhead/TeamHeadDashboard';
 //Team Member
@@ -30,6 +32,7 @@ import ContactsManagement from '../pages/dashboard/admin/ContactsManagement';
 import FormBuilder from '../pages/dashboard/admin/FormBuilder';
 import OrdersDetailPage from '../pages/dashboard/client/OrdersDetailPage';
 import OrderManagementPage from '../pages/dashboard/admin/OrderManagementPage';
+import PortfolioPage from '../pages/PortfolioPage';
 
 // New Pages
 import { NotificationsPage } from '../pages/Notifications';
@@ -74,6 +77,7 @@ export const AppRoutes: React.FC = () => {
 
         {/* ✅ ALL AUTHENTICATED USERS */}
         <Route path="/notifications" element={<NotificationsPage />} />
+        <Route path="/portfolio" element={<PortfolioPage />} />
 
         {/* ✅ ADMIN ONLY */}
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
@@ -92,6 +96,8 @@ export const AppRoutes: React.FC = () => {
             <Route path="/dashboard/contacts" element={<ContactsManagement />} />
             <Route path="/dashboard/forms/new" element={<FormBuilder />} />
             <Route path="/dashboard/forms/:id" element={<FormBuilder />} />
+            <Route path="/dashboard/estimations" element={<Estimations />} />
+            <Route path="/dashboard/invoices" element={<Invoices />} />
             <Route path="/dashboard/orders/:orderId" element={<OrderManagementPage />} />
           </Route>
 

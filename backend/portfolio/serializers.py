@@ -4,11 +4,22 @@ from django.utils.text import slugify
 from .models import PortfolioProject
 
 class PortfolioProjectSerializer(serializers.ModelSerializer):
+    service = serializers.SerializerMethodField()
 
     class Meta:
         model = PortfolioProject
         fields = "__all__"
         read_only_fields = ["slug", "created_by"]
+    
+    def get_service(self, obj):
+        """Return service details if service exists"""
+        if obj.service:
+            return {
+                'id': obj.service.id,
+                'name': obj.service.title,  # Service model uses 'title' field
+                'icon': obj.service.icon_name if hasattr(obj.service, 'icon_name') else None
+            }
+        return None
 
     def validate(self, data):
         if not data.get("featured_image"):

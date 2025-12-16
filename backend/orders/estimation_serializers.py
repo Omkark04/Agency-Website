@@ -1,5 +1,6 @@
 # orders/estimation_serializers.py
 from rest_framework import serializers
+from django.utils import timezone
 from .estimation_models import Estimation, Invoice
 from .models import Order
 from accounts.models import User
@@ -19,14 +20,14 @@ class EstimationSerializer(serializers.ModelSerializer):
             'id', 'uuid', 'order', 'order_title', 'title', 'description',
             'cost_breakdown', 'subtotal', 'tax_percentage', 'tax_amount',
             'total_amount', 'estimated_timeline_days', 'valid_until',
-            'pdf_url', 'pdf_public_id', 'status', 'created_by',
+            'pdf_url', 'pdf_file_path', 'status', 'created_by',
             'created_by_name', 'client_name', 'internal_notes',
             'client_notes', 'created_at', 'updated_at', 'sent_at',
             'approved_at', 'rejected_at', 'is_expired'
         ]
         read_only_fields = [
             'id', 'uuid', 'subtotal', 'tax_amount', 'total_amount',
-            'pdf_url', 'pdf_public_id', 'created_at', 'updated_at',
+            'pdf_url', 'pdf_file_path', 'created_at', 'updated_at',
             'sent_at', 'approved_at', 'rejected_at'
         ]
     
@@ -92,10 +93,10 @@ class InvoiceSerializer(serializers.ModelSerializer):
     """Serializer for Invoice model"""
     
     order_title = serializers.CharField(source='order.title', read_only=True)
-    client_name = serializers.SerializerMethodField()
-    created_by_name = serializers.SerializerMethodField()
+    created_by_name = serializers.CharField(source='created_by.get_full_name', read_only=True)
+    client_name = serializers.CharField(source='order.client.get_full_name', read_only=True)
     balance_due = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
-    is_overdue = serializers.BooleanField(read_only=True)
+    is_overdue = serializers.SerializerMethodField()
     
     class Meta:
         model = Invoice
@@ -104,28 +105,34 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'invoice_number', 'title', 'line_items', 'subtotal',
             'tax_percentage', 'tax_amount', 'discount_amount',
             'total_amount', 'amount_paid', 'balance_due',
-            'invoice_date', 'due_date', 'pdf_url', 'pdf_public_id',
+            'invoice_date', 'due_date', 'pdf_url', 'pdf_file_path',
             'status', 'created_by', 'created_by_name', 'client_name',
             'notes', 'terms_and_conditions', 'created_at', 'updated_at',
             'sent_at', 'paid_at', 'is_overdue'
         ]
         read_only_fields = [
             'id', 'uuid', 'invoice_number', 'subtotal', 'tax_amount',
-            'total_amount', 'pdf_url', 'pdf_public_id', 'created_at',
+            'total_amount', 'pdf_url', 'pdf_file_path', 'created_at',
             'updated_at', 'sent_at', 'paid_at'
         ]
     
-    def get_client_name(self, obj):
-        """Get client name"""
-        if obj.order.client:
-            return obj.order.client.get_full_name() or obj.order.client.email
-        return obj.order.client_email
+    def get_is_overdue(self, obj):
+        """Check if invoice is overdue"""
+        if obj.status in ['paid', 'cancelled'] or not obj.due_date:
+            return False
+        return obj.due_date < timezone.now().date()
     
-    def get_created_by_name(self, obj):
-        """Get creator name"""
-        if obj.created_by:
-            return obj.created_by.get_full_name() or obj.created_by.email
-        return None
+    def to_representation(self, instance):
+        """Convert datetime fields to date for proper serialization"""
+        data = super().to_representation(instance)
+        
+        # Convert invoice_date and due_date from datetime to date if needed
+        if instance.invoice_date and hasattr(instance.invoice_date, 'date'):
+            data['invoice_date'] = instance.invoice_date.date()
+        if instance.due_date and hasattr(instance.due_date, 'date'):
+            data['due_date'] = instance.due_date.date()
+        
+        return data
 
 
 class InvoiceGenerateSerializer(serializers.Serializer):

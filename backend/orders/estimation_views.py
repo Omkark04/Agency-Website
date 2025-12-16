@@ -150,14 +150,14 @@ def generate_estimation_pdf(request, estimation_id):
             pdf_generator = EstimationPDFGenerator(estimation)
             
             logger.info("Uploading to Cloudinary...")
-            result = pdf_generator.upload_to_cloudinary()
+            result = pdf_generator.upload_to_dropbox()
             
             logger.info(f"PDF generated successfully: {result['url']}")
             return Response({
                 'success': True,
                 'message': 'PDF generated successfully',
                 'pdf_url': result['url'],
-                'pdf_public_id': result['public_id']
+                'pdf_file_path': result['file_path']
             })
         except RuntimeError as e:
             # WeasyPrint not available
@@ -226,7 +226,7 @@ def send_estimation(request, estimation_id):
             try:
                 logger.info(f"Attempting to generate PDF for estimation {estimation_id}")
                 pdf_generator = EstimationPDFGenerator(estimation)
-                pdf_generator.upload_to_cloudinary()
+                pdf_generator.upload_to_dropbox()
                 logger.info("PDF generated successfully")
             except Exception as e:
                 # Log the error but don't block sending
@@ -243,8 +243,7 @@ def send_estimation(request, estimation_id):
                 user=estimation.order.client,
                 title="New Estimation Received",
                 message=f"You have received an estimation for Order #{estimation.order.id}: {estimation.title}",
-                notification_type="estimation_received",
-                link=f"/dashboard/orders/{estimation.order.id}/estimations/{estimation.id}"
+                notification_type="estimation_received"
             )
         
         return Response({
@@ -312,7 +311,7 @@ def generate_invoice(request, order_id):
         
         # Generate PDF
         pdf_generator = InvoicePDFGenerator(invoice)
-        pdf_generator.upload_to_cloudinary()
+        pdf_generator.upload_to_dropbox()
         
         # Send notification to client
         if order.client:
@@ -320,8 +319,7 @@ def generate_invoice(request, order_id):
                 user=order.client,
                 title="Invoice Generated",
                 message=f"Invoice {invoice.invoice_number} has been generated for Order #{order.id}",
-                notification_type="invoice_generated",
-                link=f"/dashboard/orders/{order.id}/invoices/{invoice.id}"
+                notification_type="invoice_generated"
             )
         
         return Response({
@@ -363,7 +361,7 @@ def download_invoice(request, invoice_id):
         # Generate PDF if not exists
         if not invoice.pdf_url:
             pdf_generator = InvoicePDFGenerator(invoice)
-            pdf_generator.upload_to_cloudinary()
+            pdf_generator.upload_to_drive()
         
         # Return PDF URL for download
         return Response({

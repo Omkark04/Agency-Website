@@ -240,116 +240,123 @@ const Testimonials = () => {
           </div>
         ) : (
           <>
-            {/* Desktop Grid View */}
-            <div className="hidden lg:block">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                {testimonials.slice(0, 6).map((testimonial, index) => (
-                  <motion.div
-                    key={testimonial.id}
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    onMouseEnter={() => setHoveredCard(index)}
-                    onMouseLeave={() => setHoveredCard(null)}
-                    className="relative group"
-                  >
-                    {/* Animated Border */}
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500 group-hover:duration-200" />
-                    
-                    <div className="relative bg-gradient-to-b from-white/5 to-white/2 backdrop-blur-sm border border-white/10 rounded-2xl p-8 h-full overflow-hidden">
-                      {/* Background Pattern */}
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-cyan-500/10 to-transparent rounded-full -translate-y-16 translate-x-16" />
-                      
-                      {/* Top Section */}
-                      <div className="relative z-10">
-                        {/* Quote Icon */}
-                        <div className="absolute -top-4 -left-4">
-                          <Quote className="h-12 w-12 text-cyan-300/20" />
-                        </div>
+            {/* Desktop Infinite Slider */}
+            <div className="hidden lg:block relative">
+              <div className="overflow-hidden">
+                <motion.div 
+                  key={currentIndex}
+                  className="flex gap-8"
+                  initial={{ x: 0 }}
+                  animate={{ x: -408 }}
+                  transition={{
+                    duration: 8,
+                    ease: "linear",
+                    repeat: Infinity,
+                  }}
+                  onAnimationComplete={() => {
+                    // Move to next testimonial when animation completes
+                    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+                  }}
+                >
+                  {/* Show current testimonial and next few */}
+                  {[0, 1, 2, 3, 4].map((offset) => {
+                    const index = (currentIndex + offset) % testimonials.length;
+                    const testimonial = testimonials[index];
+                    return (
+                      <div
+                        key={`${testimonial.id}-${offset}`}
+                        onMouseEnter={() => setHoveredCard(offset)}
+                        onMouseLeave={() => setHoveredCard(null)}
+                        className="relative group flex-shrink-0 w-[400px]"
+                      >
+                        {/* Animated Border */}
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500 group-hover:duration-200" />
                         
-                        {/* Rating */}
-                        <div className="flex items-center mb-6">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-5 w-5 ${i < testimonial.rating ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-500/50 text-gray-500/50'}`}
-                            />
-                          ))}
-                          <span className="ml-2 text-sm text-gray-400">({testimonial.rating}/5)</span>
-                        </div>
-                        
-                        {/* Content */}
-                        <p className="text-gray-200 mb-8 line-clamp-4 group-hover:line-clamp-none transition-all duration-300">
-                          "{testimonial.content}"
-                        </p>
-                      </div>
-                      
-                      {/* Client Info */}
-                      <div className="flex items-center gap-4 mt-8 pt-8 border-t border-white/10">
-                        {testimonial.avatar_url ? (
-                          <motion.img 
-                            src={testimonial.avatar_url} 
-                            alt={testimonial.client_name}
-                            className="h-14 w-14 rounded-full border-2 border-cyan-300/30 object-cover"
-                            whileHover={{ scale: 1.1 }}
-                          />
-                        ) : (
+                        <div className="relative bg-gradient-to-b from-white/5 to-white/2 backdrop-blur-sm border border-white/10 rounded-2xl p-8 h-full overflow-hidden">
+                          {/* Background Pattern */}
+                          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-cyan-500/10 to-transparent rounded-full -translate-y-16 translate-x-16" />
+                          
+                          {/* Top Section */}
+                          <div className="relative z-10">
+                            {/* Quote Icon */}
+                            <div className="absolute -top-4 -left-4">
+                              <Quote className="h-12 w-12 text-cyan-300/20" />
+                            </div>
+                            
+                            {/* Rating */}
+                            <div className="flex items-center mb-6">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-5 w-5 ${i < testimonial.rating ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-500/50 text-gray-500/50'}`}
+                                />
+                              ))}
+                              <span className="ml-2 text-sm text-gray-400">({testimonial.rating}/5)</span>
+                            </div>
+                            
+                            {/* Content */}
+                            <p className="text-gray-200 mb-8 line-clamp-4 group-hover:line-clamp-none transition-all duration-300">
+                              "{testimonial.content}"
+                            </p>
+                          </div>
+                          
+                          {/* Client Info */}
+                          <div className="flex items-center gap-4 mt-8 pt-8 border-t border-white/10">
+                            {testimonial.avatar_url ? (
+                              <motion.img 
+                                src={testimonial.avatar_url} 
+                                alt={testimonial.client_name}
+                                className="h-14 w-14 rounded-full border-2 border-cyan-300/30 object-cover"
+                                whileHover={{ scale: 1.1 }}
+                              />
+                            ) : (
+                              <motion.div 
+                                className="h-14 w-14 rounded-full border-2 border-cyan-300/30 bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg"
+                                whileHover={{ scale: 1.1 }}
+                              >
+                                {testimonial.client_name.charAt(0)}
+                              </motion.div>
+                            )}
+                            
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-bold text-lg truncate">{testimonial.client_name}</h4>
+                              <p className="text-cyan-300 text-sm truncate">{testimonial.client_role}</p>
+                              {testimonial.client_company && (
+                                <p className="text-gray-400 text-sm truncate">{testimonial.client_company}</p>
+                              )}
+                            </div>
+                            
+                            {testimonial.service_title && (
+                              <span className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-full text-xs text-cyan-300">
+                                {testimonial.service_title}
+                              </span>
+                            )}
+                          </div>
+                          
+                          {/* Hover Effect Indicator */}
                           <motion.div 
-                            className="h-14 w-14 rounded-full border-2 border-cyan-300/30 bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg"
-                            whileHover={{ scale: 1.1 }}
+                            className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-500"
+                            initial={{ scaleX: 0 }}
+                            animate={{ scaleX: hoveredCard === offset ? 1 : 0 }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        </div>
+                        
+                        {/* Floating Icon on Hover */}
+                        {hoveredCard === offset && (
+                          <motion.div
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="absolute -top-3 -right-3 bg-gradient-to-r from-cyan-500 to-blue-500 p-2 rounded-full shadow-lg"
                           >
-                            {testimonial.client_name.charAt(0)}
+                            <Heart className="h-5 w-5 text-white fill-white" />
                           </motion.div>
                         )}
-                        
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-lg truncate">{testimonial.client_name}</h4>
-                          <p className="text-cyan-300 text-sm truncate">{testimonial.client_role}</p>
-                          {testimonial.client_company && (
-                            <p className="text-gray-400 text-sm truncate">{testimonial.client_company}</p>
-                          )}
-                        </div>
-                        
-                        {testimonial.service_title && (
-                          <span className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-full text-xs text-cyan-300">
-                            {testimonial.service_title}
-                          </span>
-                        )}
                       </div>
-                      
-                      {/* Hover Effect Indicator */}
-                      <motion.div 
-                        className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-500"
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: hoveredCard === index ? 1 : 0 }}
-                        transition={{ duration: 0.3 }}
-                      />
-                    </div>
-                    
-                    {/* Floating Icon on Hover */}
-                    {hoveredCard === index && (
-                      <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="absolute -top-3 -right-3 bg-gradient-to-r from-cyan-500 to-blue-500 p-2 rounded-full shadow-lg"
-                      >
-                        <Heart className="h-5 w-5 text-white fill-white" />
-                      </motion.div>
-                    )}
-                  </motion.div>
-                ))}
+                    );
+                  })}
+                </motion.div>
               </div>
-              
-              {/* View All Button */}
-              {testimonials.length > 6 && (
-                <div className="text-center mt-12">
-                  <button className="group relative inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 backdrop-blur-sm border border-white/10 text-white font-medium py-3 px-8 rounded-full transition-all duration-300">
-                    View All {testimonials.length} Testimonials
-                    <TrendingUp className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                  </button>
-                </div>
-              )}
             </div>
 
             {/* Mobile/Tablet Carousel */}

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { Navigate, useLocation } from 'react-router-dom';
 
 /**
  * HOC to wrap admin components and add department filtering
@@ -11,7 +10,6 @@ export function withDepartmentFilter<P extends object>(
 ): React.FC<P> {
   return function DepartmentFilteredComponent(props: P) {
     const { user } = useAuth();
-    const location = useLocation();
     const [departmentId, setDepartmentId] = useState<number | null>(null);
 
     useEffect(() => {

@@ -1,8 +1,8 @@
 // frontend/src/components/invoices/InvoiceList.tsx
 import React, { useEffect, useState } from 'react';
 import { listInvoices } from '../../api/invoices';
-import { Invoice } from '../../types/invoices';
-import { FileText, Calendar, DollarSign, Loader2, AlertCircle } from 'lucide-react';
+import type { Invoice } from '../../types/invoices';
+import { FileText, Calendar, DollarSign, Loader2, AlertCircle, Download } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface InvoiceListProps {
@@ -28,6 +28,27 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ orderId, onInvoiceClick }) =>
       console.error('Failed to fetch invoices:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDownloadPDF = (e: React.MouseEvent, pdfUrl: string, invoiceNumber: string) => {
+    e.stopPropagation();
+    
+    try {
+      // Dropbox URLs are direct download links
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = `${invoiceNumber}_invoice.pdf`;
+      link.target = '_blank';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('✅ PDF download initiated from Dropbox');
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Failed to download PDF');
     }
   };
 
@@ -66,8 +87,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ orderId, onInvoiceClick }) =>
       {invoices.map((invoice) => (
         <div
           key={invoice.id}
-          onClick={() => onInvoiceClick && onInvoiceClick(invoice)}
-          className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer"
+          className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow"
         >
           {/* Header */}
           <div className="flex items-start justify-between mb-3">
@@ -89,7 +109,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ orderId, onInvoiceClick }) =>
           )}
 
           {/* Info Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
             <div className="flex items-center text-gray-600">
               <DollarSign className="w-4 h-4 mr-2" />
               <div>
@@ -110,6 +130,19 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ orderId, onInvoiceClick }) =>
               </div>
             )}
           </div>
+
+          {/* Action Buttons */}
+          {invoice.pdf_url && (
+            <div className="flex gap-2 pt-3 border-t border-gray-200">
+              <button
+                onClick={(e) => handleDownloadPDF(e, invoice.pdf_url!, invoice.invoice_number)}
+                className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download PDF
+              </button>
+            </div>
+          )}
         </div>
       ))}
     </div>
@@ -117,3 +150,4 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ orderId, onInvoiceClick }) =>
 };
 
 export default InvoiceList;
+

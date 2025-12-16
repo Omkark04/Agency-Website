@@ -6,6 +6,7 @@ from rest_framework.routers import DefaultRouter
 from . import views
 from . import estimation_views
 from . import workflow_views
+from . import download_views
 
 # Create separate routers to avoid conflicts
 order_router = DefaultRouter()
@@ -35,6 +36,10 @@ urlpatterns = [
     # Invoice endpoints
     path('<int:order_id>/invoices/generate/', estimation_views.generate_invoice, name='generate-invoice'),
     path('invoices/<int:invoice_id>/download/', estimation_views.download_invoice, name='download-invoice'),
+    
+    # Download proxy endpoints
+    path('estimations/<int:estimation_id>/download-pdf/', download_views.download_estimation_pdf, name='download-estimation-pdf'),
+    path('invoices/<int:invoice_id>/download-pdf/', download_views.download_invoice_pdf, name='download-invoice-pdf'),
     
     # Tasks endpoint (for consistency with other order-related endpoints)
     path('<int:order_id>/tasks/', include('tasks.urls_order_tasks')),

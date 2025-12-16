@@ -313,14 +313,17 @@ class EstimationPDFGenerator:
         except Exception as e:
             raise RuntimeError(f"PDF generation failed: {str(e)}")
     
-    def upload_to_cloudinary(self):
+    def upload_to_dropbox(self):
         """
-        Generate PDF and upload to Cloudinary
+        Generate PDF and upload to Dropbox
         
         Returns:
-            dict: Cloudinary upload response with 'url' and 'public_id'
+            dict: Dropbox upload response with 'file_path', 'download_url'
         """
         try:
+            from utils.dropbox_service import get_dropbox_service
+            
+            # Generate PDF
             pdf_file = self.generate()
             
             # Verify PDF file is valid before upload
@@ -334,31 +337,30 @@ class EstimationPDFGenerator:
             pdf_file = BytesIO(pdf_content)
             pdf_file.seek(0)
             
-            # Upload to Cloudinary
-            upload_result = cloudinary.uploader.upload(
-                pdf_file,
-                folder="estimations",
-                resource_type="raw",
-                public_id=f"estimation_{self.estimation.uuid}",
-                format="pdf",
-                invalidate=True  # Invalidate CDN cache
+            # Get Dropbox service
+            dropbox_service = get_dropbox_service()
+            
+            # Generate filename
+            filename = f"estimation_{self.estimation.uuid}.pdf"
+            
+            # Upload to Dropbox
+            result = dropbox_service.upload_pdf(
+                pdf_file=pdf_file,
+                filename=filename,
+                folder_path="/Estimations"
             )
             
-            # Verify upload was successful
-            if 'secure_url' not in upload_result:
-                raise RuntimeError("Cloudinary upload failed - no URL returned")
-            
-            # Update estimation with PDF URL
-            self.estimation.pdf_url = upload_result["secure_url"]
-            self.estimation.pdf_public_id = upload_result["public_id"]
+            # Update estimation with Dropbox info
+            self.estimation.pdf_url = result['download_url']
+            self.estimation.pdf_file_path = result['file_path']
             self.estimation.save()
             
             return {
-                "url": upload_result["secure_url"],
-                "public_id": upload_result["public_id"]
+                "url": result['download_url'],
+                "file_path": result['file_path']
             }
         except Exception as e:
-            raise RuntimeError(f"PDF upload failed: {str(e)}")
+            raise RuntimeError(f"PDF upload to Dropbox failed: {str(e)}")
 
 
 class InvoicePDFGenerator:
@@ -650,30 +652,40 @@ class InvoicePDFGenerator:
         pdf_file.seek(0)
         return pdf_file
     
-    def upload_to_cloudinary(self):
+    def upload_to_dropbox(self):
         """
-        Generate PDF and upload to Cloudinary
+        Generate PDF and upload to Dropbox
         
         Returns:
-            dict: Cloudinary upload response with 'url' and 'public_id'
+            dict: Dropbox upload response with 'file_path', 'download_url'
         """
-        pdf_file = self.generate()
-        
-        # Upload to Cloudinary
-        upload_result = cloudinary.uploader.upload(
-            pdf_file,
-            folder="invoices",
-            resource_type="raw",
-            public_id=f"invoice_{self.invoice.invoice_number}",
-            format="pdf"
-        )
-        
-        # Update invoice with PDF URL
-        self.invoice.pdf_url = upload_result["secure_url"]
-        self.invoice.pdf_public_id = upload_result["public_id"]
-        self.invoice.save()
-        
-        return {
-            "url": upload_result["secure_url"],
-            "public_id": upload_result["public_id"]
-        }
+        try:
+            from utils.dropbox_service import get_dropbox_service
+            
+            # Generate PDF
+            pdf_file = self.generate()
+            
+            # Get Dropbox service
+            dropbox_service = get_dropbox_service()
+            
+            # Generate filename
+            filename = f"invoice_{self.invoice.invoice_number}.pdf"
+            
+            # Upload to Dropbox
+            result = dropbox_service.upload_pdf(
+                pdf_file=pdf_file,
+                filename=filename,
+                folder_path="/Invoices"
+            )
+            
+            # Update invoice with Dropbox info
+            self.invoice.pdf_url = result['download_url']
+            self.invoice.pdf_file_path = result['file_path']
+            self.invoice.save()
+            
+            return {
+                "url": result['download_url'],
+                "file_path": result['file_path']
+            }
+        except Exception as e:
+            raise RuntimeError(f"PDF upload to Dropbox failed: {str(e)}")

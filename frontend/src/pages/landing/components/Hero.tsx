@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, CheckCircle, Image as ImageIcon } from 'lucide-react';
+import { ArrowRight, CheckCircle, Image as ImageIcon, Building2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { fetchHeroImages } from '../../../api/media';
 import type { MediaItem } from '../../../api/media';
 import { getTestimonialStats } from '../../../api/testinomials';
+import { listDepartments, type Department } from '../../../api/departments';
 
 interface HeroProps {
   onGetStartedClick: () => void;
@@ -13,6 +14,7 @@ export const Hero = ({ onGetStartedClick }: HeroProps) => {
   const [heroImages, setHeroImages] = useState<MediaItem[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [stats, setStats] = useState({
     clients: 100,
     projects: 250,
@@ -23,6 +25,7 @@ export const Hero = ({ onGetStartedClick }: HeroProps) => {
   useEffect(() => {
     loadHeroImages();
     loadStats();
+    loadDepartments();
   }, []);
 
   // Auto-rotate images every 5 seconds
@@ -63,6 +66,15 @@ export const Hero = ({ onGetStartedClick }: HeroProps) => {
       console.log('Hero: Stats updated');
     } catch (error) {
       console.error('Hero: Failed to load stats:', error);
+    }
+  };
+
+  const loadDepartments = async () => {
+    try {
+      const response = await listDepartments({ is_active: true });
+      setDepartments(response.data);
+    } catch (error) {
+      console.error('Failed to load departments:', error);
     }
   };
 
@@ -147,6 +159,140 @@ export const Hero = ({ onGetStartedClick }: HeroProps) => {
                 <div className="text-sm text-gray-300">Satisfaction Rate</div>
               </motion.div>
             </div>
+
+            {/* Departments List - Enhanced with Creative Animations */}
+            {departments.length > 0 && (
+              <motion.div 
+                className="mt-12"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+              >
+                <motion.h3 
+                  className="text-lg font-semibold text-white/90 mb-6 flex items-center gap-2"
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  <motion.div
+                    animate={{ 
+                      rotate: [0, 10, -10, 0],
+                      scale: [1, 1.1, 1.1, 1]
+                    }}
+                    transition={{ 
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatDelay: 3
+                    }}
+                  >
+                    <Building2 className="h-5 w-5 text-[#00C2A8]" />
+                  </motion.div>
+                  Our Departments
+                </motion.h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {departments.map((dept, index) => (
+                    <motion.div
+                      key={dept.id}
+                      initial={{ opacity: 0, y: 30, scale: 0.8 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ 
+                        delay: 0.7 + index * 0.1,
+                        duration: 0.5,
+                        type: "spring",
+                        stiffness: 100
+                      }}
+                      whileHover={{ 
+                        scale: 1.05,
+                        y: -5,
+                        transition: { duration: 0.2 }
+                      }}
+                      className="relative group cursor-pointer"
+                    >
+                      {/* Animated gradient background */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-br from-[#00C2A8]/20 via-[#0066FF]/20 to-purple-500/20 rounded-xl opacity-0 group-hover:opacity-100 blur-xl"
+                        animate={{
+                          scale: [1, 1.2, 1],
+                          rotate: [0, 5, -5, 0]
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                      />
+                      
+                      {/* Card content */}
+                      <motion.div
+                        className="relative bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 overflow-hidden"
+                        whileHover={{
+                          borderColor: "rgba(0, 194, 168, 0.5)",
+                          boxShadow: "0 0 20px rgba(0, 194, 168, 0.3)"
+                        }}
+                      >
+                        {/* Floating particles effect on hover */}
+                        <motion.div
+                          className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-cyan-400/20 to-transparent rounded-full"
+                          animate={{
+                            scale: [1, 1.5, 1],
+                            opacity: [0.3, 0.6, 0.3]
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                        />
+                        
+                        <div className="flex items-center gap-3 relative z-10">
+                          {dept.logo ? (
+                            <motion.img 
+                              src={dept.logo} 
+                              alt={dept.title}
+                              className="w-10 h-10 object-contain rounded-lg"
+                              whileHover={{ rotate: 360 }}
+                              transition={{ duration: 0.6 }}
+                            />
+                          ) : (
+                            <motion.div 
+                              className="w-10 h-10 bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-lg flex items-center justify-center shadow-lg"
+                              whileHover={{ 
+                                rotate: [0, -10, 10, 0],
+                                scale: 1.1
+                              }}
+                              transition={{ duration: 0.4 }}
+                            >
+                              <Building2 className="h-5 w-5 text-white" />
+                            </motion.div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <motion.p 
+                              className="text-sm font-semibold text-white truncate"
+                              initial={{ opacity: 0.9 }}
+                              whileHover={{ 
+                                opacity: 1,
+                                x: 3,
+                                color: "#00C2A8"
+                              }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              {dept.title}
+                            </motion.p>
+                            <motion.div
+                              className="h-0.5 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] mt-1"
+                              initial={{ scaleX: 0 }}
+                              whileHover={{ scaleX: 1 }}
+                              transition={{ duration: 0.3 }}
+                              style={{ transformOrigin: "left" }}
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Right Content - Dynamic Hero Image Gallery */}

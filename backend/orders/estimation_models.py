@@ -1,8 +1,14 @@
 # orders/estimation_models.py
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
+from decimal import Decimal
 import uuid
+
+
+def get_today():
+    """Helper function to get today's date for invoice_date default"""
+    return timezone.now().date()
 
 
 class Estimation(models.Model):
@@ -70,9 +76,9 @@ class Estimation(models.Model):
     # Validity
     valid_until = models.DateField(null=True, blank=True)
     
-    # PDF storage
-    pdf_url = models.URLField(blank=True, help_text="Cloudinary URL for generated PDF")
-    pdf_public_id = models.CharField(max_length=255, blank=True, help_text="Cloudinary public ID")
+    # PDF storage (Dropbox)
+    pdf_url = models.URLField(blank=True, help_text="Dropbox download URL for generated PDF")
+    pdf_file_path = models.CharField(max_length=500, blank=True, help_text="Dropbox file path")
     
     # Status
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
@@ -115,8 +121,11 @@ class Estimation(models.Model):
         # Calculate subtotal from cost breakdown
         self.subtotal = sum(item.get('amount', 0) for item in self.cost_breakdown)
         
-        # Calculate tax amount - convert subtotal to Decimal to match tax_percentage type
-        self.tax_amount = (Decimal(str(self.subtotal)) * self.tax_percentage) / 100
+        # Convert subtotal to Decimal to ensure correct arithmetic
+        self.subtotal = Decimal(str(self.subtotal))
+        
+        # Calculate tax amount
+        self.tax_amount = (self.subtotal * self.tax_percentage) / 100
         self.total_amount = self.subtotal + self.tax_amount
     
     def save(self, *args, **kwargs):
@@ -211,12 +220,12 @@ class Invoice(models.Model):
     )
     
     # Dates
-    invoice_date = models.DateField(default=timezone.now)
+    invoice_date = models.DateField(default=get_today)
     due_date = models.DateField(null=True, blank=True)
     
-    # PDF storage
-    pdf_url = models.URLField(blank=True, help_text="Cloudinary URL for generated PDF")
-    pdf_public_id = models.CharField(max_length=255, blank=True, help_text="Cloudinary public ID")
+    # PDF storage (Dropbox)
+    pdf_url = models.URLField(blank=True, help_text="Dropbox download URL for generated PDF")
+    pdf_file_path = models.CharField(max_length=500, blank=True, help_text="Dropbox file path")
     
     # Status
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
@@ -260,8 +269,11 @@ class Invoice(models.Model):
             float(item.get("amount", 0)) 
             for item in self.line_items
         )
-        # Convert subtotal to Decimal to match tax_percentage type
-        self.tax_amount = (Decimal(str(self.subtotal)) * self.tax_percentage) / 100
+        # Convert subtotal to Decimal to ensure correct arithmetic
+        self.subtotal = Decimal(str(self.subtotal))
+        
+        # Calculate tax amount
+        self.tax_amount = (self.subtotal * self.tax_percentage) / 100
         self.total_amount = self.subtotal + self.tax_amount - self.discount_amount
     
     def save(self, *args, **kwargs):
