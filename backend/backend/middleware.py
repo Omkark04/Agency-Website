@@ -36,5 +36,5 @@ class DisableCSRFForAPIMiddleware(MiddlewareMixin):
     This middleware must be placed BEFORE CsrfViewMiddleware in settings.
     """
     def process_request(self, request):
-        if request.path.startswith('/api/'):
+        if request.path.startswith('/api/') or request.path.startswith('/auth/'):
             setattr(request, '_dont_enforce_csrf_checks', True)

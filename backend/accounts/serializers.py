@@ -29,10 +29,11 @@ class RegisterSerializer(serializers.ModelSerializer):
     role = serializers.ChoiceField(choices=User._meta.get_field("role").choices, default="client")
     # Use IntegerField for department to avoid circular import issues
     department = serializers.IntegerField(required=False, allow_null=True)
+    job_title = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
     class Meta:
         model = User
-        fields = ["username", "email", "password", "password2", "role", "phone", "department"]
+        fields = ["username", "email", "password", "password2", "role", "phone", "department", "job_title"]
         extra_kwargs = {"email": {"required": True}, "username": {"required": True}}
 
     def validate_department(self, value):
@@ -67,6 +68,22 @@ class RegisterSerializer(serializers.ModelSerializer):
                 pass  # Already validated, should not happen
         
         user.save()
+
+        # Send welcome email
+        try:
+            from django.core.mail import send_mail
+            from django.conf import settings
+            
+            send_mail(
+                subject='Welcome to UdyogWorks!',
+                message=f'Hi {user.username},\n\nWelcome to UdyogWorks! We are excited to have you on board.\n\nYour account has been successfully created. You can now explore our services and place orders.\n\nBest regards,\nUdyogWorks Team',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=True,
+            )
+        except Exception as e:
+            print(f"Failed to send welcome email: {e}")
+
         return user
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -120,17 +137,55 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
             raise serializers.ValidationError({"new_password": "Password fields didn't match."})
         return attrs
 
-class UserProfileUpdateSerializer(serializers.ModelSerializer):
+class AdminProfileSerializer(serializers.ModelSerializer):
+    """Profile update serializer for Admin users"""
     class Meta:
         model = User
-        fields = ["username", "email", "first_name", "last_name"]
-        extra_kwargs = {"email": {"required": True}, "username": {"read_only": True}}
+        fields = ["id", "username", "email", "first_name", "last_name", "phone", "avatar_url"]
+        read_only_fields = ["id", "username", "email"]
 
-    def validate_email(self, value):
-        user = self.context["request"].user
-        if User.objects.exclude(pk=user.pk).filter(email=value).exists():
-            raise serializers.ValidationError("This email is already in use.")
-        return value
+class ClientProfileSerializer(serializers.ModelSerializer):
+    """Profile update serializer for Client users"""
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "first_name", "last_name", "phone", "company", "avatar_url"]
+        read_only_fields = ["id", "username", "email"]
+
+class ServiceHeadProfileSerializer(serializers.ModelSerializer):
+    """Profile update serializer for Service Head users"""
+    department_info = serializers.SerializerMethodField()
+    service_info = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "first_name", "last_name", "phone", "avatar_url", 
+                  "department", "department_info", "service", "service_info"]
+        read_only_fields = ["id", "username", "email", "department", "service"]
+    
+    def get_department_info(self, obj):
+        if obj.department:
+            return {"id": obj.department.id, "title": obj.department.title}
+        return None
+    
+    def get_service_info(self, obj):
+        if obj.service:
+            return {"id": obj.service.id, "title": obj.service.title}
+        return None
+
+class TeamMemberProfileSerializer(serializers.ModelSerializer):
+    """Profile update serializer for Team Member users"""
+    department_info = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "first_name", "last_name", "phone", "avatar_url", 
+                  "department", "department_info", "job_title"]
+        read_only_fields = ["id", "username", "email", "department", "job_title"]
+    
+    def get_department_info(self, obj):
+        if obj.department:
+            return {"id": obj.department.id, "title": obj.department.title}
+        return None
 
 
 # Team Head Serializers
@@ -229,3 +284,17 @@ class TeamPerformanceSerializer(serializers.Serializer):
     workload = serializers.FloatField()
     engagement = serializers.FloatField()
     weekly_trend = serializers.ListField(child=serializers.DictField())
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, validators=[validate_password])
+    new_password_confirm = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        if attrs.get("new_password") != attrs.get("new_password_confirm"):
+            raise serializers.ValidationError({"new_password": "New passwords must match"})
+        return attrs
+
+class ChangeEmailSerializer(serializers.Serializer):
+    password = serializers.CharField(required=True)
+    new_email = serializers.EmailField(required=True)

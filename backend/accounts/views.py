@@ -22,6 +22,8 @@ from .serializers import (
     CustomTokenObtainPairSerializer,
     PasswordResetRequestSerializer,
     PasswordResetConfirmSerializer,
+    ChangePasswordSerializer,
+    ChangeEmailSerializer,
 )
 
 User = get_user_model()
@@ -115,11 +117,45 @@ class PasswordResetConfirmView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserProfileView(generics.RetrieveUpdateAPIView):
-    serializer_class = UserSerializer
+    """
+    User profile view that returns role-specific serializer based on user's role.
+    GET: Retrieve current user profile
+    PUT/PATCH: Update current user profile
+    """
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        """Return appropriate serializer based on user role"""
+        from .serializers import (
+            AdminProfileSerializer,
+            ClientProfileSerializer,
+            ServiceHeadProfileSerializer,
+            TeamMemberProfileSerializer
+        )
+        
+        user = self.request.user
+        if user.role == 'admin':
+            return AdminProfileSerializer
+        elif user.role == 'client':
+            return ClientProfileSerializer
+        elif user.role == 'service_head':
+            return ServiceHeadProfileSerializer
+        elif user.role == 'team_member':
+            return TeamMemberProfileSerializer
+        else:
+            return UserSerializer
 
     def get_object(self):
         return self.request.user
+    
+    def update(self, request, *args, **kwargs):
+        """Override update to prevent email modification"""
+        if 'email' in request.data and request.data['email'] != request.user.email:
+            return Response(
+                {"error": "Email cannot be modified"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().update(request, *args, **kwargs)
 
 class GoogleOAuthView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -220,4 +256,39 @@ class AdminUserListView(generics.ListAPIView):
             # Other roles cannot access this endpoint
             queryset = queryset.none()
         
+        
         return queryset.order_by('-date_joined')
+
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            if not user.check_password(serializer.validated_data["old_password"]):
+                 return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+            
+            user.set_password(serializer.validated_data["new_password"])
+            user.save()
+            return Response({"message": "Password updated successfully"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ChangeEmailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = ChangeEmailSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            if not user.check_password(serializer.validated_data["password"]):
+                 return Response({"password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+            
+            new_email = serializer.validated_data["new_email"]
+            if User.objects.filter(email=new_email).exclude(pk=user.pk).exists():
+                 return Response({"new_email": ["Email already exists."]}, status=status.HTTP_400_BAD_REQUEST)
+            
+            user.email = new_email
+            user.save()
+            return Response({"message": "Email updated successfully"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

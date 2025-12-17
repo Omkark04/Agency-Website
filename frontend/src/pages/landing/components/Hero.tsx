@@ -5,12 +5,11 @@ import { fetchHeroImages } from '../../../api/media';
 import type { MediaItem } from '../../../api/media';
 import { getTestimonialStats } from '../../../api/testinomials';
 import { listDepartments, type Department } from '../../../api/departments';
+import { useNavigate } from 'react-router-dom';
 
-interface HeroProps {
-  onGetStartedClick: () => void;
-}
 
-export const Hero = ({ onGetStartedClick }: HeroProps) => {
+export const Hero = ({ }) => {
+  const navigate = useNavigate();
   const [heroImages, setHeroImages] = useState<MediaItem[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -110,22 +109,11 @@ export const Hero = ({ onGetStartedClick }: HeroProps) => {
             
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <button 
-                onClick={onGetStartedClick}
+                onClick={() => navigate('/client-dashboard/services')}
                 className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-3 px-8 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-105"
               >
-                Get Started
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </button>
-              <button 
-                onClick={() => {
-                  const servicesSection = document.getElementById('services');
-                  if (servicesSection) {
-                    servicesSection.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-                className="bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold py-3 px-8 rounded-full border border-white/20 transition-all duration-300"
-              >
                 View Services
+                <ArrowRight className="ml-2 h-5 w-5" />
               </button>
             </div>
 

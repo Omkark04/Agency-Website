@@ -3,6 +3,7 @@ import { Lightbulb, Users, Rocket, Award, ArrowRight, Image as ImageIcon } from 
 import { useState, useEffect } from 'react';
 import { fetchAboutImages } from '../../../api/media';
 import type { MediaItem } from '../../../api/media';
+import { Button as MovingBorderContainer } from "@/components/ui/moving-border";
 
 const features = [
   {
@@ -85,8 +86,17 @@ export const About = () => {
             transition={{ duration: 0.8 }}
             className="relative"
           >
-            <div className="bg-gradient-to-br from-[#00C2A8] to-[#0066FF] p-1 rounded-2xl">
-              <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
+            <MovingBorderContainer
+              borderRadius="1rem"
+              containerClassName="bg-transparent w-full h-auto p-[3px]"
+              className="bg-white dark:bg-gray-800 rounded p-[3px]
+            bg-gradient-to-r from-indigo-500 via-purple-500 to-green-500
+            transition-all duration-300 hover:scale-[1.02] overflow-hidden w-full h-full"
+              duration={3000}
+              as="div"
+              borderClassName="bg-[radial-gradient(#06b6d4_40%,transparent_60%)]"
+            >
+              <div className="bg-white dark:bg-gray-800 w-full h-full relative">
                 {isLoading ? (
                   // Loading skeleton
                   <div className="h-96 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
@@ -117,13 +127,13 @@ export const About = () => {
                       <>
                         <button
                           onClick={handlePrevImage}
-                          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
                         >
                           <ArrowRight className="h-5 w-5 rotate-180" />
                         </button>
                         <button
                           onClick={handleNextImage}
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
                         >
                           <ArrowRight className="h-5 w-5" />
                         </button>
@@ -132,7 +142,7 @@ export const About = () => {
                     
                     {/* Image Caption */}
                     {aboutImages[currentImageIndex]?.caption && (
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 z-10">
                         <p className="text-white text-sm font-medium">
                           {aboutImages[currentImageIndex].caption}
                         </p>
@@ -149,7 +159,7 @@ export const About = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </MovingBorderContainer>
             
             {/* Image Indicators (Dots) */}
             {aboutImages.length > 1 && (
@@ -204,18 +214,6 @@ export const About = () => {
                   <p className="text-gray-600 dark:text-gray-400 text-sm">{feature.description}</p>
                 </motion.div>
               ))}
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-4">
-              <button className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-3 px-6 rounded-full flex items-center transition-all duration-300">
-                Learn More
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </button>
-              <button className="bg-white dark:bg-gray-800 border-2 border-[#0066FF] text-[#0066FF] hover:bg-[#0066FF] hover:text-white font-semibold py-3 px-6 rounded-full transition-all duration-300">
-                Our Story
-              </button>
             </div>
           </motion.div>
         </div>

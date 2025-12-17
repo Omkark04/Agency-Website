@@ -10,7 +10,8 @@ import {
   FiFileText,
   FiLayers,
   FiUpload,
-  FiX
+  FiX,
+  FiUsers
 } from 'react-icons/fi';
 
 export default function ServiceForm({
@@ -19,11 +20,15 @@ export default function ServiceForm({
 }: any) {
   const { user } = useAuth();
   const [department, setDepartments] = useState<any[]>([]);
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [title, setTitle] = useState(initial?.title || '');
   const [shortDesc, setShortDesc] = useState(initial?.short_description || '');
   const [longDesc, setLongDesc] = useState(initial?.long_description || '');
   const [departmentId, setDepartmentId] = useState<number | ''>(
     initial?.department || ''
+  );
+  const [selectedMembers, setSelectedMembers] = useState<number[]>(
+    initial?.team_members || []
   );
   const [isActive, setIsActive] = useState(initial?.is_active ?? true);
 
@@ -48,6 +53,14 @@ export default function ServiceForm({
   useEffect(() => {
     api.get('/api/departments/')
       .then(res => setDepartments(res.data))
+      .catch(err => console.error(err));
+    
+    // Load team members
+    api.get('/api/auth/admin/users/')
+      .then(res => {
+        const members = res.data.filter((u: any) => u.role === 'team_member');
+        setTeamMembers(members);
+      })
       .catch(err => console.error(err));
   }, []);
   // ✅ FILE SELECT
@@ -94,6 +107,7 @@ export default function ServiceForm({
         long_description: longDesc,
         department: departmentId === '' ? undefined : departmentId,
         is_active: isActive,
+        team_members: selectedMembers,
       };
 
       if (initial?.id) {
@@ -212,6 +226,31 @@ export default function ServiceForm({
             ℹ️ You can only create services for your assigned department
           </p>
         )}
+      </div>
+
+      {/* ✅ TEAM MEMBERS */}
+      <div>
+        <label className="text-sm font-semibold mb-2 flex items-center gap-2">
+          <FiUsers /> Assign Team Members
+        </label>
+        <select
+          multiple
+          value={selectedMembers.map(String)}
+          onChange={(e) => {
+            const selected = Array.from(e.target.selectedOptions, option => Number(option.value));
+            setSelectedMembers(selected);
+          }}
+          className="w-full border rounded p-3 min-h-[120px]"
+        >
+          {teamMembers.map(member => (
+            <option key={member.id} value={member.id}>
+              {member.username} ({member.email}){member.job_title ? ` - ${member.job_title}` : ''}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-gray-500 mt-1">
+          Hold Ctrl/Cmd to select multiple team members for this service
+        </p>
       </div>
 
       {/* ✅ STATUS */}

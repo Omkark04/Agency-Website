@@ -32,3 +32,12 @@ class IsServiceHead(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.role == 'service_head'
+
+
+class IsTeamMember(permissions.BasePermission):
+    """
+    Custom permission to only allow team member users.
+    """
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role == 'team_member'
+

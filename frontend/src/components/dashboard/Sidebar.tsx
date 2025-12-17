@@ -17,7 +17,8 @@ import {
   FiX,
   FiChevronRight,
   FiFileText,
-  FiDollarSign
+  FiDollarSign,
+  FiEdit
 } from 'react-icons/fi';
 
 interface SidebarProps {
@@ -50,6 +51,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, userRole }) =
     { title: 'Portfolio', path: '/dashboard/service-head/portfolio', roles: ['service_head'], icon: FiBriefcase, gradient: 'from-purple-500 to-indigo-600' },
     { title: 'Estimations', path: '/dashboard/estimations', roles: ['admin', 'service_head'], icon: FiFileText, gradient: 'from-blue-500 to-purple-600' },
     { title: 'Invoices', path: '/dashboard/invoices', roles: ['admin', 'service_head'], icon: FiDollarSign, gradient: 'from-green-500 to-emerald-600' },
+    { title: 'Blogs', path: '/dashboard/blogs', roles: ['admin'], icon: FiEdit, gradient: 'from-amber-500 to-orange-600' },
+    { title: 'Blogs', path: '/dashboard/service-head/blogs', roles: ['service_head'], icon: FiEdit, gradient: 'from-amber-500 to-orange-600' },
     { title: 'Users', path: '/dashboard/users', roles: ['admin'], icon: FiUsers, gradient: 'from-purple-500 to-pink-600' },
     { title: 'Team Members', path: '/dashboard/service-head/team-members', roles: ['service_head'], icon: FiUsers, gradient: 'from-purple-500 to-pink-600' },
     { title: 'Tasks', path: '/dashboard/tasks', roles: ['admin','team_member'], icon: FiCheckSquare, gradient: 'from-green-500 to-emerald-600' },

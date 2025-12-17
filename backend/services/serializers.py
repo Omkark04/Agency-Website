@@ -49,16 +49,48 @@ class ServiceSerializer(serializers.ModelSerializer):
     department_title = serializers.CharField(
         source="department.title", read_only=True
     )
+    
+    # Readable team members
+    team_members_details = serializers.SerializerMethodField(read_only=True)
+    
+    # Writable team members
+    team_members = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.filter(role="team_member"),
+        many=True,
+        required=False
+    )
+    
     class Meta:
         model = Service
         fields = "__all__"
         read_only_fields = ["id", "slug", "created_at", "updated_at", "created_by"]
+    
+    def get_team_members_details(self, obj):
+        return [
+            {
+                "id": member.id,
+                "username": member.username,
+                "email": member.email,
+                "job_title": member.job_title
+            }
+            for member in obj.team_members.all()
+        ]
 
     def create(self, validated_data):
+        team_members = validated_data.pop('team_members', [])
         request = self.context.get("request")
         if request and hasattr(request, "user"):
             validated_data["created_by"] = request.user
-        return super().create(validated_data)
+        service = super().create(validated_data)
+        service.team_members.set(team_members)
+        return service
+    
+    def update(self, instance, validated_data):
+        team_members = validated_data.pop('team_members', None)
+        service = super().update(instance, validated_data)
+        if team_members is not None:
+            service.team_members.set(team_members)
+        return service
 
 
 

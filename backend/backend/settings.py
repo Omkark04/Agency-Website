@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     "accounts",
     "services",
     "orders",
+    "blog",
     "portfolio",
     "tasks",
     "media",
@@ -97,6 +98,7 @@ INSTALLED_APPS = [
     "notifications",
     "analytics",
     "forms",  # New: Dynamic form builder
+    "newsletter",
 ]
 
 
@@ -192,9 +194,16 @@ GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
-# Email settings placeholder (sendgrid / console for dev)
-EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@udyogworks.local")
+# Email settings (Gmail SMTP)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = f'UdyogWorks <{EMAIL_HOST_USER}>'
+
+
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 # ============================================

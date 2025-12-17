@@ -132,7 +132,7 @@ const categoryIcons = {
   'analytics': BarChart3,
 };
 
-// Project Card Component
+// Project Card Component - Premium Admin Style
 const ProjectCard = ({ project }: { project: Project }) => {
   const status = statuses[project.status as keyof typeof statuses];
   const priority = priorities[project.priority as keyof typeof priorities];
@@ -141,56 +141,66 @@ const ProjectCard = ({ project }: { project: Project }) => {
   const isOverdue = daysLeft < 0;
 
   return (
-    <div className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden">
+    <div className="group relative overflow-hidden bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700 hover:scale-[1.02] hover:-translate-y-1">
+      {/* Floating gradient blur element */}
+      <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-[#2563EB]/10 to-[#1E40AF]/10 rounded-full blur-3xl group-hover:from-[#2563EB]/20 group-hover:to-[#1E40AF]/20 transition-all duration-700"></div>
+      
+      {/* Gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#2563EB]/0 via-[#1E40AF]/0 to-[#2563EB]/0 group-hover:from-[#2563EB]/3 group-hover:via-[#1E40AF]/3 group-hover:to-[#2563EB]/3 transition-all duration-700"></div>
+      
       {/* Card Header */}
-      <div className="p-6 pb-4">
+      <div className="relative z-10 p-6 pb-4">
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-center space-x-3">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
-              <CategoryIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-3 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 shadow-md group-hover:shadow-lg transition-shadow">
+              <CategoryIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                 {project.name}
               </h3>
-              <div className="flex items-center space-x-2 mt-1">
-                <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${status.bgColor} ${status.textColor}`}>
+              <div className="flex items-center space-x-2 mt-1.5">
+                <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full ${status.bgColor} ${status.textColor} shadow-sm`}>
+                  <status.icon className="h-3 w-3 mr-1" />
                   {status.label}
                 </span>
-                <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${priority.bgColor} ${priority.textColor}`}>
+                <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full ${priority.bgColor} ${priority.textColor} shadow-sm`}>
                   {priority.label}
                 </span>
               </div>
             </div>
           </div>
-          <button className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+          <button className="p-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-all hover:scale-110">
             <MoreVertical className="h-4 w-4" />
           </button>
         </div>
 
         {/* Description */}
-        <p className="text-gray-600 dark:text-gray-300 text-sm mb-6 line-clamp-2">
+        <p className="text-gray-600 dark:text-gray-300 text-sm mb-6 line-clamp-2 leading-relaxed">
           {project.description}
         </p>
 
-        {/* Progress Section */}
+        {/* Progress Section - Enhanced */}
         <div className="mb-6">
-          <div className="flex justify-between text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+          <div className="flex justify-between text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">
             <span>Project Progress</span>
-            <span className="font-semibold text-gray-700 dark:text-gray-300">{project.progress}%</span>
+            <span className="text-gray-900 dark:text-white">{project.progress}%</span>
           </div>
-          <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+          <div className="relative w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden shadow-inner">
             <div 
-              className={`h-full rounded-full ${status.color} transition-all duration-500`}
+              className={`absolute inset-y-0 left-0 rounded-full ${status.color} shadow-lg transition-all duration-700 ease-out`}
               style={{ width: `${project.progress}%` }}
-            ></div>
+            >
+              {/* Animated shimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+            </div>
           </div>
-          <div className="flex justify-between mt-1">
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {project.tasks.completed}/{project.tasks.total} tasks
+          <div className="flex justify-between mt-2">
+            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+              {project.tasks.completed}/{project.tasks.total} tasks completed
             </span>
-            <span className={`text-xs font-medium ${isOverdue ? 'text-red-600' : 'text-gray-500 dark:text-gray-400'}`}>
-              {isOverdue ? `Overdue by ${-daysLeft} days` : `${daysLeft} days left`}
+            <span className={`text-xs font-semibold ${isOverdue ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-300'}`}>
+              {isOverdue ? `⚠️ Overdue by ${-daysLeft} days` : `📅 ${daysLeft} days left`}
             </span>
           </div>
         </div>
@@ -201,7 +211,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
             {project.team.slice(0, 4).map((member, i) => (
               <div 
                 key={i} 
-                className={`${member.avatarColor} w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold text-white border-2 border-white dark:border-gray-800 shadow-sm`}
+                className={`${member.avatarColor} w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white border-3 border-white dark:border-gray-800 shadow-lg hover:scale-110 hover:z-10 transition-transform cursor-pointer`}
                 title={`${member.name} - ${member.role}`}
               >
                 {member.name.split(' ').map(n => n[0]).join('')}
@@ -209,8 +219,8 @@ const ProjectCard = ({ project }: { project: Project }) => {
             ))}
             {project.team.length > 4 && (
               <div 
-                className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-300 border-2 border-white dark:border-gray-800 shadow-sm"
-                title={`+${project.team.length - 4} more`}
+                className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300 border-3 border-white dark:border-gray-800 shadow-lg hover:scale-110 transition-transform cursor-pointer"
+                title={`+${project.team.length - 4} more team members`}
               >
                 +{project.team.length - 4}
               </div>
@@ -218,40 +228,58 @@ const ProjectCard = ({ project }: { project: Project }) => {
           </div>
 
           <div className="flex space-x-2">
-            <button className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
+            <button className="p-2.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-all hover:scale-110 shadow-sm hover:shadow-md">
               <Eye className="h-4 w-4" />
             </button>
-            <button className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors">
+            <button className="p-2.5 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-xl transition-all hover:scale-110 shadow-sm hover:shadow-md">
               <Edit2 className="h-4 w-4" />
             </button>
-            <button className="p-2 text-gray-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-colors">
+            <button className="p-2.5 text-gray-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-all hover:scale-110 shadow-sm hover:shadow-md">
               <BarChart2 className="h-4 w-4" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Card Footer */}
-      <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100/50 dark:from-gray-800/30 dark:to-gray-700/30 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
+      {/* Card Footer - Enhanced */}
+      <div className="relative z-10 px-6 py-4 bg-gradient-to-r from-gray-50 via-gray-100/80 to-gray-50 dark:from-gray-800/50 dark:via-gray-700/50 dark:to-gray-800/50 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center backdrop-blur-sm">
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-1.5">
-            <Calendar className="h-3.5 w-3.5 text-gray-400" />
-            <span className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex items-center space-x-2">
+            <div className="p-1.5 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
+              <Calendar className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
               Due {new Date(project.dueDate).toLocaleDateString()}
             </span>
           </div>
-          <div className="flex items-center space-x-1.5">
-            <FileText className="h-3.5 w-3.5 text-gray-400" />
-            <span className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex items-center space-x-2">
+            <div className="p-1.5 bg-white dark:bg-gray-700 rounded-lg shadow-sm">
+              <FileText className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+            </div>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
               {project.files} files
             </span>
           </div>
         </div>
-        <button className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center group">
+        <button className="text-sm font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center group/btn">
           View Details
-          <ArrowUpRight className="ml-1.5 h-3.5 w-3.5 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          <ArrowUpRight className="ml-1.5 h-4 w-4 transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
         </button>
       </div>
+      
+      {/* Bottom accent line */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2563EB] via-[#1E40AF] to-[#2563EB] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+      
+      {/* Shimmer animation keyframes */}
+      <style>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        .animate-shimmer {
+          animation: shimmer 2s infinite;
+        }
+      `}</style>
     </div>
   );
 };
@@ -415,7 +443,7 @@ const ProjectFilters = ({
           </div>
           
           {/* New Project Button */}
-          <button className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+          <button className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-[#2563EB] to-[#1E40AF] hover:from-[#1E40AF] hover:to-[#1E3A8A] text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
             <Plus className="-ml-1 mr-2 h-5 w-5" />
             New Project
           </button>
@@ -708,7 +736,7 @@ export default function MyProjects() {
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">
             No projects match your current filters. Try adjusting your search or create a new project.
           </p>
-          <button className="mt-6 inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all">
+          <button className="mt-6 inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-[#2563EB] to-[#1E40AF] text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all">
             <Plus className="-ml-1 mr-2 h-5 w-5" />
             Create New Project
           </button>

@@ -13,6 +13,8 @@ from .views import (
     GoogleOAuthView,
     AdminEnvLoginView,
     AdminUserListView,
+    ChangePasswordView,
+    ChangeEmailView,
 )
 from .team_head_views import (
     TeamHeadStatsView,
@@ -26,6 +28,11 @@ from .team_head_views import (
     RecentActivityView,
     DepartmentTeamMembersView,
 )
+from .team_member_views import (
+    TeamMemberStatsView,
+    TeamMemberTasksListView,
+    TeamMemberTaskUpdateView,
+)
 
 urlpatterns = [
     path("token/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
@@ -37,6 +44,8 @@ urlpatterns = [
     path("register/team-member/", TeamMemberRegisterView.as_view(), name="register_team_member"),
     path("password/reset/", PasswordResetRequestView.as_view(), name="password_reset"),
     path("password/reset/confirm/<uidb64>/<token>/", PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
+    path("password/change/", ChangePasswordView.as_view(), name="password_change"),
+    path("email/change/", ChangeEmailView.as_view(), name="email_change"),
     path("profile/", UserProfileView.as_view(), name="user_profile"),
     path("admin/users/", AdminUserListView.as_view()),
     path("department/team-members/", DepartmentTeamMembersView.as_view(), name="department_team_members"),
@@ -51,4 +60,9 @@ urlpatterns = [
     path("team-head/tasks/<int:pk>/", TeamTaskDetailView.as_view(), name="team_task_detail"),
     path("team-head/performance/", TeamPerformanceView.as_view(), name="team_performance"),
     path("team-head/activity/", RecentActivityView.as_view(), name="recent_activity"),
+    
+    # Team Member Dashboard Routes
+    path("team-member/stats/", TeamMemberStatsView.as_view(), name="team_member_stats"),
+    path("team-member/tasks/", TeamMemberTasksListView.as_view(), name="team_member_tasks"),
+    path("team-member/tasks/<int:pk>/", TeamMemberTaskUpdateView.as_view(), name="team_member_task_update"),
 ]

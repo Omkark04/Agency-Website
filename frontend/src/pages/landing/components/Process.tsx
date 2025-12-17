@@ -105,7 +105,7 @@ const Process = () => {
             Our proven 4-step process ensures that every project is delivered on time, within budget, and exceeds your expectations.
           </p>
           <a 
-            href="#contact" 
+            onClick={() => window.location.href = 'client-dashboard/services'}
             className="inline-block bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105"
           >
             Start Your Project

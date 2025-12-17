@@ -24,7 +24,7 @@ export default function DepartmentForm({ initial, onSaved }: any) {
 
   useEffect(() => {
     const loadHeads = async () => {
-      const res = await api.get('/auth/admin/users/');
+      const res = await api.get('/api/auth/admin/users/');
       const serviceHeads = res.data.filter((u: any) => u.role === 'service_head');
       setTeamHeads(serviceHeads);
     };

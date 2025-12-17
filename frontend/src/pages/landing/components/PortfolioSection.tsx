@@ -14,6 +14,7 @@ import {
   Grid,
   List
 } from 'lucide-react';
+import { Button as MovingBorderContainer } from "@/components/ui/moving-border";
 import { fetchPortfolioProjects } from '../../../api/portfolio';
 import type { PortfolioProject } from '../../../api/portfolio';
 
@@ -344,86 +345,93 @@ const PortfolioSection = () => {
                     key={project.id}
                     variants={itemVariants}
                     whileHover={{ y: -8, transition: { duration: 0.2 } }}
-                    className="group relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer"
+                    className="relative z-0"
                     onClick={() => setSelectedProject(project)}
                   >
-                    {/* Featured Badge */}
-                    {project.is_featured && (
-                      <div className="absolute top-4 left-4 z-10">
-                        <div className="px-3 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 text-white text-xs font-bold flex items-center gap-1">
-                          <Star className="w-3 h-3" />
-                          Featured
+                    <MovingBorderContainer
+                      borderRadius="1rem"
+                      containerClassName="w-full h-full bg-transparent p-[3px]"
+                      className="bg-white dark:bg-gray-800 border-neutral-200 dark:border-gray-700 p-0 overflow-hidden items-start justify-start flex-col h-full w-full"
+                      duration={Math.floor(Math.random() * 2000) + 2000} // Random duration for variety
+                      as="div"
+                    >
+                      <div className="group relative w-full h-full"> 
+                        {/* Featured Badge */}
+                        {project.is_featured && (
+                          <div className="absolute top-4 left-4 z-10">
+                            <div className="px-3 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 text-white text-xs font-bold flex items-center gap-1">
+                              <Star className="w-3 h-3" />
+                              Featured
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Image Container */}
+                        <div className="relative overflow-hidden h-64">
+                          <img
+                            src={project.featured_image}
+                            alt={project.title}
+                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          
+                          {/* Video Indicator */}
+                          {project.video && (
+                            <div className="absolute top-4 right-4 bg-black/50 rounded-full p-2">
+                              <PlayCircle className="w-6 h-6 text-white" />
+                            </div>
+                          )}
+
+                          {/* View Button */}
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div className="bg-white/10 backdrop-blur-sm rounded-full p-4">
+                              <Eye className="w-8 h-8 text-white" />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-6">
+                          {/* Service Tag */}
+                          {project.service && (
+                            <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 text-[#00C2A8] dark:text-[#00C2A8] text-xs font-semibold mb-3">
+                              {project.service.name}
+                            </div>
+                          )}
+
+                          {/* Title */}
+                          <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2 line-clamp-1">
+                            {project.title}
+                          </h3>
+
+                          {/* Description */}
+                          <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                            {project.description}
+                          </p>
+
+                          {/* Client Info */}
+                          {project.client_name && (
+                            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                              <User className="w-4 h-4" />
+                              <span>Client: {project.client_name}</span>
+                            </div>
+                          )}
+
+                          {/* Date */}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                              <Calendar className="w-4 h-4" />
+                              <span>{new Date(project.created_at).toLocaleDateString()}</span>
+                            </div>
+                            
+                            <button className="flex items-center gap-1 text-[#00C2A8] dark:text-[#00C2A8] font-semibold group-hover:gap-2 transition-all duration-300">
+                              View Details
+                              <ChevronRight className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    )}
-
-                    {/* Image Container */}
-                    <div className="relative overflow-hidden h-64">
-                      <img
-                        src={project.featured_image}
-                        alt={project.title}
-                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      
-                      {/* Video Indicator */}
-                      {project.video && (
-                        <div className="absolute top-4 right-4 bg-black/50 rounded-full p-2">
-                          <PlayCircle className="w-6 h-6 text-white" />
-                        </div>
-                      )}
-
-                      {/* View Button */}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="bg-white/10 backdrop-blur-sm rounded-full p-4">
-                          <Eye className="w-8 h-8 text-white" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6">
-                      {/* Service Tag */}
-                      {project.service && (
-                        <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 text-[#00C2A8] dark:text-[#00C2A8] text-xs font-semibold mb-3">
-                          {project.service.name}
-                        </div>
-                      )}
-
-                      {/* Title */}
-                      <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2 line-clamp-1">
-                        {project.title}
-                      </h3>
-
-                      {/* Description */}
-                      <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
-                        {project.description}
-                      </p>
-
-                      {/* Client Info */}
-                      {project.client_name && (
-                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
-                          <User className="w-4 h-4" />
-                          <span>Client: {project.client_name}</span>
-                        </div>
-                      )}
-
-                      {/* Date */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                          <Calendar className="w-4 h-4" />
-                          <span>{new Date(project.created_at).toLocaleDateString()}</span>
-                        </div>
-                        
-                        <button className="flex items-center gap-1 text-[#00C2A8] dark:text-[#00C2A8] font-semibold group-hover:gap-2 transition-all duration-300">
-                          View Details
-                          <ChevronRight className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Hover Effect Border */}
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+                    </MovingBorderContainer>
                   </motion.div>
                 ))}
               </motion.div>
@@ -554,7 +562,7 @@ const PortfolioSection = () => {
                 Join our satisfied clients and let us bring your vision to life with our expertise.
               </p>
               <a
-                href="#contact"
+                onClick={() => window.location.href = '/portfolio'}
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
               >
                 Start Your Project

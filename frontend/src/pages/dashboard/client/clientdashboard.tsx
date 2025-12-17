@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { listOrders } from '../../../api/orders';
 import { useAuth } from '../../../hooks/useAuth';
+import { logout } from '../../../utils/auth';
 import logo from '../../../assets/UdyogWorks logo.png';
+import { useNavigate } from 'react-router-dom';
 import { 
   Home, 
   Folder, 
@@ -28,6 +30,7 @@ import {
 
 export default function ClientDashboard() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -41,6 +44,11 @@ export default function ClientDashboard() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleLogout = () => {
+      logout();
+      navigate('/');
+    };
 
   useEffect(() => {
     fetchDashboardData();
@@ -220,7 +228,7 @@ export default function ClientDashboard() {
                   </div>
                   <div className="py-1">
                     <Link
-                      to="/profile"
+                      to="/client-dashboard/profile"
                       className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
                       role="menuitem"
                       onClick={() => setShowProfileMenu(false)}
@@ -229,7 +237,7 @@ export default function ClientDashboard() {
                       Your Profile
                     </Link>
                     <Link
-                      to="/settings"
+                      to="/client-dashboard/settings"
                       className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
                       role="menuitem"
                       onClick={() => setShowProfileMenu(false)}
@@ -249,7 +257,7 @@ export default function ClientDashboard() {
                   </div>
                   <div className="border-t border-gray-100 py-1">
                     <button
-                      onClick={() => {}}
+                      onClick={handleLogout}
                       className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                       role="menuitem"
                     >
@@ -427,8 +435,28 @@ export default function ClientDashboard() {
           {/* Dashboard Content */}
           {location.pathname === '/client-dashboard' && (
             <>
+              {/* Animated Header with Gradient - Admin Style */}
+              <div className="mb-8 animate-fade-in">
+                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2563EB] to-[#1E40AF] p-8 shadow-2xl">
+                  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30"></div>
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+                        <Home className="h-8 w-8 text-white" />
+                      </div>
+                      <div>
+                        <h1 className="text-4xl font-bold text-white drop-shadow-lg">Welcome Back, {user?.username || 'Client'}!</h1>
+                        <p className="text-white/90 text-lg mt-1">Here's your project overview at a glance</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+                  <div className="absolute -top-6 -left-6 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+                </div>
+              </div>
+
               {/* Quick Actions */}
-              <div className="mb-8">
+              <div className="mb-8 animate-fade-in" style={{animationDelay: '0.1s'}}>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <Link
@@ -493,59 +521,95 @@ export default function ClientDashboard() {
                 </div>
               </div>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-                {stats.map((stat) => (
-                  <div
-                    key={stat.id}
-                    className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group"
-                  >
-                    <div className="p-5">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-500 mb-1">{stat.name}</p>
-                          <div className="flex items-baseline mb-2">
-                            <span className="text-2xl font-bold text-gray-900">{stat.value}</span>
-                            <span className={`flex items-center text-sm font-medium ml-2 ${
-                              stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600'
-                            }`}>
-                              {stat.changeType === 'increase' ? (
-                                <TrendingUp className="h-4 w-4 mr-1" />
-                              ) : (
-                                <TrendingDown className="h-4 w-4 mr-1" />
+              {/* Enhanced Stats Grid - Admin Style */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-fade-in" style={{animationDelay: '0.2s'}}>
+                {stats.map((stat, index) => {
+                  // First card gets premium gradient treatment like admin
+                  if (index === 0) {
+                    return (
+                      <div key={stat.id} className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#16A34A] to-[#15803D] p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSJ3aGl0ZSIgZmlsbC1vcGFjaXR5PSIwLjIiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCIvPjwvc3ZnPg==')] opacity-40"></div>
+                        <div className="relative z-10">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex-1">
+                                <p className="text-green-100 text-sm font-semibold uppercase tracking-wider">{stat.name}</p>
+                              <p className="text-4xl font-black text-white mt-2 drop-shadow-lg">{stat.value}</p>
+                              {stat.change && (
+                                <div className="flex items-center gap-2 mt-3">
+                                  <div className="flex items-center gap-1 px-2.5 py-1 bg-white/25 backdrop-blur-sm rounded-full">
+                                    <TrendingUp className="h-3.5 w-3.5 text-white" />
+                                    <span className="text-xs font-bold text-white">{stat.change}</span>
+                                  </div>
+                                  <span className="text-xs text-green-100">{stat.description}</span>
+                                </div>
                               )}
-                              {stat.change}
-                            </span>
+                            </div>
+                            <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl group-hover:bg-white/30 transition-colors shadow-lg">
+                              <stat.icon className="h-8 w-8 text-white drop-shadow" />
+                            </div>
                           </div>
-                          <p className="text-xs text-gray-500">{stat.description}</p>
                         </div>
-                        <div className={`p-3 rounded-xl ${stat.bgColor} shadow-sm`}>
-                          <div className={`bg-gradient-to-br ${stat.color} p-2 rounded-lg`}>
-                            <stat.icon className="h-5 w-5 text-white" />
+                        <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                      </div>
+                    );
+                  }
+                  
+                  // Other cards get glassmorphism treatment
+                  return (
+                    <div key={stat.id} className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-gray-100">
+                      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${stat.color.replace('from-', 'from-').replace('to-', 'to-')}/10 rounded-full blur-3xl`}></div>
+                      <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className={`p-3 bg-gradient-to-br ${stat.color} rounded-2xl shadow-lg group-hover:shadow-${stat.color.split('-')[1]}-500/50 transition-shadow`}>
+                            <stat.icon className="h-6 w-6 text-white" />
+                          </div>
+                          <div className={`px-3 py-1 bg-${stat.color.split('-')[1]}-50 rounded-full`}>
+                            <span className={`text-xs font-bold text-${stat.color.split('-')[1]}-600`}>Active</span>
+                          </div>
+                        </div>
+                        <p className="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">{stat.name}</p>
+                        <p className="text-4xl font-black text-gray-900">{stat.value}</p>
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            {stat.changeType === 'increase' ? (
+                              <>
+                                <TrendingUp className="h-4 w-4 text-green-500" />
+                                {stat.change && <span className="font-semibold text-green-600">{stat.change}</span>}
+                              </>
+                            ) : (
+                              <>
+                                <TrendingDown className="h-4 w-4 text-red-500" />
+                                {stat.change && <span className="font-semibold text-red-600">{stat.change}</span>}
+                              </>
+                            )}
+                            <span>{stat.description}</span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="h-1 w-0 group-hover:w-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300"></div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
-              {/* Content Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              {/* Content Grid - Enhanced */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 animate-fade-in" style={{animationDelay: '0.3s'}}>
                 {/* Recent Activity */}
-                <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-shadow p-6">
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+                      <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <Activity className="h-5 w-5 text-blue-600" />
+                        Recent Activity
+                      </h2>
                       <p className="text-sm text-gray-500 mt-1">Latest updates from your projects</p>
                     </div>
-                    <button className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
-                      View All →
+                    <button className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1">
+                      View All
+                      <ChevronRight className="h-4 w-4" />
                     </button>
                   </div>
                   
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {recentActivity.map((activity) => (
                       <div 
                         key={activity.id} 
@@ -637,8 +701,22 @@ export default function ClientDashboard() {
         </div>
       </main>
 
-      {/* Custom Animations */}
+      {/* Custom Animations - Admin Style */}
       <style>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out forwards;
+        }
+        
         @keyframes fadeIn {
           from {
             opacity: 0;

@@ -21,6 +21,12 @@ class User(AbstractUser):
     company = models.CharField(max_length=255, blank=True, null=True)
     google_id = models.CharField(max_length=255, blank=True, null=True)
     avatar_url = models.URLField(blank=True, null=True)
+    job_title = models.CharField(
+        max_length=100, 
+        blank=True, 
+        null=True,
+        help_text="Job title/role for team members (e.g., Voice-over Artist, Frontend Developer)"
+    )
 
     service = models.ForeignKey(
         "services.Service",

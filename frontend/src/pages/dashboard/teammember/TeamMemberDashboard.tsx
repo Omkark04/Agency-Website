@@ -45,7 +45,6 @@ import {
   Star,
   Award,
   Rocket,
-  RefreshCw,
   TrendingUp as TrendingUpIcon
 } from 'lucide-react';
 
@@ -82,70 +81,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Mock data
-const tasks = [
-  {
-    id: 1,
-    title: 'Design Dashboard UI',
-    description: 'Create modern dashboard layout with Tailwind CSS',
-    priority: 'High',
-    assignedDate: '2025-12-01',
-    deadline: '2025-12-15',
-    status: 'In Progress',
-    progress: 65,
-    category: 'Design',
-    assignedBy: 'Sarah Chen',
-    timeEstimate: '18h',
-    tags: ['UI/UX', 'Design', 'Figma'],
-    color: 'from-purple-500 to-pink-500'
-  },
-  {
-    id: 2,
-    title: 'Implement API Integration',
-    description: 'Connect frontend with backend services',
-    priority: 'Medium',
-    assignedDate: '2025-12-05',
-    deadline: '2025-12-20',
-    status: 'To Do',
-    progress: 0,
-    category: 'Development',
-    assignedBy: 'Michael Rodriguez',
-    timeEstimate: '32h',
-    tags: ['Backend', 'API', 'Node.js'],
-    color: 'from-blue-500 to-cyan-500'
-  },
-  {
-    id: 3,
-    title: 'Write Unit Tests',
-    description: 'Create test cases for all components',
-    priority: 'High',
-    assignedDate: '2025-11-28',
-    deadline: '2025-12-10',
-    status: 'Completed',
-    progress: 100,
-    category: 'Testing',
-    assignedBy: 'Alex Johnson',
-    timeEstimate: '24h',
-    tags: ['Testing', 'Quality'],
-    color: 'from-green-500 to-emerald-500'
-  },
-  {
-    id: 4,
-    title: 'User Documentation',
-    description: 'Create comprehensive user guides',
-    priority: 'Low',
-    assignedDate: '2025-12-03',
-    deadline: '2025-12-25',
-    status: 'In Progress',
-    progress: 30,
-    category: 'Documentation',
-    assignedBy: 'Emma Wilson',
-    timeEstimate: '16h',
-    tags: ['Docs', 'Content'],
-    color: 'from-amber-500 to-orange-500'
-  },
-];
+// Import API functions
+import { getTeamMemberStats, getMyTasks, updateTaskStatus, type TeamMemberTask, type TeamMemberStats } from '@/api/teamMemberApi';
+import { useAuth } from '@/hooks/useAuth';
 
+// Mock data for charts and notifications (will be replaced with real data later)
 const productivityData = [
   { name: 'Mon', hours: 8, efficiency: 92, focus: 85 },
   { name: 'Tue', hours: 6, efficiency: 85, focus: 78 },
@@ -155,13 +95,6 @@ const productivityData = [
   { name: 'Sat', hours: 5, efficiency: 78, focus: 72 },
   { name: 'Sun', hours: 3, efficiency: 65, focus: 60 },
 ];
-
-const taskCompletionData = [
-  { name: 'Completed', value: 12, color: '#22c55e', gradient: 'from-green-400 to-emerald-600' },
-  { name: 'In Progress', value: 5, color: '#3b82f6', gradient: 'from-blue-400 to-indigo-600' },
-  { name: 'Pending', value: 3, color: '#f59e0b', gradient: 'from-amber-400 to-orange-600' },
-];
-
 
 const notifications = [
   { id: 1, title: 'New task assigned', description: 'You have been assigned to "Project Analysis"', time: '10 min ago', unread: true, icon: '✨' },
@@ -178,31 +111,126 @@ const achievements = [
 ];
 
 const TeamMemberDashboard = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
-  const [] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
-  const [stats] = useState({
-    productivity: 89,
-    tasksCompleted: 12,
-    tasksInProgress: 5,
-    streak: 7
-  });
+  const [error, setError] = useState<string | null>(null);
+  
+  // Real data from API
+  const [stats, setStats] = useState<TeamMemberStats | null>(null);
+  const [allTasks, setAllTasks] = useState<(TeamMemberTask & { color: string })[]>([]);
+  const [filteredTasks, setFilteredTasks] = useState<(TeamMemberTask & { color: string })[]>([]);
 
+  // Fetch data from API
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        // Fetch stats and tasks in parallel
+        const [statsResponse, tasksResponse] = await Promise.all([
+          getTeamMemberStats(),
+          getMyTasks()
+        ]);
+        
+        setStats(statsResponse.data);
+        
+        // Add color to tasks based on priority
+        const tasksWithColor = tasksResponse.data.map(task => ({
+          ...task,
+          color: getTaskColor(task.priority)
+        }));
+        
+        setAllTasks(tasksWithColor);
+        setFilteredTasks(tasksWithColor);
+      } catch (err: any) {
+        console.error('Error fetching dashboard data:', err);
+        setError(err.response?.data?.error || 'Failed to load dashboard data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
   }, []);
+
+  // Filter tasks based on status and search query
+  useEffect(() => {
+    let filtered = allTasks;
+    
+    // Apply status filter
+    if (statusFilter !== 'all') {
+      const statusMap: { [key: string]: string } = {
+        'pending': 'To Do',
+        'in-progress': 'In Progress',
+        'completed': 'Completed'
+      };
+      filtered = filtered.filter(task => task.status === statusMap[statusFilter]);
+    }
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(task =>
+        task.title.toLowerCase().includes(query) ||
+        task.description.toLowerCase().includes(query) ||
+        task.category.toLowerCase().includes(query)
+      );
+    }
+    
+    setFilteredTasks(filtered);
+  }, [allTasks, statusFilter, searchQuery]);
 
   const menuItems = [
     { id: 'overview', icon: <LayoutDashboard className="h-5 w-5" />, label: 'Overview', badge: null },
-    { id: 'tasks', icon: <ClipboardList className="h-5 w-5" />, label: 'My Tasks', badge: '3' },
+    { id: 'tasks', icon: <ClipboardList className="h-5 w-5" />, label: 'My Tasks', badge: stats?.tasks_in_progress.toString() || '0' },
     { id: 'progress', icon: <Activity className="h-5 w-5" />, label: 'Progress', badge: '🔥' },
     { id: 'submissions', icon: <Upload className="h-5 w-5" />, label: 'Submissions', badge: '2' },
     { id: 'messages', icon: <MessageSquare className="h-5 w-5" />, label: 'Messages', badge: '5' },
     { id: 'support', icon: <HelpCircle className="h-5 w-5" />, label: 'Support', badge: null },
   ];
+
+  // Helper function to get task color based on priority
+  const getTaskColor = (priority: string) => {
+    switch (priority) {
+      case 'Urgent':
+        return 'from-red-500 to-rose-600';
+      case 'High':
+        return 'from-purple-500 to-pink-500';
+      case 'Medium':
+        return 'from-blue-500 to-cyan-500';
+      case 'Low':
+        return 'from-green-500 to-emerald-500';
+      default:
+        return 'from-gray-500 to-slate-600';
+    }
+  };
+
+  // Handle task status update
+  const handleTaskStatusUpdate = async (taskId: number, newStatus: string) => {
+    try {
+      await updateTaskStatus(taskId, newStatus);
+      
+      // Refresh tasks
+      const tasksResponse = await getMyTasks();
+      const tasksWithColor = tasksResponse.data.map(task => ({
+        ...task,
+        color: getTaskColor(task.priority)
+      }));
+      setAllTasks(tasksWithColor);
+      setFilteredTasks(tasksWithColor);
+      
+      // Refresh stats
+      const statsResponse = await getTeamMemberStats();
+      setStats(statsResponse.data);
+    } catch (err: any) {
+      console.error('Error updating task status:', err);
+      alert('Failed to update task status');
+    }
+  };
 
   const renderStatusBadge = (status: string) => {
     switch (status) {
@@ -309,17 +337,17 @@ const TeamMemberDashboard = () => {
                       <Sparkles className="h-5 w-5" />
                       <span className="text-sm font-medium bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">Welcome back!</span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold mb-3">Hello, John! 👋</h1>
+                    <h1 className="text-3xl md:text-4xl font-bold mb-3">Hello, {user?.first_name || user?.username || 'Team Member'}! 👋</h1>
                     <p className="text-blue-100 text-lg mb-6">You're doing great! Here's your performance overview for today.</p>
                     
                     <div className="flex flex-wrap gap-4 mb-6">
                       <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-xl">
                         <div className="h-3 w-3 rounded-full bg-green-400 animate-pulse"></div>
-                        <span className="text-sm">Active Streak: {stats.streak} days</span>
+                        <span className="text-sm">Active Streak: {stats?.streak || 0} days</span>
                       </div>
                       <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-xl">
                         <Rocket className="h-4 w-4" />
-                        <span className="text-sm">Productivity: {stats.productivity}%</span>
+                        <span className="text-sm">Productivity: {stats?.productivity || 0}%</span>
                       </div>
                     </div>
                   </div>
@@ -349,7 +377,7 @@ const TeamMemberDashboard = () => {
               {[
                 { 
                   title: 'Total Tasks', 
-                  value: '20', 
+                  value: stats?.total_tasks?.toString() || '0', 
                   change: '+12%', 
                   trend: 'up',
                   icon: <ClipboardList className="h-6 w-6" />,
@@ -358,7 +386,7 @@ const TeamMemberDashboard = () => {
                 },
                 { 
                   title: 'Completed', 
-                  value: '12', 
+                  value: stats?.tasks_completed?.toString() || '0', 
                   change: '+25%', 
                   trend: 'up',
                   icon: <CheckCircle2 className="h-6 w-6" />,
@@ -367,8 +395,8 @@ const TeamMemberDashboard = () => {
                 },
                 { 
                   title: 'In Progress', 
-                  value: '5', 
-                  change: '2 due', 
+                  value: stats?.tasks_in_progress?.toString() || '0', 
+                  change: `${stats?.tasks_pending || 0} pending`, 
                   trend: 'warning',
                   icon: <Activity className="h-6 w-6" />,
                   color: 'from-amber-500 to-orange-600',
@@ -376,7 +404,7 @@ const TeamMemberDashboard = () => {
                 },
                 { 
                   title: 'Productivity', 
-                  value: '89%', 
+                  value: `${stats?.productivity || 0}%`, 
                   change: '+8%', 
                   trend: 'up',
                   icon: <TrendingUpIcon className="h-6 w-6" />,
@@ -544,7 +572,11 @@ const TeamMemberDashboard = () => {
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          data={taskCompletionData}
+                          data={[
+                            { name: 'Completed', value: stats?.tasks_completed || 0, color: '#22c55e' },
+                            { name: 'In Progress', value: stats?.tasks_in_progress || 0, color: '#3b82f6' },
+                            { name: 'Pending', value: stats?.tasks_pending || 0, color: '#f59e0b' },
+                          ]}
                           cx="50%"
                           cy="50%"
                           innerRadius={60}
@@ -554,7 +586,11 @@ const TeamMemberDashboard = () => {
                           label={({ name, percent = 0 }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                           labelLine={false}
                         >
-                          {taskCompletionData.map((entry, index) => (
+                          {[
+                            { name: 'Completed', value: stats?.tasks_completed || 0, color: '#22c55e' },
+                            { name: 'In Progress', value: stats?.tasks_in_progress || 0, color: '#3b82f6' },
+                            { name: 'Pending', value: stats?.tasks_pending || 0, color: '#f59e0b' },
+                          ].map((entry: any, index: number) => (
                             <Cell 
                               key={`cell-${index}`} 
                               fill={entry.color}
@@ -607,7 +643,7 @@ const TeamMemberDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {tasks.map((task, index) => (
+                      {filteredTasks.slice(0, 4).map((task, index) => (
                         <motion.div
                           key={task.id}
                           initial={{ opacity: 0, x: -20 }}
@@ -792,7 +828,7 @@ const TeamMemberDashboard = () => {
             </motion.div>
             
             {/* Enhanced Task Tabs */}
-            <Tabs defaultValue="all" className="w-full">
+            <Tabs value={statusFilter} onValueChange={setStatusFilter} className="w-full">
               <TabsList className="grid w-full md:w-auto grid-cols-4 bg-gray-100 p-1 rounded-2xl">
                 <TabsTrigger 
                   value="all"
@@ -820,7 +856,7 @@ const TeamMemberDashboard = () => {
                 </TabsTrigger>
               </TabsList>
               
-              <TabsContent value="all" className="space-y-4 mt-6">
+              <TabsContent value={statusFilter} className="space-y-4 mt-6">
                 <Card className="border-none shadow-xl backdrop-blur-sm bg-white/80 overflow-hidden">
                   <div className="overflow-hidden">
                     <div className="grid grid-cols-12 gap-4 p-6 border-b bg-gradient-to-r from-gray-50 to-white/50">
@@ -837,7 +873,7 @@ const TeamMemberDashboard = () => {
                     </div>
                     
                     <div className="divide-y divide-gray-100">
-                      {tasks.map((task, index) => (
+                      {filteredTasks.map((task: any, index: number) => (
                         <motion.div
                           key={task.id}
                           initial={{ opacity: 0, y: 10 }}
@@ -894,7 +930,10 @@ const TeamMemberDashboard = () => {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="shadow-xl rounded-xl">
-                                  <DropdownMenuItem className="gap-2">
+                                  <DropdownMenuItem 
+                                    className="gap-2"
+                                    onClick={() => handleTaskStatusUpdate(task.id, 'done')}
+                                  >
                                     <CheckCircle className="h-4 w-4" />
                                     Mark Complete
                                   </DropdownMenuItem>
@@ -1110,7 +1149,192 @@ const TeamMemberDashboard = () => {
             </Card>
           </div>
         );
-      
+      case 'progress':
+        return (
+          <div className="space-y-6">
+            {/* Progress Header */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 p-8 text-white"
+            >
+              <div className="relative z-10">
+                <h2 className="text-3xl font-bold mb-2">Your Progress</h2>
+                <p className="text-purple-100">Track your productivity and performance metrics</p>
+              </div>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            </motion.div>
+            {/* Stats Grid */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {[
+                { label: 'Total Tasks', value: stats?.total_tasks || 0, icon: <ClipboardList className="h-6 w-6" />, color: 'from-blue-500 to-cyan-500' },
+                { label: 'Completed', value: stats?.tasks_completed || 0, icon: <CheckCircle className="h-6 w-6" />, color: 'from-green-500 to-emerald-500' },
+                { label: 'In Progress', value: stats?.tasks_in_progress || 0, icon: <Activity className="h-6 w-6" />, color: 'from-amber-500 to-orange-500' },
+                { label: 'Productivity', value: `${stats?.productivity || 0}%`, icon: <TrendingUp className="h-6 w-6" />, color: 'from-purple-500 to-pink-500' },
+              ].map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className="border-none shadow-lg">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-gray-500">{stat.label}</p>
+                          <p className="text-3xl font-bold mt-1">{stat.value}</p>
+                        </div>
+                        <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} text-white`}>
+                          {stat.icon}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+            {/* Productivity Chart */}
+            <Card className="border-none shadow-lg">
+              <CardHeader>
+                <CardTitle>Weekly Productivity</CardTitle>
+                <CardDescription>Your task completion rate over time</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={productivityData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Area type="monotone" dataKey="hours" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.6} />
+                      <Area type="monotone" dataKey="efficiency" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.4} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+            {/* Streak Info */}
+            <Card className="border-none shadow-lg bg-gradient-to-br from-orange-50 to-amber-50">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-gradient-to-br from-orange-500 to-amber-600 rounded-full">
+                    <Trophy className="h-8 w-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold">{stats?.streak || 0} Day Streak! 🔥</h3>
+                    <p className="text-gray-600">Keep up the great work!</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+      case 'messages':
+        return (
+          <div className="space-y-6">
+            {/* Messages Header */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-green-600 to-teal-600 p-8 text-white"
+            >
+              <div className="relative z-10">
+                <h2 className="text-3xl font-bold mb-2">Notifications</h2>
+                <p className="text-green-100">Stay updated with your latest notifications</p>
+              </div>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            </motion.div>
+            {/* Notifications List */}
+            <div className="space-y-4">
+              {notifications.map((notification, index) => (
+                <motion.div
+                  key={notification.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card className={`border-none shadow-lg ${notification.unread ? 'bg-blue-50' : 'bg-white'}`}>
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <div className="text-3xl">{notification.icon}</div>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h4 className="font-semibold text-gray-900">{notification.title}</h4>
+                              <p className="text-gray-600 mt-1">{notification.description}</p>
+                              <p className="text-sm text-gray-400 mt-2">{notification.time}</p>
+                            </div>
+                            {notification.unread && (
+                              <Badge className="bg-blue-500">New</Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        );
+      case 'support':
+        return (
+          <div className="space-y-6">
+            {/* Support Header */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 p-8 text-white"
+            >
+              <div className="relative z-10">
+                <h2 className="text-3xl font-bold mb-2">Help & Support</h2>
+                <p className="text-indigo-100">Get help and find answers to your questions</p>
+              </div>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            </motion.div>
+            {/* FAQ Section */}
+            <Card className="border-none shadow-lg">
+              <CardHeader>
+                <CardTitle>Frequently Asked Questions</CardTitle>
+                <CardDescription>Find quick answers to common questions</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {[
+                  { q: 'How do I update my task status?', a: 'Click on the task, then use the dropdown menu to select "Mark Complete" or "Start Task".' },
+                  { q: 'Where can I view my completed tasks?', a: 'Go to the Tasks tab and filter by "Completed" status.' },
+                  { q: 'How is productivity calculated?', a: 'Productivity is calculated as (Completed Tasks / Total Tasks) × 100%.' },
+                  { q: 'Can I upload files for my tasks?', a: 'Yes! Go to the Submissions tab to upload files related to your tasks.' },
+                ].map((faq, index) => (
+                  <div key={index} className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-semibold text-gray-900 mb-2">{faq.q}</h4>
+                    <p className="text-gray-600">{faq.a}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+            {/* Contact Support */}
+            <Card className="border-none shadow-lg">
+              <CardHeader>
+                <CardTitle>Need More Help?</CardTitle>
+                <CardDescription>Contact our support team</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-4">
+                  <Button className="flex-1 gap-2">
+                    <MessageSquare className="h-5 w-5" />
+                    Send Message
+                  </Button>
+                  <Button variant="outline" className="flex-1 gap-2">
+                    <HelpCircle className="h-5 w-5" />
+                    View Guides
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
       default:
         return (
           <motion.div 
@@ -1202,12 +1426,11 @@ const TeamMemberDashboard = () => {
                     <Avatar 
                       src="/placeholder-avatar.jpg" 
                       alt="User"
-                      fallback="JD"
+                      fallback={user?.username?.[0] || 'U'}
                       className="h-10 w-10 border-2 border-white shadow-md"
                     />
                     <div className="min-w-0">
-                      <p className="font-semibold text-gray-900 truncate">John Doe</p>
-                      <p className="text-xs text-gray-500">Senior Developer</p>
+                      <p className="font-semibold text-gray-900 truncate">{user?.username}</p>
                     </div>
                   </div>
                   <Button
@@ -1225,29 +1448,6 @@ const TeamMemberDashboard = () => {
 
           {/* Main Content */}
           <div className="flex-1 flex flex-col overflow-y-auto md:ml-64 bg-gray-50">
-            {/* Quick Actions Bar */}
-            <div className="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <Button variant="outline" size="sm" className="rounded-lg border-gray-200 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600">
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Task
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-lg border-gray-200 hover:border-green-400 hover:bg-green-50 hover:text-green-600">
-                  <UploadCloud className="h-4 w-4 mr-2" />
-                  Upload File
-                </Button>
-                <Button variant="outline" size="sm" className="rounded-lg border-gray-200 hover:border-purple-400 hover:bg-purple-50 hover:text-purple-600">
-                  <Users className="h-4 w-4 mr-2" />
-                  New Message
-                </Button>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">Last updated: Just now</span>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full">
-                  <RefreshCw className="h-4 w-4 text-gray-500" />
-                </Button>
-              </div>
-            </div>
             {/* Header */}
             <header className="bg-white/90 backdrop-blur-lg border-b border-gray-100 flex items-center justify-between px-6 py-4 sticky top-0 z-40 shadow-sm">
               <div className="flex items-center space-x-6">
@@ -1307,7 +1507,12 @@ const TeamMemberDashboard = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
                 
-                <Button variant="ghost" size="sm" className="h-10 w-10 p-0 rounded-full hover:bg-gray-100 transition-colors">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-10 w-10 p-0 rounded-full hover:bg-gray-100 transition-colors"
+                  onClick={() => window.location.href = '/team-member-dashboard/settings'}
+                >
                   <Settings className="h-5 w-5 text-gray-600" />
                 </Button>
                 
@@ -1321,11 +1526,11 @@ const TeamMemberDashboard = () => {
                       <Avatar 
                         src="/placeholder-avatar.jpg" 
                         alt="User"
-                        fallback="JD"
+                        fallback={user?.username?.[0] || 'U'}
                         className="h-10 w-10 border-2 border-white shadow-md"
                       />
                       <div className="hidden lg:block">
-                        <p className="text-sm font-semibold">John Doe</p>
+                        <p className="text-sm font-semibold">{user?.username}</p>
                         <p className="text-xs text-gray-500">Team Member</p>
                       </div>
                       <ChevronLeft className="h-4 w-4 text-gray-500 rotate-90" />
@@ -1338,7 +1543,7 @@ const TeamMemberDashboard = () => {
                       <Users className="h-4 w-4" />
                       Profile
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="gap-2 rounded-lg">
+                    <DropdownMenuItem className="gap-2 rounded-lg" onClick={() => window.location.href = '/team-member-dashboard/settings'}>
                       <Settings className="h-4 w-4" />
                       Settings
                     </DropdownMenuItem>

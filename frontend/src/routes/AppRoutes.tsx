@@ -33,9 +33,27 @@ import FormBuilder from '../pages/dashboard/admin/FormBuilder';
 import OrdersDetailPage from '../pages/dashboard/client/OrdersDetailPage';
 import OrderManagementPage from '../pages/dashboard/admin/OrderManagementPage';
 import PortfolioPage from '../pages/PortfolioPage';
+// Profile Pages
+import AdminProfile from '../pages/dashboard/admin/Profile';
+import ClientProfile from '../pages/dashboard/client/Profile';
+import ServiceHeadProfile from '../pages/dashboard/teamhead/Profile';
+import TeamMemberProfile from '../pages/dashboard/teammember/Profile';
+
+// Support Pages
+import HelpCenter from '../pages/support/HelpCenter';
+import PrivacyPolicy from '../pages/support/PrivacyPolicy';
+import TermsOfService from '../pages/support/TermsOfService';
+import FAQ from '../pages/support/FAQ';
+import Blog from '../pages/Blog';
+import BlogDetail from '../pages/BlogDetail';
+
+// Blog Management
+import BlogManagement from '../pages/dashboard/admin/BlogManagement';
+import BlogEditor from '../components/blog/BlogEditor';
 
 // New Pages
 import { NotificationsPage } from '../pages/Notifications';
+import SettingsPage from '../pages/dashboard/shared/SettingsPage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -43,6 +61,12 @@ export const AppRoutes: React.FC = () => {
 
       {/* ✅ PUBLIC */}
       <Route path="/" element={<LandingPage />} />
+      <Route path="/help" element={<HelpCenter />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/faq" element={<FAQ />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/blog/:id" element={<BlogDetail />} />
 
       {/* ✅ PROTECTED DASHBOARD WITH LAYOUT */}
       <Route
@@ -58,6 +82,8 @@ export const AppRoutes: React.FC = () => {
             <Route path='/client-dashboard/orders/:orderId' element={<OrdersDetailPage />} />
             <Route path='/client-dashboard/notifications' element={<Notifications />} />
             <Route path='/client-dashboard/documents' element={<Documents />} />
+            <Route path='/client-dashboard/profile' element={<ClientProfile />} />
+            <Route path='/client-dashboard/settings' element={<SettingsPage />} />
           </Route>
         </Route>
         
@@ -65,14 +91,21 @@ export const AppRoutes: React.FC = () => {
         <Route element={<ProtectedRoute allowedRoles={['team_head', 'service_head', 'admin']} />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard/service-head/*" element={<TeamHeadDashboard />} />
+            <Route path="/dashboard/service-head/profile" element={<ServiceHeadProfile />} />
+            <Route path="/dashboard/service-head/blogs" element={<BlogManagement />} />
+            <Route path="/dashboard/service-head/blogs/new" element={<BlogEditor />} />
+            <Route path="/dashboard/service-head/blogs/:id/edit" element={<BlogEditor />} />
             <Route path="/dashboard/forms/new" element={<FormBuilder />} />
             <Route path="/dashboard/forms/:id" element={<FormBuilder />} />
             <Route path="/dashboard/orders/:orderId" element={<OrderManagementPage />} />
+            <Route path="/dashboard/service-head/settings" element={<SettingsPage />} />
           </Route>
         </Route>
         
         <Route element={<ProtectedRoute allowedRoles={['team_member', 'admin']} />}>
           <Route path='/team-member-dashboard' element={<TeamMemberDashboard />} />
+          <Route path='/team-member-dashboard/profile' element={<TeamMemberProfile />} />
+          <Route path='/team-member-dashboard/settings' element={<SettingsPage />} />
         </Route>
 
         {/* ✅ ALL AUTHENTICATED USERS */}
@@ -83,6 +116,7 @@ export const AppRoutes: React.FC = () => {
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<AdminDashboard />} />
+            <Route path="/dashboard/profile" element={<AdminProfile />} />
             <Route path="/dashboard/portfolio" element={<Portfolio />} />
             <Route path="/dashboard/departments" element={<Departments />} />
             <Route path="/dashboard/offers" element={<Offers />} />
@@ -98,7 +132,11 @@ export const AppRoutes: React.FC = () => {
             <Route path="/dashboard/forms/:id" element={<FormBuilder />} />
             <Route path="/dashboard/estimations" element={<Estimations />} />
             <Route path="/dashboard/invoices" element={<Invoices />} />
+            <Route path="/dashboard/blogs" element={<BlogManagement />} />
+            <Route path="/dashboard/blogs/new" element={<BlogEditor />} />
+            <Route path="/dashboard/blogs/:id/edit" element={<BlogEditor />} />
             <Route path="/dashboard/orders/:orderId" element={<OrderManagementPage />} />
+            <Route path="/dashboard/settings" element={<SettingsPage />} />
           </Route>
 
         </Route>

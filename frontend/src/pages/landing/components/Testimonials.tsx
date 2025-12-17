@@ -1,7 +1,7 @@
 // components/Testimonials.tsx - UPDATED CARD VERSION
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Quote, ChevronLeft, ChevronRight, Star, MessageSquarePlus, Sparkles, Award, TrendingUp, Heart } from 'lucide-react';
+import { Quote, ChevronLeft, ChevronRight, Star, MessageSquarePlus, Sparkles, Award, Heart } from 'lucide-react';
 import { listTestimonials, createTestimonial } from '../../../api/testinomials';
 import type { TestimonialSubmission, Testimonial } from '../../../api/testinomials';
 import { listServices } from '../../../api/services';
@@ -240,37 +240,40 @@ const Testimonials = () => {
           </div>
         ) : (
           <>
-            {/* Desktop Infinite Slider */}
-            <div className="hidden lg:block relative">
+            {/* Desktop Infinite Slider - Improved Marquee */}
+            <style>{`
+              @keyframes marquee {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+              }
+              .animate-marquee {
+                animation: marquee 30s linear infinite;
+              }
+              /* Hover pause is handled by Tailwind class hover:[animation-play-state:paused] used below, 
+                 or we can add it here explicitly if Tailwind JIT isn't picking it up */
+              .animate-marquee:hover {
+                animation-play-state: paused;
+              }
+            `}</style>
+            <div className="hidden lg:block relative group">
+              {/* Gradient Edges */}
+              <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#0B2545] to-transparent z-10 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#0B2545] to-transparent z-10 pointer-events-none" />
+
               <div className="overflow-hidden">
-                <motion.div 
-                  key={currentIndex}
-                  className="flex gap-8"
-                  initial={{ x: 0 }}
-                  animate={{ x: -408 }}
-                  transition={{
-                    duration: 8,
-                    ease: "linear",
-                    repeat: Infinity,
-                  }}
-                  onAnimationComplete={() => {
-                    // Move to next testimonial when animation completes
-                    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
-                  }}
+                <div 
+                  className="flex gap-8 w-max animate-marquee"
                 >
-                  {/* Show current testimonial and next few */}
-                  {[0, 1, 2, 3, 4].map((offset) => {
-                    const index = (currentIndex + offset) % testimonials.length;
-                    const testimonial = testimonials[index];
-                    return (
-                      <div
-                        key={`${testimonial.id}-${offset}`}
-                        onMouseEnter={() => setHoveredCard(offset)}
+                  {/* Render Double for infinite loop */}
+                  {[...testimonials, ...testimonials].map((testimonial, index) => (
+                    <div
+                        key={`${testimonial.id}-marquee-${index}`}
+                        onMouseEnter={() => setHoveredCard(index)}
                         onMouseLeave={() => setHoveredCard(null)}
-                        className="relative group flex-shrink-0 w-[400px]"
+                        className="relative group/card flex-shrink-0 w-[400px]"
                       >
                         {/* Animated Border */}
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500 group-hover:duration-200" />
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 rounded-2xl opacity-0 group-hover/card:opacity-100 blur transition duration-500 group-hover/card:duration-200" />
                         
                         <div className="relative bg-gradient-to-b from-white/5 to-white/2 backdrop-blur-sm border border-white/10 rounded-2xl p-8 h-full overflow-hidden">
                           {/* Background Pattern */}
@@ -295,7 +298,7 @@ const Testimonials = () => {
                             </div>
                             
                             {/* Content */}
-                            <p className="text-gray-200 mb-8 line-clamp-4 group-hover:line-clamp-none transition-all duration-300">
+                            <p className="text-gray-200 mb-8 line-clamp-4 group-hover/card:line-clamp-none transition-all duration-300">
                               "{testimonial.content}"
                             </p>
                           </div>
@@ -303,19 +306,15 @@ const Testimonials = () => {
                           {/* Client Info */}
                           <div className="flex items-center gap-4 mt-8 pt-8 border-t border-white/10">
                             {testimonial.avatar_url ? (
-                              <motion.img 
+                              <img 
                                 src={testimonial.avatar_url} 
                                 alt={testimonial.client_name}
-                                className="h-14 w-14 rounded-full border-2 border-cyan-300/30 object-cover"
-                                whileHover={{ scale: 1.1 }}
+                                className="h-14 w-14 rounded-full border-2 border-cyan-300/30 object-cover hover:scale-110 transition-transform duration-300"
                               />
                             ) : (
-                              <motion.div 
-                                className="h-14 w-14 rounded-full border-2 border-cyan-300/30 bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg"
-                                whileHover={{ scale: 1.1 }}
-                              >
+                              <div className="h-14 w-14 rounded-full border-2 border-cyan-300/30 bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg hover:scale-110 transition-transform duration-300">
                                 {testimonial.client_name.charAt(0)}
-                              </motion.div>
+                              </div>
                             )}
                             
                             <div className="flex-1 min-w-0">
@@ -334,28 +333,20 @@ const Testimonials = () => {
                           </div>
                           
                           {/* Hover Effect Indicator */}
-                          <motion.div 
-                            className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-500"
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: hoveredCard === offset ? 1 : 0 }}
-                            transition={{ duration: 0.3 }}
+                          <div 
+                            className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-500 transition-transform duration-300 origin-left ${hoveredCard === index ? 'scale-x-100' : 'scale-x-0'}`}
                           />
                         </div>
                         
                         {/* Floating Icon on Hover */}
-                        {hoveredCard === offset && (
-                          <motion.div
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            className="absolute -top-3 -right-3 bg-gradient-to-r from-cyan-500 to-blue-500 p-2 rounded-full shadow-lg"
+                        <div
+                            className={`absolute -top-3 -right-3 bg-gradient-to-r from-cyan-500 to-blue-500 p-2 rounded-full shadow-lg transition-all duration-300 ${hoveredCard === index ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}
                           >
                             <Heart className="h-5 w-5 text-white fill-white" />
-                          </motion.div>
-                        )}
+                        </div>
                       </div>
-                    );
-                  })}
-                </motion.div>
+                  ))}
+                </div>
               </div>
             </div>
 

@@ -73,6 +73,7 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
 
         if (userRole === 'admin') navigate('/dashboard');
         else if (userRole === 'service_head') navigate('/dashboard/service-head');
+        else if (userRole === 'team_member') navigate('/team-member-dashboard');
         else navigate('/client-dashboard');
 
 

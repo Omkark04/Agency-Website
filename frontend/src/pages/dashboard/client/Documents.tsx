@@ -56,23 +56,24 @@ export default function Documents() {
   };
 
   const getStatusBadge = (status: string) => {
-    const badges: Record<string, { bg: string; text: string; icon: JSX.Element; label: string }> = {
-      draft: { bg: 'bg-gray-100', text: 'text-gray-800', icon: <Clock className="w-4 h-4" />, label: 'Draft' },
-      sent: { bg: 'bg-blue-100', text: 'text-blue-800', icon: <Clock className="w-4 h-4" />, label: 'Sent' },
-      approved: { bg: 'bg-green-100', text: 'text-green-800', icon: <CheckCircle className="w-4 h-4" />, label: 'Approved' },
-      rejected: { bg: 'bg-red-100', text: 'text-red-800', icon: <XCircle className="w-4 h-4" />, label: 'Rejected' },
-      expired: { bg: 'bg-gray-100', text: 'text-gray-600', icon: <XCircle className="w-4 h-4" />, label: 'Expired' },
-      pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: <Clock className="w-4 h-4" />, label: 'Pending' },
-      partial: { bg: 'bg-orange-100', text: 'text-orange-800', icon: <Clock className="w-4 h-4" />, label: 'Partially Paid' },
-      paid: { bg: 'bg-green-100', text: 'text-green-800', icon: <CheckCircle className="w-4 h-4" />, label: 'Paid' },
-      overdue: { bg: 'bg-red-100', text: 'text-red-800', icon: <XCircle className="w-4 h-4" />, label: 'Overdue' },
-      cancelled: { bg: 'bg-gray-100', text: 'text-gray-600', icon: <XCircle className="w-4 h-4" />, label: 'Cancelled' },
+    const badges: Record<string, { bg: string; text: string; gradient: string; icon: JSX.Element; label: string; emoji: string }> = {
+      draft: { bg: 'bg-gradient-to-r from-gray-50 to-slate-50', text: 'text-gray-700', gradient: 'from-gray-500 to-slate-500', icon: <Clock className="w-3.5 h-3.5" />, label: 'Draft', emoji: '📝' },
+      sent: { bg: 'bg-gradient-to-r from-blue-50 to-blue-100', text: 'text-[#1E40AF]', gradient: 'from-[#2563EB] to-[#1E40AF]', icon: <Clock className="w-3.5 h-3.5" />, label: 'Sent', emoji: '📤' },
+      approved: { bg: 'bg-gradient-to-r from-green-50 to-emerald-50', text: 'text-green-700', gradient: 'from-green-500 to-emerald-500', icon: <CheckCircle className="w-3.5 h-3.5" />, label: 'Approved', emoji: '✅' },
+      rejected: { bg: 'bg-gradient-to-r from-red-50 to-rose-50', text: 'text-red-700', gradient: 'from-red-500 to-rose-500', icon: <XCircle className="w-3.5 h-3.5" />, label: 'Rejected', emoji: '❌' },
+      expired: { bg: 'bg-gradient-to-r from-gray-50 to-gray-100', text: 'text-gray-600', gradient: 'from-gray-500 to-gray-600', icon: <XCircle className="w-3.5 h-3.5" />, label: 'Expired', emoji: '⏰' },
+      pending: { bg: 'bg-gradient-to-r from-yellow-50 to-amber-50', text: 'text-yellow-700', gradient: 'from-yellow-500 to-amber-500', icon: <Clock className="w-3.5 h-3.5" />, label: 'Pending', emoji: '⏳' },
+      partial: { bg: 'bg-gradient-to-r from-orange-50 to-amber-50', text: 'text-orange-700', gradient: 'from-orange-500 to-amber-500', icon: <Clock className="w-3.5 h-3.5" />, label: 'Partially Paid', emoji: '💰' },
+      paid: { bg: 'bg-gradient-to-r from-green-50 to-green-100', text: 'text-[#15803D]', gradient: 'from-[#16A34A] to-[#15803D]', icon: <CheckCircle className="w-3.5 h-3.5" />, label: 'Paid', emoji: '💵' },
+      overdue: { bg: 'bg-gradient-to-r from-red-50 to-pink-50', text: 'text-red-700', gradient: 'from-red-500 to-pink-500', icon: <XCircle className="w-3.5 h-3.5" />, label: 'Overdue', emoji: '⚠️' },
+      cancelled: { bg: 'bg-gradient-to-r from-gray-50 to-slate-50', text: 'text-gray-600', gradient: 'from-gray-500 to-slate-500', icon: <XCircle className="w-3.5 h-3.5" />, label: 'Cancelled', emoji: '🚫' },
     };
 
     const badge = badges[status] || badges.draft;
 
     return (
-      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${badge.bg} ${badge.text}`}>
+      <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold ${badge.bg} ${badge.text} shadow-sm border border-current/20`}>
+        <span className="mr-1.5">{badge.emoji}</span>
         {badge.icon}
         <span className="ml-1.5">{badge.label}</span>
       </span>
@@ -161,44 +162,65 @@ export default function Documents() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {estimations.map((estimation) => (
-                <div key={estimation.id} className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{estimation.title}</h3>
-                      {estimation.description && (
-                        <p className="text-sm text-gray-600 line-clamp-2">{estimation.description}</p>
+              {estimations.map((estimation, index) => (
+                <div key={estimation.id} className="group relative overflow-hidden bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
+                  {/* Floating gradient blur */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#2563EB]/10 to-[#1E40AF]/10 rounded-full blur-3xl group-hover:from-[#2563EB]/20 group-hover:to-[#1E40AF]/20 transition-all duration-500"></div>
+                  
+                  <div className="relative z-10">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="p-2 bg-gradient-to-br from-[#2563EB] to-[#1E40AF] rounded-xl shadow-lg">
+                            <FileText className="w-5 h-5 text-white" />
+                          </div>
+                          <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{estimation.title}</h3>
+                        </div>
+                        {estimation.description && (
+                          <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">{estimation.description}</p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="mb-4">
+                      {getStatusBadge(estimation.status)}
+                    </div>
+
+                    <div className="space-y-3 mb-5 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <div className="p-1.5 bg-white rounded-lg shadow-sm mr-2">
+                            <DollarSign className="w-4 h-4 text-emerald-600" />
+                          </div>
+                          <span className="font-medium">Total Amount</span>
+                        </div>
+                        <span className="text-lg font-black text-gray-900">₹{estimation.total_amount}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Calendar className="w-4 h-4 mr-2 text-blue-600" />
+                        <span>{format(new Date(estimation.created_at), 'MMM dd, yyyy')}</span>
+                      </div>
+                      {estimation.valid_until && (
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Clock className="w-4 h-4 mr-2 text-amber-600" />
+                          <span>Valid until: {format(new Date(estimation.valid_until), 'MMM dd, yyyy')}</span>
+                        </div>
                       )}
                     </div>
-                    {getStatusBadge(estimation.status)}
-                  </div>
 
-                  <div className="space-y-3 mb-4">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <DollarSign className="w-4 h-4 mr-2" />
-                      <span className="font-semibold text-gray-900">₹{estimation.total_amount}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      <span>{format(new Date(estimation.created_at), 'MMM dd, yyyy')}</span>
-                    </div>
-                    {estimation.valid_until && (
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Clock className="w-4 h-4 mr-2" />
-                        <span>Valid until: {format(new Date(estimation.valid_until), 'MMM dd, yyyy')}</span>
-                      </div>
+                    {estimation.pdf_url && (
+                      <button
+                        onClick={() => handleDownload(estimation.pdf_url, `Estimation-${estimation.id}.pdf`)}
+                        className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-[#2563EB] to-[#1E40AF] hover:from-[#1E40AF] hover:to-[#1E3A8A] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Download PDF
+                      </button>
                     )}
                   </div>
-
-                  {estimation.pdf_url && (
-                    <button
-                      onClick={() => handleDownload(estimation.pdf_url, `Estimation-${estimation.id}.pdf`)}
-                      className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Download PDF
-                    </button>
-                  )}
+                  
+                  {/* Bottom accent line */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2563EB] via-[#1E40AF] to-[#2563EB] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
                 </div>
               ))}
             </div>
@@ -217,54 +239,72 @@ export default function Documents() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {invoices.map((invoice) => (
-                <div key={invoice.id} className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{invoice.invoice_number}</h3>
-                      <p className="text-sm text-gray-600">{invoice.title}</p>
+              {invoices.map((invoice, index) => (
+                <div key={invoice.id} className="group relative overflow-hidden bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 animate-fade-in" style={{animationDelay: `${index * 0.1}s`}}>
+                  {/* Floating gradient blur */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#16A34A]/10 to-[#15803D]/10 rounded-full blur-3xl group-hover:from-[#16A34A]/20 group-hover:to-[#15803D]/20 transition-all duration-500"></div>
+                  
+                  <div className="relative z-10">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="p-2 bg-gradient-to-br from-[#16A34A] to-[#15803D] rounded-xl shadow-lg">
+                            <FileText className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">{invoice.invoice_number}</h3>
+                            <p className="text-sm text-gray-600">{invoice.title}</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    {getStatusBadge(invoice.status)}
-                  </div>
+                    
+                    <div className="mb-4">
+                      {getStatusBadge(invoice.status)}
+                    </div>
 
-                  <div className="space-y-3 mb-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Total Amount:</span>
-                      <span className="font-semibold text-gray-900">₹{invoice.total_amount}</span>
+                    <div className="space-y-3 mb-5 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-600">Total Amount:</span>
+                        <span className="text-lg font-black text-gray-900">₹{invoice.total_amount}</span>
+                      </div>
+                      {parseFloat(invoice.amount_paid) > 0 && (
+                        <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg">
+                          <span className="text-sm font-medium text-green-700">Amount Paid:</span>
+                          <span className="text-sm font-bold text-green-600">₹{invoice.amount_paid}</span>
+                        </div>
+                      )}
+                      {parseFloat(invoice.balance_due) > 0 && (
+                        <div className="flex items-center justify-between p-2 bg-red-50 rounded-lg">
+                          <span className="text-sm font-medium text-red-700">Balance Due:</span>
+                          <span className="text-sm font-bold text-red-600">₹{invoice.balance_due}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center text-sm text-gray-600 pt-2 border-t border-gray-200">
+                        <Calendar className="w-4 h-4 mr-2 text-blue-600" />
+                        <span>{format(new Date(invoice.invoice_date), 'MMM dd, yyyy')}</span>
+                      </div>
+                      {invoice.due_date && (
+                        <div className="flex items-center text-sm text-gray-600">
+                          <Clock className="w-4 h-4 mr-2 text-amber-600" />
+                          <span>Due: {format(new Date(invoice.due_date), 'MMM dd, yyyy')}</span>
+                        </div>
+                      )}
                     </div>
-                    {parseFloat(invoice.amount_paid) > 0 && (
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Amount Paid:</span>
-                        <span className="font-semibold text-green-600">₹{invoice.amount_paid}</span>
-                      </div>
-                    )}
-                    {parseFloat(invoice.balance_due) > 0 && (
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Balance Due:</span>
-                        <span className="font-semibold text-red-600">₹{invoice.balance_due}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      <span>{format(new Date(invoice.invoice_date), 'MMM dd, yyyy')}</span>
-                    </div>
-                    {invoice.due_date && (
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Clock className="w-4 h-4 mr-2" />
-                        <span>Due: {format(new Date(invoice.due_date), 'MMM dd, yyyy')}</span>
-                      </div>
+
+                    {invoice.pdf_url && (
+                      <button
+                        onClick={() => handleDownload(invoice.pdf_url, `Invoice-${invoice.invoice_number}.pdf`)}
+                        className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-[#16A34A] to-[#15803D] hover:from-[#15803D] hover:to-[#166534] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Download PDF
+                      </button>
                     )}
                   </div>
-
-                  {invoice.pdf_url && (
-                    <button
-                      onClick={() => handleDownload(invoice.pdf_url, `Invoice-${invoice.invoice_number}.pdf`)}
-                      className="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Download PDF
-                    </button>
-                  )}
+                  
+                  {/* Bottom accent line */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#16A34A] via-[#15803D] to-[#16A34A] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
                 </div>
               ))}
             </div>

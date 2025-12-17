@@ -207,11 +207,14 @@ const ServicesPage = () => {
                   className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2.5 pr-8 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="all">All Departments</option>
-                  {services.map(s => s.department).filter((v, i, a) => a.indexOf(v) === i).map(deptId => (
-                    <option key={deptId} value={deptId.toString()}>
-                      Department {deptId}
-                    </option>
-                  ))}
+                  {Array.from(new Set(services.map(s => s.department))).map(deptId => {
+                    const deptTitle = services.find(s => s.department === deptId)?.department_title || `Department ${deptId}`;
+                    return (
+                      <option key={deptId} value={deptId.toString()}>
+                        {deptTitle}
+                      </option>
+                    );
+                  })}
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
@@ -406,30 +409,49 @@ const ServicesPage = () => {
   );
 };
 
-// Service Card Component (Grid View)
+// Service Card Component (Grid View) - Premium Admin Style
 const ServiceCard = ({ service, onSelect }: { service: Service; onSelect: () => void }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300"
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
+      whileHover={{ scale: 1.03, y: -5 }}
+      className="group relative overflow-hidden rounded-2xl bg-white border border-gray-100 shadow-lg hover:shadow-2xl transition-all duration-300"
     >
-      <div className="p-5">
+      {/* Floating gradient blur element */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#2563EB]/10 to-[#1E40AF]/10 rounded-full blur-3xl group-hover:from-[#2563EB]/20 group-hover:to-[#1E40AF]/20 transition-all duration-500"></div>
+      
+      {/* Gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#2563EB]/0 via-[#1E40AF]/0 to-[#2563EB]/0 group-hover:from-[#2563EB]/5 group-hover:via-[#1E40AF]/5 group-hover:to-[#2563EB]/5 transition-all duration-500"></div>
+      
+      <div className="relative z-10 p-6">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">
             {service.logo && (
-              <img src={service.logo} alt={service.title} className="w-10 h-10 rounded-lg" />
+              <motion.img 
+                src={service.logo} 
+                alt={service.title} 
+                className="w-12 h-12 rounded-xl shadow-md"
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.6 }}
+              />
             )}
             <div>
               <div className="flex items-center space-x-2">
-                <h3 className="font-semibold text-gray-900">{service.title}</h3>
+                <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">{service.title}</h3>
                 {service.is_featured && (
-                  <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                  <motion.div
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                  >
+                    <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+                  </motion.div>
                 )}
               </div>
               {service.department_title && (
-                <span className="text-xs font-medium px-2 py-1 bg-gray-100 text-gray-600 rounded">
+                <span className="inline-block mt-1 text-xs font-semibold px-2.5 py-1 bg-gradient-to-r from-blue-50 to-blue-100 text-[#1E40AF] rounded-full border border-blue-200">
                   {service.department_title}
                 </span>
               )}
@@ -438,39 +460,53 @@ const ServiceCard = ({ service, onSelect }: { service: Service; onSelect: () => 
         </div>
 
         {/* Description */}
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{service.short_description}</p>
+        <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">{service.short_description}</p>
 
         {/* Features */}
         {service.features && service.features.length > 0 && (
           <div className="space-y-2 mb-4">
             {service.features.slice(0, 3).map((feature, index) => (
-              <div key={index} className="flex items-center text-sm">
-                <CheckCircle className="w-3.5 h-3.5 text-green-500 mr-2 flex-shrink-0" />
+              <motion.div 
+                key={index} 
+                className="flex items-center text-sm"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <div className="p-1 bg-green-50 rounded-full mr-2">
+                  <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+                </div>
                 <span className="text-gray-700 truncate">{feature.title}</span>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
 
         {/* Price */}
         {service.original_price && (
-          <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-            <div className="flex items-center">
-              <DollarSign className="w-3.5 h-3.5 mr-1" />
-              ₹{service.original_price.toLocaleString()}
+          <div className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl mb-4 border border-gray-200">
+            <div className="flex items-center text-gray-600">
+              <div className="p-1.5 bg-white rounded-lg mr-2 shadow-sm">
+                <DollarSign className="w-4 h-4 text-blue-600" />
+              </div>
+              <span className="text-sm font-medium">Starting from</span>
             </div>
+            <span className="text-lg font-black text-gray-900">₹{service.original_price.toLocaleString()}</span>
           </div>
         )}
 
         {/* Action Button */}
         <Button 
           onClick={onSelect}
-          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-sm font-medium"
+          className="w-full flex items-center justify-center bg-gradient-to-r from-[#2563EB] to-[#1E40AF] hover:from-[#1E40AF] hover:to-[#1E3A8A] text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105"
         >
           Request Service
-          <ArrowRight className="ml-2 w-4 h-4" />
+          <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </Button>
       </div>
+      
+      {/* Bottom accent line */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2563EB] via-[#1E40AF] to-[#2563EB] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
     </motion.div>
   );
 };
@@ -514,7 +550,7 @@ const ServiceListItem = ({ service, onSelect }: { service: Service; onSelect: ()
         <Button 
           onClick={onSelect}
           size="sm"
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 whitespace-nowrap"
+          className="bg-gradient-to-r from-[#2563EB] to-[#1E40AF] hover:from-[#1E40AF] hover:to-[#1E3A8A] whitespace-nowrap"
         >
           Request
           <ArrowRight className="ml-1.5 w-3.5 h-3.5" />

@@ -46,6 +46,14 @@ class Service(models.Model):
         related_name="services"
     )
 
+    team_members = models.ManyToManyField(
+        "accounts.User",
+        blank=True,
+        related_name="assigned_services",
+        limit_choices_to={'role': 'team_member'},
+        help_text="Team members assigned to this service"
+    )
+
     is_active = models.BooleanField(default=True)
     created_by = models.ForeignKey(
         "accounts.User",

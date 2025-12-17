@@ -40,7 +40,7 @@ export function Users() {
       } else {
         // Admin uses the general users endpoint
         console.log('👥 Users: Using admin/users endpoint');
-        res = await api.get('/auth/admin/users/');
+        res = await api.get('/api/auth/admin/users/');
       }
       
       console.log('👥 Users: API response:', res.data);
@@ -91,7 +91,7 @@ export function Users() {
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.email.toLowerCase().includes(search.toLowerCase()) ||
                          user.username?.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filter === 'all' || user.role === filter;
+    const matchesFilter = filter === 'all' || user?.role === filter;
     return matchesSearch && matchesFilter;
   });
 

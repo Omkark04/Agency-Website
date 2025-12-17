@@ -20,22 +20,48 @@ class DropboxService:
     def _initialize_service(self):
         """Initialize the Dropbox API client"""
         try:
-            # Get access token from environment variable
+            # Get credentials from environment variables
             access_token = os.getenv('DROPBOX_ACCESS_TOKEN')
+            refresh_token = os.getenv('DROPBOX_REFRESH_TOKEN')
+            app_key = os.getenv('DROPBOX_APP_KEY')
+            app_secret = os.getenv('DROPBOX_APP_SECRET')
             
-            if not access_token:
-                raise ValueError("DROPBOX_ACCESS_TOKEN not found in environment variables")
+            # Debug logging
+            print(f"DEBUG: Initializing Dropbox Service")
+            print(f"DEBUG: ACCESS_TOKEN present: {bool(access_token)}")
+            print(f"DEBUG: REFRESH_TOKEN present: {bool(refresh_token)}")
+            print(f"DEBUG: APP_KEY present: {bool(app_key)}")
+            print(f"DEBUG: APP_SECRET present: {bool(app_secret)}")
             
-            # Create Dropbox client
-            self.dbx = dropbox.Dropbox(access_token)
+            if refresh_token and app_key and app_secret:
+                print("DEBUG: Using Refresh Token Flow")
+                # Initialize with refresh token for automatic refreshing
+                self.dbx = dropbox.Dropbox(
+                    oauth2_refresh_token=refresh_token,
+                    app_key=app_key,
+                    app_secret=app_secret,
+                    oauth2_access_token=access_token  # Optional: use existing access token until it expires
+                )
+            elif access_token:
+                print("DEBUG: Using Access Token Flow (No Refresh Token)")
+                # Initialize with access token only (will expire)
+                self.dbx = dropbox.Dropbox(access_token)
+            else:
+                print("DEBUG: No credentials found")
+                raise ValueError("Dropbox credentials not found. Provide DROPBOX_ACCESS_TOKEN or (DROPBOX_REFRESH_TOKEN, DROPBOX_APP_KEY, DROPBOX_APP_SECRET)")
             
-            # Verify the token works
+            # Verify the token works (or can be refreshed)
             try:
                 self.dbx.users_get_current_account()
+                print("DEBUG: Dropbox connection verified successfully")
             except AuthError as e:
-                raise Exception(f"Invalid Dropbox access token: {str(e)}")
+                print(f"DEBUG: Dropout Auth Error: {e}")
+                # If using only access token and it's expired, this will fail
+                # If using refresh token, it should have auto-refreshed by now
+                raise Exception(f"Invalid Dropbox credentials or expired token: {str(e)}")
             
         except Exception as e:
+            print(f"DEBUG: Dropbox Initialization Failed: {e}")
             raise Exception(f"Failed to initialize Dropbox service: {str(e)}")
     
     def upload_pdf(self, pdf_file, filename, folder_path="/PDFs"):

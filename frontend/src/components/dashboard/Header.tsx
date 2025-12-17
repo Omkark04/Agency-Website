@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { 
   FiSearch, 
@@ -153,7 +154,17 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
                   </div>
                   
                   <div className="p-2">
-                    <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all text-left group">
+                    <Link 
+                      to={
+                        user?.role === 'admin' ? '/dashboard/profile' :
+                        user?.role === 'client' ? '/client-dashboard/profile' :
+                        user?.role === 'service_head' ? '/dashboard/service-head/profile' :
+                        user?.role === 'team_member' ? '/team-member-dashboard/profile' :
+                        '/dashboard/profile'
+                      }
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all text-left group"
+                      onClick={() => setShowUserMenu(false)}
+                    >
                       <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-white transition-colors">
                         <FiUser className="w-4 h-4 text-gray-600" />
                       </div>
@@ -161,9 +172,19 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
                         <div className="text-sm font-semibold text-gray-900">My Profile</div>
                         <div className="text-xs text-gray-500">View and edit profile</div>
                       </div>
-                    </button>
+                    </Link>
                     
-                    <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all text-left group">
+                    <Link 
+                      to={
+                        user?.role === 'admin' ? '/dashboard/settings' :
+                        user?.role === 'client' ? '/client-dashboard/settings' :
+                        user?.role === 'service_head' ? '/dashboard/service-head/settings' :
+                        user?.role === 'team_member' ? '/team-member-dashboard/settings' :
+                        '/dashboard/settings'
+                      }
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all text-left group"
+                      onClick={() => setShowUserMenu(false)}
+                    >
                       <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-white transition-colors">
                         <FiSettings className="w-4 h-4 text-gray-600" />
                       </div>
@@ -171,7 +192,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
                         <div className="text-sm font-semibold text-gray-900">Settings</div>
                         <div className="text-xs text-gray-500">Manage preferences</div>
                       </div>
-                    </button>
+                    </Link>
                   </div>
 
                   <div className="p-2 border-t border-gray-200">

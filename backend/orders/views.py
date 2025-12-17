@@ -60,9 +60,71 @@ class OfferObjectPermission(drf_permissions.BasePermission):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [drf_permissions.IsAuthenticated]  # tune this as your project requires
+    permission_classes = [drf_permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['status', 'service__department']
+
+    def get_queryset(self):
+        """
+        Filter orders based on user role to prevent data leakage.
+        - Admin: Views all orders
+        - Client: Views own orders only
+        - Service Head & Team: Views orders in their department
+        """
+        user = self.request.user
+        qs = Order.objects.all()
+
+        # Unauthenticated handled by permission_classes, but safeguard here
+        if not user.is_authenticated:
+            return Order.objects.none()
+
+        if user.role == 'admin':
+            return qs
+
+        if user.role == 'client':
+            return qs.filter(client=user)
+
+        # Service Head & Team Member - Filter by Department
+        if user.role in ['service_head', 'team_member']:
+            if user.department:
+                return qs.filter(service__department=user.department)
+            return Order.objects.none()
+
+        # Fallback
+        return Order.objects.none()
+
+    def perform_create(self, serializer):
+        """
+        Create order and send confirmation email.
+        Ensure client is set to request.user if the creator is a client.
+        """
+        user = self.request.user
+        save_kwargs = {}
+        
+        # If client is creating, force client field to themselves
+        if user.role == 'client':
+             save_kwargs['client'] = user
+
+        order = serializer.save(**save_kwargs)
+        
+        # Send order confirmation email
+        try:
+            from django.core.mail import send_mail
+            from django.conf import settings
+             
+            service_title = order.service.title if order.service else "Service"
+            # Send to the client (who owns the order) or current user if client not set
+            recipient_user = order.client if order.client else user
+            
+            send_mail(
+                subject=f'Order Confirmation - #{order.id}',
+                message=f'Hi {recipient_user.username},\n\nYour order for "{service_title}" has been placed successfully.\n\nOrder ID: #{order.id}\nStatus: {order.status}\n\nWe will notify you once the work begins. You can track your order status in your dashboard.\n\nThank you for choosing UdyogWorks!\n\nBest regards,\nUdyogWorks Team',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[recipient_user.email],
+                fail_silently=True,
+            )
+        except Exception as e:
+            print(f"Failed to send order confirmation email: {e}")
 
 
 class OfferViewSet(viewsets.ModelViewSet):

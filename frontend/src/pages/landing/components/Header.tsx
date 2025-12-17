@@ -71,6 +71,28 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Listen for auth changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setUser(getCurrentUser());
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check on mount and after modal closes
+    const interval = setInterval(() => {
+      const currentUser = getCurrentUser();
+      if (currentUser !== user) {
+        setUser(currentUser);
+      }
+    }, 1000);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, [user]);
+
 
   const navLinks = [
     { name: 'Home', href: '#home' },

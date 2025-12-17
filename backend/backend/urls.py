@@ -35,6 +35,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from accounts.views import CustomTokenObtainPairView
 
 router = routers.DefaultRouter()
 router.register(r"departments", DepartmentViewSet)
@@ -75,8 +76,8 @@ urlpatterns = [
     path("api/", include(router.urls)),
 
     # Auth
-    path("auth/", include("accounts.urls")),
-    path("auth/jwt/login/", TokenObtainPairView.as_view(), name="jwt-login"),
+    path("api/auth/", include("accounts.urls")),
+    path("auth/jwt/login/", CustomTokenObtainPairView.as_view(), name="jwt-login"),
     path("auth/jwt/refresh/", TokenRefreshView.as_view(), name="jwt-refresh"),
 
     # Analytics
@@ -121,6 +122,10 @@ urlpatterns = [
     
     # Department lookup by team_head
     path("api/user/department/", get_user_department, name="user-department"),
+    
+    # Blog
+    path("api/", include("blog.urls")),
+    path("api/", include("newsletter.urls")),
 ]
 
 urlpatterns += [

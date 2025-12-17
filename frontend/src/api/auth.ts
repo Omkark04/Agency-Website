@@ -1,6 +1,6 @@
 import api from './api';
 export const login = async (identifier: string, password: string) => {
-  const response = await api.post('/auth/token/', {
+  const response = await api.post('/api/auth/token/', {
     email: identifier,
     password
   });
@@ -9,7 +9,7 @@ export const login = async (identifier: string, password: string) => {
 
 
 export const refreshToken = async (refresh: string) => {
-  const response = await api.post('/auth/token/refresh/', { refresh });  // Already correct
+  const response = await api.post('/api/auth/token/refresh/', { refresh });
   return response.data;
 };
 
@@ -24,15 +24,27 @@ export const register = async (userData: {
     ...userData,
     password2: userData.password
   };
-  const response = await api.post('/auth/register/client/', dataToSend);
+  const response = await api.post('/api/auth/register/client/', dataToSend);
   return response.data;
 };
 
 // Admin login using environment credentials
 export const adminLogin = async (email: string, password: string) => {
-  const response = await api.post('/auth/admin/login/', {
+  const response = await api.post('/api/auth/admin/login/', {
     email,
     password
   });
+  return response.data;
+};
+
+// Change Password
+export const changePassword = async (data: any) => {
+  const response = await api.post('/api/auth/password/change/', data);
+  return response.data;
+};
+
+// Change Email
+export const changeEmail = async (data: any) => {
+  const response = await api.post('/api/auth/email/change/', data);
   return response.data;
 };

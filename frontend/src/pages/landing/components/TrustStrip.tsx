@@ -188,18 +188,6 @@ export const TrustStrip = () => {
             <p className="text-gray-600 dark:text-gray-300 mb-4">
               Join {clients.length}+ satisfied clients who trust us with their digital transformation
             </p>
-            <button
-              onClick={() => {
-                const contactSection = document.getElementById('contact');
-                if (contactSection) {
-                  contactSection.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
-              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white font-medium rounded-lg hover:opacity-90 transition-all duration-300"
-            >
-              <FaBriefcase className="mr-2" />
-              Start Your Project
-            </button>
           </motion.div>
         )}
       </div>

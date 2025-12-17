@@ -6,6 +6,7 @@ import { listPriceCards } from '../../../api/pricecards';
 import type { PriceCard } from '../../../api/pricecards';
 import { listServices } from '../../../api/services';
 import type { Service } from '../../../api/services';
+import { Button as MovingBorderCard } from "@/components/ui/moving-border";
 
 export const Pricing = () => {
   const [cards, setCards] = useState<PriceCard[]>([]);
@@ -138,76 +139,86 @@ export const Pricing = () => {
             {/* Show cards in 3-column layout for Basic, Medium, Premium */}
             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
               {/* Basic Plan */}
+              {/* Basic Plan */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="relative rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl border border-gray-200 dark:border-gray-700"
+                whileHover={{ y: -12, scale: 1.02, transition: { duration: 0.3 } }}
+                className="relative"
               >
-                <div className="bg-white dark:bg-gray-800 p-8">
-                  <div className="mb-6">
-                    <h3 className="text-2xl font-bold mb-2">Basic</h3>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm">
-                      Perfect for getting started
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    {groupedCards.basic.map(card => (
-                      <div key={card.id} className="border-t pt-6 first:border-t-0 first:pt-0">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <div className="font-semibold text-gray-900 dark:text-white">
-                              {getServiceName(card.service)}
-                            </div>
-                            <div className="text-sm text-gray-500 mt-1">
-                              {card.delivery_days || 7} days delivery • {card.revisions} revisions
-                            </div>
-                          </div>
-                          <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                            ₹{card.price}
-                          </div>
-                        </div>
-                        
-                        {card.description && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                            {card.description}
-                          </p>
-                        )}
-                        
-                        {card.features && card.features.length > 0 && (
-                          <ul className="space-y-2">
-                            {card.features.slice(0, 3).map((feature, index) => (
-                              <li key={index} className="flex items-start text-sm">
-                                <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                                <span className="text-gray-700 dark:text-gray-300">{feature}</span>
-                              </li>
-                            ))}
-                            {card.features.length > 3 && (
-                              <li className="text-xs text-blue-600 dark:text-blue-400">
-                                +{card.features.length - 3} more features
-                              </li>
-                            )}
-                          </ul>
-                        )}
-                        
-                        <button 
-                          className="w-full mt-4 py-3 px-6 rounded-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition-all duration-300 flex items-center justify-center"
-                        >
-                          Get Started
-                          <ChevronRight className="ml-2 h-4 w-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {groupedCards.basic.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
-                      No basic plans available
+                <MovingBorderCard
+                  as="div"
+                  borderRadius="1rem"
+                  className="bg-white dark:bg-gray-800 border-2 border-[#0066FF]/50 text-left items-start justify-start h-full w-full p-0"
+                  containerClassName="h-full w-full bg-transparent p-[3px]"
+                  borderClassName="bg-[radial-gradient(#3b82f6_40%,transparent_60%)]"
+                >
+                  <div className="p-8 w-full">
+                    <div className="mb-6">
+                      <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Basic</h3>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm">
+                        Perfect for getting started
+                      </p>
                     </div>
-                  )}
-                </div>
+                  
+                    <div className="space-y-6">
+                      {groupedCards.basic.map(card => (
+                        <div key={card.id} className="border-t pt-6 first:border-t-0 first:pt-0">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <div className="font-semibold text-gray-900 dark:text-white">
+                                {getServiceName(card.service)}
+                              </div>
+                              <div className="text-sm text-gray-500 mt-1">
+                                {card.delivery_days || 7} days delivery • {card.revisions} revisions
+                              </div>
+                            </div>
+                            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                              ₹{card.price}
+                            </div>
+                          </div>
+                          
+                          {card.description && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                              {card.description}
+                            </p>
+                          )}
+                          
+                          {card.features && card.features.length > 0 && (
+                            <ul className="space-y-2">
+                              {card.features.slice(0, 3).map((feature, index) => (
+                                <li key={index} className="flex items-start text-sm">
+                                  <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                                  <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+                                </li>
+                              ))}
+                              {card.features.length > 3 && (
+                                <li className="text-xs text-blue-600 dark:text-blue-400">
+                                  +{card.features.length - 3} more features
+                                </li>
+                              )}
+                            </ul>
+                          )}
+                          
+                          <button 
+                            className="w-full mt-4 py-3 px-6 rounded-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition-all duration-300 flex items-center justify-center"
+                          >
+                            Get Started
+                            <ChevronRight className="ml-2 h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  
+                    {groupedCards.basic.length === 0 && (
+                      <div className="text-center py-8 text-gray-500">
+                        No basic plans available
+                      </div>
+                    )}
+                  </div>
+                </MovingBorderCard>
               </motion.div>
 
               {/* Medium Plan (Popular) */}
@@ -216,76 +227,85 @@ export const Pricing = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="relative rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl transform -translate-y-2 border-2 border-[#00C2A8]"
+                whileHover={{ y: -12, scale: 1.02, transition: { duration: 0.3 } }}
+                className="relative"
               >
-                <div className="absolute top-0 right-0 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white text-xs font-bold px-4 py-2 rounded-bl-lg">
+                <div className="absolute top-0 right-0 z-20 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white text-xs font-bold px-4 py-2 rounded-bl-lg rounded-tr-lg">
                   <Star className="h-3 w-3 inline mr-1" />
                   MOST POPULAR
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 p-8">
-                  <div className="mb-6">
-                    <h3 className="text-2xl font-bold mb-2">Medium</h3>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm">
-                      Best value for growing businesses
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    {groupedCards.medium.map(card => (
-                      <div key={card.id} className="border-t pt-6 first:border-t-0 first:pt-0">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <div className="font-semibold text-gray-900 dark:text-white">
-                              {getServiceName(card.service)}
-                            </div>
-                            <div className="text-sm text-gray-500 mt-1">
-                              {card.delivery_days || 14} days delivery • {card.revisions} revisions
-                            </div>
-                          </div>
-                          <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                            ₹{card.price}
-                          </div>
-                        </div>
-                        
-                        {card.description && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                            {card.description}
-                          </p>
-                        )}
-                        
-                        {card.features && card.features.length > 0 && (
-                          <ul className="space-y-2">
-                            {card.features.slice(0, 4).map((feature, index) => (
-                              <li key={index} className="flex items-start text-sm">
-                                <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                                <span className="text-gray-700 dark:text-gray-300">{feature}</span>
-                              </li>
-                            ))}
-                            {card.features.length > 4 && (
-                              <li className="text-xs text-blue-600 dark:text-blue-400">
-                                +{card.features.length - 4} more features
-                              </li>
-                            )}
-                          </ul>
-                        )}
-                        
-                        <button 
-                          className="w-full mt-4 py-3 px-6 rounded-lg font-semibold text-white bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 transition-all duration-300 flex items-center justify-center"
-                        >
-                          Get Started
-                          <ChevronRight className="ml-2 h-4 w-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {groupedCards.medium.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
-                      No medium plans available
+                <MovingBorderCard
+                  as="div"
+                  borderRadius="1rem"
+                  className="bg-white dark:bg-gray-800 border-2 border-[#00C2A8]/50 text-left items-start justify-start h-full w-full p-0"
+                  containerClassName="h-full w-full bg-transparent p-[3px]"
+                  borderClassName="bg-[radial-gradient(#00C2A8_40%,transparent_60%)]"
+                >
+                  <div className="p-8 w-full pt-12">
+                    <div className="mb-6">
+                      <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Medium</h3>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm">
+                        Best value for growing businesses
+                      </p>
                     </div>
-                  )}
-                </div>
+                    
+                    <div className="space-y-6">
+                      {groupedCards.medium.map(card => (
+                        <div key={card.id} className="border-t pt-6 first:border-t-0 first:pt-0">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <div className="font-semibold text-gray-900 dark:text-white">
+                                {getServiceName(card.service)}
+                              </div>
+                              <div className="text-sm text-gray-500 mt-1">
+                                {card.delivery_days || 14} days delivery • {card.revisions} revisions
+                              </div>
+                            </div>
+                            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                              ₹{card.price}
+                            </div>
+                          </div>
+                          
+                          {card.description && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                              {card.description}
+                            </p>
+                          )}
+                          
+                          {card.features && card.features.length > 0 && (
+                            <ul className="space-y-2">
+                              {card.features.slice(0, 4).map((feature, index) => (
+                                <li key={index} className="flex items-start text-sm">
+                                  <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                                  <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+                                </li>
+                              ))}
+                              {card.features.length > 4 && (
+                                <li className="text-xs text-blue-600 dark:text-blue-400">
+                                  +{card.features.length - 4} more features
+                                </li>
+                              )}
+                            </ul>
+                          )}
+                          
+                          <button 
+                            className="w-full mt-4 py-3 px-6 rounded-lg font-semibold text-white bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 transition-all duration-300 flex items-center justify-center"
+                          >
+                            Get Started
+                            <ChevronRight className="ml-2 h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {groupedCards.medium.length === 0 && (
+                      <div className="text-center py-8 text-gray-500">
+                        No medium plans available
+                      </div>
+                    )}
+                  </div>
+                </MovingBorderCard>
               </motion.div>
 
               {/* Premium Plan */}
@@ -294,71 +314,80 @@ export const Pricing = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="relative rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl border border-gray-200 dark:border-gray-700"
+                whileHover={{ y: -12, scale: 1.02, transition: { duration: 0.3 } }}
+                className="relative"
               >
-                <div className="bg-white dark:bg-gray-800 p-8">
-                  <div className="mb-6">
-                    <h3 className="text-2xl font-bold mb-2">Premium</h3>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm">
-                      Enterprise-grade solutions
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    {groupedCards.premium.map(card => (
-                      <div key={card.id} className="border-t pt-6 first:border-t-0 first:pt-0">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <div className="font-semibold text-gray-900 dark:text-white">
-                              {getServiceName(card.service)}
-                            </div>
-                            <div className="text-sm text-gray-500 mt-1">
-                              {card.delivery_days || 30} days delivery • {card.revisions} revisions
-                            </div>
-                          </div>
-                          <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                            ₹{card.price}
-                          </div>
-                        </div>
-                        
-                        {card.description && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                            {card.description}
-                          </p>
-                        )}
-                        
-                        {card.features && card.features.length > 0 && (
-                          <ul className="space-y-2">
-                            {card.features.slice(0, 5).map((feature, index) => (
-                              <li key={index} className="flex items-start text-sm">
-                                <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                                <span className="text-gray-700 dark:text-gray-300">{feature}</span>
-                              </li>
-                            ))}
-                            {card.features.length > 5 && (
-                              <li className="text-xs text-blue-600 dark:text-blue-400">
-                                +{card.features.length - 5} more features
-                              </li>
-                            )}
-                          </ul>
-                        )}
-                        
-                        <button 
-                          className="w-full mt-4 py-3 px-6 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 transition-all duration-300 flex items-center justify-center"
-                        >
-                          Get Started
-                          <ChevronRight className="ml-2 h-4 w-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {groupedCards.premium.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
-                      No premium plans available
+                <MovingBorderCard
+                  as="div"
+                  borderRadius="1rem"
+                  className="bg-white dark:bg-gray-800 border-neutral-200 dark:border-gray-700 text-left items-start justify-start h-full w-full p-0"
+                  containerClassName="h-full w-full bg-transparent p-[3px]"
+                  borderClassName="bg-[radial-gradient(#a855f7_40%,transparent_60%)]"
+                >
+                  <div className="bg-white dark:bg-gray-800 p-8 w-full">
+                    <div className="mb-6">
+                      <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Premium</h3>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm">
+                        Enterprise-grade solutions
+                      </p>
                     </div>
-                  )}
-                </div>
+                    
+                    <div className="space-y-6">
+                      {groupedCards.premium.map(card => (
+                        <div key={card.id} className="border-t pt-6 first:border-t-0 first:pt-0">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <div className="font-semibold text-gray-900 dark:text-white">
+                                {getServiceName(card.service)}
+                              </div>
+                              <div className="text-sm text-gray-500 mt-1">
+                                {card.delivery_days || 30} days delivery • {card.revisions} revisions
+                              </div>
+                            </div>
+                            <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                              ₹{card.price}
+                            </div>
+                          </div>
+                          
+                          {card.description && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                              {card.description}
+                            </p>
+                          )}
+                          
+                          {card.features && card.features.length > 0 && (
+                            <ul className="space-y-2">
+                              {card.features.slice(0, 5).map((feature, index) => (
+                                <li key={index} className="flex items-start text-sm">
+                                  <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                                  <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+                                </li>
+                              ))}
+                              {card.features.length > 5 && (
+                                <li className="text-xs text-blue-600 dark:text-blue-400">
+                                  +{card.features.length - 5} more features
+                                </li>
+                              )}
+                            </ul>
+                          )}
+                          
+                          <button 
+                            className="w-full mt-4 py-3 px-6 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 transition-all duration-300 flex items-center justify-center"
+                          >
+                            Get Started
+                            <ChevronRight className="ml-2 h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {groupedCards.premium.length === 0 && (
+                      <div className="text-center py-8 text-gray-500">
+                        No premium plans available
+                      </div>
+                    )}
+                  </div>
+                </MovingBorderCard>
               </motion.div>
             </div>
           </>

@@ -1,36 +1,73 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin,} from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { listServices, type Service } from '../../../api/services';
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [services, setServices] = useState<Service[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadServices();
+  }, []);
+
+  const loadServices = async () => {
+    try {
+      setIsLoading(true);
+      const response = await listServices({ is_active: true });
+      setServices(response.data.slice(0, 5)); // Limit to 5 services for footer
+    } catch (error) {
+      console.error('Failed to load services:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleHashLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
+    e.preventDefault();
+    
+    // Navigate to home page first if not already there
+    if (window.location.pathname !== '/') {
+      window.location.href = `/${hash}`;
+      return;
+    }
+    
+    // Scroll to section
+    const element = document.querySelector(hash);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
   
   const footerLinks = [
     {
       title: 'Services',
-      links: [
-        { name: 'Social Media Design', url: '/services#social-media' },
-        { name: 'Web Development', url: '/services#web-dev' },
-        { name: 'Mobile Apps', url: '/services#mobile' },
-        { name: 'UI/UX Design', url: '/services#design' },
-        { name: 'Branding', url: '/services#branding' },
-      ]
+      links: isLoading 
+        ? [{ name: 'Loading...', url: '#' }]
+        : services.length > 0
+          ? services.map(service => ({
+              name: service.title,
+              url: `/client-dashboard/services#${service.slug || service.id}`
+            }))
+          : [{ name: 'No services found', url: '#' }]
     },
     {
       title: 'Company',
       links: [
-        { name: 'About Us', url: '/about' },
-        { name: 'Our Team', url: '/team' },
-        { name: 'Case Studies', url: '/case-studies' },
-        { name: 'Careers', url: '/careers' },
+        { name: 'About Us', url: '#about', isHash: true },
+        { name: 'Testimonials', url: '#testimonials', isHash: true },
+        { name: 'Portfolio', url: '/portfolio' },
         { name: 'Blog', url: '/blog' },
+        { name: 'LinkedIn', url: 'https://linkedin.com/company/udyogworks', external: true },
       ]
     },
     {
       title: 'Support',
       links: [
         { name: 'Help Center', url: '/help' },
-        { name: 'Contact Us', url: '/contact' },
+        { name: 'Contact Us', url: '/#contact' },
         { name: 'Privacy Policy', url: '/privacy' },
         { name: 'Terms of Service', url: '/terms' },
         { name: 'FAQ', url: '/faq' },
@@ -75,20 +112,6 @@ export const Footer = () => {
                 </motion.a>
               ))}
             </div>
-            
-            <div className="pt-4 border-t border-gray-800">
-              <h4 className="font-semibold text-white mb-3">Subscribe to our newsletter</h4>
-              <div className="flex">
-                <input
-                  type="email"
-                  placeholder="Your email"
-                  className="px-4 py-2 bg-gray-800 text-white rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#00C2A8] w-full"
-                />
-                <button className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold px-4 rounded-r-lg transition-all duration-300">
-                  Subscribe
-                </button>
-              </div>
-            </div>
           </div>
           
           {/* Footer Links */}
@@ -105,60 +128,36 @@ export const Footer = () => {
               <ul className="space-y-3">
                 {column.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
-                    <Link
-                      to={link.url}
-                      className="text-gray-400 hover:text-[#00C2A8] transition-colors duration-300 text-sm"
-                    >
-                      {link.name}
-                    </Link>
+                    {link.external ? (
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-[#00C2A8] transition-colors duration-300 text-sm"
+                      >
+                        {link.name}
+                      </a>
+                    ) : link.isHash ? (
+                      <a
+                        href={link.url}
+                        onClick={(e) => handleHashLinkClick(e, link.url)}
+                        className="text-gray-400 hover:text-[#00C2A8] transition-colors duration-300 text-sm cursor-pointer"
+                      >
+                        {link.name}
+                      </a>
+                    ) : (
+                      <Link
+                        to={link.url}
+                        className="text-gray-400 hover:text-[#00C2A8] transition-colors duration-300 text-sm"
+                      >
+                        {link.name}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
             </motion.div>
           ))}
-          
-          {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="space-y-6"
-          >
-            <h3 className="text-white font-semibold text-lg">Contact Info</h3>
-            <div className="space-y-4">
-              <div className="flex items-start">
-                <MapPin className="h-5 w-5 text-[#00C2A8] mt-1 mr-3 flex-shrink-0" />
-                <div>
-                  <h4 className="font-medium text-white">Our Office</h4>
-                  <p className="text-sm text-gray-400">123 Business Avenue, Suite 456<br />Mumbai, Maharashtra 400001</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center">
-                <Mail className="h-5 w-5 text-[#00C2A8] mr-3 flex-shrink-0" />
-                <a href="rahulbhatambare72@gmail.com" className="text-gray-400 hover:text-[#00C2A8] transition-colors duration-300 text-sm">
-                  rahulbhatambare72@gmail.com
-                </a>
-              </div>
-              
-              <div className="flex items-center">
-                <Phone className="h-5 w-5 text-[#00C2A8] mr-3 flex-shrink-0" />
-                <a href="tel:+918208776319" className="text-gray-400 hover:text-[#00C2A8] transition-colors duration-300 text-sm">
-                  +91 8208776319
-                </a>
-              </div>
-            </div>
-            
-            <div className="pt-4 border-t border-gray-800">
-              <h4 className="font-semibold text-white mb-3">Business Hours</h4>
-              <div className="text-sm text-gray-400 space-y-1">
-                <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
-                <p>Saturday: 10:00 AM - 4:00 PM</p>
-                <p>Sunday: Closed</p>
-              </div>
-            </div>
-          </motion.div>
         </div>
         
         {/* Bottom Bar */}
@@ -188,3 +187,4 @@ export const Footer = () => {
 };
 
 export default Footer;
+

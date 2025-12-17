@@ -1,5 +1,6 @@
 // frontend/src/pages/landing/components/Offers.tsx
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { listOffers } from "@/api/offers";
 import type { Offer } from "@/api/offers";
 
@@ -124,20 +125,32 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {offers.slice(0, limit).map((offer) => (
-            <article key={offer.id} className="relative bg-white rounded-xl shadow p-4 overflow-hidden">
+            <motion.article 
+              key={offer.id} 
+              className="relative bg-white rounded-xl shadow p-4 overflow-hidden"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              whileHover={{ 
+                y: -8, 
+                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+              }}
+            >
               <div className="relative">
                 {renderBadge(offer)}
-                <div className="h-44 w-full bg-gray-100 rounded-md overflow-hidden flex items-center justify-center">
+                <div className="h-44 w-full bg-gray-100 rounded-md overflow-hidden flex items-center justify-center group">
                   {offer.image ? (
-                    // Image urls are served from Cloudinary or backend media URL (fully-qualified)
-                    <img
+                    <motion.img
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.4 }}
                       src={offer.image}
                       alt={offer.title}
                       className="object-cover w-full h-full"
                       loading="lazy"
                     />
                   ) : (
-                    <div className="text-gray-400">No image</div>
+                    <div className="text-gray-440">No image</div>
                   )}
                 </div>
               </div>
@@ -160,12 +173,14 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
                   </div>
 
                   <div>
-                    <a
+                    <motion.a
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       href={offer.cta_link || `/offers/${offer.slug || offer.id}`}
                       className="inline-block bg-black text-white px-4 py-2 rounded-md text-sm"
                     >
                       {offer.cta_text || "Claim Offer"}
-                    </a>
+                    </motion.a>
                   </div>
                 </div>
 
@@ -177,7 +192,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
                   </ul>
                 )}
               </div>
-            </article>
+            </motion.article>
           ))}
         </div>
       </div>

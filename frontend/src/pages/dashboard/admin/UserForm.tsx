@@ -13,6 +13,7 @@
       password: '',
       phone: '',
       role: user?.role === 'service_head' ? 'team_member' : 'service_head',
+      job_title: '',
     });
 
     // Auto-set role to team_member for service heads
@@ -52,6 +53,11 @@
           const dept = (user as any).department;
           payload.department = typeof dept === 'object' ? dept.id : dept;
           console.log('👥 Auto-assigning department to team member:', payload.department);
+        }
+
+        // Add job_title for team members
+        if (form.role === 'team_member' && form.job_title) {
+          payload.job_title = form.job_title;
         }
 
         // ✅ REAL BACKEND CALL
@@ -144,6 +150,23 @@
                   placeholder="10-digit mobile number"
                 />
               </div>
+
+              {/* ✅ JOB TITLE (for team members only) */}
+              {form.role === 'team_member' && (
+                <div>
+                  <label className="block text-sm font-semibold mb-1">Job Title / Role</label>
+                  <input
+                    type="text"
+                    className="w-full border p-3 rounded"
+                    value={form.job_title}
+                    onChange={e => setForm({ ...form, job_title: e.target.value })}
+                    placeholder="e.g., Voice-over Artist, Frontend Developer, UI/UX Designer"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    ℹ️ Enter a specific role/title for this team member
+                  </p>
+                </div>
+              )}
 
               {/* ✅ PASSWORD WITH VIEW TOGGLE */}
               <div className="relative">

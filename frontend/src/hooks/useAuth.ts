@@ -50,7 +50,7 @@ export const useAuth = () => {
     try {
       setAuth(prev => ({ ...prev, loading: true, error: null }));
 
-      const response = await api.post('/auth/token/', {
+      const response = await api.post('/auth/jwt/login/', {
         email: identifier,
         password
       });
@@ -61,10 +61,10 @@ export const useAuth = () => {
       localStorage.setItem('access', access);
       localStorage.setItem('refresh', refresh);
       localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('role', user.role); // Store role separately
+      localStorage.setItem('role', user?.role || ''); // Store role separately
 
       // ✅ Fetch department for service_head users
-      if (user.role === 'service_head') {
+      if (user?.role === 'service_head') {
         console.log('🔍 User is service_head, fetching department...');
         try {
           const deptResponse = await api.get('/api/user/department/');
@@ -94,13 +94,13 @@ export const useAuth = () => {
       setAuth({ user, loading: false, error: null });
       
       // Role-based redirect
-      if (user.role === 'admin') {
+      if (user?.role === 'admin') {
         navigate('/dashboard');
-      } else if (user.role === 'service_head') {
+      } else if (user?.role === 'service_head') {
         navigate('/dashboard/service-head');
-      } else if (user.role === 'team_member') {
+      } else if (user?.role === 'team_member') {
         navigate('/team-member-dashboard');
-      } else if (user.role === 'client') {
+      } else if (user?.role === 'client') {
         navigate('/client-dashboard');
       } else {
         navigate('/dashboard'); 
@@ -125,7 +125,7 @@ export const useAuth = () => {
   }) => {
     try {
       setAuth(prev => ({ ...prev, loading: true, error: null }));
-      const response = await api.post('/auth/register/client/', {
+      const response = await api.post('/api/auth/register/client/', {
         ...userData,
         password2: userData.password
       });
@@ -134,7 +134,7 @@ export const useAuth = () => {
       localStorage.setItem('access', access);
       localStorage.setItem('refresh', refresh);
       localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('role', user.role);
+      localStorage.setItem('role', user?.role || '');
 
       setAuth({ user, loading: false, error: null });
       
