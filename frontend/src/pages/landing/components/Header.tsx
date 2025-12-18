@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, LogIn, UserPlus, LogOut, User, Home } from 'lucide-react';
+import { Menu, X, LogIn, UserPlus, LogOut, Home } from 'lucide-react';
 import { AuthModal } from './AuthModal';
 import logo from '../../../assets/UdyogWorks logo.png';
 import { getCurrentUser, logout } from '../../../utils/auth';
+import { UserAvatar } from '../../../components/ui/UserAvatar';
 
 
 interface HeaderProps {
@@ -172,8 +173,8 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                 </>
               ) : (
                 <>
-                  <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium px-3">
-                    <User size={18} />
+                  <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300 font-medium px-3">
+                    <UserAvatar user={user} size="sm" />
                     <span>Hi, {user.username}</span>
                   </div>
 
@@ -264,8 +265,8 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                   </>
                 ) : (
                   <>
-                    <p className="font-semibold text-center text-gray-700 dark:text-gray-300 py-2 flex items-center justify-center gap-2">
-                      <User size={18} />
+                    <p className="font-semibold text-center text-gray-700 dark:text-gray-300 py-2 flex items-center justify-center gap-3">
+                      <UserAvatar user={user} size="sm" />
                       <span>Hi, {user.username}</span>
                     </p>
 

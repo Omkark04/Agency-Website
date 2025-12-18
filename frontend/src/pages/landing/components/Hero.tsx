@@ -5,11 +5,12 @@ import { fetchHeroImages } from '../../../api/media';
 import type { MediaItem } from '../../../api/media';
 import { getTestimonialStats } from '../../../api/testinomials';
 import { listDepartments, type Department } from '../../../api/departments';
-import { useNavigate } from 'react-router-dom';
+import { useProtectedNavigation } from '../../../hooks/useProtectedNavigation';
+import AuthModal from './AuthModal';
 
 
 export const Hero = ({ }) => {
-  const navigate = useNavigate();
+  const { navigateTo, showAuthModal, setShowAuthModal } = useProtectedNavigation();
   const [heroImages, setHeroImages] = useState<MediaItem[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -90,32 +91,41 @@ export const Hero = ({ }) => {
   };
 
   return (
-    <section id='home' className="relative overflow-hidden bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white py-20 md:py-32">
-      <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="z-10"
-          >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-              We Build, Create & Grow Your Business Digitally
-            </h1>
-            <p className="text-xl text-gray-300 mb-8">
-              Business development agency powering growth through design, technology & education.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <button 
-                onClick={() => navigate('/client-dashboard/services')}
-                className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-3 px-8 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-105"
-              >
-                View Services
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </button>
-            </div>
+    <>
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+        />
+      )}
+      
+      <section id='home' className="relative overflow-hidden bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white py-20 md:py-32">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              className="z-10"
+            >
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                We Build, Create & Grow Your Business Digitally
+              </h1>
+              <p className="text-xl text-gray-300 mb-8">
+                Business development agency powering growth through design, technology & education.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 mb-12">
+                <button 
+                  onClick={() => navigateTo('/client-dashboard/services')}
+                  className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-3 px-8 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-105"
+                >
+                  View Services
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </button>
+              </div>
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 mt-12">
@@ -441,6 +451,7 @@ export const Hero = ({ }) => {
         ))}
       </div>
     </section>
+    </>
   );
 };
 

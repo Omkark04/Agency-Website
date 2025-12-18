@@ -135,3 +135,123 @@ class UserActivityView(APIView):
             'recent_registrations': recent_registrations,
             'top_clients': list(top_clients),
         })
+
+
+# ==================== GOOGLE ANALYTICS 4 VIEWS ====================
+
+class GA4RealtimeView(APIView):
+    """Get real-time active users from GA4"""
+    permission_classes = [IsAdmin]
+    
+    def get(self, request):
+        try:
+            from .ga4_service import get_ga4_service
+            ga4 = get_ga4_service()
+            data = ga4.get_realtime_users()
+            return Response(data)
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class GA4OverviewView(APIView):
+    """Get GA4 overview metrics"""
+    permission_classes = [IsAdmin]
+    
+    def get(self, request):
+        try:
+            from .ga4_service import get_ga4_service
+            days = int(request.query_params.get('days', 7))
+            ga4 = get_ga4_service()
+            
+            overview = ga4.get_overview_metrics(days)
+            trend = ga4.get_page_views_trend(days)
+            
+            return Response({
+                'overview': overview,
+                'trend': trend
+            })
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class GA4PagesView(APIView):
+    """Get top pages from GA4"""
+    permission_classes = [IsAdmin]
+    
+    def get(self, request):
+        try:
+            from .ga4_service import get_ga4_service
+            days = int(request.query_params.get('days', 7))
+            limit = int(request.query_params.get('limit', 10))
+            ga4 = get_ga4_service()
+            
+            pages = ga4.get_top_pages(days, limit)
+            return Response({'pages': pages})
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class GA4SourcesView(APIView):
+    """Get traffic sources from GA4"""
+    permission_classes = [IsAdmin]
+    
+    def get(self, request):
+        try:
+            from .ga4_service import get_ga4_service
+            days = int(request.query_params.get('days', 7))
+            ga4 = get_ga4_service()
+            
+            sources = ga4.get_traffic_sources(days)
+            return Response({'sources': sources})
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class GA4DevicesView(APIView):
+    """Get device breakdown from GA4"""
+    permission_classes = [IsAdmin]
+    
+    def get(self, request):
+        try:
+            from .ga4_service import get_ga4_service
+            days = int(request.query_params.get('days', 7))
+            ga4 = get_ga4_service()
+            
+            devices = ga4.get_device_breakdown(days)
+            return Response({'devices': devices})
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class GA4DemographicsView(APIView):
+    """Get user demographics from GA4"""
+    permission_classes = [IsAdmin]
+    
+    def get(self, request):
+        try:
+            from .ga4_service import get_ga4_service
+            days = int(request.query_params.get('days', 7))
+            ga4 = get_ga4_service()
+            
+            demographics = ga4.get_user_demographics(days)
+            return Response(demographics)
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

@@ -15,16 +15,16 @@ export interface FormField {
 
 export interface ServiceForm {
   id?: number;
-  service: number;
-  service_title?: string;
   title: string;
   description: string;
+  service: number;
+  service_title?: string;
   is_active: boolean;
-  created_by?: number;
-  created_by_name?: string;
+  card_type?: 'service' | 'offer'; // New field
+  selected_offer_id?: number; // New field
+  fields?: FormField[];
   created_at?: string;
   updated_at?: string;
-  fields?: FormField[];
 }
 
 export interface FormSubmission {

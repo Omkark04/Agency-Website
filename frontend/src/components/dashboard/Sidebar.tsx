@@ -20,6 +20,7 @@ import {
   FiDollarSign,
   FiEdit
 } from 'react-icons/fi';
+import { UserAvatar } from '../ui/UserAvatar';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, userRole }) =
     { title: 'Testimonials', path: '/dashboard/service-head/testimonials', roles: ['service_head'], icon: FiMessageSquare, gradient: 'from-purple-500 to-pink-600' },
     { title: 'Inquiries', path: '/dashboard/contacts', roles: ['admin'], icon: FiUsers, gradient: 'from-green-500 to-teal-600' },
     { title: 'Form Builder', path: '/dashboard/forms/new', roles: ['admin'], icon: FiCheckSquare, gradient: 'from-indigo-500 to-blue-600' },
+    { title: 'Special Orders', path: '/dashboard/special-orders', roles: ['admin'], icon: FiGift, gradient: 'from-pink-500 to-rose-600' },
     { title: 'Form Builder', path: '/dashboard/service-head/forms', roles: ['service_head'], icon: FiCheckSquare, gradient: 'from-indigo-500 to-blue-600' },
     { title: 'Offers', path: '/dashboard/offers', roles: ['admin'], icon: FiGift, gradient: 'from-pink-500 to-rose-600' },
     { title: 'Portfolio', path: '/dashboard/portfolio', roles: ['admin'], icon: FiBriefcase, gradient: 'from-purple-500 to-indigo-600' },
@@ -130,9 +132,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, userRole }) =
         {user && (
           <div className="border-t border-white/10 p-4 bg-white/5">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold">
-                {user.username?.charAt(0).toUpperCase() || 'U'}
-              </div>
+              <UserAvatar user={user} size="lg" className="rounded-xl" />
               <div>
                 <p className="text-sm font-bold text-white">{user.username || 'User'}</p>
                 <p className="text-xs text-gray-400 capitalize">{user.role || 'Member'}</p>

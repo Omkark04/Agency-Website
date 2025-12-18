@@ -9,6 +9,7 @@ import {
 import { createForm, updateForm, getForm, createField, updateField, deleteField, listForms, deleteForm } from '../../../api/forms';
 import type { ServiceForm, FormField } from '../../../api/forms';
 import { listServices } from '../../../api/services';
+import api from '../../../api/api';
 import { useAuth } from '../../../hooks/useAuth';
 import { NoDepartmentMessage } from '../../../components/dashboard/NoDepartmentMessage';
 
@@ -30,11 +31,14 @@ const FormBuilder = () => {
   const isServiceHeadWithoutDept = user?.role === 'service_head' && !(user as any).department;
   const [loading, setLoading] = useState(false);
   const [services, setServices] = useState<any[]>([]);
+  const [offers, setOffers] = useState<any[]>([]);
   const [form, setForm] = useState<Partial<ServiceForm>>({
     title: '',
     description: '',
     service: 0,
-    is_active: false
+    is_active: false,
+    card_type: 'service', // New field
+    selected_offer_id: undefined, // New field
   });
   const [fields, setFields] = useState<FormField[]>([]);
   const [editingField, setEditingField] = useState<FormField | null>(null);
@@ -52,6 +56,7 @@ const FormBuilder = () => {
   useEffect(() => {
     if (!isServiceHeadWithoutDept && user) {
       loadServices();
+      loadOffers();
       loadAllForms();
       if (id) {
         loadForm(parseInt(id));
@@ -80,6 +85,16 @@ const FormBuilder = () => {
       setServices(response.data);
     } catch (error) {
       console.error('❌ Error loading services:', error);
+    }
+  };
+
+  const loadOffers = async () => {
+    try {
+      const response = await api.get('/api/offers/');
+      const data = response.data.results || response.data;
+      setOffers(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('❌ Error loading offers:', error);
     }
   };
 
@@ -440,24 +455,30 @@ const FormBuilder = () => {
             </h2>
             
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Service *
-                </label>
-                <select
-                  value={form.service || ''}
-                  onChange={(e) => setForm({ ...form, service: parseInt(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                >
-                  <option value="">Select a service</option>
-                  {services.map(service => (
-                    <option key={service.id} value={service.id}>
-                      {service.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* SERVICE SELECTION (only for service cards) */}
+              {form.card_type === 'service' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Service *
+                  </label>
+                  <select
+                    value={form.service || ''}
+                    onChange={(e) => setForm({ ...form, service: parseInt(e.target.value) })}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    required={form.card_type === 'service'}
+                  >
+                    <option value="">Select a service</option>
+                    {services.map(service => (
+                      <option key={service.id} value={service.id}>
+                        {service.title}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    This form will be embedded in the selected service's button
+                  </p>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -485,6 +506,49 @@ const FormBuilder = () => {
                   placeholder="Describe what this form is for..."
                 />
               </div>
+
+              {/* CARD TYPE */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Card Type
+                </label>
+                <select
+                  value={form.card_type || 'service'}
+                  onChange={(e) => setForm({ ...form, card_type: e.target.value as 'service' | 'offer' })}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="service">Service Card</option>
+                  <option value="offer">Offer Card</option>
+                </select>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Choose whether this form is for a service or an offer
+                </p>
+              </div>
+
+              {/* OFFER SELECTION (conditional) */}
+              {form.card_type === 'offer' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Select Offer *
+                  </label>
+                  <select
+                    value={form.selected_offer_id || ''}
+                    onChange={(e) => setForm({ ...form, selected_offer_id: e.target.value ? Number(e.target.value) : undefined })}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    required={form.card_type === 'offer'}
+                  >
+                    <option value="">Select an offer</option>
+                    {offers.map((offer: any) => (
+                      <option key={offer.id} value={offer.id}>
+                        {offer.title} ({offer.offer_category === 'special' ? 'Special Offer' : 'Regular Offer'})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    This form will be embedded in the selected offer's button
+                  </p>
+                </div>
+              )}
 
               <div className="flex items-center gap-2">
                 <input

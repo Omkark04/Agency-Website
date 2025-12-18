@@ -3,6 +3,7 @@ import { createOffer, updateOffer } from "../../../api/offers";
 import api from "../../../api/api";
 import { Button } from "../../../components/ui/Button";
 import { Input } from "../../../components/ui/Input";
+import { useAuth } from "../../../hooks/useAuth";
 import {
   FiTag,
   FiAlignLeft,
@@ -16,6 +17,7 @@ import {
 } from "react-icons/fi";
 
 export default function OffersForm({ initial, onSaved }: any) {
+  const { user } = useAuth();
   const [services, setServices] = useState<any[]>([]);
 
   const [title, setTitle] = useState(initial?.title || "");
@@ -23,6 +25,7 @@ export default function OffersForm({ initial, onSaved }: any) {
   const [description, setDescription] = useState(initial?.description || "");
 
   const [offerType, setOfferType] = useState(initial?.offer_type || "seasonal");
+  const [offerCategory, setOfferCategory] = useState(initial?.offer_category || "regular");
   const [serviceIds, setServiceIds] = useState<number[]>(
     initial?.services?.map((s: any) => s.id) || []
   );
@@ -54,7 +57,7 @@ export default function OffersForm({ initial, onSaved }: any) {
   );
 
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState(initial?.image || null);
+  const [imagePreview, setImagePreview] = useState(initial?.imageURL || initial?.image || null);
 
   const [loading, setLoading] = useState(false);
 
@@ -62,7 +65,7 @@ export default function OffersForm({ initial, onSaved }: any) {
     api.get("/api/services/").then((res) => setServices(res.data));
   }, []);
 
-  /* ---------------- IMAGE UPLOAD ---------------- */
+  /* ---------------- IMAGE UPLOAD (CLOUDINARY) ---------------- */
   const handleImageChange = (e: any) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -74,6 +77,8 @@ export default function OffersForm({ initial, onSaved }: any) {
   const removeImage = () => {
     setImageFile(null);
     setImagePreview(null);
+    const fileInput = document.getElementById('offer-image') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
   };
 
   /* ---------------- FEATURE HANDLERS ---------------- */
@@ -101,34 +106,49 @@ export default function OffersForm({ initial, onSaved }: any) {
     e.preventDefault();
     setLoading(true);
 
-    const FD = new FormData();
-
-    FD.append("title", title);
-    FD.append("short_description", shortDesc);
-    FD.append("description", description);
-    FD.append("offer_type", offerType);
-    FD.append("discount_type", discountType);
-    FD.append("discount_value", discountValue.toString());
-    FD.append("original_price", originalPrice.toString());
-    FD.append("valid_from", validFrom);
-    FD.append("valid_to", validTo);
-    FD.append("is_featured", isFeatured ? "true" : "false");
-    FD.append("is_active", isActive ? "true" : "false");
-    
-    // Add CTA fields
-    FD.append("cta_text", ctaText);
-    FD.append("cta_link", ctaLink);
-
-    FD.append("features", JSON.stringify(features));
-    FD.append("conditions", JSON.stringify(conditions));
-    FD.append("services", JSON.stringify(serviceIds));
-
-    if (imageFile) {
-      FD.append("image", imageFile);
-    }
-
-
     try {
+      let imageUrl = initial?.imageURL || null;
+
+      // Upload image to Cloudinary if new file selected
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('file', imageFile);
+
+        const uploadRes = await api.post('/api/upload/', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+
+        imageUrl = uploadRes.data.url; // Cloudinary URL
+      }
+
+      const FD = new FormData();
+
+      FD.append("title", title);
+      FD.append("short_description", shortDesc);
+      FD.append("description", description);
+      FD.append("offer_type", offerType);
+      FD.append("offer_category", offerCategory);
+      FD.append("discount_type", discountType);
+      FD.append("discount_value", discountValue.toString());
+      FD.append("original_price", originalPrice.toString());
+      FD.append("valid_from", validFrom);
+      FD.append("valid_to", validTo);
+      FD.append("is_featured", isFeatured ? "true" : "false");
+      FD.append("is_active", isActive ? "true" : "false");
+      
+      // Add CTA fields
+      FD.append("cta_text", ctaText);
+      FD.append("cta_link", ctaLink);
+
+      FD.append("features", JSON.stringify(features));
+      FD.append("conditions", JSON.stringify(conditions));
+      FD.append("services", JSON.stringify(serviceIds));
+
+      if (imageUrl) {
+        FD.append("imageURL", imageUrl);  // Use imageURL for Cloudinary URLs
+      }
+
+
       if (initial?.id) {
         await updateOffer(initial.id, FD);
       } else {
@@ -253,28 +273,75 @@ export default function OffersForm({ initial, onSaved }: any) {
           </select>
         </div>
 
-        {/* SERVICES CHECKBOXES */}
+        {/* OFFER CATEGORY */}
+        <div>
+          <label className="text-sm font-semibold mb-2">Offer Category *</label>
+          <select
+            value={offerCategory}
+            onChange={(e) => {
+              const newCategory = e.target.value;
+              setOfferCategory(newCategory);
+              // Reset services when switching categories
+              if (newCategory === "regular" && serviceIds.length > 1) {
+                setServiceIds([serviceIds[0]]);
+              }
+            }}
+            className="w-full border rounded p-3"
+            disabled={user?.role !== 'admin'}
+          >
+            <option value="regular">Regular Offer</option>
+            <option value="special" disabled={user?.role !== 'admin'}>
+              Special Offer {user?.role !== 'admin' ? '(Admin Only)' : ''}
+            </option>
+          </select>
+          {user?.role !== 'admin' && (
+            <p className="text-xs text-gray-500 mt-1">
+              ℹ️ Only administrators can create Special Offers
+            </p>
+          )}
+        </div>
+
+        {/* SERVICES SELECTION */}
         <div>
           <label className="text-sm font-semibold mb-2 block">
-            Included Services
+            {offerCategory === "special" ? "Included Services (Multiple)" : "Service (Single)"}
           </label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 bg-gray-50 p-3 rounded border">
-            {services.map((srv) => (
-              <label key={srv.id} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={serviceIds.includes(srv.id)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setServiceIds([...serviceIds, srv.id]);
-                    } else {
-                      setServiceIds(serviceIds.filter((id) => id !== srv.id));
-                    }
-                  }}
-                />
-                {srv.title}
-              </label>
-            ))}
+          <div className="bg-gray-50 p-3 rounded border max-h-48 overflow-y-auto">
+            {offerCategory === "regular" ? (
+              // SINGLE SELECT FOR REGULAR OFFERS
+              <select
+                value={serviceIds[0] || ""}
+                onChange={(e) => setServiceIds(e.target.value ? [Number(e.target.value)] : [])}
+                className="w-full border rounded p-2"
+              >
+                <option value="">Select a service</option>
+                {services.map((srv) => (
+                  <option key={srv.id} value={srv.id}>
+                    {srv.title}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              // MULTI SELECT FOR SPECIAL OFFERS
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {services.map((srv) => (
+                  <label key={srv.id} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={serviceIds.includes(srv.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setServiceIds([...serviceIds, srv.id]);
+                        } else {
+                          setServiceIds(serviceIds.filter((id) => id !== srv.id));
+                        }
+                      }}
+                    />
+                    {srv.title}
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

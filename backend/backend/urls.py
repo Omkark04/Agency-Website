@@ -36,6 +36,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from accounts.views import CustomTokenObtainPairView
+from accounts.oauth_views import GoogleCallbackView, LinkedInCallbackView
 
 router = routers.DefaultRouter()
 router.register(r"departments", DepartmentViewSet)
@@ -49,7 +50,7 @@ router.register(r"media", MediaViewSet)
 router.register(r"notifications", NotificationViewSet, basename="notification")
 router.register(r"pricing-plans", PricingPlanViewSet)
 router.register(r"testimonials", TestimonialViewSet)
-router.register(r"offers", OfferViewSet)   # FULL CRUD enabled
+router.register(r"offers", OfferViewSet)   
 router.register(r"contacts", ContactSubmissionViewSet, basename="contact")
 router.register(r"forms", ServiceFormViewSet, basename="form")
 router.register(r"form-fields", ServiceFormFieldViewSet, basename="form-field")
@@ -79,6 +80,10 @@ urlpatterns = [
     path("api/auth/", include("accounts.urls")),
     path("auth/jwt/login/", CustomTokenObtainPairView.as_view(), name="jwt-login"),
     path("auth/jwt/refresh/", TokenRefreshView.as_view(), name="jwt-refresh"),
+    
+    # OAuth Callbacks
+    path("api/auth/google/callback/", GoogleCallbackView.as_view(), name="google-callback"),
+    path("api/auth/linkedin/callback/", LinkedInCallbackView.as_view(), name="linkedin-callback"),
 
     # Analytics
     path("api/analytics/", include("analytics.urls")),
