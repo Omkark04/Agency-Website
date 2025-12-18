@@ -1,22 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import { GoogleOAuthProvider } from "@react-oauth/google";
 import "./index.css";
+import { initGA } from "./utils/analytics";
 
-const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+// Initialize Google Analytics
+initGA();
 
 // Create a wrapper component that conditionally renders GoogleOAuthProvider
 const AppWrapper = () => {
-  if (!clientId) {
-    console.warn('Google OAuth client ID is not set. Google authentication will not work.');
-    return <App />;
-  }
   
   return (
-    <GoogleOAuthProvider clientId={clientId}>
-      <App />
-    </GoogleOAuthProvider>
+    <App />
   );
 };
 

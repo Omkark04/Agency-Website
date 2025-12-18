@@ -9,10 +9,18 @@ class ServiceForm(models.Model):
     service = models.ForeignKey(
         Service, 
         on_delete=models.CASCADE, 
-        related_name='forms'
+        related_name='forms',
+        null=True,  # Allow null for offer cards
+        blank=True
     )
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    card_type = models.CharField(
+        max_length=20,
+        choices=[('service', 'Service Card'), ('offer', 'Offer Card')],
+        default='service'
+    )
+    selected_offer_id = models.IntegerField(null=True, blank=True)  # For offer cards
     created_by = models.ForeignKey(
         User, 
         on_delete=models.SET_NULL, 

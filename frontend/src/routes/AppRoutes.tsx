@@ -8,11 +8,14 @@ import MyProjects from '../pages/dashboard/client/MyProjects';
 import Notifications from '../pages/dashboard/client/Notifications';
 import Documents from '../pages/dashboard/client/Documents';
 import OrdersPage from '../pages/dashboard/client/OrdersPage';
+import OAuthCallback from '@/pages/auth/OAuthCallback';
 // Pages
 import { LandingPage } from '../pages/landing/LandingPage';
 import Portfolio from '@/pages/dashboard/admin/Portfolio';
+import OffersPage from '@/pages/dashboard/client/OffersPage';
 // Admin Pages
 import AdminDashboard from '../pages/dashboard/admin/AdminDashboard';
+import SpecialOffersPage from '../pages/dashboard/admin/SpecialOffersPage';
 import Offers from '../../src/pages/dashboard/admin/Offers';
 import Departments from '../pages/dashboard/admin/Departments';
 import Services from '../pages/dashboard/admin/Services';
@@ -23,6 +26,7 @@ import Tasks from '../pages/dashboard/admin/Tasks';
 import MediaLibrary from '../pages/dashboard/admin/MediaLibrary';
 import Estimations from '../pages/dashboard/admin/Estimations';
 import Invoices from '../pages/dashboard/admin/Invoices';
+import Analytics from '../pages/Analytics';
 // Team Head - NEW: Reuses admin components
 import TeamHeadDashboard from '@/pages/dashboard/teamhead/TeamHeadDashboard';
 //Team Member
@@ -67,6 +71,8 @@ export const AppRoutes: React.FC = () => {
       <Route path="/faq" element={<FAQ />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:id" element={<BlogDetail />} />
+      <Route path="/offers" element={<OffersPage />} />
+      <Route path="/auth/callback" element={<OAuthCallback />} />
 
       {/* ✅ PROTECTED DASHBOARD WITH LAYOUT */}
       <Route
@@ -84,6 +90,7 @@ export const AppRoutes: React.FC = () => {
             <Route path='/client-dashboard/documents' element={<Documents />} />
             <Route path='/client-dashboard/profile' element={<ClientProfile />} />
             <Route path='/client-dashboard/settings' element={<SettingsPage />} />
+            <Route path="/client-dashboard/offers" element={<OffersPage />} />
           </Route>
         </Route>
         
@@ -126,6 +133,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/dashboard/orders" element={<Orders />} />
             <Route path="/dashboard/tasks" element={<Tasks />} />
             <Route path="/dashboard/media" element={<MediaLibrary />} />
+            <Route path="/dashboard/special-orders" element={<SpecialOffersPage />} />
             <Route path="/dashboard/testimonials" element={<TestimonialsManagement />} />
             <Route path="/dashboard/contacts" element={<ContactsManagement />} />
             <Route path="/dashboard/forms/new" element={<FormBuilder />} />
@@ -136,6 +144,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/dashboard/blogs/new" element={<BlogEditor />} />
             <Route path="/dashboard/blogs/:id/edit" element={<BlogEditor />} />
             <Route path="/dashboard/orders/:orderId" element={<OrderManagementPage />} />
+            <Route path="/dashboard/analytics" element={<Analytics />} />
             <Route path="/dashboard/settings" element={<SettingsPage />} />
           </Route>
 

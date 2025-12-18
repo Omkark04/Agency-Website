@@ -9,7 +9,9 @@ export type Offer = {
   short_description?: string;
   description?: string;
   image?: string | null;
+  imageURL?: string | null;  // Cloudinary image URL
   offer_type?: string;
+  offer_category?: "regular" | "special";
   services?: Array<{ id: number; title: string; slug?: string }>;
   original_price?: number | null;
   discounted_price?: number | null;
@@ -62,3 +64,6 @@ export function updateOffer(id: number, formData: FormData) {
 
 export const deleteOffer = (id: number) =>
   api.delete(`/api/offers/${id}/`);
+
+export const approveOffer = (id: number) =>
+  api.post(`/api/offers/${id}/approve/`);

@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { listOffers } from "@/api/offers";
 import type { Offer } from "@/api/offers";
+import { useProtectedNavigation } from "../../../hooks/useProtectedNavigation";
+import AuthModal from './AuthModal';
+
 
 type Props = {
   limit?: number; // optional: limit number of cards
@@ -10,10 +13,10 @@ type Props = {
 };
 
 export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
+  const { navigateTo, showAuthModal, setShowAuthModal } = useProtectedNavigation();
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
   const [featuredOnly, setFeaturedOnly] = useState<boolean>(showFeaturedOnly);
   const [limitedOnly, setLimitedOnly] = useState<boolean>(false);
 
@@ -34,6 +37,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
       const resp = await listOffers(params);
       // If your API returns paginated object {results: [...]} handle both
       const data: Offer[] = (resp.data && (resp.data.results ?? resp.data)) || [];
+      console.log(data);
       setOffers(Array.isArray(data) ? data : []);
     } catch (err: any) {
       console.error("Failed to load offers:", err);
@@ -140,11 +144,11 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
               <div className="relative">
                 {renderBadge(offer)}
                 <div className="h-44 w-full bg-gray-100 rounded-md overflow-hidden flex items-center justify-center group">
-                  {offer.image ? (
+                  {(offer.imageURL || offer.image) ? (
                     <motion.img
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.4 }}
-                      src={offer.image}
+                      src={(offer.imageURL || offer.image) || undefined}
                       alt={offer.title}
                       className="object-cover w-full h-full"
                       loading="lazy"
@@ -194,7 +198,28 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
               </div>
             </motion.article>
           ))}
+          
         </div>
+
+        {/* VIEW ALL OFFERS BUTTON */}
+        {offers.length >= limit && (
+          <div className="text-center mt-8">
+            <button
+              onClick={() => navigateTo('/offers')}
+              className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+            >
+              View All Offers →
+            </button>
+          </div>
+        )}
+        
+        {/* Auth Modal */}
+        {showAuthModal && (
+          <AuthModal
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+          />
+        )}
       </div>
     </section>
   );

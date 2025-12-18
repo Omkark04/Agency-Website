@@ -192,6 +192,10 @@ class OfferViewSet(viewsets.ModelViewSet):
         if offer_type:
             qs = qs.filter(offer_type=offer_type)
 
+        offer_category = request.query_params.get('offer_category')
+        if offer_category:
+            qs = qs.filter(offer_category=offer_category)
+
         service_id = request.query_params.get('service')
         if service_id:
             qs = qs.filter(services__id=service_id)

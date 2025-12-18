@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { listOffers, deleteOffer } from "../../../api/offers";
+import { listOffers, deleteOffer, approveOffer } from "../../../api/offers";
 import Modal from "../../../components/ui/Modal";
 import { Button } from "../../../components/ui/Button";
 import OffersForm from "./OffersForm";
@@ -11,6 +11,7 @@ import {
   FiPlus,
   FiSearch,
   FiImage,
+  FiCheck,
 } from "react-icons/fi";
 
 export default function Offers() {
@@ -22,6 +23,8 @@ export default function Offers() {
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterFeatured, setFilterFeatured] = useState("all");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [filterApproval, setFilterApproval] = useState("all");
 
   const load = async () => {
     setLoading(true);
@@ -44,6 +47,16 @@ export default function Offers() {
     load();
   };
 
+  const onApprove = async (id: number) => {
+    try {
+      await approveOffer(id);
+      load();
+    } catch (error) {
+      console.error("Failed to approve offer:", error);
+      alert("Failed to approve offer");
+    }
+  };
+
   const filtered = offers.filter((o) => {
     const matchesSearch =
       o.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -57,7 +70,15 @@ export default function Offers() {
       (filterFeatured === "featured" && o.is_featured) ||
       (filterFeatured === "nonfeatured" && !o.is_featured);
 
-    return matchesSearch && matchesType && matchesFeatured;
+    const matchesCategory =
+      filterCategory === "all" || o.offer_category === filterCategory;
+
+    const matchesApproval =
+      filterApproval === "all" ||
+      (filterApproval === "approved" && o.is_approved) ||
+      (filterApproval === "unapproved" && !o.is_approved);
+
+    return matchesSearch && matchesType && matchesFeatured && matchesCategory && matchesApproval;
   });
 
   return (
@@ -122,6 +143,26 @@ export default function Offers() {
           <option value="featured">Featured Only</option>
           <option value="nonfeatured">Non-Featured</option>
         </select>
+
+        <select
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+          className="border p-3 rounded-lg"
+        >
+          <option value="all">All Categories</option>
+          <option value="regular">Regular Offers</option>
+          <option value="special">Special Offers</option>
+        </select>
+
+        <select
+          value={filterApproval}
+          onChange={(e) => setFilterApproval(e.target.value)}
+          className="border p-3 rounded-lg"
+        >
+          <option value="all">All Status</option>
+          <option value="approved">Approved</option>
+          <option value="unapproved">Pending Approval</option>
+        </select>
       </div>
 
       {/* TABLE */}
@@ -134,9 +175,11 @@ export default function Offers() {
               <tr>
                 <th className="p-4 text-left">Image</th>
                 <th className="p-4 text-left">Title</th>
+                <th className="p-4 text-left">Category</th>
                 <th className="p-4 text-left">Discount</th>
                 <th className="p-4 text-left">Type</th>
                 <th className="p-4 text-left">Featured</th>
+                <th className="p-4 text-left">Approval</th>
                 <th className="p-4 text-left">Actions</th>
               </tr>
             </thead>
@@ -147,9 +190,9 @@ export default function Offers() {
 
                   {/* IMAGE */}
                   <td className="p-4">
-                    {offer.image ? (
+                    {(offer.imageURL || offer.image) ? (
                       <img
-                        src={offer.image}
+                        src={offer.imageURL || offer.image}
                         className="w-12 h-12 object-cover rounded border"
                       />
                     ) : (
@@ -160,6 +203,17 @@ export default function Offers() {
                   </td>
 
                   <td className="p-4 font-semibold">{offer.title}</td>
+
+                  {/* CATEGORY */}
+                  <td className="p-4">
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      offer.offer_category === "special"
+                        ? "bg-purple-100 text-purple-700"
+                        : "bg-blue-100 text-blue-700"
+                    }`}>
+                      {offer.offer_category === "special" ? "Special" : "Regular"}
+                    </span>
+                  </td>
 
                   <td className="p-4">
                     {offer.discount_type === "percent"
@@ -181,8 +235,31 @@ export default function Offers() {
                     )}
                   </td>
 
+                  {/* APPROVAL STATUS */}
+                  <td className="p-4">
+                    {offer.is_approved ? (
+                      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm flex items-center gap-1 w-fit">
+                        <FiCheck /> Approved
+                      </span>
+                    ) : (
+                      <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm w-fit">
+                        Pending
+                      </span>
+                    )}
+                  </td>
+
                   {/* ACTIONS */}
                   <td className="p-4 flex gap-2">
+                    {!offer.is_approved && (
+                      <button
+                        onClick={() => onApprove(offer.id)}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-1"
+                        title="Approve Offer"
+                      >
+                        <FiCheck /> Approve
+                      </button>
+                    )}
+
                     <button
                       onClick={() => {
                         setEdit(offer);

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, Eye, EyeOff, Facebook, Twitter, Github } from 'lucide-react';
+import { X, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
-
+import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
+import { initiateGoogleAuth, initiateLinkedInAuth } from '@/api/oauth';
 
 type AuthMode = 'login' | 'signup';
 
@@ -188,23 +189,34 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
           <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white py-2 rounded">
             {loading ? 'Processing...' : mode === 'login' ? 'Sign In' : 'Create Account'}
           </button>
+
+          {/* OR DIVIDER */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">
+                {mode === 'login' ? 'Or continue with' : 'Or sign up with'}
+              </span>
+            </div>
+          </div>
+
+          {/* SOCIAL LOGIN BUTTONS */}
+          <SocialLoginButtons
+            onGoogleLogin={initiateGoogleAuth}
+            onLinkedInLogin={initiateLinkedInAuth}
+            loading={loading}
+          />
         </form>
 
 
         {/* FOOTER */}
-        <div className="p-4 text-center">
+        <div className="p-4 text-center border-t">
           {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
-          <button onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="text-[#00C2A8]">
+          <button onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="text-[#00C2A8] font-semibold">
             {mode === 'login' ? 'Sign Up' : 'Sign In'}
           </button>
-        </div>
-
-
-        {/* SOCIALS */}
-        <div className="px-6 pb-6 grid grid-cols-3 gap-3">
-          <button className="border p-2 rounded"><Github /></button>
-          <button className="border p-2 rounded"><Facebook /></button>
-          <button className="border p-2 rounded"><Twitter /></button>
         </div>
 
 

@@ -32,17 +32,36 @@ class ServiceFormFieldSerializer(serializers.ModelSerializer):
 class ServiceFormSerializer(serializers.ModelSerializer):
     """Serializer for service forms"""
     fields = ServiceFormFieldSerializer(many=True, read_only=True)
-    service_title = serializers.CharField(source='service.title', read_only=True)
+    service_title = serializers.CharField(source='service.title', read_only=True, allow_null=True)
     created_by_name = serializers.CharField(source='created_by.username', read_only=True)
     
     class Meta:
         model = ServiceForm
         fields = [
             'id', 'service', 'service_title', 'title', 'description', 
+            'card_type', 'selected_offer_id',  # New fields
             'is_active', 'created_by', 'created_by_name', 
             'created_at', 'updated_at', 'fields'
         ]
         read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
+    
+    def validate(self, attrs):
+        """Validate that service is provided for service cards"""
+        card_type = attrs.get('card_type', 'service')
+        service = attrs.get('service')
+        selected_offer_id = attrs.get('selected_offer_id')
+        
+        if card_type == 'service' and not service:
+            raise serializers.ValidationError({
+                'service': 'Service is required for service cards'
+            })
+        
+        if card_type == 'offer' and not selected_offer_id:
+            raise serializers.ValidationError({
+                'selected_offer_id': 'Offer selection is required for offer cards'
+            })
+        
+        return attrs
 
 
 class ServiceFormSubmissionSerializer(serializers.ModelSerializer):

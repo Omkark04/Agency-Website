@@ -168,6 +168,11 @@ class Offer(models.Model):
         ("flat", "Flat Amount"),
     ]
 
+    OFFER_CATEGORY = [
+        ("regular", "Regular Offer"),
+        ("special", "Special Offer"),
+    ]
+
     id = models.AutoField(primary_key=True)
 
     # Core marketing fields
@@ -178,9 +183,11 @@ class Offer(models.Model):
 
     # Image handling (same pattern as other models)
     image = models.ImageField(upload_to="offers/", null=True, blank=True)
+    imageURL = models.URLField(max_length=500, null=True, blank=True, help_text="Cloudinary image URL")
 
     # Offer categorization & services covered
     offer_type = models.CharField(max_length=20, choices=OFFER_TYPES, default="seasonal")
+    offer_category = models.CharField(max_length=20, choices=OFFER_CATEGORY, default="regular", help_text="Regular offers: single service. Special offers: multiple services.")
     services = models.ManyToManyField(
         "services.Service",
         related_name="offers",
@@ -387,6 +394,7 @@ class Offer(models.Model):
             "description": self.description,
             "image": self.image.url if self.image else None,
             "offer_type": self.offer_type,
+            "offer_category": self.offer_category,
             "services": list(self.services.values("id", "title", "slug")),
             "original_price": float(self.original_price) if self.original_price is not None else None,
             "discounted_price": float(self.discounted_price) if self.discounted_price is not None else None,

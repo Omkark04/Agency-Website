@@ -103,9 +103,9 @@ class OfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offer
         fields = [
-            'id', 'title', 'slug', 'description', 'short_description', 'image',
+            'id', 'title', 'slug', 'description', 'short_description', 'image', 'imageURL',
             'services', 'services_info',
-            'offer_type', 'original_price', 'discounted_price',
+            'offer_type', 'offer_category', 'original_price', 'discounted_price',
             'discount_type', 'discount_value', 'discount_percent', 'discount_percentage',
             'discount_code', 'terms', 'valid_from', 'valid_to', 'valid_until',
             'is_active', 'is_featured', 'is_limited_time', 'is_limited_time', 'priority',
@@ -273,6 +273,16 @@ class OfferSerializer(serializers.ModelSerializer):
         if 'is_approved' in validated_data:
             # remove it to avoid clients approving their own offers
             validated_data.pop('is_approved')
+
+        # Only admins can create Special Offers
+        offer_category = validated_data.get('offer_category', 'regular')
+        if offer_category == 'special':
+            user = getattr(request, 'user', None)
+            if not (user and getattr(user, 'role', '') == 'admin'):
+                from rest_framework import serializers as drf_serializers
+                raise drf_serializers.ValidationError({
+                    "offer_category": "Only administrators can create Special Offers."
+                })
 
         # Assign creator if request user exists
         if request and hasattr(request, 'user') and request.user and request.user.is_authenticated:

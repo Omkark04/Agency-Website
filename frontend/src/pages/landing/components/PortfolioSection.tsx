@@ -17,8 +17,11 @@ import {
 import { Button as MovingBorderContainer } from "@/components/ui/moving-border";
 import { fetchPortfolioProjects } from '../../../api/portfolio';
 import type { PortfolioProject } from '../../../api/portfolio';
+import { useProtectedNavigation } from '../../../hooks/useProtectedNavigation';
+import AuthModal from './AuthModal';
 
 const PortfolioSection = () => {
+  const { navigateTo, showAuthModal, setShowAuthModal } = useProtectedNavigation();
   const [projects, setProjects] = useState<PortfolioProject[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<PortfolioProject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -535,7 +538,7 @@ const PortfolioSection = () => {
                 </div>
                 
                 <button
-                  onClick={() => window.location.href = '/portfolio'}
+                  onClick={() => navigateTo('/portfolio')}
                   className="group inline-flex items-center gap-3 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:from-[#00A58E] hover:to-[#0052CC] text-white px-8 py-4 rounded-full font-semibold hover:shadow-2xl hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
                 >
                   <span>View Complete Portfolio</span>
@@ -561,13 +564,13 @@ const PortfolioSection = () => {
               <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
                 Join our satisfied clients and let us bring your vision to life with our expertise.
               </p>
-              <a
-                onClick={() => window.location.href = '/portfolio'}
+              <button
+                onClick={() => navigateTo('/portfolio')}
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
               >
                 Start Your Project
                 <ExternalLink className="w-5 h-5" />
-              </a>
+              </button>
             </div>
           </div>
         </motion.div>
@@ -713,6 +716,14 @@ const PortfolioSection = () => {
             </div>
           </motion.div>
         </div>
+      )}
+      
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+        />
       )}
     </section>
   );

@@ -4,6 +4,7 @@ import { listOrders } from '../../../api/orders';
 import { useAuth } from '../../../hooks/useAuth';
 import { logout } from '../../../utils/auth';
 import logo from '../../../assets/UdyogWorks logo.png';
+import OffersSection from '@/components/dashboard/OffersSection';
 import { useNavigate } from 'react-router-dom';
 import { 
   Home, 
@@ -520,7 +521,9 @@ export default function ClientDashboard() {
                   </Link>
                 </div>
               </div>
-
+              {/* Offers Section */}
+              <OffersSection />
+              
               {/* Enhanced Stats Grid - Admin Style */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-fade-in" style={{animationDelay: '0.2s'}}>
                 {stats.map((stat, index) => {
