@@ -42,13 +42,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-if os.getenv('DATABASE_URL'):
-    DATABASES['default'] = dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
@@ -60,16 +53,17 @@ SIMPLE_JWT = {
 AUTH_USER_MODEL = "accounts.User"
 
 # Redis Cache Configuration
+REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1")
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": REDIS_URL,
     }
 }
 
 # Celery Configuration
-CELERY_BROKER_URL = "redis://localhost:6379/0"
-CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_BROKER_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
@@ -207,6 +201,14 @@ DATABASES = {
         "CONN_MAX_AGE": 600,  # Connection pooling
     }
 }
+
+# Override with DATABASE_URL if provided (for Docker/Railway)
+if os.getenv('DATABASE_URL'):
+    DATABASES['default'] = dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",},
