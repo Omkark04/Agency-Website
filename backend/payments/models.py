@@ -1,6 +1,102 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.utils import timezone
+from datetime import timedelta
+import uuid
+
+
+class PaymentRequest(models.Model):
+    """
+    Represents a payment request initiated by admin or service head.
+    This creates a payment link that is sent to the client.
+    """
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("paid", "Paid"),
+        ("expired", "Expired"),
+        ("cancelled", "Cancelled"),
+    ]
+    
+    GATEWAY_CHOICES = [
+        ("razorpay", "Razorpay"),
+        ("paypal", "PayPal"),
+    ]
+    
+    id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)  # Secure identifier
+    order = models.ForeignKey(
+        "orders.Order",
+        on_delete=models.CASCADE,
+        related_name="payment_requests"
+    )
+    requested_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="payment_requests_created"
+    )
+    
+    # Payment details
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        validators=[MinValueValidator(0)]
+    )
+    gateway = models.CharField(max_length=20, choices=GATEWAY_CHOICES)
+    currency = models.CharField(max_length=3, default="INR")
+    
+    # Status and tracking
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    payment_link = models.URLField(max_length=500, blank=True)
+    
+    # Notes and metadata
+    notes = models.TextField(blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
+    
+    # Related payment order (created when client initiates payment)
+    payment_order = models.ForeignKey(
+        "PaymentOrder",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="payment_request"
+    )
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        db_table = "payment_requests"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["order"]),
+            models.Index(fields=["status"]),
+            models.Index(fields=["requested_by"]),
+        ]
+    
+    def __str__(self):
+        return f"Payment Request #{self.id} - {self.amount} {self.currency} - {self.status}"
+    
+    def save(self, *args, **kwargs):
+        # Set expiration date if not set (7 days from creation)
+        if not self.expires_at and not self.pk:
+            self.expires_at = timezone.now() + timedelta(days=7)
+        super().save(*args, **kwargs)
+    
+    def is_expired(self):
+        """Check if payment request has expired"""
+        if self.expires_at:
+            return timezone.now() > self.expires_at
+        return False
+    
+    def mark_paid(self):
+        """Mark payment request as paid"""
+        self.status = "paid"
+        self.paid_at = timezone.now()
+        self.save()
 
 
 class PaymentOrder(models.Model):
@@ -22,6 +118,7 @@ class PaymentOrder(models.Model):
     ]
     
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)  # Secure identifier
     order = models.ForeignKey(
         "orders.Order", 
         on_delete=models.CASCADE, 
@@ -104,6 +201,7 @@ class Transaction(models.Model):
     ]
     
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)  # Secure identifier
     
     # Relations
     order = models.ForeignKey(

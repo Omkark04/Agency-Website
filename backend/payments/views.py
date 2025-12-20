@@ -7,16 +7,21 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 import json
 
-from .models import PaymentOrder, Transaction, WebhookLog
+from .models import PaymentRequest, PaymentOrder, Transaction, WebhookLog
 from .serializers import (
+    PaymentRequestSerializer, PaymentRequestCreateSerializer,
     PaymentOrderSerializer, PaymentOrderCreateSerializer,
     TransactionSerializer, PaymentVerificationSerializer,
     WebhookLogSerializer
 )
 from .services import RazorpayService, PayPalService, PaymentProcessor
 from orders.models import Order
+from notifications.models import Notification
 
 
 class PaymentOrderViewSet(viewsets.ModelViewSet):
@@ -134,6 +139,145 @@ class PaymentOrderViewSet(viewsets.ModelViewSet):
                 {'error': str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_payment_request(request):
+    """
+    Create a payment request and send email to client
+    POST /api/payments/request-payment/
+    
+    Only admin and service heads can create payment requests
+    """
+    serializer = PaymentRequestCreateSerializer(
+        data=request.data,
+        context={'request': request}
+    )
+    
+    if not serializer.is_valid():
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        order_id = serializer.validated_data['order_id']
+        amount = serializer.validated_data['amount']
+        gateway = serializer.validated_data['gateway']
+        currency = serializer.validated_data['currency']
+        notes = serializer.validated_data.get('notes', '')
+        
+        order = Order.objects.get(id=order_id)
+        
+        # Create payment request
+        payment_request = PaymentRequest.objects.create(
+            order=order,
+            requested_by=request.user,
+            amount=amount,
+            gateway=gateway,
+            currency=currency,
+            notes=notes
+        )
+        
+        # Generate payment link
+        payment_link = f"{settings.FRONTEND_URL}/payment/{payment_request.id}"
+        payment_request.payment_link = payment_link
+        payment_request.save()
+        
+        # Send email to client
+        if order.client and order.client.email:
+            try:
+                gateway_display = "Razorpay" if gateway == "razorpay" else "PayPal"
+                
+                html_message = render_to_string('emails/payment_request.html', {
+                    'client_name': order.client.get_full_name() or order.client.email,
+                    'order_id': order.id,
+                    'order_title': order.title,
+                    'amount': amount,
+                    'currency': currency,
+                    'gateway_display': gateway_display,
+                    'payment_link': payment_link,
+                    'expires_at': payment_request.expires_at.strftime('%B %d, %Y'),
+                    'notes': notes,
+                    'requested_by': request.user.get_full_name() or request.user.email,
+                    'company_email': settings.COMPANY_EMAIL,
+                    'company_phone': getattr(settings, 'COMPANY_PHONE', ''),
+                })
+                
+                plain_message = strip_tags(html_message)
+                
+                send_mail(
+                    subject=f'Payment Request for Order #{order.id}',
+                    message=plain_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[order.client.email],
+                    html_message=html_message,
+                    fail_silently=True,
+                )
+            except Exception as email_error:
+                # Log email error but don't fail the request
+                print(f"Failed to send email: {email_error}")
+        
+        # Create dashboard notification
+        if order.client:
+            Notification.objects.create(
+                user=order.client,
+                title="Payment Request Received",
+                message=f"You have a payment request of {currency} {amount} for Order #{order.id}. Check your email for the payment link.",
+                notification_type="payment_received",
+                order=order
+            )
+        
+        return Response({
+            'success': True,
+            'message': 'Payment request created and email sent successfully',
+            'payment_request': PaymentRequestSerializer(payment_request).data
+        }, status=status.HTTP_201_CREATED)
+    
+    except Order.DoesNotExist:
+        return Response(
+            {'error': 'Order not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        # Log the full error for debugging
+        import traceback
+        print(f"Error creating payment request: {e}")
+        print(traceback.format_exc())
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_payment_requests(request):
+    """
+    List payment requests based on user role
+    GET /api/payments/requests/
+    """
+    user = request.user
+    
+    if user.role == 'admin':
+        payment_requests = PaymentRequest.objects.all()
+    elif user.role == 'service_head':
+        # Service heads can see requests for their department's orders
+        payment_requests = PaymentRequest.objects.filter(
+            order__service__department__team_head=user
+        )
+    else:
+        # Clients can see their own payment requests
+        payment_requests = PaymentRequest.objects.filter(order__client=user)
+    
+    # Filter by status if provided
+    status_filter = request.query_params.get('status')
+    if status_filter:
+        payment_requests = payment_requests.filter(status=status_filter)
+    
+    serializer = PaymentRequestSerializer(payment_requests, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['POST'])
@@ -515,6 +659,49 @@ def retry_payment(request, transaction_id):
             'message': 'New payment order created for retry',
             'payment_order': PaymentOrderSerializer(payment_order).data
         })
+    
+    except Transaction.DoesNotExist:
+        return Response(
+            {'error': 'Transaction not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def download_receipt(request, transaction_id):
+    """
+    Download receipt PDF for a transaction
+    GET /api/payments/receipt/<transaction_id>/
+    """
+    try:
+        transaction = Transaction.objects.get(transaction_id=transaction_id)
+        
+        # Check permissions
+        user = request.user
+        if user.role == 'client' and transaction.user != user:
+            return Response(
+                {'error': 'You do not have permission to download this receipt'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Generate receipt PDF
+        from .receipt_generator import ReceiptPDFGenerator
+        from django.http import HttpResponse
+        
+        generator = ReceiptPDFGenerator(transaction)
+        pdf_file = generator.generate()
+        
+        # Create HTTP response with PDF
+        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="receipt_{transaction_id}.pdf"'
+        
+        return response
     
     except Transaction.DoesNotExist:
         return Response(

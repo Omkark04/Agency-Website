@@ -3,6 +3,7 @@ from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
 import os
+import dj_database_url
 
 # Load environment variables from .env file
 load_dotenv()
@@ -40,6 +41,13 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
     ),
 }
+
+if os.getenv('DATABASE_URL'):
+    DATABASES['default'] = dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
@@ -84,6 +92,11 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",  # Required for dj-rest-auth
     "django_filters", 
     'cloudinary',
+    'drf_yasg',  # API documentation (Swagger/OpenAPI)
+    
+    # Security
+    'axes',  # Track failed login attempts
+    'defender',  # Brute force protection
     
     # allauth & dj-rest-auth
     'dj_rest_auth',
@@ -125,6 +138,11 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",  # Required for allauth
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    
+    # Security middleware
+    "middleware.logging_middleware.RequestLoggingMiddleware",  # Log all requests
+    "middleware.logging_middleware.SecurityHeadersMiddleware",  # Add security headers
+    "axes.middleware.AxesMiddleware",  # Track failed logins
 ]
 
 # CORS Configuration
@@ -162,7 +180,7 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -177,18 +195,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": os.getenv("DB_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.getenv("DB_NAME", str(BASE_DIR / "db.sqlite3")),
+        "USER": os.getenv("DB_USER", ""),
+        "PASSWORD": os.getenv("DB_PASSWORD", ""),
+        "HOST": os.getenv("DB_HOST", ""),
+        "PORT": os.getenv("DB_PORT", ""),
+        "CONN_MAX_AGE": 600,  # Connection pooling
     }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 12,  # Increased from default 8
+        }
+    },
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
+    {"NAME": "utils.validators.PasswordComplexityValidator",},  # Custom validator
 ]
 
 LANGUAGE_CODE = "en-us"
@@ -196,6 +226,7 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -309,3 +340,10 @@ COMPANY_TAX_ID = os.getenv("COMPANY_TAX_ID", "")
 
 # Base URL for WeasyPrint (used for loading assets in PDFs)
 WEASYPRINT_BASEURL = os.getenv("WEASYPRINT_BASEURL", "http://localhost:8000")
+
+# ============================================
+# IMPORT SECURITY SETTINGS
+# ============================================
+
+# Import comprehensive security, logging, and monitoring configurations
+from .security_settings import *

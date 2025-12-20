@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+        .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .button { display: inline-block; padding: 12px 30px; background: #3b82f6; color: white; text-decoration: none; border-radius: 5px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 style="margin: 0;">💰 Payment Received</h1>
+        <p style="margin: 10px 0 0 0;">UdyogWorks Admin Notification</p>
+    </div>
+    
+    <div class="content">
+        <h2>Hello {{ admin_name }},</h2>
+        
+        <div class="info-box">
+            <h3 style="margin-top: 0; color: #2563eb;">New payment received!</h3>
+            <p>A client has successfully completed a payment.</p>
+        </div>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>Payment Details</h3>
+            <div class="detail-row">
+                <span>Client:</span>
+                <span><strong>{{ client_name }} ({{ client_email }})</strong></span>
+            </div>
+            <div class="detail-row">
+                <span>Order:</span>
+                <span><strong>#{{ order_id }} - {{ order_title }}</strong></span>
+            </div>
+            <div class="detail-row">
+                <span>Amount:</span>
+                <span><strong style="color: #10b981; font-size: 18px;">{{ currency }} {{ amount }}</strong></span>
+            </div>
+            <div class="detail-row">
+                <span>Gateway:</span>
+                <span>{{ gateway }}</span>
+            </div>
+            <div class="detail-row">
+                <span>Transaction ID:</span>
+                <span><code>{{ transaction_id }}</code></span>
+            </div>
+            <div class="detail-row">
+                <span>Payment Date:</span>
+                <span>{{ payment_date }}</span>
+            </div>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="{{ dashboard_link }}" class="button">View Order in Dashboard</a>
+        </div>
+        
+        <p style="color: #666; margin-top: 30px; font-size: 14px;">
+            The order status has been automatically updated. You can view full transaction details in the admin dashboard.
+        </p>
+    </div>
+    
+    <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 14px;">
+        <p><strong>UdyogWorks Admin Panel</strong></p>
+        <p>This is an automated notification</p>
+    </div>
+</body>
+</html>

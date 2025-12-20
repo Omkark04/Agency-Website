@@ -14,8 +14,8 @@ import {
   DeliverableUpload
 } from '@/components';
 import { getWorkflowInfo, updateOrderStatus } from '@/api/workflow';
-import { generateInvoice } from '../../../api/invoices';
 import { getOrder } from '../../../api/orders';
+import { createPaymentRequest } from '../../../api/payments';
 import type { WorkflowInfo } from '@/types/workflow';
 import { FiCheckCircle, FiX, FiAlertCircle, FiDollarSign, FiEdit } from 'react-icons/fi';
 
@@ -30,6 +30,7 @@ export default function OrderManagementPage() {
   const [showPaymentRequestModal, setShowPaymentRequestModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState('');
   const [paymentReason, setPaymentReason] = useState('');
+  const [paymentGateway, setPaymentGateway] = useState<'razorpay' | 'paypal'>('razorpay');
 
   useEffect(() => {
     if (orderId) {
@@ -111,39 +112,25 @@ export default function OrderManagementPage() {
         return;
       }
       
-      // Generate invoice for partial payment
-      await generateInvoice(parseInt(orderId!), {
+      // Create payment request using new API
+      await createPaymentRequest({
         order_id: parseInt(orderId!),
-        title: `Partial Payment Invoice - ${workflowInfo?.current_status_display}`,
-        line_items: [
-          {
-            item: 'Partial Payment',
-            description: paymentReason || `Payment request for ${workflowInfo?.current_status_display}`,
-            quantity: 1,
-            rate: amount,
-            amount: amount
-          }
-        ],
-        tax_percentage: 0,
-        discount_amount: 0,
-        notes: paymentReason || `Partial payment request - ${workflowInfo?.current_status_display}`
+        amount: amount,
+        gateway: paymentGateway,
+        currency: 'INR',
+        notes: paymentReason || `Payment request for ${workflowInfo?.current_status_display}`
       });
       
-      // Update status to payment_pending
-      await updateOrderStatus(parseInt(orderId!), {
-        new_status: 'payment_pending',
-        notes: `Partial payment of ₹${amount} requested: ${paymentReason}`
-      });
-      
-      alert('Payment request sent to client!');
+      alert('Payment request sent to client! They will receive an email with payment link.');
       setShowPaymentRequestModal(false);
       setPaymentAmount('');
       setPaymentReason('');
+      setPaymentGateway('razorpay');
       fetchWorkflowInfo();
       fetchOrderDetails();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to request payment:', error);
-      alert('Failed to send payment request');
+      alert(error.response?.data?.error || 'Failed to send payment request');
     }
   };
 
@@ -409,12 +396,49 @@ export default function OrderManagementPage() {
               />
             </div>
             
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Payment Gateway
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPaymentGateway('razorpay')}
+                  className={`px-4 py-3 border-2 rounded-lg font-medium transition-all ${
+                    paymentGateway === 'razorpay'
+                      ? 'border-blue-600 bg-blue-50 text-blue-700'
+                      : 'border-gray-300 hover:border-gray-400'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="font-bold">Razorpay</div>
+                    <div className="text-xs text-gray-500">Indian Payments (INR)</div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentGateway('paypal')}
+                  className={`px-4 py-3 border-2 rounded-lg font-medium transition-all ${
+                    paymentGateway === 'paypal'
+                      ? 'border-blue-600 bg-blue-50 text-blue-700'
+                      : 'border-gray-300 hover:border-gray-400'
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="font-bold">PayPal</div>
+                    <div className="text-xs text-gray-500">International (USD/EUR)</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+            
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => {
                   setShowPaymentRequestModal(false);
                   setPaymentAmount('');
                   setPaymentReason('');
+                  setPaymentGateway('razorpay');
                 }}
                 className="px-4 py-2 border rounded-lg hover:bg-gray-50"
               >

@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.core.validators import MinValueValidator
 from django.utils.text import slugify
 import math
+import uuid
 
 
 class Order(models.Model):
@@ -22,6 +23,7 @@ class Order(models.Model):
         ("closed", "Closed"),
     ]
     id = models.AutoField(primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)  # Secure identifier
     client = models.ForeignKey(
         "accounts.User", 
         on_delete=models.SET_NULL, 

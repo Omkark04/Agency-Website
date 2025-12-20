@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 import cloudinary.uploader
+import logging
 
 from .models import Order
 from .workflow_models import OrderStatusHistory
@@ -18,6 +19,8 @@ from .workflow_serializers import (
 )
 from notifications.models import Notification
 from accounts.models import User
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['POST'])
@@ -40,17 +43,33 @@ def update_order_status(request, order_id):
         
         # Service heads can only update orders for their department's services
         if user.role == 'service_head':
-            from services.models import Department
-            user_dept = Department.objects.filter(team_head=user).first()
-            if not user_dept:
+            try:
+                from services.models import Department
+                user_dept = Department.objects.filter(team_head=user).first()
+                if not user_dept:
+                    return Response(
+                        {'error': 'You are not assigned to any department'},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+                
+                # Check if service has a department
+                if not hasattr(order.service, 'department') or not order.service.department:
+                    logger.error(f"Order {order.id} service {order.service.id} has no department")
+                    return Response(
+                        {'error': 'This order\'s service is not assigned to any department'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                
+                if order.service.department != user_dept:
+                    return Response(
+                        {'error': 'You can only update orders for services in your department'},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+            except Exception as e:
+                logger.error(f"Error checking service head permissions: {str(e)}", exc_info=True)
                 return Response(
-                    {'error': 'You are not assigned to any department'},
-                    status=status.HTTP_403_FORBIDDEN
-                )
-            if order.service.department != user_dept:
-                return Response(
-                    {'error': 'You can only update orders for services in your department'},
-                    status=status.HTTP_403_FORBIDDEN
+                    {'error': f'Permission check failed: {str(e)}'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
         
         # Validate and update status
@@ -76,8 +95,8 @@ def update_order_status(request, order_id):
                     user=order.client,
                     title="Order Status Updated",
                     message=f"Order #{order.id} status has been updated to: {status_display}",
-                    notification_type="order_status_update",
-                    link=f"/dashboard/orders/{order.id}"
+                    notification_type="order_update",
+                    order=order
                 )
             
             # Send notification to admin if status is payment_done
@@ -89,7 +108,7 @@ def update_order_status(request, order_id):
                         title="Payment Received",
                         message=f"Payment received for Order #{order.id}",
                         notification_type="payment_received",
-                        link=f"/dashboard/admin/orders/{order.id}"
+                        order=order
                     )
             
             return Response({
@@ -116,6 +135,7 @@ def update_order_status(request, order_id):
             status=status.HTTP_404_NOT_FOUND
         )
     except Exception as e:
+        logger.error(f"Error updating order status for order {order_id}: {str(e)}", exc_info=True)
         return Response(
             {'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -225,8 +245,8 @@ def upload_deliverable(request, order_id):
                 user=order.client,
                 title="New Deliverable Uploaded",
                 message=f"A new deliverable has been uploaded for Order #{order.id}",
-                notification_type="deliverable_uploaded",
-                link=f"/dashboard/orders/{order.id}"
+                notification_type="order_update",
+                order=order
             )
         
         return Response({

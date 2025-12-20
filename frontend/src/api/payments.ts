@@ -32,3 +32,47 @@ export const getPaymentOrder = (id: number) =>
 // List all payment orders (admin/service head)
 export const listPaymentOrders = (params?: any) =>
   api.get<PaymentOrder[]>('/api/payments/payment-orders/', { params });
+
+// Payment Request APIs
+export interface PaymentRequestData {
+  order_id: number;
+  amount: number;
+  gateway: 'razorpay' | 'paypal';
+  currency?: string;
+  notes?: string;
+}
+
+export interface PaymentRequest {
+  id: number;
+  order: number;
+  order_title: string;
+  requested_by: number;
+  requested_by_email: string;
+  client_email: string;
+  amount: string;
+  gateway: string;
+  currency: string;
+  status: string;
+  payment_link: string;
+  notes: string;
+  created_at: string;
+  expires_at: string;
+  paid_at: string | null;
+}
+
+// Create payment request (admin/service head only)
+export const createPaymentRequest = (data: PaymentRequestData) =>
+  api.post<{ success: boolean; message: string; payment_request: PaymentRequest }>(
+    '/api/payments/request-payment/',
+    data
+  );
+
+// List payment requests
+export const listPaymentRequests = (params?: { status?: string }) =>
+  api.get<PaymentRequest[]>('/api/payments/requests/', { params });
+
+// Download receipt PDF
+export const downloadReceipt = (transactionId: string) =>
+  api.get(`/api/payments/receipt/${transactionId}/`, {
+    responseType: 'blob'
+  });

@@ -54,7 +54,7 @@ class TaskViewSet(viewsets.ModelViewSet):
                 title="New Task Assigned",
                 message=f"You have been assigned a new task: {task.title}",
                 notification_type="task_assigned",
-                link=f"/dashboard/tasks/{task.id}"
+                task=task
             )
     
     def perform_update(self, serializer):
@@ -72,7 +72,7 @@ class TaskViewSet(viewsets.ModelViewSet):
                 title="Task Assigned to You",
                 message=f"You have been assigned to task: {task.title}",
                 notification_type="task_assigned",
-                link=f"/dashboard/tasks/{task.id}"
+                task=task
             )
         
         # Notify if status changed to done
@@ -83,8 +83,8 @@ class TaskViewSet(viewsets.ModelViewSet):
                     user=task.order.client,
                     title="Task Completed",
                     message=f"Task '{task.title}' for Order #{task.order.id} has been completed",
-                    notification_type="task_completed",
-                    link=f"/dashboard/orders/{task.order.id}/tasks"
+                    notification_type="order_update",
+                    order=task.order
                 )
     
     def destroy(self, request, *args, **kwargs):
@@ -157,7 +157,7 @@ def order_tasks(request, order_id):
                         title="New Task Assigned",
                         message=f"You have been assigned a new task: {task.title}",
                         notification_type="task_assigned",
-                        link=f"/dashboard/tasks/{task.id}"
+                        task=task
                     )
                 
                 return Response(

@@ -28,6 +28,7 @@ from .serializers import (
 
 User = get_user_model()
 
+@method_decorator(ratelimit(key='ip', rate='10/h', method='POST'), name='dispatch')
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
@@ -157,6 +158,7 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
             )
         return super().update(request, *args, **kwargs)
 
+@method_decorator(ratelimit(key='ip', rate='10/h', method='POST'), name='dispatch')
 class GoogleOAuthView(APIView):
     permission_classes = [permissions.AllowAny]
 
