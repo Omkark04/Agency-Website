@@ -5,8 +5,7 @@
     "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate && gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT --workers 2",
-    "healthcheckPath": "/api/",
+    "startCommand": "npm run dev -- --host 0.0.0.0 --port $PORT",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
