@@ -23,8 +23,8 @@ export default function Portfolio() {
       const dept = (user as any).department;
       params.service__department = typeof dept === 'object' ? dept.id : dept;
     }
-    const res = await fetchPortfolioProjects(params);
-    setItems(Array.isArray(res) ? res : res.data || []);
+    const res: any = await fetchPortfolioProjects(params);
+    setItems(Array.isArray(res) ? res : (res?.data || []));
     setLoading(false);
   };
 
