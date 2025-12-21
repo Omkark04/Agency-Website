@@ -11,7 +11,7 @@ build/
 # Django
 *.log
 db.sqlite3
-media/
+# media/  # Commented out - we have a Django app named 'media' that must be included
 staticfiles/
 logs/
 
