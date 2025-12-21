@@ -2,6 +2,9 @@
 import api from './api';
 import type { Task, TaskAttachment, TaskCreateData } from '../types/task';
 
+// Re-export types for use in other components
+export type { Task, TaskCreateData, TaskAttachment };
+
 // Get all tasks for an order
 export const getOrderTasks = (orderId: number, status?: string) => {
   const params = status ? { status } : {};

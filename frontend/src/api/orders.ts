@@ -8,6 +8,8 @@ export interface Order {
   title: string;
   details?: string;
   price: string;
+  total_price?: number; // Added for OrdersPage compatibility
+  service_title?: string; // Added for OrdersPage compatibility
   status: string;
   due_date?: string;
   created_at?: string;

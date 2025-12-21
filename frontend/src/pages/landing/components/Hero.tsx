@@ -9,7 +9,7 @@ import { useProtectedNavigation } from '../../../hooks/useProtectedNavigation';
 import AuthModal from './AuthModal';
 
 
-export const Hero = ({ }) => {
+export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) => {
   const { navigateTo, showAuthModal, setShowAuthModal } = useProtectedNavigation();
   const [heroImages, setHeroImages] = useState<MediaItem[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);

@@ -56,7 +56,7 @@ export default function Documents() {
   };
 
   const getStatusBadge = (status: string) => {
-    const badges: Record<string, { bg: string; text: string; gradient: string; icon: JSX.Element; label: string; emoji: string }> = {
+    const badges: Record<string, { bg: string; text: string; gradient: string; icon: React.ReactElement; label: string; emoji: string }> = {
       draft: { bg: 'bg-gradient-to-r from-gray-50 to-slate-50', text: 'text-gray-700', gradient: 'from-gray-500 to-slate-500', icon: <Clock className="w-3.5 h-3.5" />, label: 'Draft', emoji: '📝' },
       sent: { bg: 'bg-gradient-to-r from-blue-50 to-blue-100', text: 'text-[#1E40AF]', gradient: 'from-[#2563EB] to-[#1E40AF]', icon: <Clock className="w-3.5 h-3.5" />, label: 'Sent', emoji: '📤' },
       approved: { bg: 'bg-gradient-to-r from-green-50 to-emerald-50', text: 'text-green-700', gradient: 'from-green-500 to-emerald-500', icon: <CheckCircle className="w-3.5 h-3.5" />, label: 'Approved', emoji: '✅' },
