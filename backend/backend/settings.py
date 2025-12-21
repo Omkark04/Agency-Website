@@ -140,12 +140,25 @@ MIDDLEWARE = [
 ]
 
 # CORS Configuration
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  
-    "http://localhost:3000",  
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:3000",
-]
+# Read from environment variable, split by comma, or use localhost defaults for development
+cors_origins_env = os.getenv("CORS_ALLOWED_ORIGINS", "")
+if cors_origins_env:
+    # Split by comma and strip whitespace
+    CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins_env.split(",") if origin.strip()]
+else:
+    # Default to localhost for development
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:5173",  
+        "http://localhost:3000",  
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000",
+    ]
+
+# Allow all origins if explicitly set to *
+if cors_origins_env == "*":
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOW_CREDENTIALS = True
 
