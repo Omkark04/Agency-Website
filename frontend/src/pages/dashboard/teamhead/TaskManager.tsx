@@ -3,7 +3,6 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import type { DropResult, DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd';
 import { FiPlus, FiFilter, FiSearch, FiCalendar, FiCheck, FiClock, FiTrash2, FiEdit2, FiAlertCircle } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { HTMLMotionProps } from 'framer-motion';
 import { getTeamTasks, createTask, updateTask, deleteTask, getTeamProjects } from '@/api/teamHeadApi';
 import type { Task as APITask } from '@/api/teamHeadApi';
 
@@ -12,14 +11,19 @@ type DraggableItemProps = {
   provided: DraggableProvided;
   snapshot: DraggableStateSnapshot;
   children: React.ReactNode;
-} & HTMLMotionProps<'div'>;
+  className?: string;
+};
 
-const DraggableItem = ({ provided, snapshot, children, ...props }: DraggableItemProps) => {
+const DraggableItem = ({ provided, snapshot, children, className }: DraggableItemProps) => {
+  // Separate drag props to avoid conflicts
+  const { draggableProps, dragHandleProps } = provided;
+  
   return (
     <motion.div
       ref={provided.innerRef}
-      {...provided.draggableProps}
-      {...provided.dragHandleProps}
+      {...draggableProps}
+      {...dragHandleProps}
+      className={className}
       initial={{ opacity: 0, y: 20 }}
       animate={{
         opacity: 1,
@@ -30,9 +34,8 @@ const DraggableItem = ({ provided, snapshot, children, ...props }: DraggableItem
       exit={{ opacity: 0, x: -100 }}
       transition={{ duration: 0.2 }}
       style={{
-        ...provided.draggableProps.style,
+        ...draggableProps.style,
       }}
-      {...props}
     >
       {children}
     </motion.div>
