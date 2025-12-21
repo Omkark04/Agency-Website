@@ -86,6 +86,17 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return user
 
+class LoginUserSerializer(serializers.ModelSerializer):
+    """Lightweight serializer for login response - avoids circular references"""
+    department_id = serializers.IntegerField(source='department.id', read_only=True, allow_null=True)
+    department_title = serializers.CharField(source='department.title', read_only=True, allow_null=True)
+    
+    class Meta:
+        model = User
+        fields = ["id", "username", "email", "role", "first_name", "last_name", "phone", 
+                  "department_id", "department_title", "avatar_url"]
+        read_only_fields = fields
+
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         # Get user by email
@@ -108,7 +119,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             # Reset failed login attempts on successful login
             if hasattr(self, 'user') and self.user:
                 self.user.reset_failed_login()
-            data.update({"user": UserSerializer(self.user).data})
+            # Use lightweight serializer to avoid circular references
+            data.update({"user": LoginUserSerializer(self.user).data})
             return data
         except Exception as e:
             # Increment failed login attempts
