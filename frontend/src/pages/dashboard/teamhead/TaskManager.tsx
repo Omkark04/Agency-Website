@@ -15,30 +15,28 @@ type DraggableItemProps = {
 };
 
 const DraggableItem = ({ provided, snapshot, children, className }: DraggableItemProps) => {
-  // Separate drag props to avoid conflicts
-  const { draggableProps, dragHandleProps } = provided;
-  
   return (
-    <motion.div
+    <div
       ref={provided.innerRef}
-      {...draggableProps}
-      {...dragHandleProps}
-      className={className}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{
-        opacity: 1,
-        y: 0,
-        scale: snapshot.isDragging ? 1.02 : 1,
-        boxShadow: snapshot.isDragging ? '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' : 'none'
-      }}
-      exit={{ opacity: 0, x: -100 }}
-      transition={{ duration: 0.2 }}
-      style={{
-        ...draggableProps.style,
-      }}
+      {...provided.draggableProps}
+      {...provided.dragHandleProps}
+      style={provided.draggableProps.style}
     >
-      {children}
-    </motion.div>
+      <motion.div
+        className={className}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{
+          opacity: 1,
+          y: 0,
+          scale: snapshot.isDragging ? 1.02 : 1,
+          boxShadow: snapshot.isDragging ? '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' : 'none'
+        }}
+        exit={{ opacity: 0, x: -100 }}
+        transition={{ duration: 0.2 }}
+      >
+        {children}
+      </motion.div>
+    </div>
   );
 };
 
