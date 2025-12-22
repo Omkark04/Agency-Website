@@ -31,8 +31,9 @@ allowed_hosts_env = os.getenv("ALLOWED_HOSTS", "")
 if allowed_hosts_env:
     ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(",") if host.strip()]
 else:
-    # Default to localhost for development
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
+    # Default to localhost + Vercel domains for development/production
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", ".vercel.app", ".now.sh"]
+
 
 
 REST_FRAMEWORK = {
@@ -130,6 +131,7 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Serve static files in production
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
