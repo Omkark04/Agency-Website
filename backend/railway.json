@@ -5,7 +5,7 @@
     "dockerfilePath": "/backend/Dockerfile"
   },
   "deploy": {
-    "startCommand": "echo 'Starting migrations...' && python manage.py migrate && echo 'Migrations done, starting Gunicorn...' && gunicorn backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --log-level debug --access-logfile - --error-logfile -",
+    "startCommand": "echo 'Container started' && echo 'PORT=$PORT' && python --version && python -c 'import django; print(f\"Django {django.VERSION}\")' && python manage.py check && echo 'Django check passed' && python manage.py migrate && echo 'Migrations done' && gunicorn backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 1 --log-level debug",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
