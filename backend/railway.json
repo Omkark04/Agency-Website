@@ -5,7 +5,7 @@
     "dockerfilePath": "/backend/Dockerfile"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate && gunicorn backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2",
+    "startCommand": "echo 'Starting migrations...' && python manage.py migrate && echo 'Migrations done, starting Gunicorn...' && gunicorn backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --log-level debug --access-logfile - --error-logfile -",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
