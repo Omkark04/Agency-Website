@@ -5,7 +5,7 @@
     "dockerfilePath": "/backend/Dockerfile"
   },
   "deploy": {
-    "startCommand": "echo 'Container started' && echo 'PORT=$PORT' && python --version && python -c 'import django; print(f\"Django {django.VERSION}\")' && python manage.py check && echo 'Django check passed' && python manage.py migrate && echo 'Migrations done' && gunicorn backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 1 --log-level debug",
+    "startCommand": "echo 'Container alive' && sleep 30 && echo 'Still alive after 30s' && python manage.py migrate && gunicorn backend.wsgi:application --bind 0.0.0.0:${PORT:-8000}",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
