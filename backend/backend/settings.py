@@ -31,8 +31,9 @@ allowed_hosts_env = os.getenv("ALLOWED_HOSTS", "")
 if allowed_hosts_env:
     ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(",") if host.strip()]
 else:
-    # Default to localhost + Vercel domains for development/production
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", ".vercel.app", ".now.sh"]
+    # Default to localhost + cloud platforms for development/production
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", ".vercel.app", ".onrender.com"]
+
 
 
 
