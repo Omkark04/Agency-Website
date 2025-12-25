@@ -69,20 +69,21 @@ class RegisterSerializer(serializers.ModelSerializer):
         
         user.save()
 
-        # Send welcome email
-        try:
-            from django.core.mail import send_mail
-            from django.conf import settings
-            
-            send_mail(
-                subject='Welcome to UdyogWorks!',
-                message=f'Hi {user.username},\n\nWelcome to UdyogWorks! We are excited to have you on board.\n\nYour account has been successfully created. You can now explore our services and place orders.\n\nBest regards,\nUdyogWorks Team',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=True,
-            )
-        except Exception as e:
-            print(f"Failed to send welcome email: {e}")
+        # Send welcome email - DISABLED for now (blocks on SMTP)
+        # TODO: Move to Celery task for async sending
+        # try:
+        #     from django.core.mail import send_mail
+        #     from django.conf import settings
+        #     
+        #     send_mail(
+        #         subject='Welcome to UdyogWorks!',
+        #         message=f'Hi {user.username},\\n\\nWelcome to UdyogWorks!...',
+        #         from_email=settings.DEFAULT_FROM_EMAIL,
+        #         recipient_list=[user.email],
+        #         fail_silently=True,
+        #     )
+        # except Exception as e:
+        #     print(f"Failed to send welcome email: {e}")
 
         return user
 
