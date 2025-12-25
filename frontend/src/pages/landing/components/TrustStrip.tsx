@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FaChartLine, FaUsers, FaAward, FaRocket, FaStar, FaBriefcase } from 'react-icons/fa';
 import { listFeaturedClients, getCompanyStats } from '../../../api/clients';
-import type { Client, CompanyStat, CompanyStatsResponse } from '../../../api/clients';
+import type { Client, CompanyStat } from '../../../api/clients';
 
 // Icon mapping for stats
 const statIconMap = {
@@ -35,6 +35,15 @@ export const TrustStrip = () => {
     fetchData();
   }, []);
 
+  // Helper function to convert CompanyStatsResponse to CompanyStat[]
+  const convertStatsResponseToArray = (response: any): CompanyStat[] => {
+    return [
+      { id: 1, title: 'Projects', value: response.total_projects.toString(), icon_name: 'briefcase', is_active: true, order_index: 1 },
+      { id: 2, title: 'Clients', value: response.total_clients.toString(), icon_name: 'users', is_active: true, order_index: 2 },
+      { id: 3, title: 'Satisfaction', value: `${response.satisfaction_rate}%`, icon_name: 'star', is_active: true, order_index: 3 }
+    ];
+  };
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -44,20 +53,12 @@ export const TrustStrip = () => {
       ]);
       setClients(clientsRes.data);
       
-      // Handle both array and object response formats
-      const statsData = statsRes.data;
-      if (Array.isArray(statsData)) {
-        setStats(statsData.sort((a: CompanyStat, b: CompanyStat) => a.order_index - b.order_index));
-      } else {
-        // Convert object format to array format for display
-        const data = statsData as CompanyStatsResponse;
-        const statsArray: CompanyStat[] = [
-          { id: 1, title: 'Projects Completed', value: String(data.total_projects || 0), icon_name: 'rocket', is_active: true, order_index: 0 },
-          { id: 2, title: 'Happy Clients', value: String(data.total_clients || 0), icon_name: 'users', is_active: true, order_index: 1 },
-          { id: 3, title: 'Success Rate', value: `${data.success_rate || 98}%`, icon_name: 'chart-line', is_active: true, order_index: 2 },
-        ];
-        setStats(statsArray);
-      }
+      // Handle both array and object response types
+      const statsData = Array.isArray(statsRes.data)
+        ? statsRes.data.sort((a, b) => a.order_index - b.order_index)
+        : convertStatsResponseToArray(statsRes.data);
+      
+      setStats(statsData);
     } catch (error) {
       console.error('Error fetching trust strip data:', error);
     } finally {
@@ -69,7 +70,7 @@ export const TrustStrip = () => {
   if (loading) {
     return (
       <section className="py-12 bg-gray-50 dark:bg-gray-800">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 md:px-8 lg:px-12">
           <div className="mb-12">
             <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mx-auto mb-6"></div>
             <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
@@ -90,7 +91,7 @@ export const TrustStrip = () => {
 
   return (
     <section className="py-12 bg-gray-50 dark:bg-gray-800">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 md:px-8 lg:px-12">
         {/* Client Logos */}
         <div className="mb-12">
           <h3 className="text-center text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-6">

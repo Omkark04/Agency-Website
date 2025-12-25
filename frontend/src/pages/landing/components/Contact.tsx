@@ -94,7 +94,7 @@ const Contact = () => {
 
   return (
     <section id="contact" className="py-20 bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 max-w-6xl">
+      <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-6xl">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Get In Touch
@@ -292,7 +292,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900 dark:text-white">Email Us</h4>
-                    <a href="mailto:info@udyogworks.com" className="text-[#0066FF] hover:underline">info@udyogworks.com</a>
+                    <a href="mailto:info@udyogworks.com" className="text-[#0066FF] hover:underline">udyogworks.official@gmail.com</a>
                   </div>
                 </div>
 

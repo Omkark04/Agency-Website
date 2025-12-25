@@ -35,7 +35,7 @@ const Process = () => {
 
   return (
     <section className="py-20 bg-white dark:bg-gray-900">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 md:px-8 lg:px-12">
         <motion.div 
           className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
@@ -64,7 +64,7 @@ const Process = () => {
               >
                 {/* Step number on timeline */}
                 <div className="hidden lg:flex absolute top-0 left-1/2 w-12 h-12 bg-white dark:bg-gray-800 rounded-full border-4 border-white dark:border-gray-900 items-center justify-center transform -translate-x-1/2 -translate-y-6 z-10">
-                  <span className="text-lg font-bold bg-gradient-to-r bg-clip-text text-transparent ${step.color}">
+                  <span className="text-lg font-bold bg-gradient-to-r bg-clip-text text-transparent from-[#00C2A8] to-[#0066FF]">
                     0{step.id}
                   </span>
                 </div>
@@ -83,8 +83,8 @@ const Process = () => {
                   <p className="text-gray-600 dark:text-gray-300">{step.description}</p>
                   
                   {/* Connector arrow for mobile */}
-                  <div className="lg:hidden absolute -bottom-6 left-1/2 transform -translate-x-1/2 rotate-90 text-gray-300">
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <div className="lg:hidden absolute -bottom-8 left-1/2 transform -translate-x-1/2 rotate-90 text-gray-400">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
@@ -104,12 +104,12 @@ const Process = () => {
           <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
             Our proven 4-step process ensures that every project is delivered on time, within budget, and exceeds your expectations.
           </p>
-          <a 
-            onClick={() => window.location.href = 'client-dashboard/services'}
+          <button 
+            onClick={() => window.open('/client-dashboard/services', '_self')}
             className="inline-block bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105"
           >
             Start Your Project
-          </a>
+          </button>
         </motion.div>
       </div>
     </section>

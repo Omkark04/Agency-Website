@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, CheckCircle, Image as ImageIcon, Building2 } from 'lucide-react';
+import { ArrowRight, CheckCircle, Image as ImageIcon, Building2, Instagram, Facebook } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { fetchHeroImages } from '../../../api/media';
 import type { MediaItem } from '../../../api/media';
@@ -7,6 +7,8 @@ import { getTestimonialStats } from '../../../api/testinomials';
 import { listDepartments, type Department } from '../../../api/departments';
 import { useProtectedNavigation } from '../../../hooks/useProtectedNavigation';
 import AuthModal from './AuthModal';
+
+
 
 
 export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) => {
@@ -21,6 +23,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
     satisfaction: 98
   });
 
+
   // Fetch hero images and stats on component mount
   useEffect(() => {
     loadHeroImages();
@@ -28,18 +31,20 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
     loadDepartments();
   }, []);
 
+
   // Auto-rotate images every 5 seconds
   useEffect(() => {
     if (heroImages.length > 1) {
       const interval = setInterval(() => {
-        setCurrentImageIndex((prevIndex) => 
+        setCurrentImageIndex((prevIndex) =>
           (prevIndex + 1) % heroImages.length
         );
       }, 5000);
-      
+     
       return () => clearInterval(interval);
     }
   }, [heroImages.length]);
+
 
   const loadHeroImages = async () => {
     try {
@@ -52,6 +57,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
       setIsLoading(false);
     }
   };
+
 
   const loadStats = async () => {
     try {
@@ -69,6 +75,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
     }
   };
 
+
   const loadDepartments = async () => {
     try {
       const response = await listDepartments({ is_active: true });
@@ -78,17 +85,20 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
     }
   };
 
+
   const handlePrevImage = () => {
-    setCurrentImageIndex(prev => 
+    setCurrentImageIndex(prev =>
       prev === 0 ? heroImages.length - 1 : prev - 1
     );
   };
 
+
   const handleNextImage = () => {
-    setCurrentImageIndex(prev => 
+    setCurrentImageIndex(prev =>
       (prev + 1) % heroImages.length
     );
   };
+
 
   return (
     <>
@@ -99,16 +109,16 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
           onClose={() => setShowAuthModal(false)}
         />
       )}
-      
-      <section id='home' className="relative overflow-hidden bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white py-20 md:py-32">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+     
+      <section id='home' className="relative overflow-hidden bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white pt-8 md:pt-12 pb-20 md:pb-32">
+        <div className="container mx-auto px-4 md:px-8 lg:px-12">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-start">
             {/* Left Content */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="z-10"
+              className="z-10 space-y-8"
             >
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
                 We Build, Create & Grow Your Business Digitally
@@ -116,9 +126,9 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               <p className="text-xl text-gray-300 mb-8">
                 Business development agency powering growth through design, technology & education.
               </p>
-              
+             
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <button 
+                <button
                   onClick={() => navigateTo('/client-dashboard/services')}
                   className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-3 px-8 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-105"
                 >
@@ -126,6 +136,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </button>
               </div>
+
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 mt-12">
@@ -158,26 +169,27 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               </motion.div>
             </div>
 
+
             {/* Departments List - Enhanced with Creative Animations */}
             {departments.length > 0 && (
-              <motion.div 
+              <motion.div
                 className="mt-12"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
               >
-                <motion.h3 
+                <motion.h3
                   className="text-lg font-semibold text-white/90 mb-6 flex items-center gap-2"
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.6 }}
                 >
                   <motion.div
-                    animate={{ 
+                    animate={{
                       rotate: [0, 10, -10, 0],
                       scale: [1, 1.1, 1.1, 1]
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 2,
                       repeat: Infinity,
                       repeatDelay: 3
@@ -193,13 +205,13 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                       key={dept.id}
                       initial={{ opacity: 0, y: 30, scale: 0.8 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ 
+                      transition={{
                         delay: 0.7 + index * 0.1,
                         duration: 0.5,
                         type: "spring",
                         stiffness: 100
                       }}
-                      whileHover={{ 
+                      whileHover={{
                         scale: 1.05,
                         y: -5,
                         transition: { duration: 0.2 }
@@ -219,7 +231,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                           ease: "easeInOut"
                         }}
                       />
-                      
+                     
                       {/* Card content */}
                       <motion.div
                         className="relative bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 overflow-hidden"
@@ -241,20 +253,20 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                             ease: "easeInOut"
                           }}
                         />
-                        
+                       
                         <div className="flex items-center gap-3 relative z-10">
                           {dept.logo ? (
-                            <motion.img 
-                              src={dept.logo} 
+                            <motion.img
+                              src={dept.logo}
                               alt={dept.title}
                               className="w-10 h-10 object-contain rounded-lg"
                               whileHover={{ rotate: 360 }}
                               transition={{ duration: 0.6 }}
                             />
                           ) : (
-                            <motion.div 
+                            <motion.div
                               className="w-10 h-10 bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-lg flex items-center justify-center shadow-lg"
-                              whileHover={{ 
+                              whileHover={{
                                 rotate: [0, -10, 10, 0],
                                 scale: 1.1
                               }}
@@ -264,10 +276,10 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                             </motion.div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <motion.p 
+                            <motion.p
                               className="text-sm font-semibold text-white truncate"
                               initial={{ opacity: 0.9 }}
-                              whileHover={{ 
+                              whileHover={{
                                 opacity: 1,
                                 x: 3,
                                 color: "#00C2A8"
@@ -291,15 +303,16 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                 </div>
               </motion.div>
             )}
-          </motion.div>
+            </motion.div>
 
-          {/* Right Content - Dynamic Hero Image Gallery */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative"
-          >
+
+            {/* Right Content - Dynamic Hero Image Gallery */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative"
+            >
             <div className="relative z-10">
               <div className="bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-2xl p-1 shadow-2xl">
                 <div className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden">
@@ -325,7 +338,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                         alt={heroImages[currentImageIndex]?.caption || 'Hero Business Image'}
                         className="w-full h-full object-cover"
                       />
-                      
+                     
                       {/* Image Navigation Arrows */}
                       {heroImages.length > 1 && (
                         <>
@@ -343,14 +356,14 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                           </button>
                         </>
                       )}
-                      
+                     
                       {/* Image Counter */}
                       {heroImages.length > 1 && (
                         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-4 py-1 rounded-full text-sm">
                           {currentImageIndex + 1} / {heroImages.length}
                         </div>
                       )}
-                      
+                     
                       {/* Image Caption */}
                       {heroImages[currentImageIndex]?.caption && (
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
@@ -367,7 +380,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                       <span className="text-gray-400 dark:text-gray-600 text-center">
                         No hero images found. Upload images with 'hero' in caption.
                       </span>
-                      <button 
+                      <button
                         onClick={() => {
                           // This would open an upload modal in a real app
                           console.log('Upload hero images');
@@ -380,7 +393,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                   )}
                 </div>
               </div>
-              
+             
               {/* Image Indicators (Dots) */}
               {heroImages.length > 1 && (
                 <div className="flex justify-center space-x-2 mt-4">
@@ -389,8 +402,8 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
                       className={`h-2 rounded-full transition-all duration-300 ${
-                        index === currentImageIndex 
-                          ? 'w-8 bg-gradient-to-r from-[#00C2A8] to-[#0066FF]' 
+                        index === currentImageIndex
+                          ? 'w-8 bg-gradient-to-r from-[#00C2A8] to-[#0066FF]'
                           : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'
                       }`}
                       aria-label={`Go to image ${index + 1}`}
@@ -398,61 +411,63 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                   ))}
                 </div>
               )}
-              
+             
               {/* Floating elements */}
-              <motion.div 
+              <motion.div
                 className="absolute -top-6 -left-6 bg-white dark:bg-gray-800 p-3 rounded-xl shadow-lg z-20"
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 3, repeat: Infinity }}
               >
-                <div className="bg-[#00C2A8]/10 p-2 rounded-lg">
-                  <CheckCircle className="h-8 w-8 text-[#00C2A8]" />
+                <div className="bg-[#E1306C]/10 p-2 rounded-lg">
+                  <Instagram className="h-8 w-8 text-[#E1306C]" />
                 </div>
               </motion.div>
-              
-              <motion.div 
+             
+              <motion.div
                 className="absolute -bottom-6 -right-6 bg-white dark:bg-gray-800 p-3 rounded-xl shadow-lg z-20"
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 3, delay: 1, repeat: Infinity }}
               >
-                <div className="bg-[#0066FF]/10 p-2 rounded-lg">
-                  <CheckCircle className="h-8 w-8 text-[#0066FF]" />
+                <div className="bg-[#1877F2]/10 p-2 rounded-lg">
+                  <Facebook className="h-8 w-8 text-[#1877F2]" />
                 </div>
               </motion.div>
             </div>
-          </motion.div>
+            </motion.div>
+          </div>
+
+
+          {/* Background elements */}
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#00C2A8]/10 to-transparent -z-0" />
+          <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#0B2545] to-transparent -z-0" />
+         
+          {/* Animated background dots */}
+          <div className="absolute inset-0 overflow-hidden -z-10">
+            {[...Array(20)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1 h-1 bg-white/10 rounded-full"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                }}
+                animate={{
+                  y: [0, Math.random() * 20 - 10, 0],
+                  x: [0, Math.random() * 20 - 10, 0],
+                }}
+                transition={{
+                  duration: Math.random() * 3 + 2,
+                  repeat: Infinity,
+                  delay: Math.random() * 2,
+                }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-      
-      {/* Background elements */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#00C2A8]/10 to-transparent -z-0" />
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#0B2545] to-transparent -z-0" />
-      
-      {/* Animated background dots */}
-      <div className="absolute inset-0 overflow-hidden -z-10">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-white/10 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, Math.random() * 20 - 10, 0],
-              x: [0, Math.random() * 20 - 10, 0],
-            }}
-            transition={{
-              duration: Math.random() * 3 + 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-      </div>
-    </section>
+      </section>
     </>
   );
 };
+
 
 export default Hero;

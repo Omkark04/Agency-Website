@@ -96,7 +96,7 @@ export const Services = () => {
   if (loading) {
     return (
       <section id="services" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-        <div className="container mx-auto px-4 max-w-7xl">
+        <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
           <div className="text-center mb-16">
             <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-48 mx-auto mb-4 animate-pulse"></div>
             <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-full w-96 mx-auto mb-4 animate-pulse"></div>

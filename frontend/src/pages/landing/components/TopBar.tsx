@@ -71,7 +71,7 @@ export const TopBar = () => {
               <div className="bg-blue-100 dark:bg-blue-900 p-2 rounded-full mr-3 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
                 <FaEnvelope className="text-[#0066FF]" />
               </div>
-              <span className="text-sm">rahulbhatambare72@gmail.com</span>
+              <span className="text-sm">udyogworks.official@gmail.com</span>
             </a>
 
 

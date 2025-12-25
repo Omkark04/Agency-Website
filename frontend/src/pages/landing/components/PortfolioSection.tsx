@@ -124,7 +124,7 @@ const PortfolioSection = () => {
   if (loading) {
     return (
       <section id="portfolio" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-        <div className="container mx-auto px-4 max-w-7xl">
+        <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00C2A8]"></div>
           </div>
@@ -138,7 +138,7 @@ const PortfolioSection = () => {
       id="portfolio" 
       className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-hidden"
     >
-      <div className="container mx-auto px-4 max-w-7xl">
+      <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
         {/* Section Header - Updated with better layout */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -730,3 +730,4 @@ const PortfolioSection = () => {
 };
 
 export default PortfolioSection;
+
