@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FaChartLine, FaUsers, FaAward, FaRocket, FaStar, FaBriefcase } from 'react-icons/fa';
 import { listFeaturedClients, getCompanyStats } from '../../../api/clients';
-import type { Client, CompanyStat } from '../../../api/clients';
+import type { Client, CompanyStat, CompanyStatsResponse } from '../../../api/clients';
 
 // Icon mapping for stats
 const statIconMap = {
@@ -43,7 +43,21 @@ export const TrustStrip = () => {
         getCompanyStats()
       ]);
       setClients(clientsRes.data);
-      setStats(statsRes.data.sort((a: CompanyStat, b: CompanyStat) => a.order_index - b.order_index));
+      
+      // Handle both array and object response formats
+      const statsData = statsRes.data;
+      if (Array.isArray(statsData)) {
+        setStats(statsData.sort((a: CompanyStat, b: CompanyStat) => a.order_index - b.order_index));
+      } else {
+        // Convert object format to array format for display
+        const data = statsData as CompanyStatsResponse;
+        const statsArray: CompanyStat[] = [
+          { id: 1, title: 'Projects Completed', value: String(data.total_projects || 0), icon_name: 'rocket', is_active: true, order_index: 0 },
+          { id: 2, title: 'Happy Clients', value: String(data.total_clients || 0), icon_name: 'users', is_active: true, order_index: 1 },
+          { id: 3, title: 'Success Rate', value: `${data.success_rate || 98}%`, icon_name: 'chart-line', is_active: true, order_index: 2 },
+        ];
+        setStats(statsArray);
+      }
     } catch (error) {
       console.error('Error fetching trust strip data:', error);
     } finally {

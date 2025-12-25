@@ -25,8 +25,21 @@ export interface CompanyStat {
   order_index: number;
 }
 
+// Object format returned by API
+export interface CompanyStatsResponse {
+  total_projects: number;
+  total_services: number;
+  total_clients: number;
+  total_testimonials: number;
+  success_rate: number;
+  satisfaction_rate: number;
+  years_experience: number;
+  team_members: number;
+}
+
 export const listFeaturedClients = () => 
   api.get<Client[]>('/api/clients/featured/');
 
+// API can return either array of CompanyStat or CompanyStatsResponse object
 export const getCompanyStats = () => 
-  api.get<CompanyStat[]>('/api/company-stats/');
+  api.get<CompanyStat[] | CompanyStatsResponse>('/api/company-stats/');

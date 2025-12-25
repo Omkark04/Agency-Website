@@ -30,9 +30,9 @@
         let endpoint = '';
 
         if (form.role === 'service_head') {
-          endpoint = '/auth/register/service-head/';
+          endpoint = '/api/auth/register/service-head/';
         } else if (form.role === 'team_member') {
-          endpoint = '/auth/register/team-member/';
+          endpoint = '/api/auth/register/team-member/';
         } else {
           alert('Only Service Head and Team Member can be created here.');
           return;

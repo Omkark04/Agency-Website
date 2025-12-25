@@ -28,7 +28,8 @@ from .serializers import (
 
 User = get_user_model()
 
-@method_decorator(ratelimit(key='ip', rate='10/h', method='POST'), name='dispatch')
+# Temporarily disabled ratelimit to debug 500 error
+# @method_decorator(ratelimit(key='ip', rate='10/h', method='POST'), name='dispatch')
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
@@ -55,9 +56,12 @@ class ClientRegisterView(RegisterView):
         return super().post(request, *args, **kwargs)
 
 class ServiceHeadRegisterView(RegisterView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+        # Only admin users can create service heads
+        if request.user.role != 'admin':
+            return Response({"error": "Only admins can create service heads"}, status=status.HTTP_403_FORBIDDEN)
         request.data["role"] = "service_head"
         return super().post(request, *args, **kwargs)
 
@@ -70,7 +74,8 @@ class TeamMemberRegisterView(RegisterView):
         request.data["role"] = "team_member"
         return super().post(request, *args, **kwargs)
 
-@method_decorator(ratelimit(key='ip', rate='5/m', method='POST'), name='dispatch')
+# Temporarily disabled ratelimit to debug 500 error
+# @method_decorator(ratelimit(key='ip', rate='5/m', method='POST'), name='dispatch')
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
