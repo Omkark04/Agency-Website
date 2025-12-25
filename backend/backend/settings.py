@@ -8,6 +8,25 @@ import dj_database_url
 # Load environment variables from .env file
 load_dotenv()
 
+# Handle base64-encoded Google credentials for production
+# If GOOGLE_APPLICATION_CREDENTIALS_BASE64 is set, decode and write to temp file
+_google_creds_base64 = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_BASE64")
+if _google_creds_base64:
+    import base64
+    import tempfile
+    try:
+        # Decode base64 credentials
+        creds_json = base64.b64decode(_google_creds_base64)
+        # Write to temp file
+        temp_file = tempfile.NamedTemporaryFile(mode='wb', suffix='.json', delete=False)
+        temp_file.write(creds_json)
+        temp_file.close()
+        # Set the environment variable to point to temp file
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = temp_file.name
+        print(f"✅ Google credentials loaded from base64 to: {temp_file.name}")
+    except Exception as e:
+        print(f"⚠️ Failed to decode Google credentials: {e}")
+
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
