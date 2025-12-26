@@ -86,7 +86,7 @@ export const fetchHeroBackground = async (): Promise<MediaItem | null> => {
   try {
     const response = await api.get<MediaItem[]>('/api/media/', {
       params: {
-        caption__icontains: 'Background',
+        caption__icontains: 'Hero Background',
         ordering: '-created_at'
       }
     });
