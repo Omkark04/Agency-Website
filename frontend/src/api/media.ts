@@ -33,7 +33,7 @@ export const fetchHeroImages = async (): Promise<MediaItem[]> => {
   try {
     const response = await api.get<MediaItem[]>('/api/media/', {
       params: {
-        caption__icontains: 'hero',
+        caption__icontains: 'Intro',
         media_type: 'image',
         ordering: '-created_at'
       }
