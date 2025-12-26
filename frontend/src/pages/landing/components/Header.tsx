@@ -6,11 +6,9 @@ import logo from '../../../assets/UdyogWorks logo.png';
 import { getCurrentUser, logout } from '../../../utils/auth';
 import { UserAvatar } from '../../../components/ui/UserAvatar';
 
-
 interface HeaderProps {
   onAuthButtonClick?: () => void;
 }
-
 
 export const Header = ({ onAuthButtonClick }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -19,10 +17,8 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [user, setUser] = useState<any>(getCurrentUser());
 
-
   const lastScrollY = useRef(0);
   const navigate = useNavigate();
-
 
   const openAuthModal = (mode: 'login' | 'signup') => {
     if (onAuthButtonClick) {
@@ -34,19 +30,16 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
     setIsMobileMenuOpen(false);
   };
 
-
   const closeAuthModal = () => {
     setIsAuthModalOpen(false);
     setUser(getCurrentUser());
   };
-
 
   const handleLogout = () => {
     logout();
     setUser(null);
     navigate('/');
   };
-
 
   const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
     e.preventDefault();
@@ -66,7 +59,6 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
         lastScrollY.current = currentScrollY;
       }
     };
-
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -94,7 +86,6 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
     };
   }, [user]);
 
-
   const navLinks = [
     { name: 'Home', href: '#home' },
     { name: 'Services', href: '#services' },
@@ -104,8 +95,6 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
     { name: 'Testimonials', href: '#testimonials' },
     { name: 'Contact', href: '#contact' },
   ];
-
-
   return (
     <>
       <header
@@ -114,8 +103,8 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
           : 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm'
           }`}
       >
-        <div className="container mx-auto pr-6 lg:pr-12 py-4 max-w-7xl">
-          <div className="flex items-center justify-between gap-8 pl-6 lg:pl-12">
+        <div className="py-4 max-w-7xl w-full px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-28">
 
             {/* Logo - Left Side */}
             <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group flex-shrink-0">
@@ -159,7 +148,6 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                     <LogIn size={18} />
                     <span>Login</span>
                   </button>
-
 
                   <button
                     onClick={() => openAuthModal('signup')}
@@ -302,7 +290,6 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
         </div>
       </header>
 
-
       {/* Auth Modal */}
       <AuthModal
         isOpen={isAuthModalOpen}
@@ -312,6 +299,4 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
     </>
   );
 };
-
-
 export default Header;

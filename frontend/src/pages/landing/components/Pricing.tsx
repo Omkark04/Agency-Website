@@ -8,15 +8,18 @@ import { listServices } from '../../../api/services';
 import type { Service } from '../../../api/services';
 import { Button as MovingBorderCard } from "@/components/ui/moving-border";
 
+
 export const Pricing = () => {
   const [cards, setCards] = useState<PriceCard[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedService, setSelectedService] = useState<number | null>(null);
 
+
   useEffect(() => {
     fetchPricingData();
   }, []);
+
 
   const fetchPricingData = async () => {
     try {
@@ -34,16 +37,19 @@ export const Pricing = () => {
     }
   };
 
+
   // Get service name by ID
   const getServiceName = (serviceId: number) => {
     const service = services.find(s => s.id === serviceId);
     return service?.title || `Service #${serviceId}`;
   };
 
+
   // Filter cards by selected service
   const filteredCards = selectedService
     ? cards.filter(card => card.service === selectedService)
     : cards;
+
 
   // Group cards by title (basic, medium, premium)
   const groupedCards = {
@@ -52,11 +58,12 @@ export const Pricing = () => {
     premium: filteredCards.filter(card => card.title === 'premium')
   };
 
+
   // Loading skeleton
   if (loading) {
     return (
       <section id="pricing" className="py-20 bg-gray-50 dark:bg-gray-900">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 md:px-8 lg:px-12">
           <div className="text-center mb-16">
             <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-64 mx-auto mb-4"></div>
             <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-96 mx-auto"></div>
@@ -71,6 +78,7 @@ export const Pricing = () => {
     );
   }
 
+
   // Get unique services for filtering
   const uniqueServices = Array.from(new Set(cards.map(c => c.service)))
     .filter(Boolean)
@@ -79,10 +87,11 @@ export const Pricing = () => {
       title: getServiceName(id!)
     }));
 
+
   return (
     <section id="pricing" className="py-20 bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4">
-        <motion.div 
+      <div className="container mx-auto px-4 md:px-8 lg:px-12">
+        <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -93,6 +102,7 @@ export const Pricing = () => {
           <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8">
             Choose the perfect plan that fits your business needs. No hidden fees, cancel anytime.
           </p>
+
 
           {/* Service Filter */}
           {uniqueServices.length > 1 && (
@@ -123,6 +133,7 @@ export const Pricing = () => {
             </div>
           )}
         </motion.div>
+
 
         {filteredCards.length === 0 ? (
           <div className="text-center py-12">
@@ -162,7 +173,7 @@ export const Pricing = () => {
                         Perfect for getting started
                       </p>
                     </div>
-                  
+                 
                     <div className="space-y-6">
                       {groupedCards.basic.map(card => (
                         <div key={card.id} className="border-t pt-6 first:border-t-0 first:pt-0">
@@ -179,13 +190,13 @@ export const Pricing = () => {
                               ₹{card.price}
                             </div>
                           </div>
-                          
+                         
                           {card.description && (
                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                               {card.description}
                             </p>
                           )}
-                          
+                         
                           {card.features && card.features.length > 0 && (
                             <ul className="space-y-2">
                               {card.features.slice(0, 3).map((feature, index) => (
@@ -201,8 +212,8 @@ export const Pricing = () => {
                               )}
                             </ul>
                           )}
-                          
-                          <button 
+                         
+                          <button
                             className="w-full mt-4 py-3 px-6 rounded-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 transition-all duration-300 flex items-center justify-center"
                           >
                             Get Started
@@ -211,7 +222,7 @@ export const Pricing = () => {
                         </div>
                       ))}
                     </div>
-                  
+                 
                     {groupedCards.basic.length === 0 && (
                       <div className="text-center py-8 text-gray-500">
                         No basic plans available
@@ -220,6 +231,7 @@ export const Pricing = () => {
                   </div>
                 </MovingBorderCard>
               </motion.div>
+
 
               {/* Medium Plan (Popular) */}
               <motion.div
@@ -234,7 +246,7 @@ export const Pricing = () => {
                   <Star className="h-3 w-3 inline mr-1" />
                   MOST POPULAR
                 </div>
-                
+               
                 <MovingBorderCard
                   as="div"
                   borderRadius="1rem"
@@ -249,7 +261,7 @@ export const Pricing = () => {
                         Best value for growing businesses
                       </p>
                     </div>
-                    
+                   
                     <div className="space-y-6">
                       {groupedCards.medium.map(card => (
                         <div key={card.id} className="border-t pt-6 first:border-t-0 first:pt-0">
@@ -266,13 +278,13 @@ export const Pricing = () => {
                               ₹{card.price}
                             </div>
                           </div>
-                          
+                         
                           {card.description && (
                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                               {card.description}
                             </p>
                           )}
-                          
+                         
                           {card.features && card.features.length > 0 && (
                             <ul className="space-y-2">
                               {card.features.slice(0, 4).map((feature, index) => (
@@ -288,8 +300,8 @@ export const Pricing = () => {
                               )}
                             </ul>
                           )}
-                          
-                          <button 
+                         
+                          <button
                             className="w-full mt-4 py-3 px-6 rounded-lg font-semibold text-white bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 transition-all duration-300 flex items-center justify-center"
                           >
                             Get Started
@@ -298,7 +310,7 @@ export const Pricing = () => {
                         </div>
                       ))}
                     </div>
-                    
+                   
                     {groupedCards.medium.length === 0 && (
                       <div className="text-center py-8 text-gray-500">
                         No medium plans available
@@ -307,6 +319,7 @@ export const Pricing = () => {
                   </div>
                 </MovingBorderCard>
               </motion.div>
+
 
               {/* Premium Plan */}
               <motion.div
@@ -331,7 +344,7 @@ export const Pricing = () => {
                         Enterprise-grade solutions
                       </p>
                     </div>
-                    
+                   
                     <div className="space-y-6">
                       {groupedCards.premium.map(card => (
                         <div key={card.id} className="border-t pt-6 first:border-t-0 first:pt-0">
@@ -348,13 +361,13 @@ export const Pricing = () => {
                               ₹{card.price}
                             </div>
                           </div>
-                          
+                         
                           {card.description && (
                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                               {card.description}
                             </p>
                           )}
-                          
+                         
                           {card.features && card.features.length > 0 && (
                             <ul className="space-y-2">
                               {card.features.slice(0, 5).map((feature, index) => (
@@ -370,8 +383,8 @@ export const Pricing = () => {
                               )}
                             </ul>
                           )}
-                          
-                          <button 
+                         
+                          <button
                             className="w-full mt-4 py-3 px-6 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 transition-all duration-300 flex items-center justify-center"
                           >
                             Get Started
@@ -380,7 +393,7 @@ export const Pricing = () => {
                         </div>
                       ))}
                     </div>
-                    
+                   
                     {groupedCards.premium.length === 0 && (
                       <div className="text-center py-8 text-gray-500">
                         No premium plans available
@@ -392,8 +405,8 @@ export const Pricing = () => {
             </div>
           </>
         )}
-        
-        <motion.div 
+       
+        <motion.div
           className="mt-16 text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -420,5 +433,6 @@ export const Pricing = () => {
     </section>
   );
 };
+
 
 export default Pricing;

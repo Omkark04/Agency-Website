@@ -67,10 +67,20 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
 
   if (loading) {
     return (
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-4">Latest Offers</h2>
-          <div>Loading offers...</div>
+      <section id="offers" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+        <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
+          <div className="text-center mb-16">
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-32 mx-auto mb-4 animate-pulse"></div>
+            <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-full w-64 mx-auto mb-4 animate-pulse"></div>
+            <div className="h-1 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-full w-20 mx-auto animate-pulse"></div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="h-80 bg-gray-200 dark:bg-gray-700 rounded-2xl"></div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     );
@@ -78,10 +88,17 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
 
   if (error) {
     return (
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-4">Latest Offers</h2>
-          <div className="text-red-600">{error}</div>
+      <section id="offers" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+        <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl text-center">
+          <div className="inline-block p-6 bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-200 dark:border-red-800">
+            <p className="text-red-600 dark:text-red-400 text-lg font-medium">{error}</p>
+            <button 
+              onClick={fetchOffers}
+              className="mt-4 px-6 py-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Retry Loading Offers
+            </button>
+          </div>
         </div>
       </section>
     );
@@ -89,49 +106,80 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
 
   if (!offers || offers.length === 0) {
     return (
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-4">Latest Offers</h2>
-          <div className="text-gray-500">No offers available at the moment. Check back soon!</div>
+      <section id="offers" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+        <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
+          <motion.div 
+            className="text-center py-20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="inline-block p-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-2xl">
+              <div className="w-16 h-16 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-4"></div>
+              <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">
+                No Offers Available
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400">
+                No offers are currently available. Check back soon!
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
     );
   }
 
   return (
-    <section id="offers" className="py-12 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-bold">Latest Offers</h2>
+    <section id="offers" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto px-4 max-w-7xl">
+        {/* Section Header */}
+        <motion.div 
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <span className="inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 text-[#00C2A8] dark:text-[#00C2A8] text-sm font-semibold mb-4">
+            Special Offers
+          </span>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            Exclusive Deals & Promotions
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto">
+            Discover amazing offers and limited-time deals on our premium services. 
+            Save big while getting the quality you deserve.
+          </p>
+        </motion.div>
 
-          <div className="flex items-center gap-3">
-            <label className="inline-flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={featuredOnly}
-                onChange={() => setFeaturedOnly((s) => !s)}
-                className="form-checkbox h-4 w-4"
-              />
-              <span className="text-sm">Featured</span>
-            </label>
+        {/* Filter Options */}
+        <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
+          <label className="inline-flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={featuredOnly}
+              onChange={() => setFeaturedOnly((s) => !s)}
+              className="w-4 h-4 text-[#00C2A8] bg-gray-100 border-gray-300 rounded focus:ring-[#00C2A8] focus:ring-2"
+            />
+            <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">Featured Only</span>
+          </label>
 
-            <label className="inline-flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={limitedOnly}
-                onChange={() => setLimitedOnly((s) => !s)}
-                className="form-checkbox h-4 w-4"
-              />
-              <span className="text-sm">Limited time</span>
-            </label>
-          </div>
+          <label className="inline-flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={limitedOnly}
+              onChange={() => setLimitedOnly((s) => !s)}
+              className="w-4 h-4 text-[#00C2A8] bg-gray-100 border-gray-300 rounded focus:ring-[#00C2A8] focus:ring-2"
+            />
+            <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">Limited Time</span>
+          </label>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {offers.slice(0, limit).map((offer) => (
             <motion.article 
               key={offer.id} 
-              className="relative bg-white rounded-xl shadow p-4 overflow-hidden"
+              className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
@@ -143,7 +191,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
             >
               <div className="relative">
                 {renderBadge(offer)}
-                <div className="h-44 w-full bg-gray-100 rounded-md overflow-hidden flex items-center justify-center group">
+                <div className="h-48 w-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-xl overflow-hidden flex items-center justify-center group">
                   {(offer.imageURL || offer.image) ? (
                     <motion.img
                       whileHover={{ scale: 1.05 }}
@@ -154,14 +202,14 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="text-gray-440">No image</div>
+                    <div className="text-gray-400 dark:text-gray-500 text-sm">No image</div>
                   )}
                 </div>
               </div>
 
-              <div className="pt-4">
-                <h3 className="text-lg font-semibold">{offer.title}</h3>
-                <p className="text-sm text-gray-600 mt-2 line-clamp-3">{offer.short_description || offer.description}</p>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-3">{offer.title}</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3">{offer.short_description || offer.description}</p>
 
                 <div className="mt-3 flex items-center justify-between">
                   <div>
@@ -224,3 +272,4 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
     </section>
   );
 }
+
