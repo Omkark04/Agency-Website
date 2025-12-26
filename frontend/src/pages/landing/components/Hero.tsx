@@ -91,10 +91,18 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
   const loadHeroBackground = async () => {
     try {
       setBackgroundLoading(true);
+      console.log('🎨 Hero: Fetching background...');
       const background = await fetchHeroBackground();
+      console.log('🎨 Hero: Background fetched:', background);
+      if (background) {
+        console.log('🎨 Hero: Background URL:', background.url);
+        console.log('🎨 Hero: Background Type:', background.media_type);
+      } else {
+        console.log('⚠️ Hero: No background found');
+      }
       setHeroBackground(background);
     } catch (error) {
-      console.error('Failed to load hero background:', error);
+      console.error('❌ Hero: Failed to load background:', error);
     } finally {
       setBackgroundLoading(false);
     }
@@ -129,29 +137,34 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
         {/* Dynamic Background - Image or Video */}
         {!backgroundLoading && heroBackground ? (
           heroBackground.media_type === 'video' ? (
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover -z-10"
-            >
-              <source src={heroBackground.url} type="video/mp4" />
-            </video>
+            <>
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover z-0"
+              >
+                <source src={heroBackground.url} type="video/mp4" />
+              </video>
+              {/* Overlay for better text readability */}
+              <div className="absolute inset-0 bg-black/40 z-[1]" />
+            </>
           ) : (
-            <div
-              className="absolute inset-0 w-full h-full bg-cover bg-center -z-10"
-              style={{ backgroundImage: `url(${heroBackground.url})` }}
-            />
+            <>
+              <div
+                className="absolute inset-0 w-full h-full bg-cover bg-center z-0"
+                style={{ backgroundImage: `url(${heroBackground.url})` }}
+              />
+              {/* Overlay for better text readability */}
+              <div className="absolute inset-0 bg-black/40 z-[1]" />
+            </>
           )
         ) : (
           // Fallback gradient background
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0B2545] to-[#1a365d] -z-10" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0B2545] to-[#1a365d] z-0" />
         )}
-        
-        {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/40 -z-10" />
-        <div className="container mx-auto px-4 md:px-8 lg:px-12">
+        <div className="container mx-auto px-4 md:px-8 lg:px-12 relative z-10">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-start">
             {/* Left Content */}
             <motion.div
@@ -469,11 +482,11 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
 
 
           {/* Background elements */}
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#00C2A8]/10 to-transparent -z-0" />
-          <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#0B2545] to-transparent -z-0" />
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#00C2A8]/10 to-transparent z-[2]" />
+          <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#0B2545] to-transparent z-[2]" />
          
           {/* Animated background dots */}
-          <div className="absolute inset-0 overflow-hidden -z-10">
+          <div className="absolute inset-0 overflow-hidden z-[2]">
             {[...Array(20)].map((_, i) => (
               <motion.div
                 key={i}
