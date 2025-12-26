@@ -81,3 +81,19 @@ export const fetchAboutImages = async (): Promise<MediaItem[]> => {
     return [];
   }
 };
+
+export const fetchHeroBackground = async (): Promise<MediaItem | null> => {
+  try {
+    const response = await api.get<MediaItem[]>('/api/media/', {
+      params: {
+        caption__icontains: 'Hero Background',
+        ordering: '-created_at'
+      }
+    });
+    // Return the first matching media item (image or video)
+    return response.data.length > 0 ? response.data[0] : null;
+  } catch (error) {
+    console.error('Error fetching hero background:', error);
+    return null;
+  }
+};

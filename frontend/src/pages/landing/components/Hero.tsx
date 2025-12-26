@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle, Image as ImageIcon, Building2, Instagram, Facebook } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { fetchHeroImages } from '../../../api/media';
+import { fetchHeroImages, fetchHeroBackground } from '../../../api/media';
 import type { MediaItem } from '../../../api/media';
 import { getTestimonialStats } from '../../../api/testinomials';
 import { listDepartments, type Department } from '../../../api/departments';
@@ -17,6 +17,8 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [heroBackground, setHeroBackground] = useState<MediaItem | null>(null);
+  const [backgroundLoading, setBackgroundLoading] = useState(true);
   const [stats, setStats] = useState({
     clients: 100,
     projects: 250,
@@ -29,6 +31,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
     loadHeroImages();
     loadStats();
     loadDepartments();
+    loadHeroBackground();
   }, []);
 
 
@@ -85,6 +88,18 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
     }
   };
 
+  const loadHeroBackground = async () => {
+    try {
+      setBackgroundLoading(true);
+      const background = await fetchHeroBackground();
+      setHeroBackground(background);
+    } catch (error) {
+      console.error('Failed to load hero background:', error);
+    } finally {
+      setBackgroundLoading(false);
+    }
+  };
+
 
   const handlePrevImage = () => {
     setCurrentImageIndex(prev =>
@@ -110,7 +125,32 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
         />
       )}
      
-      <section id='home' className="relative overflow-hidden bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white pt-8 md:pt-12 pb-20 md:pb-32">
+      <section id='home' className="relative overflow-hidden text-white pt-8 md:pt-12 pb-20 md:pb-32">
+        {/* Dynamic Background - Image or Video */}
+        {!backgroundLoading && heroBackground ? (
+          heroBackground.media_type === 'video' ? (
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover -z-10"
+            >
+              <source src={heroBackground.url} type="video/mp4" />
+            </video>
+          ) : (
+            <div
+              className="absolute inset-0 w-full h-full bg-cover bg-center -z-10"
+              style={{ backgroundImage: `url(${heroBackground.url})` }}
+            />
+          )
+        ) : (
+          // Fallback gradient background
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0B2545] to-[#1a365d] -z-10" />
+        )}
+        
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/40 -z-10" />
         <div className="container mx-auto px-4 md:px-8 lg:px-12">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-start">
             {/* Left Content */}
