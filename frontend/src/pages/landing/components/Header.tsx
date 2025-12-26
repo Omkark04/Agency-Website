@@ -100,7 +100,7 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
       <header
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled
           ? 'bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl shadow-lg'
-          : 'bg-white/50 dark:bg-gray-900/50 backdrop-blur-md'
+          : 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md'
           }`}
       >
         <div className="py-4 max-w-7xl w-full px-4 sm:px-6 lg:px-8">
