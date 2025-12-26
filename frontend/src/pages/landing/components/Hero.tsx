@@ -91,18 +91,10 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
   const loadHeroBackground = async () => {
     try {
       setBackgroundLoading(true);
-      console.log('🎨 Hero: Fetching background...');
       const background = await fetchHeroBackground();
-      console.log('🎨 Hero: Background fetched:', background);
-      if (background) {
-        console.log('🎨 Hero: Background URL:', background.url);
-        console.log('🎨 Hero: Background Type:', background.media_type);
-      } else {
-        console.log('⚠️ Hero: No background found');
-      }
       setHeroBackground(background);
     } catch (error) {
-      console.error('❌ Hero: Failed to load background:', error);
+      console.error('Failed to load hero background:', error);
     } finally {
       setBackgroundLoading(false);
     }
@@ -480,11 +472,6 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
             </motion.div>
           </div>
 
-
-          {/* Background elements */}
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#00C2A8]/10 to-transparent z-[2]" />
-          <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#0B2545] to-transparent z-[2]" />
-         
           {/* Animated background dots */}
           <div className="absolute inset-0 overflow-hidden z-[2]">
             {[...Array(20)].map((_, i) => (
