@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { TopBar } from './components/TopBar';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
-import { TrustStrip } from './components/TrustStrip';
 import { Services } from '../landing/components/Services';
 import Offers from '../landing/components/Offers';
 import PortfolioSection from './components/PortfolioSection'; // Add this import
@@ -36,7 +35,6 @@ export const LandingPage = () => {
 
       <main className="pt-20">
         <Hero onGetStartedClick={() => setIsAuthModalOpen(true)} />
-        <TrustStrip />
         <Services />
         <Offers />
         <PortfolioSection />

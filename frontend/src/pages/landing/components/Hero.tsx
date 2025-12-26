@@ -367,15 +367,6 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                       <span className="text-gray-400 dark:text-gray-600 text-center">
                         No hero images found. Upload images with 'hero' in caption.
                       </span>
-                      <button 
-                        onClick={() => {
-                          // This would open an upload modal in a real app
-                          console.log('Upload hero images');
-                        }}
-                        className="mt-4 text-sm text-[#00C2A8] hover:text-[#0066FF] transition-colors"
-                      >
-                        Upload Hero Images →
-                      </button>
                     </div>
                   )}
                 </div>
