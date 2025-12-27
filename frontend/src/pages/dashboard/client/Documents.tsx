@@ -416,30 +416,6 @@ const PremiumHeader = () => {
               </motion.div>
             </div>
           </div>
-         
-          {/* Quick stats */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.6 }}
-            className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-xl"
-          >
-            <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">Quick Stats</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Total Documents</span>
-                <span className="text-lg font-bold text-gray-900 dark:text-white">24</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">This Month</span>
-                <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">+8</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Storage Used</span>
-                <span className="text-lg font-bold text-blue-600 dark:text-blue-400">42%</span>
-              </div>
-            </div>
-          </motion.div>
         </div>
       </div>
     </motion.div>

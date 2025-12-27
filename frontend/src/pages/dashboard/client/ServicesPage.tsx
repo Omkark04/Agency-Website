@@ -337,14 +337,6 @@ const ServiceCard = ({ service, onSelect, index }: { service: Service; onSelect:
           transition={{ delay: index * 0.1 + 0.9 }}
           className="mt-5 pt-4 border-t border-gray-200/50 dark:border-gray-700/50 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400"
         >
-          <div className="flex items-center">
-            <Eye className="w-3.5 h-3.5 mr-1.5" />
-            <span>1.2k views</span>
-          </div>
-          <div className="flex items-center">
-            <Star className="w-3.5 h-3.5 mr-1.5 text-amber-500" />
-            <span>4.8</span>
-          </div>
         </motion.div>
       </div>
     </motion.div>

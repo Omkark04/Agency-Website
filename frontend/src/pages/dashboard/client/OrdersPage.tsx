@@ -920,50 +920,6 @@ export default function OrdersPage() {
             </div>
           )}
         </motion.div>
-
-
-        {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="mt-8"
-        >
-          <div className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-xl">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 text-left group"
-              >
-                <CreditCard className="w-8 h-8 text-blue-500 mb-3" />
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Make Payment</h4>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Pay for pending orders</p>
-              </motion.button>
-             
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="p-4 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-300 dark:hover:border-purple-600 transition-all duration-300 text-left group"
-              >
-                <BarChart3 className="w-8 h-8 text-purple-500 mb-3" />
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-1">View Analytics</h4>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Order statistics & insights</p>
-              </motion.button>
-             
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 border border-emerald-200/50 dark:border-emerald-700/50 hover:border-emerald-300 dark:hover:border-emerald-600 transition-all duration-300 text-left group"
-              >
-                <Download className="w-8 h-8 text-emerald-500 mb-3" />
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Export Data</h4>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Download order reports</p>
-              </motion.button>
-            </div>
-          </div>
-        </motion.div>
       </div>
 
 
