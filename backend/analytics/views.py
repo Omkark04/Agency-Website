@@ -137,6 +137,106 @@ class UserActivityView(APIView):
         })
 
 
+class ServiceHeadMetricsView(APIView):
+    """
+    Dashboard metrics endpoint for service head users.
+    Provides department-specific statistics.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        
+        # Ensure user is service_head and has a department
+        if user.role != 'service_head':
+            return Response(
+                {'error': 'Only service heads can access this endpoint'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        if not user.department:
+            return Response(
+                {'error': 'Service head must be assigned to a department'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        department = user.department
+        
+        # Get all services in this department
+        department_services = Service.objects.filter(department=department)
+        
+        # Filter orders by department services
+        department_orders = Order.objects.filter(service__in=department_services)
+        
+        # Date range for recent activity (last 30 days)
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        
+        # Total orders
+        total_orders = department_orders.count()
+        recent_orders_count = department_orders.filter(created_at__gte=thirty_days_ago).count()
+        
+        # Total revenue from department orders
+        total_revenue = department_orders.aggregate(
+            total=Sum('price')
+        )['total'] or 0
+        
+        recent_revenue = department_orders.filter(
+            created_at__gte=thirty_days_ago
+        ).aggregate(total=Sum('price'))['total'] or 0
+        
+        # Active clients (unique clients with orders in this department)
+        active_clients = department_orders.values('client').distinct().count()
+        
+        # Team members in department
+        team_members = User.objects.filter(
+            department=department,
+            role='team_member'
+        ).count()
+        
+        # Services count
+        services_count = department_services.filter(is_active=True).count()
+        
+        # Orders by status
+        orders_by_status = department_orders.values('status').annotate(
+            count=Count('id')
+        )
+        
+        # Recent orders (last 10)
+        recent_orders_data = department_orders.select_related(
+            'client', 'service'
+        ).order_by('-created_at')[:10].values(
+            'id', 'title', 'status', 'price',
+            'client__email', 'service__title', 'created_at'
+        )
+        
+        # Services performance
+        services_performance = department_services.annotate(
+            total_orders=Count('orders'),
+            total_revenue=Sum('orders__price')
+        ).values(
+            'id', 'title', 'total_orders', 'total_revenue'
+        ).order_by('-total_revenue')
+        
+        return Response({
+            'overview': {
+                'total_orders': total_orders,
+                'recent_orders': recent_orders_count,
+                'total_revenue': float(total_revenue),
+                'recent_revenue': float(recent_revenue),
+                'active_clients': active_clients,
+                'team_members': team_members,
+                'services_count': services_count,
+            },
+            'department': {
+                'id': department.id,
+                'title': department.title,
+            },
+            'orders_by_status': list(orders_by_status),
+            'recent_orders': list(recent_orders_data),
+            'services_performance': list(services_performance),
+        })
+
+
 # ==================== GOOGLE ANALYTICS 4 VIEWS ====================
 
 class GA4RealtimeView(APIView):

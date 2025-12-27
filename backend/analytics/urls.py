@@ -2,12 +2,14 @@
 from django.urls import path
 from .views import (
     DashboardMetricsView, ServicePerformanceView, UserActivityView,
+    ServiceHeadMetricsView,
     GA4RealtimeView, GA4OverviewView, GA4PagesView,
     GA4SourcesView, GA4DevicesView, GA4DemographicsView
 )
 
 urlpatterns = [
     path('dashboard/', DashboardMetricsView.as_view(), name='analytics-dashboard'),
+    path('service-head-metrics/', ServiceHeadMetricsView.as_view(), name='service-head-metrics'),
     path('services/', ServicePerformanceView.as_view(), name='analytics-services'),
     path('users/', UserActivityView.as_view(), name='analytics-users'),
     
