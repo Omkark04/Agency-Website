@@ -37,8 +37,8 @@ const FormBuilder = () => {
     description: '',
     service: 0,
     is_active: false,
-    card_type: 'service', // New field
-    selected_offer_id: undefined, // New field
+    card_type: undefined, // Start with no selection
+    selected_offer_id: undefined,
   });
   const [fields, setFields] = useState<FormField[]>([]);
   const [editingField, setEditingField] = useState<FormField | null>(null);
@@ -160,7 +160,9 @@ const FormBuilder = () => {
       title: '',
       description: '',
       service: 0,
-      is_active: false
+      is_active: false,
+      card_type: undefined, // Start with no selection
+      selected_offer_id: undefined
     });
     setFields([]);
     setShowHistory(false);
@@ -285,6 +287,7 @@ const FormBuilder = () => {
                 onClick={handleSaveForm}
                 disabled={
                   loading || 
+                  !form.card_type ||
                   (form.card_type === 'service' && !form.service) || 
                   (form.card_type === 'offer' && !form.selected_offer_id)
                 }
@@ -462,12 +465,13 @@ const FormBuilder = () => {
               {/* CARD TYPE - MOVED TO TOP */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Card Type
+                  Card Type *
                 </label>
                 <select
-                  value={form.card_type || 'service'}
-                  onChange={(e) => setForm({ ...form, card_type: e.target.value as 'service' | 'offer' })}
+                  value={form.card_type || ''}
+                  onChange={(e) => setForm({ ...form, card_type: e.target.value as 'service' | 'offer' | undefined })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  required
                 >
                   <option value="">Select Card Type</option>
                   <option value="service">Service Card</option>
