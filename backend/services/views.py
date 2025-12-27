@@ -30,6 +30,18 @@ class ServiceViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["department"]
+    
+    def get_queryset(self):
+        """
+        Optionally filter services by department.
+        """
+        queryset = super().get_queryset()
+        department_id = self.request.query_params.get('department')
+        
+        if department_id:
+            queryset = queryset.filter(department_id=department_id)
+        
+        return queryset
 
 
 class PriceCardViewSet(viewsets.ModelViewSet):

@@ -199,6 +199,11 @@ class OfferViewSet(viewsets.ModelViewSet):
         service_id = request.query_params.get('service')
         if service_id:
             qs = qs.filter(services__id=service_id)
+        
+        # Filter by department (for service heads)
+        department_id = request.query_params.get('department')
+        if department_id:
+            qs = qs.filter(services__department_id=department_id)
 
         # By default hide unapproved offers for non-admins
         if not is_admin:

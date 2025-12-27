@@ -147,20 +147,31 @@ class ServiceHeadMetricsView(APIView):
     def get(self, request):
         user = request.user
         
-        # Ensure user is service_head and has a department
+        # Ensure user is service_head
         if user.role != 'service_head':
             return Response(
                 {'error': 'Only service heads can access this endpoint'},
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        if not user.department:
+        # Try to get department from user.department field first
+        department = user.department
+        
+        # If not found, try to get from Department.team_head field
+        if not department:
+            try:
+                from services.models import Department
+                department = Department.objects.filter(team_head=user).first()
+                if department:
+                    print(f"✅ Found department via team_head: {department.title}")
+            except Exception as e:
+                print(f"❌ Error fetching Department: {e}")
+        
+        if not department:
             return Response(
                 {'error': 'Service head must be assigned to a department'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        department = user.department
         
         # Get all services in this department
         department_services = Service.objects.filter(department=department)
