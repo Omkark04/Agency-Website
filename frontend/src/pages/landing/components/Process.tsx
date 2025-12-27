@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion';
 import { FaSearch, FaClipboardList, FaCode, FaRocket } from 'react-icons/fa';
+import { useProtectedNavigation } from '../../../hooks/useProtectedNavigation';
+import { AuthModal } from './AuthModal';
 
 
 const Process = () => {
+  const { navigateTo, showAuthModal, setShowAuthModal } = useProtectedNavigation();
   const steps = [
     {
       id: 1,
@@ -106,13 +109,20 @@ const Process = () => {
             Our proven 4-step process ensures that every project is delivered on time, within budget, and exceeds your expectations.
           </p>
           <button 
-            onClick={() => window.open('/client-dashboard/services', '_self')}
+            onClick={() => navigateTo('/client-dashboard/services')}
             className="inline-block bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105"
           >
             Start Your Project
           </button>
         </motion.div>
       </div>
+      
+      {/* Auth Modal for Protected Navigation */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+        defaultMode="login"
+      />
     </section>
   );
 };

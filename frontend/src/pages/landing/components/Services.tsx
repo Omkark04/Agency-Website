@@ -19,6 +19,7 @@ import {
 } from 'react-icons/fa';
 import { FiX } from 'react-icons/fi';
 import { listServices } from '../../../api/services';
+import { useProtectedNavigation } from '../../../hooks/useProtectedNavigation';
 import type { Service } from '../../../api/services';
 import { listDepartments } from '../../../api/departments';
 import type { Department } from '../../../api/departments';
@@ -61,6 +62,7 @@ const iconColorMap = {
 
 
 export const Services = () => {
+  const { navigateTo, showAuthModal: showAuthFromHook, setShowAuthModal: setShowAuthFromHook } = useProtectedNavigation();
   const [services, setServices] = useState<Service[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
@@ -160,8 +162,8 @@ export const Services = () => {
         {/* Services Grid - Department Based */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {departments.map((department, index) => {
-            // Get ALL services from this department
-            const departmentServices = services.filter(s => s.department === department.id);
+            // Get top 3 services from this department
+            const departmentServices = services.filter(s => s.department === department.id).slice(0, 3);
             
             // Use first service for icon/color theming, or defaults if no services
             const firstService = departmentServices[0];
@@ -273,7 +275,7 @@ export const Services = () => {
                   <div className="flex flex-col gap-3">
                     <button
                       onClick={() => {
-                        window.location.href = '/client-dashboard/services';
+                        navigateTo('/client-dashboard/services');
                       }}
                       className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white font-semibold hover:shadow-xl hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-[1.02]"
                     >
@@ -352,7 +354,7 @@ export const Services = () => {
                   Get a Custom Quote
                 </button>
                 <button
-                  onClick={fetchServices}
+                  onClick={() => navigateTo('/client-dashboard/services')}
                   className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-300 px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300"
                 >
                   View All Services
@@ -416,6 +418,13 @@ export const Services = () => {
         </div>
       </div>
     )}
+    
+    {/* Auth Modal for Protected Navigation */}
+    <AuthModal 
+      isOpen={showAuthFromHook} 
+      onClose={() => setShowAuthFromHook(false)} 
+      defaultMode="login"
+    />
   </>
   );
 };

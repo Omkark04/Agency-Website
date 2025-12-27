@@ -61,15 +61,8 @@ const Testimonials = () => {
 
   const fetchStats = async () => {
     try {
-      console.log('Fetching testimonial stats...');
       const response = await getTestimonialStats();
-      console.log('Stats response:', response.data);
       setStats({
-        total: response.data.total,
-        average_rating: response.data.average_rating,
-        satisfaction: Math.round((response.data.average_rating / 5) * 100)
-      });
-      console.log('Stats updated:', {
         total: response.data.total,
         average_rating: response.data.average_rating,
         satisfaction: Math.round((response.data.average_rating / 5) * 100)

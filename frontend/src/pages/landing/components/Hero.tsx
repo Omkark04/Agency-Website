@@ -65,15 +65,12 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
 
   const loadStats = async () => {
     try {
-      console.log('Hero: Fetching stats...');
       const response = await getTestimonialStats();
-      console.log('Hero: Stats response:', response.data);
       setStats({
         clients: response.data.total,
         projects: response.data.total * 2, // Approximate: 2 projects per client
         satisfaction: Math.round((response.data.average_rating / 5) * 100)
       });
-      console.log('Hero: Stats updated');
     } catch (error) {
       console.error('Hero: Failed to load stats:', error);
     }
