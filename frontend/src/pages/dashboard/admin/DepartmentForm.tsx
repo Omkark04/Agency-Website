@@ -9,6 +9,7 @@ import {
   FiUpload,
   FiX
 } from 'react-icons/fi';
+import '../../../styles/admin/DepartmentForm.css';
 
 export default function DepartmentForm({ initial, onSaved }: any) {
   const [title, setTitle] = useState(initial?.title || '');
@@ -89,9 +90,9 @@ export default function DepartmentForm({ initial, onSaved }: any) {
   };
 
   return (
-    <form onSubmit={submit} className="space-y-6 p-1">
-      <div>
-        <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+    <form onSubmit={submit} className="department-form">
+      <div className="department-form__group">
+        <label className="department-form__label">
           <FiLayers />
           Department Title *
         </label>
@@ -100,43 +101,43 @@ export default function DepartmentForm({ initial, onSaved }: any) {
           onChange={e => setTitle(e.target.value)} 
           required 
           placeholder="Enter department name"
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+          className="department-form__input"
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+      <div className="department-form__group">
+        <label className="department-form__label department-form__label--block">
           Short Description
         </label>
         <textarea
           value={shortDescription}
           onChange={e => setShortDescription(e.target.value)}
           rows={3}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+          className="department-form__textarea"
           placeholder="Brief description of the department"
         />
       </div>
 
       {/* Logo Upload */}
-      <div>
-        <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+      <div className="department-form__group">
+        <label className="department-form__label">
           <FiUpload />
           Department Logo
         </label>
-        <div className="space-y-3">
+        <div className="department-form__logo-section">
           {(logoPreview || initial?.logo) && (
-            <div className="relative inline-block">
+            <div className="department-form__logo-preview-wrapper">
               <img
                 src={logoPreview || initial?.logo}
                 alt="Logo preview"
-                className="w-24 h-24 rounded-lg object-cover border border-gray-300"
+                className="department-form__logo-preview"
               />
               <button
                 type="button"
                 onClick={removeLogo}
-                className="absolute -top-2 -right-2 p-1 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors"
+                className="department-form__logo-remove"
               >
-                <FiX className="h-4 w-4" />
+                <FiX className="department-form__logo-remove-icon" />
               </button>
             </div>
           )}
@@ -146,12 +147,12 @@ export default function DepartmentForm({ initial, onSaved }: any) {
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="hidden"
+              className="department-form__logo-input"
             />
-            <label htmlFor="logo-upload" className="cursor-pointer">
-              <div className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors">
-                <FiUpload className="text-gray-400" />
-                <span className="text-gray-600">
+            <label htmlFor="logo-upload" className="department-form__logo-label">
+              <div className="department-form__logo-upload-area">
+                <FiUpload className="department-form__logo-upload-icon" />
+                <span className="department-form__logo-upload-text">
                   {logoPreview ? 'Change logo' : 'Upload logo (JPG, PNG, GIF)'}
                 </span>
               </div>
@@ -161,8 +162,8 @@ export default function DepartmentForm({ initial, onSaved }: any) {
       </div>
 
       {/* Team Head Selection */}
-      <div>
-        <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+      <div className="department-form__group">
+        <label className="department-form__label">
           <FiUsers />
           Assign Team Head
         </label>
@@ -171,11 +172,11 @@ export default function DepartmentForm({ initial, onSaved }: any) {
           onChange={(e) =>
             setTeamHeadId(e.target.value ? Number(e.target.value) : null)
           }
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition appearance-none bg-white"
+          className="department-form__select"
         >
-          <option value="" className="text-gray-400">Select a service head (optional)</option>
+          <option value="" className="department-form__select-option--placeholder">Select a service head (optional)</option>
           {teamHeads.map(head => (
-            <option key={head.id} value={head.id} className="py-2">
+            <option key={head.id} value={head.id} className="department-form__select-option">
               {head.username} ({head.email})
             </option>
           ))}
@@ -183,32 +184,32 @@ export default function DepartmentForm({ initial, onSaved }: any) {
       </div>
 
       {/* Active Toggle */}
-      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+      <div className="department-form__toggle-wrapper">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Department Status</label>
-          <p className="text-sm text-gray-500">Enable or disable this department</p>
+          <label className="department-form__toggle-label">Department Status</label>
+          <p className="department-form__toggle-description">Enable or disable this department</p>
         </div>
         <button
           type="button"
           onClick={() => setIsActive(!isActive)}
-          className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-            isActive ? 'bg-green-500' : 'bg-gray-300'
+          className={`department-form__toggle-button ${
+            isActive ? 'department-form__toggle-button--active' : 'department-form__toggle-button--inactive'
           }`}
         >
           <span
-            className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
-              isActive ? 'translate-x-6' : 'translate-x-1'
+            className={`department-form__toggle-slider ${
+              isActive ? 'department-form__toggle-slider--active' : ''
             }`}
           />
         </button>
       </div>
 
       {/* Submit Button */}
-      <div className="pt-4 border-t border-gray-200">
+      <div className="department-form__submit-section">
         <Button 
           type="submit" 
           isLoading={loading}
-          className="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800"
+          className="department-form__submit-button"
         >
           {initial ? 'Update Department' : 'Create Department'}
         </Button>

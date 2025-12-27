@@ -11,6 +11,7 @@ import AuthModal from './AuthModal';
 
 
 
+
 export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) => {
   const { navigateTo, showAuthModal, setShowAuthModal } = useProtectedNavigation();
   const [heroImages, setHeroImages] = useState<MediaItem[]>([]);
@@ -125,7 +126,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
         />
       )}
      
-      <section id='home' className="relative overflow-hidden text-white pt-8 md:pt-12 pb-20 md:pb-32">
+      <section id='home' className="relative overflow-hidden text-white pt-40 md:pb-12">
         {/* Dynamic Background - Image or Video */}
         {!backgroundLoading && heroBackground ? (
           heroBackground.media_type === 'video' ? (

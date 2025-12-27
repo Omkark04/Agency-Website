@@ -1,0 +1,210 @@
+/* ============================================
+   Service Form Component Styles
+   ============================================ */
+
+.service-form {
+  padding: 0.25rem;
+}
+
+.service-form__group {
+  margin-bottom: 1.5rem;
+}
+
+.service-form__label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.service-form__input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+}
+
+.service-form__input:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3b82f6;
+  border-color: transparent;
+}
+
+.service-form__textarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  resize: vertical;
+}
+
+.service-form__textarea:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3b82f6;
+  border-color: transparent;
+}
+
+/* Logo Upload */
+.service-form__logo-preview-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 0.75rem;
+}
+
+.service-form__logo-preview {
+  width: 6rem;
+  height: 6rem;
+  object-fit: cover;
+  border-radius: 0.25rem;
+  border: 1px solid #d1d5db;
+}
+
+.service-form__logo-remove {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  background: #ef4444;
+  color: white;
+  padding: 0.25rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+}
+
+.service-form__logo-input {
+  display: none;
+}
+
+.service-form__logo-label {
+  cursor: pointer;
+  display: block;
+  border: 1px dashed #d1d5db;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.service-form__logo-label:hover {
+  border-color: #3b82f6;
+}
+
+/* Department Select */
+.service-form__select {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  background: white;
+}
+
+.service-form__select:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3b82f6;
+  border-color: transparent;
+}
+
+.service-form__select:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.service-form__help-text {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+/* Team Members Multi-Select */
+.service-form__multi-select {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  min-height: 120px;
+}
+
+.service-form__multi-select:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3b82f6;
+  border-color: transparent;
+}
+
+/* Status Toggle */
+.service-form__toggle-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #d1d5db;
+  padding: 1rem;
+  border-radius: 0.25rem;
+}
+
+.service-form__toggle-label {
+  font-weight: 600;
+}
+
+.service-form__toggle-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.service-form__toggle-button {
+  width: 2.75rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  position: relative;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.service-form__toggle-button--active {
+  background: #22c55e;
+}
+
+.service-form__toggle-button--inactive {
+  background: #d1d5db;
+}
+
+.service-form__toggle-slider {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  background: white;
+  border-radius: 9999px;
+  transform: translateX(0.25rem);
+  transition: transform 0.3s;
+}
+
+.service-form__toggle-slider--active {
+  transform: translateX(1.5rem);
+}
+
+/* Submit Button */
+.service-form__submit {
+  width: 100%;
+  padding: 0.75rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.service-form__submit:hover {
+  background: #1d4ed8;
+}
+
+.service-form__submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

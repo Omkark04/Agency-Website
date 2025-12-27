@@ -14,6 +14,7 @@ import {
   FiSearch,
   FiImage
 } from 'react-icons/fi';
+import '../../../styles/admin/Services.css';
 
 const Services = () => {
   const { user } = useAuth();
@@ -87,23 +88,23 @@ const Services = () => {
 
 
   return (
-    <div className="min-h-screen">
+    <div className="services">
 
       {/* ✅ HEADER */}
-      <div className="mb-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-cyan-600 to-teal-500 p-8 shadow-2xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 text-white">
-              <FiPackage className="text-4xl" />
+      <div className="services__header">
+        <div className="services__header-inner">
+          <div className="services__header-content">
+            <div className="services__header-title-wrapper">
+              <FiPackage className="services__header-icon" />
               <div>
-                <h1 className="text-4xl font-bold">Services</h1>
-                <p className="opacity-90">Manage your service offerings</p>
+                <h1 className="services__header-title">Services</h1>
+                <p className="services__header-subtitle">Manage your service offerings</p>
               </div>
             </div>
 
             <Button
               onClick={() => { setEdit(null); setOpen(true); }}
-              className="flex items-center gap-2 bg-white text-blue-700 px-6 py-3 font-bold rounded-xl"
+              className="services__header-button"
             >
               <FiPlus /> Create Service
             </Button>
@@ -112,22 +113,22 @@ const Services = () => {
       </div>
 
       {/* ✅ SEARCH + FILTER */}
-      <div className="flex gap-4 mb-6">
-        <div className="relative flex-1">
-          <FiSearch className="absolute left-3 top-4 text-gray-400" />
+      <div className="services__controls">
+        <div className="services__search-wrapper">
+          <FiSearch className="services__search-icon" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by title or department..."
-            className="w-full pl-10 py-3 border rounded-lg"
+            className="services__search-input"
           />
         </div>
 
         <select
           value={filter}
           onChange={e => setFilter(e.target.value as any)}
-          className="border p-3 rounded-lg"
+          className="services__filter-select"
         >
           <option value="all">All</option>
           <option value="active">Active</option>
@@ -136,74 +137,74 @@ const Services = () => {
       </div>
 
       {/* ✅ SERVICES TABLE */}
-      <div className="bg-white shadow-xl rounded-xl overflow-hidden border">
+      <div className="services__table-container">
         {loading ? (
-          <div className="py-20 text-center">Loading...</div>
+          <div className="services__loading">Loading...</div>
         ) : (
           <>
-            <table className="w-full">
-              <thead className="bg-gray-100">
+            <table className="services__table">
+              <thead className="services__table-head">
                 <tr>
-                  <th className="p-4 text-left">Logo</th>
-                  <th className="p-4 text-left">Service</th>
-                  <th className="p-4 text-left">Department</th>
-                  <th className="p-4 text-left">Status</th>
-                  <th className="p-4 text-left">Actions</th>
+                  <th>Logo</th>
+                  <th>Service</th>
+                  <th>Department</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
 
-              <tbody>
+              <tbody className="services__table-body">
                 {filteredServices.map(service => (
-                  <tr key={service.id} className="border-t hover:bg-gray-50">
+                  <tr key={service.id}>
 
                     {/* ✅ LOGO COLUMN */}
-                    <td className="p-4">
+                    <td className="services__table-cell">
                       {service.logo ? (
                         <img
                           src={service.logo}
                           alt={service.title}
-                          className="w-12 h-12 object-cover rounded border"
+                          className="services__logo"
                         />
                       ) : (
-                        <div className="w-12 h-12 bg-gray-200 flex items-center justify-center rounded text-gray-500">
+                        <div className="services__logo-placeholder">
                           <FiImage />
                         </div>
                       )}
                     </td>
 
                     {/* ✅ TITLE */}
-                    <td className="p-4 font-semibold">{service.title}</td>
+                    <td className="services__table-cell services__title">{service.title}</td>
 
                     {/* ✅ DEPARTMENT */}
-                    <td className="p-4">
-                      <div className="flex items-center gap-2">
+                    <td className="services__table-cell">
+                      <div className="services__department">
                         <FiLayers />
                         {service.department_title || 'No department'}
                       </div>
                     </td>
 
                     {/* ✅ STATUS */}
-                    <td className="p-4">
-                      <span className={`px-3 py-1 rounded-full text-sm ${
+                    <td className="services__table-cell">
+                      <span className={`services__status-badge ${
                         service.is_active
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-200 text-gray-700'
+                          ? 'services__status-badge--active'
+                          : 'services__status-badge--inactive'
                       }`}>
                         {service.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
 
                     {/* ✅ ACTIONS */}
-                    <td className="p-4 flex gap-2">
+                    <td className="services__table-cell services__actions">
                       <button
                         onClick={() => { setEdit(service); setOpen(true); }}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                        className="services__action-btn services__action-btn--edit"
                       >
                         <FiEdit2 />
                       </button>
                       <button
                         onClick={() => onDelete(service.id)}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg"
+                        className="services__action-btn services__action-btn--delete"
                       >
                         <FiTrash2 />
                       </button>
@@ -215,7 +216,7 @@ const Services = () => {
             </table>
 
             {filteredServices.length === 0 && (
-              <div className="py-20 text-center text-gray-500">
+              <div className="services__empty">
                 No services found
               </div>
             )}

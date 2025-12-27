@@ -13,6 +13,7 @@ import {
   FiToggleRight,
   FiActivity
 } from 'react-icons/fi';
+import '../../../styles/admin/Departments.css';
 
 export default function Departments() {
   const [departments, setDepartments] = useState<any[]>([]);
@@ -53,93 +54,93 @@ export default function Departments() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="departments">
       {/* Hero Header */}
-      <div className="mb-8 animate-fade-in">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-blue-600 to-cyan-500 p-8 shadow-2xl">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImxheWVycyIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDMwIDAgTCAwIDIwIDAgNDAgMzAgNjAgNjAgNDAgNjAgMjAgWiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2xheWVycykiLz48L3N2Zz4=')] opacity-30"></div>
-          <div className="relative z-10">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
-                  <FiLayers className="h-8 w-8 text-white" />
+      <div className="departments__hero">
+        <div className="departments__hero-inner">
+          <div className="departments__hero-pattern"></div>
+          <div className="departments__hero-content">
+            <div className="departments__hero-header">
+              <div className="departments__hero-title-wrapper">
+                <div className="departments__hero-icon-wrapper">
+                  <FiLayers className="departments__hero-icon" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold text-white drop-shadow-lg">Departments</h1>
-                  <p className="text-white/90 text-lg mt-1">Manage your organization's departments</p>
+                  <h1 className="departments__hero-title">Departments</h1>
+                  <p className="departments__hero-subtitle">Manage your organization's departments</p>
                 </div>
               </div>
               <Button 
                 onClick={() => { setEditing(null); setOpenForm(true); }}
-                className="flex items-center gap-2 bg-white text-indigo-600 hover:bg-gray-50 px-6 py-3 font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all rounded-xl"
+                className="departments__hero-button"
               >
-                <FiPlus className="text-black text-xl" />
+                <FiPlus className="departments__hero-button-icon" />
                 Create Department
               </Button>
             </div>
           </div>
-          <div className="absolute -bottom-6 -right-6 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute -top-6 -left-6 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="departments__hero-blur-1"></div>
+          <div className="departments__hero-blur-2"></div>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 animate-fade-in" style={{animationDelay: '0.1s'}}>
-        <div className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 hover:border-indigo-300">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-500/10 to-blue-500/10 rounded-full blur-2xl"></div>
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl shadow-lg">
-                <FiLayers className="text-white text-2xl" />
+      <div className="departments__stats">
+        <div className="departments__stat-card departments__stat-card--total">
+          <div className="departments__stat-blur departments__stat-blur--total"></div>
+          <div className="departments__stat-content">
+            <div className="departments__stat-header">
+              <div className="departments__stat-icon-wrapper departments__stat-icon-wrapper--total">
+                <FiLayers className="departments__stat-icon" />
               </div>
-              <FiActivity className="text-indigo-500 text-xl" />
+              <FiActivity className="departments__stat-icon" />
             </div>
-            <p className="text-sm text-gray-500 font-semibold uppercase tracking-wider mb-2">Total Departments</p>
-            <p className="text-4xl font-black text-gray-900">{stats.total}</p>
+            <p className="departments__stat-label">Total Departments</p>
+            <p className="departments__stat-value">{stats.total}</p>
           </div>
         </div>
         
-        <div className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 hover:border-green-300">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-full blur-2xl"></div>
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg">
-                <FiToggleRight className="text-white text-2xl" />
+        <div className="departments__stat-card departments__stat-card--active">
+          <div className="departments__stat-blur departments__stat-blur--active"></div>
+          <div className="departments__stat-content">
+            <div className="departments__stat-header">
+              <div className="departments__stat-icon-wrapper departments__stat-icon-wrapper--active">
+                <FiToggleRight className="departments__stat-icon" />
               </div>
-              <div className="px-3 py-1 bg-green-50 rounded-full border border-green-200">
-                <span className="text-xs font-bold text-green-700">Active</span>
+              <div className="departments__stat-badge departments__stat-badge--active">
+                <span>Active</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 font-semibold uppercase tracking-wider mb-2">Active</p>
-            <p className="text-4xl font-black text-gray-900">{stats.active}</p>
+            <p className="departments__stat-label">Active</p>
+            <p className="departments__stat-value">{stats.active}</p>
           </div>
         </div>
         
-        <div className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 hover:border-gray-300">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-500/10 to-slate-500/10 rounded-full blur-2xl"></div>
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-gray-500 to-slate-600 rounded-2xl shadow-lg">
-                <FiToggleLeft className="text-white text-2xl" />
+        <div className="departments__stat-card departments__stat-card--inactive">
+          <div className="departments__stat-blur departments__stat-blur--inactive"></div>
+          <div className="departments__stat-content">
+            <div className="departments__stat-header">
+              <div className="departments__stat-icon-wrapper departments__stat-icon-wrapper--inactive">
+                <FiToggleLeft className="departments__stat-icon" />
               </div>
-              <div className="px-3 py-1 bg-gray-100 rounded-full border border-gray-300">
-                <span className="text-xs font-bold text-gray-700">Inactive</span>
+              <div className="departments__stat-badge departments__stat-badge--inactive">
+                <span>Inactive</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 font-semibold uppercase tracking-wider mb-2">Inactive</p>
-            <p className="text-4xl font-black text-gray-900">{stats.inactive}</p>
+            <p className="departments__stat-label">Inactive</p>
+            <p className="departments__stat-value">{stats.inactive}</p>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 mb-6 animate-fade-in" style={{animationDelay: '0.2s'}}>
+      <div className="departments__filters">
         <button
           onClick={() => setFilter('all')}
-          className={`px-6 py-4 rounded-xl font-bold transition-all flex items-center gap-2 ${
+          className={`departments__filter-btn ${
             filter === 'all'
-              ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg'
-              : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200'
+              ? 'departments__filter-btn--active-all'
+              : 'departments__filter-btn--inactive'
           }`}
         >
           <FiLayers />
@@ -147,10 +148,10 @@ export default function Departments() {
         </button>
         <button
           onClick={() => setFilter('active')}
-          className={`px-6 py-4 rounded-xl font-bold transition-all flex items-center gap-2 ${
+          className={`departments__filter-btn ${
             filter === 'active'
-              ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
-              : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200'
+              ? 'departments__filter-btn--active-active'
+              : 'departments__filter-btn--inactive'
           }`}
         >
           <FiToggleRight />
@@ -158,10 +159,10 @@ export default function Departments() {
         </button>
         <button
           onClick={() => setFilter('inactive')}
-          className={`px-6 py-4 rounded-xl font-bold transition-all flex items-center gap-2 ${
+          className={`departments__filter-btn ${
             filter === 'inactive'
-              ? 'bg-gradient-to-r from-gray-600 to-slate-600 text-white shadow-lg'
-              : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200'
+              ? 'departments__filter-btn--active-inactive'
+              : 'departments__filter-btn--inactive'
           }`}
         >
           <FiToggleLeft />
@@ -170,94 +171,94 @@ export default function Departments() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-gray-100 animate-fade-in" style={{animationDelay: '0.3s'}}>
+      <div className="departments__table-container">
         {loading ? (
-          <div className="flex items-center justify-center py-24">
-            <div className="relative">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-600"></div>
-              <div className="absolute inset-0 animate-ping rounded-full h-16 w-16 border-4 border-indigo-400 opacity-20"></div>
+          <div className="departments__loading">
+            <div className="departments__loading-spinner-wrapper">
+              <div className="departments__loading-spinner"></div>
+              <div className="departments__loading-ping"></div>
             </div>
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y-2 divide-gray-200">
-                <thead className="bg-gradient-to-r from-gray-50 to-indigo-50">
+            <div className="departments__table-wrapper">
+              <table className="departments__table">
+                <thead className="departments__table-head">
                   <tr>
-                    <th className="px-8 py-5 text-left text-xs font-black text-gray-700 uppercase tracking-wider">
+                    <th>
                       Department Details
                     </th>
-                    <th className="px-8 py-5 text-left text-xs font-black text-gray-700 uppercase tracking-wider">
+                    <th>
                       Team Head
                     </th>
-                    <th className="px-8 py-5 text-left text-xs font-black text-gray-700 uppercase tracking-wider">
+                    <th>
                       Status
                     </th>
-                    <th className="px-8 py-5 text-left text-xs font-black text-gray-700 uppercase tracking-wider">
+                    <th>
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="departments__table-body">
                   {filteredDepartments.map(d => (
-                    <tr key={d.id} className="group hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-blue-50/50 transition-all duration-300">
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-4">
+                    <tr key={d.id} className="departments__table-row">
+                      <td className="departments__table-cell">
+                        <div className="departments__dept-info">
                           {d.logo ? (
                             <img 
                               src={d.logo} 
                               alt={d.title} 
-                              className="w-14 h-14 rounded-2xl object-cover border-2 border-gray-200 group-hover:border-indigo-300 shadow-sm group-hover:shadow-md transition-all"
+                              className="departments__dept-logo"
                             />
                           ) : (
-                            <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
-                              <FiLayers className="h-7 w-7 text-white" />
+                            <div className="departments__dept-logo-placeholder">
+                              <FiLayers className="departments__dept-logo-icon" />
                             </div>
                           )}
                           <div>
-                            <div className="font-bold text-gray-900 text-lg mb-1">{d.title}</div>
-                            <div className="text-sm text-gray-500 truncate max-w-md">
+                            <div className="departments__dept-title">{d.title}</div>
+                            <div className="departments__dept-description">
                               {d.short_description || 'No description'}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-3">
-                          <div className="p-3 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl">
-                            <FiUsers className="text-blue-600 h-5 w-5" />
+                      <td className="departments__table-cell">
+                        <div className="departments__team-head">
+                          <div className="departments__team-head-icon-wrapper">
+                            <FiUsers className="departments__team-head-icon" />
                           </div>
                           <div>
-                            <div className="font-bold text-gray-900">
+                            <div className="departments__team-head-name">
                               {d.team_head?.username || d.team_head?.email || 'Not assigned'}
                             </div>
                             {d.team_head?.email && (
-                              <div className="text-sm text-gray-500">{d.team_head.email}</div>
+                              <div className="departments__team-head-email">{d.team_head.email}</div>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
-                        <span className={`px-4 py-2 text-sm font-bold rounded-full ${
+                      <td className="departments__table-cell">
+                        <span className={`departments__status-badge ${
                           d.is_active 
-                            ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg' 
-                            : 'bg-gray-200 text-gray-700'
+                            ? 'departments__status-badge--active' 
+                            : 'departments__status-badge--inactive'
                         }`}>
                           {d.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center gap-3">
+                      <td className="departments__table-cell">
+                        <div className="departments__actions">
                           <button
                             onClick={() => onEdit(d)}
-                            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                            className="departments__action-btn departments__action-btn--edit"
                           >
                             <FiEdit2 />
                             Edit
                           </button>
                           <button
                             onClick={() => onDelete(d.id)}
-                            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold rounded-xl hover:from-red-700 hover:to-rose-700 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                            className="departments__action-btn departments__action-btn--delete"
                           >
                             <FiTrash2 />
                             Delete
@@ -271,22 +272,22 @@ export default function Departments() {
             </div>
             
             {filteredDepartments.length === 0 && !loading && (
-              <div className="text-center py-20">
-                <div className="mx-auto w-28 h-28 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-3xl flex items-center justify-center mb-6 shadow-inner">
-                  <FiLayers className="text-5xl text-indigo-400" />
+              <div className="departments__empty">
+                <div className="departments__empty-icon-wrapper">
+                  <FiLayers className="departments__empty-icon" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">No departments found</h3>
-                <p className="text-gray-500 text-lg mb-6">
+                <h3 className="departments__empty-title">No departments found</h3>
+                <p className="departments__empty-description">
                   {filter === 'all' ? 'Create your first department to get started' :
                    filter === 'active' ? 'No active departments' :
                    'No inactive departments'}
                 </p>
                 <Button 
                   onClick={() => { setEditing(null); setOpenForm(true); }}
-                  className="flex items-center gap-2 bg-white text-blue-700 px-6 py-3 rounded-xl font-bold shadow-xl"
+                  className="departments__empty-button"
                 >
                   <FiPlus />
-                    <p className='text-black'>Create Department</p>
+                    <p className='departments__empty-button-text'>Create Department</p>
                 </Button>
               </div>
             )}
@@ -297,16 +298,6 @@ export default function Departments() {
       <Modal open={openForm} onClose={() => setOpenForm(false)} title={editing ? 'Edit Department' : 'Create Department'}>
         <DepartmentForm initial={editing} onSaved={() => { setOpenForm(false); load(); }} />
       </Modal>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.6s ease-out forwards;
-        }
-      `}} />;
     </div>
   );
 };

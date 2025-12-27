@@ -1,0 +1,261 @@
+/* ============================================
+   Department Form Component Styles
+   ============================================ */
+
+.department-form {
+  padding: 0.25rem;
+}
+
+.department-form__group {
+  margin-bottom: 1.5rem;
+}
+
+.department-form__label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.department-form__label--block {
+  display: block;
+}
+
+.department-form__input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  transition: all 0.3s;
+}
+
+.department-form__input:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3b82f6;
+  border-color: transparent;
+}
+
+.department-form__input::placeholder {
+  color: #9ca3af;
+}
+
+.department-form__textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  transition: all 0.3s;
+  resize: none;
+  rows: 3;
+}
+
+.department-form__textarea:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3b82f6;
+  border-color: transparent;
+}
+
+.department-form__textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* Logo Upload Section */
+.department-form__logo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.department-form__logo-preview-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.department-form__logo-preview {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 0.5rem;
+  object-fit: cover;
+  border: 1px solid #d1d5db;
+}
+
+.department-form__logo-remove {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  padding: 0.25rem;
+  background: #fee2e2;
+  color: #dc2626;
+  border-radius: 9999px;
+  transition: background-color 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.department-form__logo-remove:hover {
+  background: #fecaca;
+}
+
+.department-form__logo-remove-icon {
+  height: 1rem;
+  width: 1rem;
+}
+
+.department-form__logo-input {
+  display: none;
+}
+
+.department-form__logo-label {
+  cursor: pointer;
+  display: block;
+}
+
+.department-form__logo-upload-area {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 2px dashed #d1d5db;
+  border-radius: 0.5rem;
+  transition: border-color 0.3s;
+}
+
+.department-form__logo-upload-area:hover {
+  border-color: #3b82f6;
+}
+
+.department-form__logo-upload-icon {
+  color: #9ca3af;
+}
+
+.department-form__logo-upload-text {
+  color: #4b5563;
+}
+
+/* Team Head Selection */
+.department-form__select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  transition: all 0.3s;
+  appearance: none;
+  background: white;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+.department-form__select:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3b82f6;
+  border-color: transparent;
+}
+
+.department-form__select-option {
+  padding: 0.5rem 0;
+}
+
+.department-form__select-option--placeholder {
+  color: #9ca3af;
+}
+
+/* Active Toggle */
+.department-form__toggle-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.department-form__toggle-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.department-form__toggle-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.department-form__toggle-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 1.5rem;
+  width: 2.75rem;
+  border-radius: 9999px;
+  transition: background-color 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.department-form__toggle-button:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3b82f6;
+  ring-offset: 2px;
+}
+
+.department-form__toggle-button--active {
+  background: #22c55e;
+}
+
+.department-form__toggle-button--inactive {
+  background: #d1d5db;
+}
+
+.department-form__toggle-slider {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  transform: translateX(0.25rem);
+  background: white;
+  border-radius: 9999px;
+  transition: transform 0.3s;
+}
+
+.department-form__toggle-slider--active {
+  transform: translateX(1.5rem);
+}
+
+/* Submit Section */
+.department-form__submit-section {
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.department-form__submit-button {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(to right, #4f46e5, #4338ca);
+  color: white;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: all 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.department-form__submit-button:hover {
+  background: linear-gradient(to right, #4338ca, #3730a3);
+}
+
+.department-form__submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -1,28 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FaEnvelope, FaPhoneAlt } from 'react-icons/fa';
 import { X } from 'lucide-react';
 
-
-export const TopBar = () => {
-  const [isVisible, setIsVisible] = useState(true);
+export const ContactFloat = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-
+  const popupRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
 
-
     checkIfMobile();
     window.addEventListener('resize', checkIfMobile);
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
 
+  // Close popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
+        setShowPopup(false);
+      }
+    };
 
-  if (!isVisible) return null;
+    if (showPopup) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
 
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showPopup]);
 
   // Contact Icon SVG
   const ContactIcon = () => (
@@ -37,9 +47,8 @@ export const TopBar = () => {
     </svg>
   );
 
-
   return (
-    <div className="fixed bottom-24 right-6 z-40 flex flex-col items-end">
+    <div className="fixed bottom-24 right-6 z-40 flex flex-col items-end" ref={popupRef}>
       {/* Contact Info Popup */}
       {showPopup && (
         <div
@@ -62,10 +71,9 @@ export const TopBar = () => {
             </div>
           </div>
 
-
           <div className="p-4 space-y-3">
             <a
-              href="mailto:rahulbhatambare72@gmail.com"
+              href="mailto:udyogworks.official@gmail.com"
               className="flex items-center text-sm hover:text-[#0066FF] transition-colors group"
             >
               <div className="bg-blue-100 dark:bg-blue-900 p-2 rounded-full mr-3 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
@@ -74,17 +82,15 @@ export const TopBar = () => {
               <span className="text-sm">udyogworks.official@gmail.com</span>
             </a>
 
-
             <a
-              href="tel:+918208776319"
+              href="tel:+918390498423"
               className="flex items-center text-sm hover:text-[#0066FF] transition-colors group"
             >
               <div className="bg-blue-100 dark:bg-blue-900 p-2 rounded-full mr-3 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
                 <FaPhoneAlt className="text-[#0066FF]" />
               </div>
-              <span className="text-sm">+91 8208776319</span>
+              <span className="text-sm">+91 8390498423</span>
             </a>
-
 
             <a
               href="#contact"
@@ -95,11 +101,9 @@ export const TopBar = () => {
             </a>
           </div>
 
-
           <div className="absolute bottom-0 right-4 w-3 h-3 bg-white dark:bg-gray-800 transform rotate-45 -mb-1.5"></div>
         </div>
       )}
-
 
       {/* Floating Contact Button */}
       <div className="relative group">
@@ -112,28 +116,14 @@ export const TopBar = () => {
         >
           <ContactIcon />
 
-
           {/* Notification indicator with pulse animation */}
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
             !
           </span>
         </button>
       </div>
-
-
-      {/* Close button for mobile */}
-      {isMobile && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsVisible(false);
-          }}
-          className="mt-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded shadow"
-          aria-label="Hide contact button"
-        >
-          Close
-        </button>
-      )}
     </div>
   );
 };
+
+export default ContactFloat;

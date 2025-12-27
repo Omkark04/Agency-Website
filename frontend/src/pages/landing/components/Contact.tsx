@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Send, MapPin, Mail, Phone, Facebook, Twitter, Instagram, Linkedin, MessageCircle } from 'lucide-react';
 import api from '../../../api/api';
 
+
 const Contact = () => {
   const [departments, setDepartments] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);

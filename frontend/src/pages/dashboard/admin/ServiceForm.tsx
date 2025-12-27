@@ -13,6 +13,7 @@ import {
   FiX,
   FiUsers
 } from 'react-icons/fi';
+import '../../../styles/admin/ServiceForm.css';
 
 export default function ServiceForm({
   initial,
@@ -126,11 +127,11 @@ export default function ServiceForm({
   };
 
   return (
-    <form onSubmit={submit} className="space-y-6 p-1">
+    <form onSubmit={submit} className="service-form">
 
       {/* ✅ TITLE */}
-      <div>
-        <label className=" text-sm font-semibold mb-2 flex items-center gap-2">
+      <div className="service-form__group">
+        <label className="service-form__label">
           <FiPackage /> Service Title *
         </label>
         <Input
@@ -142,47 +143,47 @@ export default function ServiceForm({
       </div>
 
       {/* ✅ SHORT DESCRIPTION */}
-      <div>
-        <label className="text-sm font-semibold mb-2 flex items-center gap-2">
+      <div className="service-form__group">
+        <label className="service-form__label">
           <FiAlignLeft /> Short Description
         </label>
         <textarea
           rows={3}
           value={shortDesc}
           onChange={e => setShortDesc(e.target.value)}
-          className="w-full border rounded p-3"
+          className="service-form__textarea"
         />
       </div>
 
       {/* ✅ LONG DESCRIPTION */}
-      <div>
-        <label className="text-sm font-semibold mb-2 flex items-center gap-2">
+      <div className="service-form__group">
+        <label className="service-form__label">
           <FiFileText /> Long Description
         </label>
         <textarea
           rows={5}
           value={longDesc}
           onChange={e => setLongDesc(e.target.value)}
-          className="w-full border rounded p-3"
+          className="service-form__textarea"
         />
       </div>
 
       {/* ✅ LOGO UPLOAD */}
-      <div>
-        <label className="text-sm font-semibold mb-2 flex items-center gap-2">
+      <div className="service-form__group">
+        <label className="service-form__label">
           <FiUpload /> Service Logo
         </label>
 
         {(logoPreview || initial?.logo) && (
-          <div className="relative inline-block mb-3">
+          <div className="service-form__logo-preview-wrapper">
             <img
               src={logoPreview || initial?.logo}
-              className="w-24 h-24 object-cover rounded border"
+              className="service-form__logo-preview"
             />
             <button
               type="button"
               onClick={removeLogo}
-              className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full"
+              className="service-form__logo-remove"
             >
               <FiX size={14} />
             </button>
@@ -194,23 +195,23 @@ export default function ServiceForm({
           type="file"
           accept="image/*"
           onChange={handleFileChange}
-          className="hidden"
+          className="service-form__logo-input"
         />
 
-        <label htmlFor="service-logo-upload" className="cursor-pointer block border-dashed border p-3 rounded text-center text-sm">
+        <label htmlFor="service-logo-upload" className="service-form__logo-label">
           {logoPreview ? 'Change Logo' : 'Upload Service Logo'}
         </label>
       </div>
 
       {/* ✅ DEPARTMENT */}
-      <div>
-        <label className="text-sm font-semibold mb-2 flex items-center gap-2">
+      <div className="service-form__group">
+        <label className="service-form__label">
           <FiLayers /> Department *
         </label>
         <select
           value={departmentId}
           onChange={e => setDepartmentId(Number(e.target.value))}
-          className="w-full border rounded p-3"
+          className="service-form__select"
           required
           disabled={user?.role === 'service_head'} // Read-only for service heads
         >
@@ -222,15 +223,15 @@ export default function ServiceForm({
           ))}
         </select>
         {user?.role === 'service_head' && (
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="service-form__help-text">
             ℹ️ You can only create services for your assigned department
           </p>
         )}
       </div>
 
       {/* ✅ TEAM MEMBERS */}
-      <div>
-        <label className="text-sm font-semibold mb-2 flex items-center gap-2">
+      <div className="service-form__group">
+        <label className="service-form__label">
           <FiUsers /> Assign Team Members
         </label>
         <select
@@ -240,7 +241,7 @@ export default function ServiceForm({
             const selected = Array.from(e.target.selectedOptions, option => Number(option.value));
             setSelectedMembers(selected);
           }}
-          className="w-full border rounded p-3 min-h-[120px]"
+          className="service-form__multi-select"
         >
           {teamMembers.map(member => (
             <option key={member.id} value={member.id}>
@@ -248,28 +249,28 @@ export default function ServiceForm({
             </option>
           ))}
         </select>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="service-form__help-text">
           Hold Ctrl/Cmd to select multiple team members for this service
         </p>
       </div>
 
       {/* ✅ STATUS */}
-      <div className="flex items-center justify-between border p-4 rounded">
+      <div className="service-form__toggle-wrapper">
         <div>
-          <p className="font-semibold">Service Status</p>
-          <p className="text-sm text-gray-500">Enable or disable service</p>
+          <p className="service-form__toggle-label">Service Status</p>
+          <p className="service-form__toggle-description">Enable or disable service</p>
         </div>
         <button
           type="button"
           onClick={() => setIsActive(!isActive)}
-          className={`w-11 h-6 rounded-full ${isActive ? 'bg-green-500' : 'bg-gray-300'}`}
+          className={`service-form__toggle-button ${isActive ? 'service-form__toggle-button--active' : 'service-form__toggle-button--inactive'}`}
         >
-          <span className={`block w-4 h-4 bg-white rounded-full transform transition ${isActive ? 'translate-x-6' : 'translate-x-1'}`} />
+          <span className={`service-form__toggle-slider ${isActive ? 'service-form__toggle-slider--active' : ''}`} />
         </button>
       </div>
 
       {/* ✅ SUBMIT */}
-      <Button type="submit" isLoading={loading} className="w-full">
+      <Button type="submit" isLoading={loading} className="service-form__submit">
         {initial ? 'Update Service' : 'Create Service'}
       </Button>
     </form>

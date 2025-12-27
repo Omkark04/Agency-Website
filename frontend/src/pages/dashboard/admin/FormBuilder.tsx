@@ -283,7 +283,11 @@ const FormBuilder = () => {
               </button>
               <button
                 onClick={handleSaveForm}
-                disabled={loading || !form.service}
+                disabled={
+                  loading || 
+                  (form.card_type === 'service' && !form.service) || 
+                  (form.card_type === 'offer' && !form.selected_offer_id)
+                }
                 className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:opacity-90 disabled:opacity-50"
               >
                 <Save className="h-5 w-5" />

@@ -7,6 +7,7 @@ import { useProtectedNavigation } from "../../../hooks/useProtectedNavigation";
 import AuthModal from './AuthModal';
 
 
+
 type Props = {
   limit?: number; // optional: limit number of cards
   showFeaturedOnly?: boolean; // default false

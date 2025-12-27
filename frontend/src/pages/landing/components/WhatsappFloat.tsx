@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 
+
 const WhatsappFloat = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -102,7 +103,7 @@ const WhatsappFloat = () => {
             e.stopPropagation();
             setIsVisible(false);
           }}
-          className="mt-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded"
+          className="mt-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded shadow"
           aria-label="Hide WhatsApp button"
         >
           Close

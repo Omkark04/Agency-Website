@@ -6,6 +6,7 @@ import logo from '../../../assets/UdyogWorks logo.png';
 import { getCurrentUser, logout } from '../../../utils/auth';
 import { UserAvatar } from '../../../components/ui/UserAvatar';
 
+
 interface HeaderProps {
   onAuthButtonClick?: () => void;
 }

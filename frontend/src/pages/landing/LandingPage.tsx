@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { TopBar } from './components/TopBar';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Services } from '../landing/components/Services';
@@ -13,6 +12,7 @@ import Contact from './components/Contact';
 import { Footer } from './components/Footer';
 import AuthModal from './components/AuthModal';
 import WhatsappFloat from './components/WhatsappFloat';
+import ContactFloat from './components/ContactFloat';
 
 
 export const LandingPage = () => {
@@ -29,11 +29,10 @@ export const LandingPage = () => {
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
-      <TopBar />
       <Header onAuthButtonClick={() => setIsAuthModalOpen(true)} />
 
 
-      <main className="pt-20">
+      <main className="mt-20">
         <Hero onGetStartedClick={() => setIsAuthModalOpen(true)} />
         <Services />
         <Offers />
@@ -48,6 +47,7 @@ export const LandingPage = () => {
 
       <Footer />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <ContactFloat />
       <WhatsappFloat />
     </div>
   );

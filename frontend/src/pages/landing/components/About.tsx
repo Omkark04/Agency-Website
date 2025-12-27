@@ -5,6 +5,7 @@ import { fetchAboutImages } from '../../../api/media';
 import type { MediaItem } from '../../../api/media';
 import { Button as MovingBorderContainer } from "@/components/ui/moving-border";
 
+
 const features = [
   {
     icon: <Lightbulb className="h-8 w-8 text-[#00C2A8]" />,

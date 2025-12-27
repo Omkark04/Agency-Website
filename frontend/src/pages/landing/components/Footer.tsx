@@ -4,6 +4,7 @@ import { Facebook, Twitter, Instagram, Linkedin,} from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { listServices, type Service } from '../../../api/services';
 
+
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [services, setServices] = useState<Service[]>([]);
@@ -187,4 +188,3 @@ export const Footer = () => {
 };
 
 export default Footer;
-

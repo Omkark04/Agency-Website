@@ -25,6 +25,7 @@ import type { Department } from '../../../api/departments';
 import { AuthModal } from './AuthModal';
 import DynamicFormRenderer from '../../../components/forms/DynamicFormRenderer';
 
+
 // Icon mapping from backend with more options
 const iconMap = {
   'palette': <FaPalette />,

@@ -20,6 +20,7 @@ import type { PortfolioProject } from '../../../api/portfolio';
 import { useProtectedNavigation } from '../../../hooks/useProtectedNavigation';
 import AuthModal from './AuthModal';
 
+
 const PortfolioSection = () => {
   const { navigateTo, showAuthModal, setShowAuthModal } = useProtectedNavigation();
   const [projects, setProjects] = useState<PortfolioProject[]>([]);

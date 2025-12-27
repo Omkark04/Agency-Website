@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { FaSearch, FaClipboardList, FaCode, FaRocket } from 'react-icons/fa';
 
+
 const Process = () => {
   const steps = [
     {

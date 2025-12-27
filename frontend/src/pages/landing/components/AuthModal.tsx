@@ -5,6 +5,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
 import { initiateGoogleAuth, initiateLinkedInAuth } from '@/api/oauth';
 
+
 type AuthMode = 'login' | 'signup';
 
 
