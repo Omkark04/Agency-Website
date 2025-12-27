@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { listOrders } from '../../../api/orders';
 import {
@@ -30,7 +29,6 @@ import {
   Target,
   Layers,
   Clock,
-  Users,
   ChevronRight,
   ExternalLink,
   Shield,
@@ -38,13 +36,6 @@ import {
   Rocket,
   LineChart,
 } from 'lucide-react';
-
-// Define types (unchanged)
-type TeamMember = {
-  name: string;
-  role: string;
-  avatarColor: string;
-};
 
 type Project = {
   id: number;
@@ -54,7 +45,6 @@ type Project = {
   progress: number;
   startDate: string;
   dueDate: string;
-  team: TeamMember[];
   lastUpdated: string;
   files: number;
   tasks: {
@@ -342,28 +332,8 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
           </div>
         </div>
 
-        {/* Premium Team & Actions Section */}
-        <div className="flex items-center justify-between">
-          {/* Animated team avatars */}
-          <div className="flex -space-x-2.5">
-            {project.team.slice(0, 4).map((member, i) => (
-              <div
-                key={i}
-                className={`relative ${member.avatarColor} w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold text-white border-3 border-white dark:border-gray-800 shadow-xl hover:scale-125 hover:z-20 transition-all duration-500 cursor-pointer transform-gpu group/avatar`}
-                title={`${member.name} - ${member.role}`}
-              >
-                {member.name.split(' ').map(n => n[0]).join('')}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/0 via-white/0 to-white/0 group-hover/avatar:from-white/20 group-hover/avatar:via-white/10 group-hover/avatar:to-white/20 transition-all duration-500" />
-              </div>
-            ))}
-            {project.team.length > 4 && (
-              <div className="relative w-11 h-11 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center text-sm font-bold text-gray-600 dark:text-gray-300 border-3 border-white dark:border-gray-800 shadow-xl hover:scale-125 transition-all duration-500 cursor-pointer transform-gpu group/more">
-                +{project.team.length - 4}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/0 via-white/0 to-white/0 group-hover/more:from-white/20 group-hover/more:via-white/10 group-hover/more:to-white/20 transition-all duration-500" />
-              </div>
-            )}
-          </div>
-
+        {/* Premium Team & Actions Section - Team avatars removed */}
+        <div className="flex items-center justify-end">
           {/* Premium action buttons */}
           <div className="flex space-x-2">
             <button className="relative p-3 text-gray-500 hover:text-blue-500 hover:bg-gradient-to-br from-blue-50 to-blue-100/50 dark:hover:bg-blue-900/30 rounded-xl transition-all duration-500 hover:scale-110 active:scale-95 shadow-lg hover:shadow-xl backdrop-blur-sm group/eye">
@@ -561,7 +531,6 @@ const PremiumHeader = () => {
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white bg-clip-text text-transparent animate-text-gradient tracking-tight">
               Project Management
-              <Rocket className="inline ml-4 h-8 w-8 text-blue-500 animate-float" />
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-4 text-lg tracking-wide leading-relaxed max-w-2xl">
               Track progress, manage teams, and monitor project performance in real-time with our advanced dashboard
@@ -859,7 +828,6 @@ export default function MyProjects() {
         progress: getProgressFromStatus(order.status),
         startDate: order.created_at,
         dueDate: order.delivery_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        team: generateTeam(),
         lastUpdated: order.updated_at || order.created_at,
         files: Math.floor(Math.random() * 20) + 5,
         tasks: {
@@ -880,19 +848,6 @@ export default function MyProjects() {
       setLoading(false);
     }
   };
-
-  const generateTeam = (): TeamMember[] => {
-    const names = ['Alex Chen', 'Sam Rivera', 'Jordan Lee', 'Taylor Kim', 'Morgan Wells', 'Casey Smith'];
-    const roles = ['Lead Dev', 'Designer', 'PM', 'QA', 'DevOps', 'Analyst']
-    const colors = ['bg-gradient-to-br from-blue-500 to-cyan-500', 'bg-gradient-to-br from-purple-500 to-pink-500', 'bg-gradient-to-br from-emerald-500 to-green-500', 'bg-gradient-to-br from-amber-500 to-orange-500', 'bg-gradient-to-br from-rose-500 to-pink-500', 'bg-gradient-to-br from-indigo-500 to-blue-500']
-    
-    const teamSize = Math.floor(Math.random() * 3) + 3
-    return Array.from({ length: teamSize }, (_, i) => ({
-      name: names[i % names.length],
-      role: roles[i % roles.length],
-      avatarColor: colors[i % colors.length]
-    }))
-  }
 
   const mapOrderStatusToProjectStatus = (status: string): string => {
     const statusMap: Record<string, string> = {
@@ -1014,9 +969,9 @@ export default function MyProjects() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {[
           { title: "Total Projects", value: totalProjects, icon: FolderOpen, color: "bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-500", trend: 75 },
-          { title: "Active Projects", value: activeProjects, icon: Activity, change: 12, color: "bg-gradient-to-br from-emerald-500 via-emerald-600 to-green-500", trend: 60 },
+          { title: "Active Projects", value: activeProjects, icon: Activity, color: "bg-gradient-to-br from-emerald-500 via-emerald-600 to-green-500", trend: 60 },
           { title: "Avg. Progress", value: `${avgProgress}%`, icon: TrendingUp, color: "bg-gradient-to-br from-purple-500 via-purple-600 to-pink-500", trend: avgProgress },
-          { title: "Budget Usage", value: `$${(totalSpent/1000).toFixed(1)}K`, icon: BarChart3, change: -5, color: "bg-gradient-to-br from-amber-500 via-amber-600 to-orange-500", trend: 45 },
+          { title: "Budget Usage", value: `${(totalSpent/1000).toFixed(1)}`, icon: BarChart3, color: "bg-gradient-to-br from-amber-500 via-amber-600 to-orange-500", trend: 45 },
         ].map((stat, index) => (
           <StatsCard key={stat.title} {...stat} index={index} />
         ))}

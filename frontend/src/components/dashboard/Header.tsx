@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useNotifications } from '../../hooks/useNotifications';
 import { 
   FiSearch, 
   FiBell, 
@@ -18,6 +19,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
   const { user, logout } = useAuth();
+  const { notifications, unreadCount, markAsRead } = useNotifications();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -75,10 +77,12 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
                 className="relative p-2.5 text-gray-600 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 rounded-xl transition-all group"
               >
                 <FiBell className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gradient-to-r from-red-500 to-rose-600 ring-2 ring-white"></span>
-                </span>
+                {unreadCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gradient-to-r from-red-500 to-rose-600 ring-2 ring-white"></span>
+                  </span>
+                )}
               </button>
 
               {/* Notifications Dropdown */}
@@ -86,29 +90,66 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title }) => {
                 <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden animate-fade-in z-50">
                   <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
                     <h3 className="font-bold text-gray-900 text-lg">Notifications</h3>
-                    <p className="text-sm text-gray-600 mt-1">You have 3 unread messages</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {unreadCount > 0 ? `You have ${unreadCount} unread message${unreadCount > 1 ? 's' : ''}` : 'All caught up!'}
+                    </p>
                   </div>
                   <div className="max-h-96 overflow-y-auto">
-                    {[1, 2, 3].map(i => (
-                      <div key={i} className="p-4 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all border-b border-gray-100 cursor-pointer group">
-                        <div className="flex gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                            <FiBell className="w-5 h-5 text-white" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-gray-900 text-sm mb-1">New order received</p>
-                            <p className="text-xs text-gray-600 line-clamp-2">Order #12345 has been placed by customer</p>
-                            <p className="text-xs text-gray-400 mt-1">2 minutes ago</p>
+                    {notifications.length === 0 ? (
+                      <div className="p-8 text-center text-gray-500">
+                        <FiBell className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                        <p>No notifications yet</p>
+                      </div>
+                    ) : (
+                      notifications.slice(0, 5).map(notification => (
+                        <div 
+                          key={notification.id} 
+                          onClick={() => {
+                            if (!notification.is_read) {
+                              markAsRead(notification.id);
+                            }
+                          }}
+                          className={`p-4 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all border-b border-gray-100 cursor-pointer group ${
+                            !notification.is_read ? 'bg-blue-50/50' : ''
+                          }`}
+                        >
+                          <div className="flex gap-3">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                              <FiBell className="w-5 h-5 text-white" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between">
+                                <p className="font-semibold text-gray-900 text-sm mb-1">{notification.title}</p>
+                                {!notification.is_read && (
+                                  <span className="ml-2 h-2 w-2 bg-blue-600 rounded-full flex-shrink-0"></span>
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-600 line-clamp-2">{notification.message}</p>
+                              <p className="text-xs text-gray-400 mt-1">
+                                {new Date(notification.created_at).toLocaleString()}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
-                  <div className="p-3 bg-gray-50 border-t border-gray-200">
-                    <button className="w-full py-2 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors">
-                      View all notifications
-                    </button>
-                  </div>
+                  {notifications.length > 5 && (
+                    <div className="p-3 bg-gray-50 border-t border-gray-200">
+                      <Link 
+                        to={
+                          user?.role === 'client' ? '/client-dashboard/notifications' :
+                          user?.role === 'admin' ? '/dashboard/notifications' :
+                          user?.role === 'service_head' ? '/dashboard/service-head/notifications' :
+                          '/notifications'
+                        }
+                        className="w-full py-2 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors block text-center"
+                        onClick={() => setShowNotifications(false)}
+                      >
+                        View all notifications
+                      </Link>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

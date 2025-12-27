@@ -125,6 +125,133 @@ class OrderViewSet(viewsets.ModelViewSet):
             )
         except Exception as e:
             print(f"Failed to send order confirmation email: {e}")
+    
+    @action(detail=False, methods=['get'])
+    def dashboard_stats(self, request):
+        """
+        Get dashboard statistics for the current user.
+        Returns order counts, spending, and progress metrics.
+        """
+        user = request.user
+        
+        # Get user's orders based on role
+        if user.role == 'admin':
+            orders = Order.objects.all()
+        elif user.role == 'client':
+            orders = Order.objects.filter(client=user)
+        elif user.role in ['service_head', 'team_member']:
+            if user.department:
+                orders = Order.objects.filter(service__department=user.department)
+            else:
+                orders = Order.objects.none()
+        else:
+            orders = Order.objects.none()
+        
+        from django.db.models import Sum, Count, Q
+        
+        # Calculate statistics
+        total_orders = orders.count()
+        active_orders = orders.filter(
+            status__in=['in_progress', '25_done', '50_done', '75_done']
+        ).count()
+        completed_orders = orders.filter(
+            status__in=['completed', 'closed', 'payment_done', 'delivered']
+        ).count()
+        pending_orders = orders.filter(status='pending').count()
+        
+        # Financial stats
+        total_spent = orders.aggregate(total=Sum('price'))['total'] or 0
+        total_paid = orders.aggregate(total=Sum('total_paid'))['total'] or 0
+        pending_payments = float(total_spent) - float(total_paid)
+        
+        # Progress calculation
+        progress_orders = orders.filter(
+            status__in=['in_progress', '25_done', '50_done', '75_done']
+        )
+        avg_progress = 0
+        if progress_orders.exists():
+            total_progress = sum([
+                25 if o.status == '25_done' else
+                50 if o.status == '50_done' else
+                75 if o.status == '75_done' else
+                10 if o.status == 'in_progress' else 0
+                for o in progress_orders
+            ])
+            avg_progress = total_progress // progress_orders.count() if progress_orders.count() > 0 else 0
+        
+        return Response({
+            'total_orders': total_orders,
+            'active_orders': active_orders,
+            'completed_orders': completed_orders,
+            'pending_orders': pending_orders,
+            'total_spent': float(total_spent),
+            'total_paid': float(total_paid),
+            'pending_payments': pending_payments,
+            'avg_progress': avg_progress
+        })
+    
+    @action(detail=False, methods=['get'])
+    def recent_activity(self, request):
+        """
+        Get recent activity for the current user's dashboard.
+        Combines order status changes, notifications, and other events.
+        """
+        user = request.user
+        activities = []
+        
+        # Get user's orders
+        if user.role == 'admin':
+            orders = Order.objects.all()
+        elif user.role == 'client':
+            orders = Order.objects.filter(client=user)
+        elif user.role in ['service_head', 'team_member']:
+            if user.department:
+                orders = Order.objects.filter(service__department=user.department)
+            else:
+                orders = Order.objects.none()
+        else:
+            orders = Order.objects.none()
+        
+        # Get recent order updates (last 10)
+        recent_orders = orders.order_by('-updated_at')[:10]
+        
+        for order in recent_orders:
+            # Determine activity type based on status
+            if order.status in ['completed', 'closed', 'payment_done']:
+                activity_status = 'completed'
+                action = f"Order completed: {order.title}"
+            elif order.status in ['in_progress', '25_done', '50_done', '75_done']:
+                activity_status = 'in-progress'
+                progress_map = {
+                    'in_progress': '0%',
+                    '25_done': '25%',
+                    '50_done': '50%',
+                    '75_done': '75%'
+                }
+                progress = progress_map.get(order.status, '0%')
+                action = f"Order in progress ({progress}): {order.title}"
+            elif order.status == 'pending':
+                activity_status = 'pending'
+                action = f"Order pending approval: {order.title}"
+            else:
+                activity_status = 'pending'
+                action = f"Order {order.get_status_display()}: {order.title}"
+            
+            activities.append({
+                'id': f'order_{order.id}',
+                'type': 'order_update',
+                'action': action,
+                'project': order.title,
+                'status': activity_status,
+                'time': order.updated_at.isoformat(),
+                'order_id': order.id
+            })
+        
+        # Sort by time (most recent first)
+        activities.sort(key=lambda x: x['time'], reverse=True)
+        
+        return Response(activities[:10])
+
 
 
 class OfferViewSet(viewsets.ModelViewSet):

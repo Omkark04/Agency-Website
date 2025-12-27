@@ -16,6 +16,10 @@ from .views import (
     ChangePasswordView,
     ChangeEmailView,
 )
+from .oauth_views import (
+    GoogleCallbackView,
+    LinkedInCallbackView,
+)
 from .team_head_views import (
     TeamHeadStatsView,
     TeamMembersListView,
@@ -38,6 +42,8 @@ urlpatterns = [
     path("token/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("google/", GoogleOAuthView.as_view(), name="google_oauth"),
+    path("google/callback/", GoogleCallbackView.as_view(), name="google_callback"),
+    path("linkedin/callback/", LinkedInCallbackView.as_view(), name="linkedin_callback"),
     path("admin/login/", AdminEnvLoginView.as_view(), name="admin_env_login"),
     path("register/client/", ClientRegisterView.as_view(), name="register_client"),
     path("register/service-head/", ServiceHeadRegisterView.as_view(), name="register_service_head"),

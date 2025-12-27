@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { listOrders } from '../../../api/orders';
+import { listOrders, getDashboardStats, getRecentActivity, type DashboardStats, type RecentActivity } from '../../../api/orders';
 import { useAuth } from '../../../hooks/useAuth';
 import { logout } from '../../../utils/auth';
 import logo from '../../../assets/UdyogWorks logo.png';
@@ -85,6 +85,8 @@ export default function ClientDashboard() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
+  const [recentActivityData, setRecentActivityData] = useState<RecentActivity[]>([]);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isAnimating, setIsAnimating] = useState(false);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
@@ -157,8 +159,17 @@ export default function ClientDashboard() {
 
   const fetchDashboardData = async () => {
     try {
+      // Fetch orders for backward compatibility
       const ordersResponse = await listOrders();
       setOrders(ordersResponse.data || []);
+      
+      // Fetch dashboard statistics
+      const statsResponse = await getDashboardStats();
+      setDashboardStats(statsResponse.data);
+      
+      // Fetch recent activity
+      const activityResponse = await getRecentActivity();
+      setRecentActivityData(activityResponse.data || []);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     }
@@ -169,7 +180,7 @@ export default function ClientDashboard() {
     {
       id: 1,
       name: 'Total Orders',
-      value: orders.length.toString(),
+      value: (dashboardStats?.total_orders || orders.length).toString(),
       icon: Folder,
       change: '+' + orders.filter(o => {
         const createdDate = new Date(o.created_at);
@@ -187,7 +198,7 @@ export default function ClientDashboard() {
     {
       id: 2,
       name: 'In Progress',
-      value: orders.filter(o => o.status === 'in_progress').length.toString(),
+      value: (dashboardStats?.active_orders || orders.filter(o => o.status === 'in_progress').length).toString(),
       icon: Clock,
       change: '',
       changeType: 'increase' as const,
@@ -200,7 +211,7 @@ export default function ClientDashboard() {
     {
       id: 3,
       name: 'Total Spent',
-      value: '₹' + orders.reduce((sum, o) => sum + (o.total_price || 0), 0).toLocaleString(),
+      value: '₹' + (dashboardStats?.total_spent || orders.reduce((sum, o) => sum + (o.total_price || 0), 0)).toLocaleString(),
       icon: CreditCard,
       change: '',
       changeType: 'increase' as const,
@@ -213,7 +224,7 @@ export default function ClientDashboard() {
     {
       id: 4,
       name: 'Completed',
-      value: orders.filter(o => o.status === 'completed').length.toString(),
+      value: (dashboardStats?.completed_orders || orders.filter(o => o.status === 'completed').length).toString(),
       icon: CheckCircle,
       change: '',
       changeType: 'increase' as const,
@@ -225,12 +236,34 @@ export default function ClientDashboard() {
     },
   ];
 
-  const recentActivity = orders.slice(0, 4).map(order => ({
-    id: order.id,
+  // Helper function to format activity time
+  const formatActivityTime = (timeString: string) => {
+    const date = new Date(timeString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  };
+
+  // Use backend activity data if available, otherwise fallback to orders
+  const recentActivity = recentActivityData.length > 0 ? recentActivityData.map(activity => ({
+    ...activity,
+    time: formatActivityTime(activity.time)
+  })) : orders.slice(0, 4).map(order => ({
+    id: order.id.toString(),
+    type: 'order_update',
     action: `Order ${order.status === 'completed' ? 'completed' : order.status === 'in_progress' ? 'in progress' : 'placed'}`,
     project: order.service_title || 'Service Order',
-    time: new Date(order.created_at).toLocaleDateString(),
-    status: order.status
+    time: formatActivityTime(new Date(order.created_at).toISOString()),
+    status: order.status,
+    order_id: order.id
   }));
 
   const getPageTitle = () => {
@@ -283,9 +316,9 @@ export default function ClientDashboard() {
             x: cursorPosition.x - 16,
             y: cursorPosition.y - 16,
           }}
-          transition={{ type: "spring", mass: 0.5 }}
+          transition={{ type: "spring", mass: 0.3 }}
         >
-          <div className="h-8 w-8 rounded-full border-2 border-blue-500/30 dark:border-blue-400/30 backdrop-blur-sm"></div>
+          <div className="h-6 w-6 rounded-full border-2 border-blue-500/30 dark:border-blue-400/30 backdrop-blur-sm"></div>
           <motion.div
             className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 dark:from-blue-400/10 dark:to-purple-400/10"
             animate={{
@@ -1234,6 +1267,7 @@ export default function ClientDashboard() {
                     </div>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
+                      onClick={() => navigate('/client-dashboard/my-projects')}
                       className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors flex items-center gap-1"
                     >
                       View All
@@ -1371,14 +1405,6 @@ export default function ClientDashboard() {
                       ));
                     })()}
                   </div>
-                 
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="mt-8 w-full py-3 bg-white/20 hover:bg-white/30 rounded-xl font-medium transition-all duration-200 text-sm border border-white/20 relative z-10"
-                  >
-                    View Detailed Report
-                  </motion.button>
                   
                   {/* Floating elements */}
                   <motion.div
