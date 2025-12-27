@@ -459,6 +459,24 @@ const FormBuilder = () => {
             </h2>
             
             <div className="space-y-4">
+              {/* CARD TYPE - MOVED TO TOP */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Card Type
+                </label>
+                <select
+                  value={form.card_type || 'service'}
+                  onChange={(e) => setForm({ ...form, card_type: e.target.value as 'service' | 'offer' })}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                >
+                  <option value="service">Service Card</option>
+                  <option value="offer">Offer Card</option>
+                </select>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Choose whether this form is for a service or an offer
+                </p>
+              </div>
+
               {/* SERVICE SELECTION (only for service cards) */}
               {form.card_type === 'service' && (
                 <div>
@@ -480,6 +498,31 @@ const FormBuilder = () => {
                   </select>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     This form will be embedded in the selected service's button
+                  </p>
+                </div>
+              )}
+
+              {/* OFFER SELECTION (conditional) */}
+              {form.card_type === 'offer' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Select Offer *
+                  </label>
+                  <select
+                    value={form.selected_offer_id || ''}
+                    onChange={(e) => setForm({ ...form, selected_offer_id: e.target.value ? Number(e.target.value) : undefined })}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    required={form.card_type === 'offer'}
+                  >
+                    <option value="">Select an offer</option>
+                    {offers.map((offer: any) => (
+                      <option key={offer.id} value={offer.id}>
+                        {offer.title} ({offer.offer_category === 'special' ? 'Special Offer' : 'Regular Offer'})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    This form will be embedded in the selected offer's button
                   </p>
                 </div>
               )}
@@ -510,49 +553,6 @@ const FormBuilder = () => {
                   placeholder="Describe what this form is for..."
                 />
               </div>
-
-              {/* CARD TYPE */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Card Type
-                </label>
-                <select
-                  value={form.card_type || 'service'}
-                  onChange={(e) => setForm({ ...form, card_type: e.target.value as 'service' | 'offer' })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="service">Service Card</option>
-                  <option value="offer">Offer Card</option>
-                </select>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Choose whether this form is for a service or an offer
-                </p>
-              </div>
-
-              {/* OFFER SELECTION (conditional) */}
-              {form.card_type === 'offer' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Select Offer *
-                  </label>
-                  <select
-                    value={form.selected_offer_id || ''}
-                    onChange={(e) => setForm({ ...form, selected_offer_id: e.target.value ? Number(e.target.value) : undefined })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    required={form.card_type === 'offer'}
-                  >
-                    <option value="">Select an offer</option>
-                    {offers.map((offer: any) => (
-                      <option key={offer.id} value={offer.id}>
-                        {offer.title} ({offer.offer_category === 'special' ? 'Special Offer' : 'Regular Offer'})
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    This form will be embedded in the selected offer's button
-                  </p>
-                </div>
-              )}
 
               <div className="flex items-center gap-2">
                 <input
