@@ -37,6 +37,7 @@ import FormBuilder from '../pages/dashboard/admin/FormBuilder';
 import OrdersDetailPage from '../pages/dashboard/client/OrdersDetailPage';
 import OrderManagementPage from '../pages/dashboard/admin/OrderManagementPage';
 import PortfolioPage from '../pages/PortfolioPage';
+import PricingPlansPage from '../pages/PricingPlansPage';
 // Profile Pages
 import AdminProfile from '../pages/dashboard/admin/Profile';
 import ClientProfile from '../pages/dashboard/client/Profile';
@@ -65,6 +66,7 @@ export const AppRoutes: React.FC = () => {
 
       {/* ✅ PUBLIC */}
       <Route path="/" element={<LandingPage />} />
+      <Route path="/pricing-plans" element={<PricingPlansPage />} />
       <Route path="/help" element={<HelpCenter />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
