@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { handleOAuthCallback } from '../../api/oauth';
 
@@ -7,9 +7,17 @@ export default function OAuthCallback() {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const hasProcessed = useRef(false); // Prevent double processing
 
   useEffect(() => {
     const processCallback = async () => {
+      // Prevent processing twice (React StrictMode or double render)
+      if (hasProcessed.current) {
+        console.log('⏭️ Skipping duplicate OAuth callback processing');
+        return;
+      }
+      hasProcessed.current = true;
+
       const code = searchParams.get('code');
       const state = searchParams.get('state');
       const errorParam = searchParams.get('error');
@@ -33,6 +41,8 @@ export default function OAuthCallback() {
         // Determine provider from state or URL
         const provider = state?.includes('linkedin') ? 'linkedin' : 'google';
         
+        console.log('🔐 Processing OAuth callback for:', provider);
+        
         // Exchange code for tokens
         const data = await handleOAuthCallback(code, provider);
         
@@ -40,6 +50,8 @@ export default function OAuthCallback() {
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
         localStorage.setItem('user', JSON.stringify(data.user));
+        
+        console.log('✅ OAuth authentication successful');
         
         // Redirect to dashboard based on role
         const role = data.user.role;

@@ -40,12 +40,17 @@ class GoogleCallbackView(APIView):
     
     def post(self, request):
         code = request.data.get('code')
+        redirect_uri = request.data.get('redirect_uri')
         
         if not code:
             return Response(
                 {'error': 'Authorization code is required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+        # Use redirect_uri from request or fall back to environment variable
+        if not redirect_uri:
+            redirect_uri = os.getenv('FRONTEND_URL', 'http://localhost:5173') + '/auth/callback'
         
         try:
             # Exchange code for access token
@@ -54,16 +59,27 @@ class GoogleCallbackView(APIView):
                 'code': code,
                 'client_id': os.getenv('GOOGLE_CLIENT_ID'),
                 'client_secret': os.getenv('GOOGLE_CLIENT_SECRET'),
-                'redirect_uri': os.getenv('FRONTEND_URL', 'http://localhost:3000') + '/auth/callback',
+                'redirect_uri': redirect_uri,
                 'grant_type': 'authorization_code'
             }
+            
+            # Debug logging
+            print(f"🔍 Google OAuth Debug:")
+            print(f"  Code (first 20 chars): {code[:20]}...")
+            print(f"  Redirect URI: {redirect_uri}")
+            print(f"  Client ID: {os.getenv('GOOGLE_CLIENT_ID')[:20]}...")
             
             token_response = requests.post(token_url, data=token_data)
             token_json = token_response.json()
             
+            print(f"  Response status: {token_response.status_code}")
+            print(f"  Response: {token_json}")
+            
             if 'error' in token_json:
+                error_msg = token_json.get('error_description', token_json.get('error', 'Failed to get access token'))
+                print(f"  ❌ Error: {error_msg}")
                 return Response(
-                    {'error': token_json.get('error_description', 'Failed to get access token')},
+                    {'error': error_msg},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
@@ -125,12 +141,17 @@ class LinkedInCallbackView(APIView):
     
     def post(self, request):
         code = request.data.get('code')
+        redirect_uri = request.data.get('redirect_uri')
         
         if not code:
             return Response(
                 {'error': 'Authorization code is required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+        # Use redirect_uri from request or fall back to environment variable
+        if not redirect_uri:
+            redirect_uri = os.getenv('FRONTEND_URL', 'http://localhost:5173') + '/auth/callback'
         
         try:
             # Exchange code for access token
@@ -140,15 +161,26 @@ class LinkedInCallbackView(APIView):
                 'code': code,
                 'client_id': os.getenv('LINKEDIN_CLIENT_ID'),
                 'client_secret': os.getenv('LINKEDIN_CLIENT_SECRET'),
-                'redirect_uri': os.getenv('FRONTEND_URL', 'http://localhost:3000') + '/auth/callback'
+                'redirect_uri': redirect_uri
             }
+            
+            # Debug logging
+            print(f"🔍 LinkedIn OAuth Debug:")
+            print(f"  Code (first 20 chars): {code[:20]}...")
+            print(f"  Redirect URI: {redirect_uri}")
+            print(f"  Client ID: {os.getenv('LINKEDIN_CLIENT_ID')}")
             
             token_response = requests.post(token_url, data=token_data)
             token_json = token_response.json()
             
+            print(f"  Response status: {token_response.status_code}")
+            print(f"  Response: {token_json}")
+            
             if 'error' in token_json:
+                error_msg = token_json.get('error_description', token_json.get('error', 'Failed to get access token'))
+                print(f"  ❌ Error: {error_msg}")
                 return Response(
-                    {'error': token_json.get('error_description', 'Failed to get access token')},
+                    {'error': error_msg},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
