@@ -62,8 +62,33 @@ export default function OffersForm({ initial, onSaved }: any) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    api.get("/api/services/").then((res) => setServices(res.data));
-  }, []);
+    const loadServices = async () => {
+      const params: any = {};
+      
+      // Filter by department for service heads
+      if (user?.role === 'service_head' && (user as any).department) {
+        const dept = (user as any).department;
+        params.department = typeof dept === 'object' ? dept.id : dept;
+      }
+      
+      const res = await api.get("/api/services/", { params });
+      
+      // FRONTEND FILTER: Ensure only user's department services are shown
+      let filteredServices = res.data;
+      if (user?.role === 'service_head' && (user as any).department) {
+        const userDeptId = typeof (user as any).department === 'object' 
+          ? (user as any).department.id 
+          : (user as any).department;
+        
+        // Filter services to match user's department
+        filteredServices = res.data.filter((s: any) => s.department === userDeptId);
+      }
+      
+      setServices(filteredServices);
+    };
+    
+    loadServices();
+  }, [user]);
 
   /* ---------------- IMAGE UPLOAD (CLOUDINARY) ---------------- */
   const handleImageChange = (e: any) => {
@@ -315,11 +340,22 @@ export default function OffersForm({ initial, onSaved }: any) {
                 className="w-full border rounded p-2"
               >
                 <option value="">Select a service</option>
-                {services.map((srv) => (
-                  <option key={srv.id} value={srv.id}>
-                    {srv.title}
-                  </option>
-                ))}
+                {services
+                  .filter((srv) => {
+                    // Additional safety filter for service heads
+                    if (user?.role === 'service_head' && (user as any).department) {
+                      const userDeptId = typeof (user as any).department === 'object' 
+                        ? (user as any).department.id 
+                        : (user as any).department;
+                      return srv.department === userDeptId;
+                    }
+                    return true; // Show all for admins
+                  })
+                  .map((srv) => (
+                    <option key={srv.id} value={srv.id}>
+                      {srv.title}
+                    </option>
+                  ))}
               </select>
             ) : (
               // MULTI SELECT FOR SPECIAL OFFERS

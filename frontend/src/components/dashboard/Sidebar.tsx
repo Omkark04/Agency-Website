@@ -49,6 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, userRole }) =
     { title: 'Special Orders', path: '/dashboard/special-orders', roles: ['admin'], icon: FiGift, gradient: 'from-pink-500 to-rose-600' },
     { title: 'Form Builder', path: '/dashboard/service-head/forms', roles: ['service_head'], icon: FiCheckSquare, gradient: 'from-indigo-500 to-blue-600' },
     { title: 'Offers', path: '/dashboard/offers', roles: ['admin'], icon: FiGift, gradient: 'from-pink-500 to-rose-600' },
+    { title: 'Offers', path: '/dashboard/service-head/offers', roles: ['service_head'], icon: FiGift, gradient: 'from-pink-500 to-rose-600' },
     { title: 'Portfolio', path: '/dashboard/portfolio', roles: ['admin'], icon: FiBriefcase, gradient: 'from-purple-500 to-indigo-600' },
     { title: 'Portfolio', path: '/dashboard/service-head/portfolio', roles: ['service_head'], icon: FiBriefcase, gradient: 'from-purple-500 to-indigo-600' },
     { title: 'Estimations', path: '/dashboard/estimations', roles: ['admin'], icon: FiFileText, gradient: 'from-blue-500 to-purple-600' },

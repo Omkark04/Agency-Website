@@ -24,11 +24,16 @@ export const TeamHeadDashboardContent: React.FC = () => {
         const fetchMetrics = async () => {
             try {
                 setLoading(true);
+                console.log('🔍 TeamHead: Fetching service head metrics...');
                 const data = await getServiceHeadMetrics();
+                console.log('✅ TeamHead: Received metrics:', data);
+                console.log('📊 Overview:', data.overview);
+                console.log('🏢 Department:', data.department);
                 setMetrics(data);
                 setError(null);
             } catch (err: any) {
-                console.error('Failed to fetch team head metrics:', err);
+                console.error('❌ TeamHead: Failed to fetch metrics:', err);
+                console.error('Error response:', err.response?.data);
                 setError(err.response?.data?.error || 'Failed to load dashboard metrics');
             } finally {
                 setLoading(false);

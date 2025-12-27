@@ -35,14 +35,10 @@ export const AdminDashboard: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        // Add department filter for service heads
+        console.log('🔍 Admin Dashboard: Fetching all metrics...');
+        
         const params: any = {};
-        if (user?.role === 'service_head' && (user as any).department) {
-          const dept = (user as any).department;
-          params.service__department = typeof dept === 'object' ? dept.id : dept;
-          console.log('📊 Dashboard: Filtering by department', params.service__department);
-        }
-
+        
         const [
           { data: ordersData },
           { data: users },
@@ -54,7 +50,7 @@ export const AdminDashboard: React.FC = () => {
           listUsers({ role: 'client', ...params }),
           listServices(params),
           listDepartments(),
-          listPortfolios() // Portfolio API doesn't support params
+          listPortfolios()
         ]);
 
         // Ensure orders is always an array
@@ -79,8 +75,10 @@ export const AdminDashboard: React.FC = () => {
           orders: 12.5,
           revenue: 8.3
         });
-      } catch (err) {
-        console.error('Dashboard Stats Error:', err);
+      } catch (err: any) {
+        console.error('❌ Dashboard Stats Error:', err);
+        console.error('Error details:', err.response?.data);
+        console.error('Error status:', err.response?.status);
       }
     })();
   }, [user]);
@@ -107,11 +105,6 @@ export const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-
-      {/* NEW: Analytics Dashboard Metrics */}
-      <div className="mb-8">
-        <DashboardMetrics />
-      </div>
 
       {/* Enhanced KPI Cards with Glassmorphism */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-fade-in" style={{animationDelay: '0.1s'}}>
@@ -232,7 +225,7 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
         </div>
-        {/* PortFolio Crad */}
+        {/* PortFolio Card */}
         <div className="bg-white p-6 rounded-xl shadow border text-center">
           <FiBriefcase className="text-3xl text-purple-600 mx-auto" />
           <h3 className="text-xl font-bold mt-2">{portfolioCount}</h3>
@@ -240,39 +233,6 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         
-        {/* Performance Card */}
-        <div className="rounded-2xl bg-white p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl">
-                <FiActivity className="text-white h-5 w-5" />
-              </div>
-              <h3 className="font-bold text-gray-900 text-lg">Performance Metrics</h3>
-            </div>
-            <FiAward className="text-green-500 h-6 w-6" />
-          </div>
-          <div className="space-y-5">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-gray-700">Order Completion</span>
-                <span className="text-sm font-black text-gray-900">94%</span>
-              </div>
-              <div className="relative w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full shadow-lg" style={{ width: '94%' }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-gray-700">Client Satisfaction</span>
-                <span className="text-sm font-black text-gray-900">4.8/5</span>
-              </div>
-              <div className="relative w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full shadow-lg" style={{ width: '96%' }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Quick Stats Card */}
         <div className="rounded-2xl bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 p-6 shadow-2xl relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQyIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25VXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkMikiLz48L3N2Zz4=')] opacity-50"></div>

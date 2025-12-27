@@ -31,9 +31,6 @@ const Services = () => {
   const load = async () => {
     setLoading(true);
     try {
-      console.log('🔍 Services: Loading services...');
-      console.log('👤 Current user:', user);
-      console.log('🏢 User department:', (user as any)?.department);
       
       // Add department filter for service_head users
       const params: any = {};

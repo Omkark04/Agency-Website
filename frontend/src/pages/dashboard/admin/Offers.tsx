@@ -3,6 +3,7 @@ import { listOffers, deleteOffer, approveOffer } from "../../../api/offers";
 import Modal from "../../../components/ui/Modal";
 import { Button } from "../../../components/ui/Button";
 import OffersForm from "./OffersForm";
+import { useAuth } from "../../../hooks/useAuth";
 
 import {
   FiTag,
@@ -15,6 +16,7 @@ import {
 } from "react-icons/fi";
 
 export default function Offers() {
+  const { user } = useAuth();
   const [offers, setOffers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -29,7 +31,15 @@ export default function Offers() {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await listOffers();
+      const params: any = {};
+      
+      // Filter by department for service heads
+      if (user?.role === 'service_head' && (user as any).department) {
+        const dept = (user as any).department;
+        params.department = typeof dept === 'object' ? dept.id : dept;
+      }
+      
+      const res = await listOffers(params);
       const data = res.data.results || res.data;
       setOffers(data);
     } finally {
