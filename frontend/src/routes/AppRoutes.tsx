@@ -99,6 +99,8 @@ export const AppRoutes: React.FC = () => {
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard/service-head/*" element={<TeamHeadDashboard />} />
             <Route path="/dashboard/service-head/profile" element={<ServiceHeadProfile />} />
+            <Route path="/dashboard/service-head/estimations" element={<Estimations />} />
+            <Route path="/dashboard/service-head/invoices" element={<Invoices />} />
             <Route path="/dashboard/service-head/blogs" element={<BlogManagement />} />
             <Route path="/dashboard/service-head/blogs/new" element={<BlogEditor />} />
             <Route path="/dashboard/service-head/blogs/:id/edit" element={<BlogEditor />} />

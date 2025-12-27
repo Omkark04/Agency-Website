@@ -1,4 +1,3 @@
-// frontend/src/api/analytics.ts
 import api from './api';
 
 export interface DashboardMetrics {
@@ -8,12 +7,14 @@ export interface DashboardMetrics {
         total_revenue: number;
         recent_revenue: number;
         active_clients: number;
+        team_members?: number;
+        services_count?: number;
     };
     orders_by_status: Array<{
         status: string;
         count: number;
     }>;
-    revenue_by_department: Array<{
+    revenue_by_department?: Array<{
         service__department__title: string;
         revenue: number;
         order_count: number;
@@ -26,6 +27,16 @@ export interface DashboardMetrics {
         client__email: string;
         service__title: string;
         created_at: string;
+    }>;
+    department?: {
+        id: number;
+        title: string;
+    };
+    services_performance?: Array<{
+        id: number;
+        title: string;
+        total_orders: number;
+        total_revenue: number;
     }>;
 }
 
@@ -70,5 +81,11 @@ export const getServicePerformance = async () => {
 // Get user activity metrics (admin only)
 export const getUserActivity = async () => {
     const response = await api.get<UserActivity>('/api/analytics/users/');
+    return response.data;
+};
+
+// Get service head dashboard metrics (service head only)
+export const getServiceHeadMetrics = async () => {
+    const response = await api.get<DashboardMetrics>('/api/analytics/service-head-metrics/');
     return response.data;
 };

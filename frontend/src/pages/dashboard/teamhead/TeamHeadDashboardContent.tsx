@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getDashboardMetrics } from '../../../api/analytics';
+import { getServiceHeadMetrics } from '../../../api/analytics';
 import type { DashboardMetrics } from '../../../api/analytics';
 import { useAuth } from '../../../hooks/useAuth';
 import {
@@ -24,7 +24,7 @@ export const TeamHeadDashboardContent: React.FC = () => {
         const fetchMetrics = async () => {
             try {
                 setLoading(true);
-                const data = await getDashboardMetrics();
+                const data = await getServiceHeadMetrics();
                 setMetrics(data);
                 setError(null);
             } catch (err: any) {

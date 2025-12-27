@@ -42,6 +42,18 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
     navigate('/');
   };
 
+  // Get dashboard route based on user role (similar to AuthModal.tsx)
+  const getDashboardRoute = () => {
+    if (!user) return '/client-dashboard';
+    
+    const userRole = user.role || localStorage.getItem('role');
+    
+    if (userRole === 'admin') return '/dashboard';
+    if (userRole === 'service_head') return '/dashboard/service-head';
+    if (userRole === 'team_member') return '/team-member-dashboard';
+    return '/client-dashboard';
+  };
+
   const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
     e.preventDefault();
     const element = document.querySelector(sectionId);
@@ -168,7 +180,7 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                   </div>
 
                   <button
-                    onClick={() => navigate('/client-dashboard')}
+                    onClick={() => navigate(getDashboardRoute())}
                     className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-4 py-2 rounded-lg flex items-center
                       gap-2 font-medium shadow-md hover:shadow-lg transition-all duration-300"
                   >
@@ -261,7 +273,7 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
 
                     <button
                       onClick={() => {
-                        navigate('/client-dashboard');
+                        navigate(getDashboardRoute());
                         setIsMobileMenuOpen(false);
                       }}
                       className="w-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-4 py-3 rounded-lg
