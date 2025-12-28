@@ -161,7 +161,7 @@ const Testimonials = () => {
   }
 
   return (
-    <section id="testimonials" className="py-20 bg-gradient-to-b from-[#0B2545] via-[#0F2B4F] to-[#0B2545] text-white overflow-hidden relative">
+    <section id="testimonials" className="py-12 md:py-20 bg-gradient-to-b from-[#0B2545] via-[#0F2B4F] to-[#0B2545] text-white overflow-hidden relative">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-grid opacity-30" />
       <div className="absolute top-1/4 left-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl" />
@@ -169,52 +169,53 @@ const Testimonials = () => {
       
       <div className="container mx-auto px-4 md:px-8 lg:px-12 relative">
         <motion.div 
-          className="text-center mb-16"
+          className="text-center mb-8 md:mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2 mb-6">
-            <Sparkles className="h-4 w-4 text-cyan-300" />
-            <span className="text-sm text-cyan-300 font-medium">Trusted by Industry Leaders</span>
-            <Sparkles className="h-4 w-4 text-cyan-300" />
+          <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-3 py-1.5 md:px-4 md:py-2 mb-4 md:mb-6">
+            <Sparkles className="h-3 w-3 md:h-4 md:w-4 text-cyan-300" />
+            <span className="text-xs md:text-sm text-cyan-300 font-medium">Trusted by Industry Leaders</span>
+            <Sparkles className="h-3 w-3 md:h-4 md:w-4 text-cyan-300" />
           </div>
           
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent animate-gradient-x">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent animate-gradient-x tracking-tight leading-tight px-4">
             Client Success Stories
           </h2>
           
-          <p className="text-gray-300 max-w-2xl mx-auto text-lg">
+          <p className="hidden md:block text-gray-300 max-w-2xl mx-auto text-lg leading-relaxed">
             Discover why industry leaders choose us. Real results from real partnerships.
           </p>
           
           {/* Stats Bar */}
-          <div className="flex flex-wrap justify-center gap-8 mt-10">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-8 mt-6 md:mt-10">
             <div className="text-center">
-              <div className="text-3xl font-bold text-cyan-300">{stats.satisfaction}%</div>
-              <div className="text-sm text-gray-400">Client Satisfaction</div>
+              <div className="text-2xl md:text-3xl font-bold text-cyan-300">{stats.satisfaction}%</div>
+              <div className="text-xs md:text-sm text-gray-400">Satisfaction</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-cyan-300">{stats.average_rating.toFixed(1)}/5</div>
-              <div className="text-sm text-gray-400">Average Rating</div>
+              <div className="text-2xl md:text-3xl font-bold text-cyan-300">{stats.average_rating.toFixed(1)}/5</div>
+              <div className="text-xs md:text-sm text-gray-400">Rating</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-cyan-300">{stats.total}+</div>
-              <div className="text-sm text-gray-400">Happy Clients</div>
+              <div className="text-2xl md:text-3xl font-bold text-cyan-300">{stats.total}+</div>
+              <div className="text-xs md:text-sm text-gray-400">Clients</div>
             </div>
           </div>
 
           {/* Add testimonial button */}
           <motion.button
             onClick={() => setShowForm(true)}
-            className="mt-8 group relative inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 overflow-hidden"
+            className="mt-6 md:mt-8 group relative inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold py-2.5 px-6 md:py-3 md:px-8 rounded-full text-sm md:text-base transition-all duration-300 overflow-hidden"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <span className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
-            <MessageSquarePlus className="h-5 w-5" />
-            Share Your Experience
+            <MessageSquarePlus className="h-4 w-4 md:h-5 md:w-5" />
+            <span className="hidden sm:inline">Share Your Experience</span>
+            <span className="sm:hidden">Share</span>
           </motion.button>
         </motion.div>
 
@@ -371,7 +372,7 @@ const Testimonials = () => {
                   </button>
                 </div>
 
-                <div className="relative h-[500px] overflow-hidden">
+                <div className="relative h-[420px] md:h-[500px] overflow-hidden">
                   <AnimatePresence mode="wait" custom={direction}>
                     {testimonials[currentIndex] && (
                       <motion.div
@@ -383,56 +384,56 @@ const Testimonials = () => {
                         transition={{ duration: 0.5 }}
                         className="absolute inset-0"
                       >
-                        <div className="relative bg-gradient-to-b from-white/5 to-white/2 backdrop-blur-sm border border-white/10 rounded-2xl p-8 h-full overflow-hidden">
+                        <div className="relative bg-gradient-to-b from-white/5 to-white/2 backdrop-blur-sm border border-white/10 rounded-xl md:rounded-2xl p-5 md:p-8 h-full overflow-hidden">
                           {/* Animated Border */}
                           <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500 rounded-2xl opacity-30 animate-pulse" />
                           
                           {/* Content */}
                           <div className="relative z-10 h-full flex flex-col">
                             <div className="flex-1">
-                              <Quote className="h-12 w-12 text-cyan-300/20 mb-6" />
-                              <div className="flex items-center mb-6">
+                              <Quote className="h-8 w-8 md:h-12 md:w-12 text-cyan-300/20 mb-4 md:mb-6" />
+                              <div className="flex items-center mb-4 md:mb-6">
                                 {[...Array(5)].map((_, i) => (
                                   <Star
                                     key={i}
-                                    className={`h-6 w-6 ${i < testimonials[currentIndex].rating ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-500/50 text-gray-500/50'}`}
+                                    className={`h-4 w-4 md:h-6 md:w-6 ${i < testimonials[currentIndex].rating ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-500/50 text-gray-500/50'}`}
                                   />
                                 ))}
                               </div>
-                              <p className="text-xl text-gray-200 mb-8">
+                              <p className="text-base md:text-xl text-gray-200 mb-6 md:mb-8 line-clamp-4 md:line-clamp-none leading-relaxed">
                                 "{testimonials[currentIndex].content}"
                               </p>
                             </div>
                             
-                            <div className="flex items-center gap-4 pt-8 border-t border-white/10">
+                            <div className="flex items-center gap-3 md:gap-4 pt-6 md:pt-8 border-t border-white/10">
                               {testimonials[currentIndex].avatar_url ? (
                                 <img 
                                   src={testimonials[currentIndex].avatar_url} 
                                   alt={testimonials[currentIndex].client_name}
-                                  width="64"
-                                  height="64"
+                                  width="56"
+                                  height="56"
                                   loading="lazy"
                                   decoding="async"
-                                  className="h-16 w-16 rounded-full border-2 border-cyan-300/30 object-cover"
+                                  className="h-12 w-12 md:h-16 md:w-16 rounded-full border-2 border-cyan-300/30 object-cover"
                                 />
                               ) : (
-                                <div className="h-16 w-16 rounded-full border-2 border-cyan-300/30 bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-white font-bold text-xl">
+                                <div className="h-12 w-12 md:h-16 md:w-16 rounded-full border-2 border-cyan-300/30 bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg md:text-xl">
                                   {testimonials[currentIndex].client_name.charAt(0)}
                                 </div>
                               )}
                               
-                              <div>
-                                <h4 className="font-bold text-lg">{testimonials[currentIndex].client_name}</h4>
-                                <p className="text-cyan-300">{testimonials[currentIndex].client_role}</p>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-bold text-base md:text-lg truncate">{testimonials[currentIndex].client_name}</h4>
+                                <p className="text-cyan-300 text-sm md:text-base truncate">{testimonials[currentIndex].client_role}</p>
                                 {testimonials[currentIndex].client_company && (
-                                  <p className="text-gray-400 text-sm">{testimonials[currentIndex].client_company}</p>
+                                  <p className="text-gray-400 text-xs md:text-sm truncate">{testimonials[currentIndex].client_company}</p>
                                 )}
                               </div>
                             </div>
                             
                             {testimonials[currentIndex].service_title && (
-                              <div className="mt-6">
-                                <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-full text-sm text-cyan-300">
+                              <div className="mt-4 md:mt-6">
+                                <span className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-full text-xs md:text-sm text-cyan-300">
                                   <Award className="h-4 w-4" />
                                   {testimonials[currentIndex].service_title}
                                 </span>
@@ -446,7 +447,7 @@ const Testimonials = () => {
                 </div>
 
                 {/* Dots Indicator */}
-                <div className="flex justify-center mt-8 space-x-2">
+                <div className="flex justify-center mt-6 md:mt-8 space-x-2">
                   {testimonials.slice(0, 6).map((_, index) => (
                     <button
                       key={index}
