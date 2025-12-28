@@ -303,6 +303,10 @@ const Testimonials = () => {
                               <img 
                                 src={testimonial.avatar_url} 
                                 alt={testimonial.client_name}
+                                width="56"
+                                height="56"
+                                loading="lazy"
+                                decoding="async"
                                 className="h-14 w-14 rounded-full border-2 border-cyan-300/30 object-cover hover:scale-110 transition-transform duration-300"
                               />
                             ) : (
@@ -405,6 +409,10 @@ const Testimonials = () => {
                                 <img 
                                   src={testimonials[currentIndex].avatar_url} 
                                   alt={testimonials[currentIndex].client_name}
+                                  width="64"
+                                  height="64"
+                                  loading="lazy"
+                                  decoding="async"
                                   className="h-16 w-16 rounded-full border-2 border-cyan-300/30 object-cover"
                                 />
                               ) : (

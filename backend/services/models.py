@@ -31,6 +31,10 @@ class Department(models.Model):
     class Meta:
         db_table = "departments"
         ordering = ["title"]
+        indexes = [
+            models.Index(fields=['is_active']),
+            models.Index(fields=['created_at']),
+        ]
 class Service(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
@@ -76,6 +80,11 @@ class Service(models.Model):
     class Meta:
         db_table = "services"
         ordering = ["department", "title"]
+        indexes = [
+            models.Index(fields=['is_active']),
+            models.Index(fields=['department', 'is_active']),
+            models.Index(fields=['created_at']),
+        ]
 
 class PriceCard(models.Model):
     PLAN_CHOICES = [

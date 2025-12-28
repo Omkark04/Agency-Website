@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { HelpCircle, ArrowLeft, ChevronDown, Search, Mail, Phone } from 'lucide-react';
+import { SEOHead } from '../../components/shared/SEOHead';
 
 interface FAQItem {
   question: string;
@@ -120,6 +121,23 @@ export default function FAQ() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <SEOHead 
+        title="Frequently Asked Questions"
+        description="Find answers to common questions about UdyogWorks' services, pricing, technical support, and more."
+        url="/faq"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": faqs.map(faq => ({
+            "@type": "Question",
+            "name": faq.question,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": faq.answer
+            }
+          }))
+        }}
+      />
       {/* Header */}
       <div className="bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white py-20">
         <div className="container mx-auto px-4">

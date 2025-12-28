@@ -375,6 +375,8 @@ const PortfolioSection = () => {
                           <img
                             src={project.featured_image}
                             alt={project.title}
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -462,6 +464,8 @@ const PortfolioSection = () => {
                         <img
                           src={project.featured_image}
                           alt={project.title}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-64 md:h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                         />
                         {project.is_featured && (

@@ -296,6 +296,8 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                               <img
                                 src={service.logo}
                                 alt={service.title}
+                                width="40"
+                                height="40"
                                 className="w-10 h-10 object-contain"
                               />
                             ) : (
@@ -376,7 +378,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                         >
                           <div className="flex items-center gap-3">
                             {dept.logo ? (
-                              <img src={dept.logo} alt={dept.title} className="w-12 h-12 object-contain rounded-lg" />
+                              <img src={dept.logo} alt={dept.title} width="48" height="48" className="w-12 h-12 object-contain rounded-lg" />
                             ) : (
                               <div className="w-12 h-12 bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-lg flex items-center justify-center">
                                 <Building2 className="h-6 w-6 text-white" />

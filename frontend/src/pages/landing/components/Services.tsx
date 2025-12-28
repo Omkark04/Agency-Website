@@ -192,6 +192,10 @@ export const Services = () => {
                       <img
                         src={department.logo}
                         alt={department.title}
+                        width="64"
+                        height="64"
+                        loading="lazy"
+                        decoding="async"
                         className="w-16 h-16 object-contain rounded-xl flex-shrink-0"
                       />
                     ) : (
@@ -229,6 +233,10 @@ export const Services = () => {
                                 <img
                                   src={service.logo}
                                   alt={service.title}
+                                  width="56"
+                                  height="56"
+                                  loading="lazy"
+                                  decoding="async"
                                   className="w-14 h-14 object-contain rounded-lg flex-shrink-0"
                                 />
                               ) : (

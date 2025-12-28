@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { SEOHead } from '../components/shared/SEOHead';
 
 export default function PricingPlansPage() {
   const [cards, setCards] = useState<PriceCard[]>([]);
@@ -152,6 +153,11 @@ export default function PricingPlansPage() {
 
   return (
     <>
+      <SEOHead 
+        title="Pricing Plans"
+        description="Choose the perfect plan for your business needs. Transparent pricing for web development, design, and digital marketing services."
+        url="/pricing-plans"
+      />
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-hidden py-12">
         <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
           {/* Header with Navigation */}

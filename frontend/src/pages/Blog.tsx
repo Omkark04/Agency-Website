@@ -15,6 +15,7 @@ import {
 import { listBlogs, getBlogCategories, type Blog as BlogType } from '../api/blog';
 import { subscribeNewsletter } from '../api/newsletter';
 import { useAuth } from '../hooks/useAuth';
+import { SEOHead } from '../components/shared/SEOHead';
 
 const categoryIcons: Record<string, React.ReactNode> = {
   'Web Development': <Code className="h-5 w-5" />,
@@ -81,6 +82,11 @@ export default function Blog() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <SEOHead 
+        title="Blog & Insights"
+        description="Read the latest insights, tips, and stories about web development, design, and digital transformation from the experts at UdyogWorks."
+        url="/blog"
+      />
       {/* Header */}
       <div className="bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white py-20">
         <div className="container mx-auto px-4">

@@ -13,6 +13,7 @@ import { Footer } from './components/Footer';
 import AuthModal from './components/AuthModal';
 import WhatsappFloat from './components/WhatsappFloat';
 import ContactFloat from './components/ContactFloat';
+import { SEOHead } from '../../components/shared/SEOHead';
 
 
 export const LandingPage = () => {
@@ -29,6 +30,27 @@ export const LandingPage = () => {
 
   return (
     <div className={`min-h-screen overflow-x-hidden ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+      <SEOHead 
+        title="UdyogWorks - Business Development Agency"
+        description="Transform your business with expert services in web development, data analytics, digital marketing, and business consulting. Get started today!"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "UdyogWorks",
+          "url": "https://udyogworks.com",
+          "logo": "https://udyogworks.com/logo.png",
+          "sameAs": [
+            "https://facebook.com/udyogworks",
+            "https://linkedin.com/company/udyogworks",
+            "https://instagram.com/udyogworks"
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+91-9876543210",
+            "contactType": "customer service"
+          }
+        }}
+      />
       <Header onAuthButtonClick={() => setIsAuthModalOpen(true)} />
 
 
