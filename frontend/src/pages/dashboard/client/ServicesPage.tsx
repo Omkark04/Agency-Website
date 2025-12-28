@@ -4,6 +4,7 @@ import type { Service } from '../../../api/services';
 import EmptyState from '../../../components/EmptyState';
 import PriceCardSelector from '../../../components/PriceCardSelector';
 import DynamicFormRenderer from '../../../components/forms/DynamicFormRenderer';
+import { getTestimonialStats } from '../../../api/testinomials';
 
 
 
@@ -179,7 +180,7 @@ const ServiceCard = ({ service, onSelect, index }: { service: Service; onSelect:
 
 
 
-        {/* Category icon */}
+        {/* Service logo or category icon */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -187,9 +188,17 @@ const ServiceCard = ({ service, onSelect, index }: { service: Service; onSelect:
           className="mb-5 relative"
         >
           <div className="absolute -inset-3 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="relative p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 shadow-lg">
-            <CategoryIcon className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-          </div>
+          {service.logo ? (
+             <img
+               src={service.logo}
+               alt={service.title}
+               className="relative w-14 h-14 rounded-xl shadow-lg object-contain bg-white dark:bg-gray-800 p-1"
+             />
+          ) : (
+            <div className="relative p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 shadow-lg">
+              <CategoryIcon className="w-7 h-7 text-blue-600 dark:text-blue-400" />
+            </div>
+          )}
         </motion.div>
 
 
@@ -442,6 +451,7 @@ const ServiceListItem = ({ service, onSelect, index }: { service: Service; onSel
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            className="flex-shrink-0"
           >
             <Button
               onClick={onSelect}
@@ -460,9 +470,51 @@ const ServiceListItem = ({ service, onSelect, index }: { service: Service; onSel
 
 
 
+
+// Stat Card Sub-component
+const StatCard = ({ stat, index }: { stat: any, index: number }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: index * 0.1, duration: 0.5 }}
+    whileHover={{ y: -5, scale: 1.02 }}
+    className="h-full relative group"
+  >
+    <div className={`absolute -inset-0.5 bg-gradient-to-r ${stat.color} rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-500`} />
+    <div className="relative bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-xl h-full">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">{stat.title}</p>
+          <div className="flex items-baseline">
+            <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              {stat.value}
+            </div>
+            {stat.change && (
+              <span className={`ml-3 text-sm font-bold px-2 py-1 rounded-full ${stat.trend === 'up' ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' : 'bg-blue-500/20 text-blue-700 dark:text-blue-400'}`}>
+                {stat.change}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg`}>
+          <stat.icon className="w-6 h-6 text-white" />
+        </div>
+      </div>
+      <div className="mt-4 h-1 bg-gray-200/50 dark:bg-gray-700/50 rounded-full overflow-hidden">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: "100%" }}
+          transition={{ delay: index * 0.1 + 0.5, duration: 1.5 }}
+          className={`h-full bg-gradient-to-r ${stat.color} rounded-full`}
+        />
+      </div>
+    </div>
+  </motion.div>
+);
+
 // Premium Stats Component
-const PremiumStats = ({ services }: { services: Service[] }) => {
-  const stats = [
+const PremiumStats = ({ services, stats }: { services: Service[], stats: any }) => {
+  const displayStats = [
     {
       id: 1,
       title: "Total Services",
@@ -475,7 +527,7 @@ const PremiumStats = ({ services }: { services: Service[] }) => {
     {
       id: 2,
       title: "Avg. Rating",
-      value: "4.8/5",
+      value: stats?.average_rating ? `${stats.average_rating.toFixed(1)}/5` : "4.8/5",
       icon: Star,
       color: "from-amber-500 to-orange-500",
       change: "+0.2",
@@ -484,7 +536,7 @@ const PremiumStats = ({ services }: { services: Service[] }) => {
     {
       id: 3,
       title: "Client Satisfaction",
-      value: "98%",
+      value: stats?.average_rating ? `${Math.round((stats.average_rating / 5) * 100)}%` : "98%",
       icon: ShieldCheck,
       color: "from-emerald-500 to-green-500",
       change: "+3%",
@@ -505,15 +557,17 @@ const PremiumStats = ({ services }: { services: Service[] }) => {
 
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-      {stats.map((stat, index) => (
+    <>
+      {/* Mobile Scrollable View */}
+      <div className="flex lg:hidden w-full overflow-x-auto pb-4 gap-4 mb-10 snap-x snap-mandatory scrollbar-hide">
+        {displayStats.map((stat, index) => (
+          <div key={stat.id} className="min-w-[70vw] sm:min-w-[48vw] flex-none snap-center">
         <motion.div
-          key={stat.id}
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1, duration: 0.5 }}
           whileHover={{ y: -5, scale: 1.02 }}
-          className="relative group"
+          className="h-full"
         >
           {/* Animated background */}
           <div className={`absolute -inset-0.5 bg-gradient-to-r ${stat.color} rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-500`} />
@@ -548,9 +602,56 @@ const PremiumStats = ({ services }: { services: Service[] }) => {
               />
             </div>
           </div>
-        </motion.div>
-      ))}
-    </div>
+
+            </motion.div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Grid View */}
+      <div className="hidden lg:grid grid-cols-4 gap-6 mb-10">
+        {displayStats.map((stat, index) => (
+          <motion.div
+            key={stat.id}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1, duration: 0.5 }}
+            whileHover={{ y: -5, scale: 1.02 }}
+            className="h-full relative group"
+          >
+            <div className={`absolute -inset-0.5 bg-gradient-to-r ${stat.color} rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-500`} />
+            <div className="relative bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-xl h-full">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">{stat.title}</p>
+                  <div className="flex items-baseline">
+                    <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                      {stat.value}
+                    </div>
+                    {stat.change && (
+                      <span className={`ml-3 text-sm font-bold px-2 py-1 rounded-full ${stat.trend === 'up' ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' : 'bg-blue-500/20 text-blue-700 dark:text-blue-400'}`}>
+                        {stat.change}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg`}>
+                  <stat.icon className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <div className="mt-4 h-1 bg-gray-200/50 dark:bg-gray-700/50 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: "100%" }}
+                  transition={{ delay: index * 0.1 + 0.5, duration: 1.5 }}
+                  className={`h-full bg-gradient-to-r ${stat.color} rounded-full`}
+                />
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </>
   );
 };
 
@@ -759,11 +860,11 @@ const PremiumHeader = ({ }: { services: Service[] }) => {
           transition={{ duration: 0.6 }}
           className="text-center"
         >
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white bg-clip-text text-transparent mb-4">
+          <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white bg-clip-text text-transparent mb-4">
             Premium Services
-            <Rocket className="inline w-10 h-10 ml-4 text-blue-500 animate-float" />
+            <Rocket className="inline w-8 h-8 sm:w-10 sm:h-10 ml-4 text-blue-500 animate-float" />
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8">
+          <p className="hidden sm:block text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8">
             Discover our curated collection of professional services designed to elevate your business
           </p>
          
@@ -809,12 +910,14 @@ const ServicesPage = () => {
   const [modalStep, setModalStep] = useState<'select-plan' | 'fill-form'>('select-plan');
   const [selectedPriceCard, setSelectedPriceCard] = useState<any>(null);
   const [formLoading, setFormLoading] = useState(false);
+  const [testimonialStats, setTestimonialStats] = useState<any>(null);
 
 
 
 
   useEffect(() => {
     fetchData();
+    fetchStats();
   }, []);
 
 
@@ -830,6 +933,15 @@ const ServicesPage = () => {
       console.error('Error fetching data:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const response = await getTestimonialStats();
+      setTestimonialStats(response.data);
+    } catch (err) {
+      console.error('Error fetching stats:', err);
     }
   };
 
@@ -954,7 +1066,7 @@ const ServicesPage = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-10">
         {/* Premium Stats */}
-        <PremiumStats services={services} />
+        <PremiumStats services={services} stats={testimonialStats} />
 
 
 
@@ -1013,16 +1125,50 @@ const ServicesPage = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-            {filteredServices.map((service, index) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                onSelect={() => openServiceModal(service)}
-                index={index}
-              />
-            ))}
+             {/* Desktop Grid View */}
+             <div className="hidden lg:grid lg:grid-cols-3 lg:gap-8">
+                {filteredServices.map((service, index) => (
+                  <ServiceCard
+                    key={service.id}
+                    service={service}
+                    onSelect={() => openServiceModal(service)}
+                    index={index}
+                  />
+                ))}
+             </div>
+
+             {/* Mobile Department View */}
+             <div className="lg:hidden space-y-8">
+               {Array.from(new Set(filteredServices.map(s => s.department_title || 'Other Services'))).sort().map((dept, deptIndex) => {
+                  const deptServices = filteredServices.filter(s => (s.department_title || 'Other Services') === dept);
+                  if (deptServices.length === 0) return null;
+                  
+                  return (
+                    <motion.div 
+                      key={dept} 
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: deptIndex * 0.1 }}
+                    >
+                      <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent px-1 mb-3">
+                        {dept}
+                      </h3>
+                      <div className="flex w-full overflow-x-auto pb-6 gap-4 snap-x snap-mandatory scrollbar-hide touch-pan-x">
+                         {deptServices.map((service, idx) => (
+                            <div key={service.id} className="min-w-[75vw] sm:min-w-[45vw] snap-center">
+                               <ServiceCard
+                                 service={service}
+                                 onSelect={() => openServiceModal(service)}
+                                 index={idx}
+                               />
+                            </div>
+                         ))}
+                      </div>
+                    </motion.div>
+                  )
+               })}
+             </div>
           </motion.div>
         )}
 
@@ -1177,7 +1323,7 @@ const ServicesPage = () => {
 
 
       {/* Animation Styles */}
-      <style jsx global>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -1326,3 +1472,4 @@ const ServicesPage = () => {
 
 
 export default ServicesPage;
+

@@ -1,5 +1,5 @@
-// DashboardLayout.tsx - UNCHANGED (already correct)
-import React, { useState } from 'react';
+// DashboardLayout.tsx
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/dashboard/Sidebar';
 import Header from '../components/dashboard/Header';
@@ -7,8 +7,58 @@ import { useAuth } from '../hooks/useAuth';
 import { FiMenu, FiX } from 'react-icons/fi';
 
 const DashboardLayout: React.FC = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Start closed on mobile
   const { user } = useAuth();
+  const touchStartX = useRef<number>(0);
+  const touchEndX = useRef<number>(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile screen
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Handle swipe gestures
+  const handleTouchStart = (e: TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const swipeDistance = touchEndX.current - touchStartX.current;
+    const minSwipeDistance = 50;
+
+    // Swipe from left edge to right (open sidebar)
+    if (touchStartX.current < 30 && swipeDistance > minSwipeDistance) {
+      setSidebarOpen(true);
+    }
+    // Swipe from right to left (close sidebar)
+    else if (sidebarOpen && swipeDistance < -minSwipeDistance) {
+      setSidebarOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isMobile) {
+      document.addEventListener('touchstart', handleTouchStart);
+      document.addEventListener('touchmove', handleTouchMove);
+      document.addEventListener('touchend', handleTouchEnd);
+
+      return () => {
+        document.removeEventListener('touchstart', handleTouchStart);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
+    }
+  }, [isMobile, sidebarOpen]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">

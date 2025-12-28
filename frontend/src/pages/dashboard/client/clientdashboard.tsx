@@ -81,7 +81,7 @@ export default function ClientDashboard() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Start closed on mobile
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
@@ -91,6 +91,60 @@ export default function ClientDashboard() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [showCursorEffect, setShowCursorEffect] = useState(false);
+  const touchStartX = useRef<number>(0);
+  const touchEndX = useRef<number>(0);
+  // Initialize isMobile immediately to prevent flash
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 1024);
+
+  // Detect mobile screen and set initial sidebar state
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      // Set sidebar state based on screen size
+      setSidebarOpen(!mobile); // Open on desktop, closed on mobile
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Handle swipe gestures
+  const handleTouchStart = (e: TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const swipeDistance = touchEndX.current - touchStartX.current;
+    const minSwipeDistance = 50;
+
+    // Swipe from left edge to right (open sidebar)
+    if (touchStartX.current < 30 && swipeDistance > minSwipeDistance) {
+      setSidebarOpen(true);
+    }
+    // Swipe from right to left (close sidebar)
+    else if (sidebarOpen && swipeDistance < -minSwipeDistance) {
+      setSidebarOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isMobile) {
+      document.addEventListener('touchstart', handleTouchStart);
+      document.addEventListener('touchmove', handleTouchMove);
+      document.addEventListener('touchend', handleTouchEnd);
+
+      return () => {
+        document.removeEventListener('touchstart', handleTouchStart);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
+    }
+  }, [isMobile, sidebarOpen]);
 
   // Theme persistence
   useEffect(() => {
@@ -120,8 +174,14 @@ export default function ClientDashboard() {
     setTimeout(() => setIsAnimating(false), 600);
   };
 
-  // Cursor effects
+  // Cursor effects (desktop only)
   useEffect(() => {
+    // Only enable cursor effects on desktop
+    if (isMobile) {
+      setShowCursorEffect(false);
+      return;
+    }
+
     const handleMouseMove = (e: MouseEvent) => {
       setCursorPosition({ x: e.clientX, y: e.clientY });
     };
@@ -138,7 +198,7 @@ export default function ClientDashboard() {
       document.removeEventListener('mouseenter', handleMouseEnter);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, []);
+  }, [isMobile]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -171,7 +231,7 @@ export default function ClientDashboard() {
       const activityResponse = await getRecentActivity();
       setRecentActivityData(activityResponse.data || []);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+
     }
   };
 
@@ -381,7 +441,7 @@ export default function ClientDashboard() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className={`fixed top-0 right-0 z-50 transition-all duration-500 ${
-          sidebarOpen ? 'left-64' : 'left-20'
+          isMobile ? 'left-0' : (sidebarOpen ? 'left-64' : 'left-20')
         } ${
           isScrolled
             ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-sm border-b border-gray-100 dark:border-gray-800'
@@ -396,10 +456,11 @@ export default function ClientDashboard() {
         <div className="h-16 px-6 flex items-center justify-between">
           {/* Left Section */}
           <div className="flex items-center space-x-4">
+            {/* Hamburger button - visible on mobile, hidden on desktop */}
             <motion.button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
-              aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+              aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -606,14 +667,25 @@ export default function ClientDashboard() {
         </div>
       </motion.header>
 
+      {/* Sidebar Overlay - Mobile Only */}
+      {sidebarOpen && isMobile && (
+        <div
+          className="fixed inset-0 z-30 bg-gray-900/60 backdrop-blur-sm transition-all duration-300"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <motion.aside
-        initial={{ x: -20, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed left-0 top-0 h-screen z-40 transition-all duration-500 ${
-          sidebarOpen ? 'w-64' : 'w-20'
-        } bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col`}
+        initial={false}
+        animate={{
+          x: sidebarOpen || !isMobile ? 0 : '-100%',
+          opacity: 1
+        }}
+        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        className={`fixed left-0 top-0 h-screen z-40 transition-[width] duration-300 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col ${
+          sidebarOpen ? 'w-64' : 'w-64 lg:w-20'
+        }`}
       >
         {/* Animated border gradient */}
         <div className="absolute right-0 inset-y-0 w-1 bg-gradient-to-b from-transparent via-blue-500/20 to-transparent dark:via-blue-400/20" />
@@ -661,7 +733,7 @@ export default function ClientDashboard() {
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-3 py-6">
-          <div className="space-y-1">
+          <div className="space-y-2">
             {/* Back to Homepage */}
             <motion.div whileHover={{ scale: 1.02 }}>
               <Link
@@ -674,9 +746,7 @@ export default function ClientDashboard() {
                 >
                   <ChevronDown className="h-5 w-5 text-gray-600 dark:text-gray-400 rotate-90" />
                 </motion.div>
-                {sidebarOpen && (
-                  <span className="ml-3">Back to Homepage</span>
-                )}
+                <span className="ml-3">Back to Homepage</span>
               </Link>
             </motion.div>
 
@@ -749,19 +819,16 @@ export default function ClientDashboard() {
                       </motion.span>
                     )}
                   </div>
-                  {sidebarOpen && (
-                    <>
-                      <span className="ml-3">{item.label}</span>
-                      {item.active && (
-                        <motion.div
-                          initial={{ x: -5, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          transition={{ delay: 0.1 }}
-                        >
-                          <ChevronRight className="ml-auto h-4 w-4 text-blue-500 dark:text-blue-400" />
-                        </motion.div>
-                      )}
-                    </>
+                  {/* Always show text labels - visibility controlled by sidebar width/transform */}
+                  <span className="ml-3">{item.label}</span>
+                  {item.active && sidebarOpen && (
+                    <motion.div
+                      initial={{ x: -5, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      <ChevronRight className="ml-auto h-4 w-4 text-blue-500 dark:text-blue-400" />
+                    </motion.div>
                   )}
                 </Link>
               </motion.div>
@@ -786,7 +853,7 @@ export default function ClientDashboard() {
                 title={!sidebarOpen ? 'Settings' : ''}
               >
                 <Settings className={`h-5 w-5 ${location.pathname.includes('settings') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300'}`} />
-                {sidebarOpen && <span className="ml-3">Settings</span>}
+                <span className="ml-3">Settings</span>
               </Link>
             </motion.div>
           </div>
@@ -833,7 +900,7 @@ export default function ClientDashboard() {
         animate={isVisible ? "visible" : "hidden"}
         variants={fadeIn}
         className={`transition-all duration-500 pt-16 min-h-screen ${
-          sidebarOpen ? 'md:ml-64' : 'md:ml-20'
+          isMobile ? 'ml-0' : (sidebarOpen ? 'md:ml-64' : 'md:ml-20')
         }`}
       >
         <div className="p-6">
@@ -1003,7 +1070,7 @@ export default function ClientDashboard() {
                   Quick Actions
                 </motion.h2>
                
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="flex overflow-x-auto pb-4 gap-4 snap-x snap-mandatory lg:grid lg:grid-cols-4 lg:pb-0 scrollbar-hide">
                   {[
                     {
                       to: "/client-dashboard/services",
@@ -1058,10 +1125,10 @@ export default function ClientDashboard() {
                       animate="visible"
                       whileHover={{ y: -8 }}
                     >
-                      <Link
-                        to={action.to}
-                        className={`group relative overflow-hidden rounded-2xl p-5 ${action.cardBg} border ${action.border} hover:shadow-lg dark:hover:shadow-blue-500/10 transition-all duration-300 block`}
-                      >
+                        <Link
+                          to={action.to}
+                          className={`group relative overflow-hidden rounded-2xl p-5 ${action.cardBg} border ${action.border} hover:shadow-lg dark:hover:shadow-blue-500/10 transition-all duration-300 block min-w-[42vw] sm:min-w-[200px] aspect-[1/1.4] lg:min-w-0 lg:aspect-auto flex flex-col justify-between snap-center`}
+                        >
                         {/* Animated border on hover */}
                         <motion.div
                           className="absolute inset-0 rounded-2xl border-2 border-transparent"
@@ -1135,7 +1202,7 @@ export default function ClientDashboard() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+                className="flex overflow-x-auto pb-4 gap-6 mb-8 snap-x snap-mandatory lg:grid lg:grid-cols-4 lg:pb-0 scrollbar-hide"
               >
                 {stats.map((stat, index) => (
                   <motion.div
@@ -1147,7 +1214,7 @@ export default function ClientDashboard() {
                       y: -8,
                       transition: { type: "spring", stiffness: 400 }
                     }}
-                    className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? stat.darkBgColor : stat.bgColor} border ${stat.borderColor} p-6 shadow-lg hover:shadow-xl transition-all duration-300`}
+                    className={`group relative overflow-hidden rounded-2xl ${theme === 'dark' ? stat.darkBgColor : stat.bgColor} border ${stat.borderColor} p-6 shadow-lg hover:shadow-xl transition-all duration-300 min-w-[70vw] sm:min-w-[300px] aspect-[1/0.6] lg:min-w-0 lg:aspect-auto snap-center`}
                   >
                     {/* Animated border effect */}
                     <motion.div
@@ -1325,7 +1392,7 @@ export default function ClientDashboard() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-900 dark:to-blue-800 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden"
+                  className="hidden lg:block bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-900 dark:to-blue-800 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden"
                 >
                   {/* Animated border */}
                   <motion.div
@@ -1450,7 +1517,7 @@ export default function ClientDashboard() {
       </motion.main>
 
       {/* Enhanced Custom Animations */}
-      <style jsx>{`
+      <style>{`
         @keyframes fade-in {
           from {
             opacity: 0;
@@ -1534,8 +1601,20 @@ export default function ClientDashboard() {
           outline: 2px solid rgba(59, 130, 246, 0.5);
           outline-offset: 2px;
         }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .scrollbar-hide {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
       `}</style>
     </div>
   );
 }
+
 

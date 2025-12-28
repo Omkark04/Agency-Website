@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileText,
@@ -249,7 +249,7 @@ const DocumentCard = ({ document, type, index }: { document: any; type: 'estimat
                   <div className="flex items-center justify-between p-2 rounded-lg bg-gradient-to-r from-emerald-50/50 to-green-50/50 dark:from-emerald-900/10 dark:to-green-900/10">
                     <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">Paid</span>
                     <span className="text-sm font-bold text-emerald-600 dark:text-emerald-300">
-                      ₹{document.amount_paid}
+                      ?{document.amount_paid}
                     </span>
                   </div>
                 )}
@@ -257,7 +257,7 @@ const DocumentCard = ({ document, type, index }: { document: any; type: 'estimat
                   <div className="flex items-center justify-between p-2 rounded-lg bg-gradient-to-r from-rose-50/50 to-red-50/50 dark:from-rose-900/10 dark:to-red-900/10">
                     <span className="text-xs font-medium text-rose-700 dark:text-rose-400">Due</span>
                     <span className="text-sm font-bold text-rose-600 dark:text-rose-300">
-                      ₹{document.balance_due}
+                      ?{document.balance_due}
                     </span>
                   </div>
                 )}
@@ -377,7 +377,7 @@ const PremiumHeader = () => {
                   Documents Center
                   <Sparkles className="inline w-8 h-8 ml-4 text-blue-500 animate-float" />
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 text-lg mt-2">
+                <p className="hidden sm:block text-gray-600 dark:text-gray-400 text-lg mt-2">
                   Manage all your estimations and invoices in one place
                 </p>
               </div>
@@ -526,14 +526,7 @@ const PremiumFilterBar = ({
               Filters
             </motion.button>
            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center px-4 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export All
-            </motion.button>
+
           </div>
         </div>
 
@@ -622,7 +615,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: Clock,
       borderColor: 'border-gray-200/50 dark:border-gray-700/50',
       label: 'Draft',
-      emoji: '📝'
+      emoji: '??'
     },
     sent: {
       bg: 'bg-gradient-to-r from-blue-50/80 to-blue-100/80 dark:from-blue-900/20 dark:to-blue-800/30',
@@ -631,7 +624,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: Clock,
       borderColor: 'border-blue-200/50 dark:border-blue-700/50',
       label: 'Sent',
-      emoji: '📤',
+      emoji: '??',
       pulse: true
     },
     approved: {
@@ -641,7 +634,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: CheckCircle,
       borderColor: 'border-green-200/50 dark:border-green-700/50',
       label: 'Approved',
-      emoji: '✅'
+      emoji: '?'
     },
     rejected: {
       bg: 'bg-gradient-to-r from-red-50/80 to-rose-50/80 dark:from-red-900/20 dark:to-rose-900/20',
@@ -650,7 +643,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: XCircle,
       borderColor: 'border-red-200/50 dark:border-red-700/50',
       label: 'Rejected',
-      emoji: '❌'
+      emoji: '?'
     },
     expired: {
       bg: 'bg-gradient-to-r from-gray-50/80 to-gray-100/80 dark:from-gray-900/20 dark:to-gray-800/30',
@@ -659,7 +652,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: XCircle,
       borderColor: 'border-gray-200/50 dark:border-gray-700/50',
       label: 'Expired',
-      emoji: '⏰'
+      emoji: '?'
     },
     pending: {
       bg: 'bg-gradient-to-r from-yellow-50/80 to-amber-50/80 dark:from-yellow-900/20 dark:to-amber-900/20',
@@ -668,7 +661,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: Clock,
       borderColor: 'border-yellow-200/50 dark:border-yellow-700/50',
       label: 'Pending',
-      emoji: '⏳',
+      emoji: '?',
       pulse: true
     },
     partial: {
@@ -678,7 +671,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: Clock,
       borderColor: 'border-orange-200/50 dark:border-orange-700/50',
       label: 'Partially Paid',
-      emoji: '💰',
+      emoji: '??',
       pulse: true
     },
     paid: {
@@ -688,7 +681,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: CheckCircle,
       borderColor: 'border-green-200/50 dark:border-green-700/50',
       label: 'Paid',
-      emoji: '💵'
+      emoji: '??'
     },
     overdue: {
       bg: 'bg-gradient-to-r from-red-50/80 to-pink-50/80 dark:from-red-900/20 dark:to-pink-900/20',
@@ -697,7 +690,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: XCircle,
       borderColor: 'border-red-200/50 dark:border-red-700/50',
       label: 'Overdue',
-      emoji: '⚠️',
+      emoji: '??',
       pulse: true
     },
     cancelled: {
@@ -707,7 +700,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: XCircle,
       borderColor: 'border-gray-200/50 dark:border-gray-700/50',
       label: 'Cancelled',
-      emoji: '🚫'
+      emoji: '??'
     },
   };
  
@@ -743,11 +736,11 @@ export default function Documents() {
 
       const [estimationsRes, invoicesRes] = await Promise.all([
         listEstimations().catch((err) => {
-          console.error('Estimations API error:', err);
+
           return { data: [] };
         }),
         listInvoices().catch((err) => {
-          console.error('Invoices API error:', err);
+
           return { data: [] };
         })
       ]);
@@ -756,7 +749,7 @@ export default function Documents() {
       setEstimations(estimationsRes.data || []);
       setInvoices(invoicesRes.data || []);
     } catch (err: any) {
-      console.error('Failed to fetch documents:', err);
+
       setError('Failed to load documents');
     } finally {
       setLoading(false);
@@ -882,16 +875,31 @@ export default function Documents() {
                 )}
               </motion.div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredEstimations.map((estimation, index) => (
-                  <DocumentCard
-                    key={estimation.id}
-                    document={estimation}
-                    type="estimation"
-                    index={index}
-                  />
-                ))}
-              </div>
+              <>
+                {/* Mobile (Horizontal Scroll) */}
+                <div className="flex lg:hidden overflow-x-auto pb-6 gap-6 snap-x snap-mandatory scrollbar-hide -mx-6 px-6">
+                  {filteredEstimations.map((estimation, index) => (
+                    <div key={estimation.id} className="min-w-[85vw] snap-center">
+                      <DocumentCard
+                        document={estimation}
+                        type="estimation"
+                        index={index}
+                      />
+                    </div>
+                  ))}
+                </div>
+                {/* Desktop (Grid) */}
+                <div className="hidden lg:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredEstimations.map((estimation, index) => (
+                    <DocumentCard
+                      key={estimation.id}
+                      document={estimation}
+                      type="estimation"
+                      index={index}
+                    />
+                  ))}
+                </div>
+              </>
             )
           ) : (
             filteredInvoices.length === 0 ? (
@@ -920,16 +928,31 @@ export default function Documents() {
                 )}
               </motion.div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredInvoices.map((invoice, index) => (
-                  <DocumentCard
-                    key={invoice.id}
-                    document={invoice}
-                    type="invoice"
-                    index={index}
-                  />
-                ))}
-              </div>
+              <>
+                {/* Mobile (Horizontal Scroll) */}
+                <div className="flex lg:hidden overflow-x-auto pb-6 gap-6 snap-x snap-mandatory scrollbar-hide -mx-6 px-6">
+                  {filteredInvoices.map((invoice, index) => (
+                    <div key={invoice.id} className="min-w-[85vw] snap-center">
+                      <DocumentCard
+                        document={invoice}
+                        type="invoice"
+                        index={index}
+                      />
+                    </div>
+                  ))}
+                </div>
+                {/* Desktop (Grid) */}
+                <div className="hidden lg:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredInvoices.map((invoice, index) => (
+                    <DocumentCard
+                      key={invoice.id}
+                      document={invoice}
+                      type="invoice"
+                      index={index}
+                    />
+                  ))}
+                </div>
+              </>
             )
           )}
         </motion.div>
@@ -951,7 +974,7 @@ export default function Documents() {
 
 
       {/* Animation Styles */}
-      <style jsx global>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -1050,3 +1073,4 @@ export default function Documents() {
     </div>
   );
 }
+

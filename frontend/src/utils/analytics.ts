@@ -13,9 +13,9 @@ export const initGA = () => {
         debug_mode: import.meta.env.DEV, // Enable debug mode in development
       },
     });
-    console.log('✅ Google Analytics initialized:', GA_MEASUREMENT_ID);
+
   } else {
-    console.warn('⚠️ Google Analytics Measurement ID not found');
+
   }
 };
 

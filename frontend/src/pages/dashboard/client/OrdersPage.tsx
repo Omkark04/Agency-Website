@@ -373,7 +373,7 @@ const PremiumHeader = () => {
                 Orders & Payments
                 <Rocket className="inline w-10 h-10 ml-4 text-blue-500 animate-float" />
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl">
+              <p className="hidden sm:block text-gray-600 dark:text-gray-400 text-lg max-w-2xl">
                 Track, manage, and analyze all your orders and payments in real-time
               </p>
             </div>
@@ -497,14 +497,7 @@ const PremiumFilterBar = ({
               Filters
             </motion.button>
            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export
-            </motion.button>
+
           </div>
         </div>
       </div>
@@ -655,6 +648,13 @@ export default function OrdersPage() {
   const totalSpent = orders.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0);
   const avgOrderValue = totalOrders > 0 ? totalSpent / totalOrders : 0;
 
+  const statsCards = [
+    { title: "Total Orders", value: totalOrders, icon: Package, color: "from-blue-500 to-cyan-500", subtitle: "All time orders" },
+    { title: "Active Orders", value: activeOrders, icon: Clock, change: 12, color: "from-purple-500 to-pink-500", subtitle: "Currently processing" },
+    { title: "Completed", value: completedOrders, icon: CheckCircle, change: 8, color: "from-emerald-500 to-green-500", subtitle: "Successfully delivered" },
+    { title: "Total Spent", value: `₹${totalSpent.toLocaleString()}`, icon: DollarSign, change: -2, color: "from-amber-500 to-orange-500", subtitle: "Total amount spent" }
+  ];
+
 
   // Filter orders
   const filteredOrders = orders.filter(order => {
@@ -709,45 +709,39 @@ export default function OrdersPage() {
 
       <div className="max-w-7xl mx-auto">
         {/* Premium Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <PremiumStatsCard
-            title="Total Orders"
-            value={totalOrders}
-            icon={Package}
-            color="from-blue-500 to-cyan-500"
-            index={0}
-            subtitle="All time orders"
-          />
-         
-          <PremiumStatsCard
-            title="Active Orders"
-            value={activeOrders}
-            icon={Clock}
-            change={12}
-            color="from-purple-500 to-pink-500"
-            index={1}
-            subtitle="Currently processing"
-          />
-         
-          <PremiumStatsCard
-            title="Completed"
-            value={completedOrders}
-            icon={CheckCircle}
-            change={8}
-            color="from-emerald-500 to-green-500"
-            index={2}
-            subtitle="Successfully delivered"
-          />
-         
-          <PremiumStatsCard
-            title="Total Spent"
-            value={`₹${totalSpent.toLocaleString()}`}
-            icon={DollarSign}
-            change={-2}
-            color="from-amber-500 to-orange-500"
-            index={3}
-            subtitle="Total amount spent"
-          />
+        <div className="mb-8">
+          {/* Mobile Stats (Horizontal Scroll) */}
+          <div className="flex lg:hidden overflow-x-auto pb-4 gap-4 snap-x snap-mandatory scrollbar-hide -mx-6 px-6">
+            {statsCards.map((stat, i) => (
+              <div key={i} className="min-w-[70vw] snap-center">
+                <PremiumStatsCard
+                  title={stat.title}
+                  value={stat.value}
+                  icon={stat.icon}
+                  change={stat.change}
+                  color={stat.color}
+                  subtitle={stat.subtitle}
+                  index={i}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Stats (Grid) */}
+          <div className="hidden lg:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+             {statsCards.map((stat, i) => (
+                <PremiumStatsCard
+                  key={i}
+                  title={stat.title}
+                  value={stat.value}
+                  icon={stat.icon}
+                  change={stat.change}
+                  color={stat.color}
+                  subtitle={stat.subtitle}
+                  index={i}
+                />
+             ))}
+          </div>
         </div>
 
 
@@ -924,7 +918,7 @@ export default function OrdersPage() {
 
 
       {/* Animation Styles */}
-      <style jsx global>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -1068,3 +1062,4 @@ const Button = ({ children, onClick, className }: any) => (
     {children}
   </motion.button>
 );
+

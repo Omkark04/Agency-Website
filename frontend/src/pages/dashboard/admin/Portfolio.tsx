@@ -57,8 +57,8 @@ export default function Portfolio() {
               <p className="opacity-90">Manage your projects</p>
             </div>
           </div>
-          <Button onClick={() => { setEdit(null); setOpen(true); }} className="bg-white text-purple-700">
-            <FiPlus /> Add Portfolio
+          <Button onClick={() => { setEdit(null); setOpen(true); }} className="bg-white flex items-center text-black">
+            <FiPlus className="text-black" /> <p className="ml-2 text-black">Add Portfolio</p>
           </Button>
         </div>
       </div>

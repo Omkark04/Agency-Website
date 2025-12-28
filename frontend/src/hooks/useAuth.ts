@@ -65,12 +65,12 @@ export const useAuth = () => {
 
       // ✅ Fetch department for service_head users
       if (user?.role === 'service_head') {
-        console.log('🔍 User is service_head, fetching department...');
+
         try {
           const deptResponse = await api.get('/api/user/department/');
           const { department, has_department } = deptResponse.data;
           
-          console.log('📦 Department API Response:', deptResponse.data);
+
           
           if (has_department && department) {
             // Store department in localStorage
@@ -78,15 +78,14 @@ export const useAuth = () => {
             // Add department to user object
             user = { ...user, department }; // Update the user object
             localStorage.setItem('user', JSON.stringify(user));
-            console.log('✅ Department assigned:', department);
-            console.log('✅ Updated user object:', user);
+
           } else {
             // No department assigned
             localStorage.setItem('userDepartment', 'null');
-            console.log('⚠️ No department assigned to this service_head');
+
           }
         } catch (error) {
-          console.error('❌ Failed to fetch department:', error);
+
           localStorage.setItem('userDepartment', 'null');
         }
       }

@@ -484,7 +484,7 @@ const StatsCard = ({ title, value, icon: Icon, change, color, index, trend }: an
           <div>
             <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wide mb-2">{title}</p>
             <div className="flex items-baseline">
-              <p className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              <p className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                 {typeof value === 'string' ? value : count.toLocaleString()}
               </p>
               {change && (
@@ -529,10 +529,10 @@ const PremiumHeader = () => {
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white bg-clip-text text-transparent animate-text-gradient tracking-tight">
+            <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white bg-clip-text text-transparent animate-text-gradient tracking-tight">
               Project Management
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-4 text-lg tracking-wide leading-relaxed max-w-2xl">
+            <p className="text-gray-600 dark:text-gray-400 mt-4 text-sm sm:text-lg tracking-wide leading-relaxed max-w-2xl">
               Track progress, manage teams, and monitor project performance in real-time with our advanced dashboard
             </p>
           </div>
@@ -598,7 +598,7 @@ const ProjectFilters = ({
       {/* Animated filter section background */}
       <div className="absolute -inset-4 bg-gradient-to-r from-gray-50/50 to-blue-50/30 dark:from-gray-900/30 dark:to-blue-900/10 rounded-3xl blur-2xl" />
       
-      <div className="relative z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl p-7 shadow-2xl border border-white/20 dark:border-gray-700/30">
+      <div className="hidden lg:block relative z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl p-7 shadow-2xl border border-white/20 dark:border-gray-700/30">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-6">
           <div className="space-y-2">
             <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent tracking-tight">
@@ -913,7 +913,7 @@ export default function MyProjects() {
   const FilterTabs = () => (
     <div className="mb-10 relative">
       <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl p-2 shadow-2xl border border-white/20 dark:border-gray-700/30">
-        <nav className="flex space-x-2">
+        <nav className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
           {[
             { name: 'All Projects', value: 'all', count: totalProjects, icon: Layers },
             { name: 'Active', value: 'active', count: activeProjects, icon: Activity },
@@ -925,7 +925,7 @@ export default function MyProjects() {
               <button
                 key={tab.value}
                 onClick={() => setActiveFilter(tab.value)}
-                className={`flex-1 flex items-center justify-center py-4 px-6 rounded-2xl font-bold text-sm transition-all duration-500 relative group ${
+                className={`flex-1 flex items-center justify-center py-4 px-6 rounded-2xl font-bold text-sm transition-all duration-500 relative group whitespace-nowrap flex-shrink-0 ${
                   activeFilter === tab.value
                     ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100/80 dark:hover:bg-gray-700/80'
@@ -966,14 +966,16 @@ export default function MyProjects() {
       <PremiumHeader />
 
       {/* Premium Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="flex overflow-x-auto pb-4 gap-4 mb-10 snap-x snap-mandatory lg:grid lg:grid-cols-4 lg:gap-6 scrollbar-hide">
         {[
           { title: "Total Projects", value: totalProjects, icon: FolderOpen, color: "bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-500", trend: 75 },
           { title: "Active Projects", value: activeProjects, icon: Activity, color: "bg-gradient-to-br from-emerald-500 via-emerald-600 to-green-500", trend: 60 },
           { title: "Avg. Progress", value: `${avgProgress}%`, icon: TrendingUp, color: "bg-gradient-to-br from-purple-500 via-purple-600 to-pink-500", trend: avgProgress },
           { title: "Budget Usage", value: `${(totalSpent/1000).toFixed(1)}`, icon: BarChart3, color: "bg-gradient-to-br from-amber-500 via-amber-600 to-orange-500", trend: 45 },
         ].map((stat, index) => (
-          <StatsCard key={stat.title} {...stat} index={index} />
+          <div key={stat.title} className="w-[48vw] flex-none snap-center lg:w-auto lg:flex-1">
+             <StatsCard {...stat} index={index} />
+          </div>
         ))}
       </div>
 
@@ -1065,7 +1067,7 @@ export default function MyProjects() {
       <FloatingActionButton />
 
       {/* Premium Animations CSS */}
-      <style jsx global>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -1319,3 +1321,4 @@ export default function MyProjects() {
     </div>
   );
 }
+

@@ -87,3 +87,22 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* Hide cursor on mobile/touch devices */
+@media (max-width: 1023px) {
+  * {
+    cursor: none !important;
+  }
+  
+  /* Allow pointer cursor for interactive elements when necessary */
+  button, a, input, select, textarea {
+    cursor: auto !important;
+  }
+}
+
+/* Alternative: Hide cursor only on touch-capable devices */
+@media (hover: none) and (pointer: coarse) {
+  * {
+    cursor: none !important;
+  }
+}

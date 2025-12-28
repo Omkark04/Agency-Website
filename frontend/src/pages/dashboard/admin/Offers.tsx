@@ -113,7 +113,7 @@ export default function Offers() {
               }}
               className="flex items-center gap-2 bg-white text-purple-700 px-6 py-3 font-bold rounded-xl"
             >
-              <FiPlus /> Create Offer
+              <FiPlus className="ml-2 text-black" /> <p className="ml-2 text-black"> Create Offer </p>
             </Button>
           </div>
         </div>
