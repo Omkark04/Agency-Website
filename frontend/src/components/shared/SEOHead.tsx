@@ -18,8 +18,8 @@ interface SEOHeadProps {
 
 const SITE_TITLE = 'UdyogWorks';
 const DEFAULT_DESCRIPTION = 'Transform your business with UdyogWorks. Expert services in web development, data analytics, digital marketing, and business consulting.';
-const DEFAULT_IMAGE = 'https://udyogworks.com/og-image.jpg';
-const SITE_URL = 'https://udyogworks.com';
+const DEFAULT_IMAGE = 'https://udyogworks.in/og-image.jpg';
+const SITE_URL = 'https://udyogworks.in';
 
 export const SEOHead: React.FC<SEOHeadProps> = ({
   title,

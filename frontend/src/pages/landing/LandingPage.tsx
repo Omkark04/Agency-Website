@@ -37,8 +37,8 @@ export const LandingPage = () => {
           "@context": "https://schema.org",
           "@type": "Organization",
           "name": "UdyogWorks",
-          "url": "https://udyogworks.com",
-          "logo": "https://udyogworks.com/logo.png",
+          "url": "https://udyogworks.in",
+          "logo": "https://udyogworks.in/logo.png",
           "sameAs": [
             "https://facebook.com/udyogworks",
             "https://linkedin.com/company/udyogworks",
