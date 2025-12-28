@@ -145,22 +145,22 @@ const PortfolioSection = () => {
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-8 md:mb-12"
         >
-          <span className="inline-block px-4 py-1 rounded-full bg-gradient-to-r from-[#00C2A8]/20 to-[#0066FF]/20 text-[#00C2A8] dark:text-[#00C2A8] text-sm font-semibold mb-4">
-            <Briefcase className="inline-block w-4 h-4 mr-2" />
+          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#00C2A8]/20 to-[#0066FF]/20 text-[#00C2A8] dark:text-[#00C2A8] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
+            <Briefcase className="inline-block w-3 h-3 md:w-4 md:h-4 mr-2" />
             Our Portfolio
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent tracking-tight leading-tight px-4">
             Showcasing Excellence
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto mb-8">
+          <p className="hidden md:block text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto mb-8 leading-relaxed">
             Explore our diverse portfolio of successful projects that demonstrate our expertise, 
             creativity, and commitment to delivering exceptional results.
           </p>
           
-          {/* Search Bar */}
-          <div className="max-w-xl mx-auto mb-8">
+          {/* Search Bar - Hidden on Mobile */}
+          <div className="hidden md:block max-w-xl mx-auto mb-8">
             <div className="relative">
               <input
                 type="text"
@@ -181,12 +181,12 @@ const PortfolioSection = () => {
           </div>
         </motion.div>
 
-        {/* Filters & Controls Section */}
+        {/* Filters & Controls Section - Hidden on Mobile */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12"
+          className="hidden md:block mb-12"
         >
           <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
             {/* Filter Buttons */}
@@ -335,14 +335,14 @@ const PortfolioSection = () => {
           </motion.div>
         ) : (
           <div>
-            {/* Grid View */}
+            {/* Desktop Grid View */}
             {viewMode === 'grid' ? (
               <motion.div
                 variants={containerVariants}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
               >
                 {filteredProjects.map((project) => (
                   <motion.div
@@ -524,6 +524,84 @@ const PortfolioSection = () => {
               </motion.div>
             )}
 
+            {/* Mobile Horizontal Scroll */}
+            <div className="md:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
+              <div className="flex gap-4 pb-4">
+                {filteredProjects.map((project, index) => (
+                  <motion.div
+                    key={project.id}
+                    className="flex-shrink-0 w-[280px] bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"
+                    initial={{ opacity: 0, x: 30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    onClick={() => setSelectedProject(project)}
+                  >
+                    {/* Image Container */}
+                    <div className="relative overflow-hidden h-48">
+                      <img
+                        src={project.featured_image}
+                        alt={project.title}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      
+                      {/* Featured Badge */}
+                      {project.is_featured && (
+                        <div className="absolute top-3 left-3">
+                          <div className="px-2 py-1 rounded-full bg-gradient-to-r from-yellow-500 to-amber-500 text-white text-xs font-bold flex items-center gap-1">
+                            <Star className="w-3 h-3" />
+                            Featured
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Video Indicator */}
+                      {project.video && (
+                        <div className="absolute top-3 right-3 bg-black/50 rounded-full p-1.5">
+                          <PlayCircle className="w-5 h-5 text-white" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-4">
+                      {/* Service Tag */}
+                      {project.service && (
+                        <div className="inline-block px-2 py-0.5 rounded-full bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 text-[#00C2A8] dark:text-[#00C2A8] text-xs font-semibold mb-2">
+                          {project.service.name}
+                        </div>
+                      )}
+
+                      {/* Title */}
+                      <h3 className="text-base font-bold text-gray-800 dark:text-white mb-2 line-clamp-2 tracking-tight leading-tight">
+                        {project.title}
+                      </h3>
+
+                      {/* Client Info */}
+                      {project.client_name && (
+                        <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mb-3">
+                          <User className="w-3 h-3" />
+                          <span className="line-clamp-1">{project.client_name}</span>
+                        </div>
+                      )}
+
+                      {/* View Button */}
+                      <button className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white text-sm font-semibold tracking-wide hover:shadow-lg transition-all duration-300">
+                        View Details
+                        <ChevronRight className="w-3 h-3" />
+                      </button>
+                    </div>
+
+                    {/* Bottom Border */}
+                    <div className="h-1 bg-gradient-to-r from-[#00C2A8] to-[#0066FF]" />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
             {/* Results Counter & View Complete Button */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -559,22 +637,22 @@ const PortfolioSection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mt-20"
+          className="text-center mt-12 md:mt-20"
         >
           <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#00C2A8] via-[#0066FF] to-purple-500">
-            <div className="bg-white dark:bg-gray-900 rounded-xl px-8 py-6">
-              <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent">
+            <div className="bg-white dark:bg-gray-900 rounded-xl px-4 py-6 md:px-8 md:py-6">
+              <h3 className="text-lg md:text-2xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent tracking-tight">
                 Ready to Start Your Project?
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
+              <p className="hidden md:block text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto leading-relaxed">
                 Join our satisfied clients and let us bring your vision to life with our expertise.
               </p>
               <button
                 onClick={() => navigateTo('/portfolio')}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold tracking-wide hover:shadow-lg hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
               >
                 Start Your Project
-                <ExternalLink className="w-5 h-5" />
+                <ExternalLink className="w-4 h-4 md:w-5 md:h-5" />
               </button>
             </div>
           </div>

@@ -95,11 +95,29 @@ export const MovingBorder = ({
 
   const x = useTransform(
     progress,
-    (val) => pathRef.current?.getPointAtLength(val).x
+    (val) => {
+      if (!pathRef.current) return 0;
+      try {
+        const length = pathRef.current.getTotalLength();
+        if (length === 0) return 0;
+        return pathRef.current.getPointAtLength(val).x;
+      } catch {
+        return 0;
+      }
+    }
   );
   const y = useTransform(
     progress,
-    (val) => pathRef.current?.getPointAtLength(val).y
+    (val) => {
+      if (!pathRef.current) return 0;
+      try {
+        const length = pathRef.current.getTotalLength();
+        if (length === 0) return 0;
+        return pathRef.current.getPointAtLength(val).y;
+      } catch {
+        return 0;
+      }
+    }
   );
 
   const transform = useMotionTemplate`translateX(${x}px) translateY(${y}px) translateX(-50%) translateY(-50%)`;

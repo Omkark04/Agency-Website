@@ -177,16 +177,16 @@ export const Pricing = () => {
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-8 md:mb-12"
           >
-            <span className="inline-block px-4 py-1 rounded-full bg-gradient-to-r from-[#00C2A8]/20 to-[#0066FF]/20 text-[#00C2A8] dark:text-[#00C2A8] text-sm font-semibold mb-4">
-              <Sparkles className="inline-block w-4 h-4 mr-2" />
+            <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#00C2A8]/20 to-[#0066FF]/20 text-[#00C2A8] dark:text-[#00C2A8] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
+              <Sparkles className="inline-block w-3 h-3 md:w-4 md:h-4 mr-2" />
               Pricing Plans
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent tracking-tight leading-tight px-4">
               Simple, Transparent Pricing
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto">
+            <p className="hidden md:block text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
               Choose the perfect plan that fits your business needs. No hidden fees, cancel anytime.
             </p>
           </motion.div>
@@ -209,29 +209,31 @@ export const Pricing = () => {
             </motion.div>
           ) : (
             <>
-              {Array.from(cardsByDepartment.entries()).map(([deptName, { deptId, cards: deptCards }], deptIndex) => (
-                <div key={deptId} className="mb-16 last:mb-8">
-                  {/* Department Header */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="text-center mb-10"
-                  >
-                    <h3 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
-                      {deptName}
-                    </h3>
-                    <div className="w-20 h-1 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] mx-auto rounded-full"></div>
-                  </motion.div>
+              {/* Desktop: Department-based Grid */}
+              <div className="hidden md:block">
+                {Array.from(cardsByDepartment.entries()).map(([deptName, { deptId, cards: deptCards }], deptIndex) => (
+                  <div key={deptId} className="mb-16 last:mb-8">
+                    {/* Department Header */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      className="text-center mb-10"
+                    >
+                      <h3 className="text-3xl font-bold text-gray-800 dark:text-white mb-2 tracking-tight">
+                        {deptName}
+                      </h3>
+                      <div className="w-20 h-1 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] mx-auto rounded-full"></div>
+                    </motion.div>
 
-                  {/* Cards Grid */}
-                  <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                  >
+                    {/* Cards Grid */}
+                    <motion.div
+                      variants={containerVariants}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
+                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                    >
                     {deptCards.map((card, cardIndex) => {
                       const service = getService(card.service);
                       if (!service) return null;
@@ -367,6 +369,172 @@ export const Pricing = () => {
                   </motion.div>
                 </div>
               ))}
+              </div>
+
+              {/* Mobile: Service-based Horizontal Scroll */}
+              <div className="md:hidden space-y-8">
+                {(() => {
+                  // Group cards by service
+                  const cardsByService = new Map<number, { service: Service; cards: PriceCard[] }>();
+                  displayCards.forEach(card => {
+                    const service = getService(card.service);
+                    if (!service) return;
+                    
+                    if (!cardsByService.has(card.service)) {
+                      cardsByService.set(card.service, { service, cards: [] });
+                    }
+                    cardsByService.get(card.service)!.cards.push(card);
+                  });
+
+                  // Sort cards within each service
+                  cardsByService.forEach(group => {
+                    group.cards.sort((a, b) => tierOrder[a.title] - tierOrder[b.title]);
+                  });
+
+                  return Array.from(cardsByService.values()).map(({ service, cards: serviceCards }) => (
+                    <div key={service.id} className="mb-8">
+                      {/* Service Title */}
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        className="mb-4 px-4"
+                      >
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-white tracking-tight leading-tight">
+                          {service.title}
+                        </h3>
+                        <div className="w-16 h-0.5 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] mt-2 rounded-full"></div>
+                      </motion.div>
+
+                      {/* Horizontal Scrollable Cards */}
+                      <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+                        <div className="flex gap-4 pb-4">
+                          {serviceCards.map((card, index) => {
+                            const isPopular = card.title === 'medium';
+
+                            return (
+                              <motion.div
+                                key={card.id}
+                                className="flex-shrink-0 w-[280px]"
+                                initial={{ opacity: 0, x: 30 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5, delay: index * 0.1 }}
+                              >
+                                <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden h-full">
+                                  {/* Popular Badge */}
+                                  {isPopular && (
+                                    <div className="absolute top-3 left-3 z-10">
+                                      <div className="px-2 py-1 rounded-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white text-xs font-bold flex items-center gap-1 shadow-lg">
+                                        <Star className="w-3 h-3 fill-current" />
+                                        POPULAR
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Tier Badge */}
+                                  <div className="absolute top-3 right-3 z-10">
+                                    <div className={`px-2 py-1 rounded-full text-xs font-semibold uppercase ${
+                                      card.title === 'basic' 
+                                        ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-blue-600 dark:text-blue-400'
+                                        : card.title === 'medium'
+                                        ? 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 text-green-600 dark:text-green-400'
+                                        : 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-600 dark:text-purple-400'
+                                    }`}>
+                                      {card.title}
+                                    </div>
+                                  </div>
+
+                                  {/* Content */}
+                                  <div className="p-5 pt-14">
+                                    {/* Price */}
+                                    <div className="mb-4">
+                                      <div className="text-3xl font-extrabold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                                        ₹{parseFloat(card.price).toLocaleString('en-IN')}
+                                      </div>
+                                    </div>
+
+                                    {/* Details Grid */}
+                                    <div className="grid grid-cols-2 gap-2 mb-4 p-3 rounded-lg bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border border-gray-100 dark:border-gray-700">
+                                      <div className="flex items-center gap-1.5">
+                                        <Clock className="w-3 h-3 text-[#00C2A8]" />
+                                        <div>
+                                          <div className="text-xs text-gray-500 dark:text-gray-400">Delivery</div>
+                                          <div className="text-xs font-semibold text-gray-800 dark:text-white">
+                                            {card.delivery_days || 7} days
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-1.5">
+                                        <RefreshCw className="w-3 h-3 text-[#0066FF]" />
+                                        <div>
+                                          <div className="text-xs text-gray-500 dark:text-gray-400">Revisions</div>
+                                          <div className="text-xs font-semibold text-gray-800 dark:text-white">
+                                            {card.revisions}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Features - Limited for mobile */}
+                                    {card.features && card.features.length > 0 && (
+                                      <div className="mb-4">
+                                        <ul className="space-y-2">
+                                          {card.features.slice(0, 3).map((feature, idx) => (
+                                            <li key={idx} className="flex items-start gap-2">
+                                              <div className="flex-shrink-0 mt-0.5">
+                                                <div className="w-4 h-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                                                  <Check className="w-2.5 h-2.5 text-green-600 dark:text-green-400 stroke-[3]" />
+                                                </div>
+                                              </div>
+                                              <span className="text-xs text-gray-700 dark:text-gray-300 line-clamp-1">
+                                                {feature}
+                                              </span>
+                                            </li>
+                                          ))}
+                                          {card.features.length > 3 && (
+                                            <li className="text-xs text-[#00C2A8] dark:text-[#00C2A8] font-medium ml-6">
+                                              +{card.features.length - 3} more
+                                            </li>
+                                          )}
+                                        </ul>
+                                      </div>
+                                    )}
+
+                                    {/* CTA Button */}
+                                    <button
+                                      onClick={() => openFormWithPriceCard(card)}
+                                      className={`w-full py-2.5 px-4 rounded-lg font-semibold text-white text-sm tracking-wide transition-all duration-300 flex items-center justify-center gap-2 ${
+                                        card.title === 'basic'
+                                          ? 'bg-gradient-to-r from-blue-600 to-purple-600'
+                                          : card.title === 'medium'
+                                          ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF]'
+                                          : 'bg-gradient-to-r from-purple-600 to-pink-600'
+                                      }`}
+                                    >
+                                      Get Started
+                                      <ChevronRight className="w-3 h-3" />
+                                    </button>
+                                  </div>
+
+                                  {/* Bottom Border */}
+                                  <div className={`h-1 bg-gradient-to-r ${
+                                    card.title === 'basic'
+                                      ? 'from-blue-600 to-purple-600'
+                                      : card.title === 'medium'
+                                      ? 'from-[#00C2A8] to-[#0066FF]'
+                                      : 'from-purple-600 to-pink-600'
+                                  }`}></div>
+                                </div>
+                              </motion.div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
 
               {/* View All Plans Button */}
               <motion.div
@@ -391,14 +559,14 @@ export const Pricing = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mt-20"
+            className="text-center mt-12 md:mt-20"
           >
             <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#00C2A8] via-[#0066FF] to-purple-500">
-              <div className="bg-white dark:bg-gray-900 rounded-xl px-8 py-6">
-                <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent">
+              <div className="bg-white dark:bg-gray-900 rounded-xl px-4 py-6 md:px-8 md:py-6">
+                <h3 className="text-lg md:text-2xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent tracking-tight">
                   Need a Custom Solution?
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
+                <p className="hidden md:block text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto leading-relaxed">
                   We've got you covered. Contact us for a personalized quote tailored to your specific needs.
                 </p>
                 <button
@@ -408,9 +576,9 @@ export const Pricing = () => {
                       contactSection.scrollIntoView({ behavior: 'smooth' });
                     }
                   }}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold tracking-wide hover:shadow-lg hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
                 >
-                  <Zap className="w-5 h-5" />
+                  <Zap className="w-4 h-4 md:w-5 md:h-5" />
                   Get a Custom Quote
                 </button>
               </div>

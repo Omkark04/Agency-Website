@@ -141,26 +141,27 @@ export const Services = () => {
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Section Header */}
         <motion.div 
-          className="text-center mb-16"
+          className="text-center mb-8 md:mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <span className="inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 text-[#00C2A8] dark:text-[#00C2A8] text-sm font-semibold mb-4">
+          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 text-[#00C2A8] dark:text-[#00C2A8] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
             Our Services
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent px-4 tracking-tight leading-tight">
             Comprehensive Solutions Tailored for Your Success
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto">
+          <p className="hidden md:block text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
             We offer a wide range of professional services across multiple departments, 
             each led by industry experts committed to delivering exceptional results.
           </p>
         </motion.div>
 
         {/* Services Grid - Department Based */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Desktop: Grid Layout */}
+        <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {departments.map((department, index) => {
             // Get top 3 services from this department
             const departmentServices = services.filter(s => s.department === department.id).slice(0, 3);
@@ -206,7 +207,7 @@ export const Services = () => {
                       </div>
                     )}
                     <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-gray-800 dark:text-white">
+                      <h3 className="text-2xl font-bold text-gray-800 dark:text-white tracking-tight leading-tight">
                         {department.title}
                       </h3>
                     </div>
@@ -214,7 +215,7 @@ export const Services = () => {
 
                   {/* Department Description */}
                   {department.short_description && (
-                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-6 line-clamp-2">
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-6 line-clamp-2 leading-relaxed">
                       {department.short_description}
                     </p>
                   )}
@@ -247,10 +248,10 @@ export const Services = () => {
                                 </div>
                               )}
                               <div className="flex-1">
-                                <h4 className="font-bold text-gray-800 dark:text-white text-base mb-1">
+                                <h4 className="font-bold text-gray-800 dark:text-white text-base mb-1 tracking-tight leading-snug">
                                   {service.title}
                                 </h4>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
                                   {service.short_description}
                                 </p>
                               </div>
@@ -285,7 +286,7 @@ export const Services = () => {
                       onClick={() => {
                         navigateTo('/client-dashboard/services');
                       }}
-                      className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white font-semibold hover:shadow-xl hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-[1.02]"
+                      className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white font-semibold tracking-wide hover:shadow-xl hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-[1.02]"
                     >
                       <span>Check Services</span>
                       <FaChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -298,7 +299,7 @@ export const Services = () => {
                           contactSection.scrollIntoView({ behavior: 'smooth' });
                         }
                       }}
-                      className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold hover:border-[#00C2A8] hover:text-[#00C2A8] dark:hover:text-[#00C2A8] transition-all duration-300"
+                      className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold tracking-wide hover:border-[#00C2A8] hover:text-[#00C2A8] dark:hover:text-[#00C2A8] transition-all duration-300"
                     >
                       <span>Make Custom Order</span>
                     </button>
@@ -310,6 +311,130 @@ export const Services = () => {
               </motion.div>
             );
           })}
+        </div>
+
+        {/* Mobile: Horizontal Scrollable Cards */}
+        <div className="md:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
+          <div className="flex gap-4 pb-4">
+          {departments.map((department, index) => {
+            // Get top 3 services from this department
+            const departmentServices = services.filter(s => s.department === department.id).slice(0, 3);
+            
+            // Use first service for icon/color theming, or defaults if no services
+            const firstService = departmentServices[0];
+            const IconComponent = firstService 
+              ? (iconMap[firstService.icon_name as keyof typeof iconMap] || iconMap['palette'])
+              : iconMap['palette'];
+            const iconColor = firstService
+              ? (iconColorMap[firstService.icon_name as keyof typeof iconColorMap] || 'text-[#00C2A8]')
+              : 'text-[#00C2A8]';
+            
+            return (
+              <motion.div
+                key={department.id}
+                className="flex-shrink-0 w-[300px] bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                {/* Department Content */}
+                <div className="p-5">
+                  {/* Department Name & Logo */}
+                  <div className="flex items-center gap-3 mb-4">
+                    {department.logo ? (
+                      <img
+                        src={department.logo}
+                        alt={department.title}
+                        width="48"
+                        height="48"
+                        loading="lazy"
+                        decoding="async"
+                        className="w-12 h-12 object-contain rounded-lg flex-shrink-0"
+                      />
+                    ) : (
+                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${iconColor.replace('text-', 'bg-')}/10 flex-shrink-0`}>
+                        {React.cloneElement(IconComponent, { 
+                          className: `text-2xl ${iconColor}`
+                        })}
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-gray-800 dark:text-white line-clamp-2 tracking-tight leading-tight">
+                        {department.title}
+                      </h3>
+                    </div>
+                  </div>
+
+                  {/* Top 3 Services */}
+                  {departmentServices.length > 0 && (
+                    <div className="mb-4 space-y-2">
+                      {departmentServices.map((service) => {
+                        const serviceIcon = iconMap[service.icon_name as keyof typeof iconMap] || iconMap['palette'];
+                        const serviceIconColor = iconColorMap[service.icon_name as keyof typeof iconColorMap] || 'text-[#00C2A8]';
+                        
+                        return (
+                          <div key={service.id} className="flex items-center gap-2.5 p-2 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700/50 dark:to-gray-800/50">
+                            {service.logo ? (
+                              <img
+                                src={service.logo}
+                                alt={service.title}
+                                width="32"
+                                height="32"
+                                loading="lazy"
+                                decoding="async"
+                                className="w-8 h-8 object-contain rounded flex-shrink-0"
+                              />
+                            ) : (
+                              <div className={`w-8 h-8 rounded flex items-center justify-center ${serviceIconColor.replace('text-', 'bg-')}/10 flex-shrink-0`}>
+                                {React.cloneElement(serviceIcon, { 
+                                  className: `text-base ${serviceIconColor}`
+                                })}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-semibold text-gray-800 dark:text-white line-clamp-2 tracking-tight leading-snug">
+                                {service.title}
+                              </h4>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={() => {
+                        navigateTo('/client-dashboard/services');
+                      }}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white text-sm font-semibold tracking-wide hover:shadow-lg transition-all duration-300"
+                    >
+                      <span>Check Services</span>
+                      <FaChevronRight className="w-3 h-3" />
+                    </button>
+                    
+                    <button
+                      onClick={() => {
+                        const contactSection = document.getElementById('contact');
+                        if (contactSection) {
+                          contactSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-semibold tracking-wide hover:border-[#00C2A8] hover:text-[#00C2A8] transition-all duration-300"
+                    >
+                      <span>Make Custom Order</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Bottom Border */}
+                <div className="h-1 bg-gradient-to-r from-[#00C2A8] to-[#0066FF]" />
+              </motion.div>
+            );
+          })}
+        </div>
         </div>
 
         {/* Empty State */}
@@ -334,22 +459,22 @@ export const Services = () => {
 
         {/* Call to Action */}
         <motion.div 
-          className="mt-20 text-center"
+          className="mt-12 md:mt-20 text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
           <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#00C2A8] via-[#0066FF] to-purple-500">
-            <div className="bg-white dark:bg-gray-900 rounded-xl px-8 py-8">
-              <h3 className="text-2xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent">
+            <div className="bg-white dark:bg-gray-900 rounded-xl px-4 py-6 md:px-8 md:py-8">
+              <h3 className="text-lg md:text-2xl lg:text-3xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent tracking-tight">
                 Ready to Transform Your Business?
               </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto text-lg">
+              <p className="hidden md:block text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto text-lg leading-relaxed">
                 Our expert teams are ready to deliver exceptional results. 
                 Get a personalized consultation and discover how we can help you achieve your goals.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
                 <button
                   onClick={() => {
                     const contactSection = document.getElementById('contact');
@@ -357,13 +482,13 @@ export const Services = () => {
                       contactSection.scrollIntoView({ behavior: 'smooth' });
                     }
                   }}
-                  className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
+                  className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold tracking-wide hover:shadow-lg hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
                 >
                   Get a Custom Quote
                 </button>
                 <button
                   onClick={() => navigateTo('/client-dashboard/services')}
-                  className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-300 px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300"
+                  className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-300 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold tracking-wide hover:shadow-lg transition-all duration-300"
                 >
                   View All Services
                 </button>

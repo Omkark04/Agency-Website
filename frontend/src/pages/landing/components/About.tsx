@@ -1,6 +1,6 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Lightbulb, Users, Rocket, Award, ArrowRight, Image as ImageIcon } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { fetchAboutImages } from '../../../api/media';
 import type { MediaItem } from '../../../api/media';
 import { Button as MovingBorderContainer } from "@/components/ui/moving-border";
@@ -28,6 +28,55 @@ const features = [
     description: 'Trusted by businesses of all sizes, we deliver measurable results that drive growth and success.'
   }
 ];
+
+// Stacking Card Component for Mobile
+const StackingCard = ({ feature, index, totalCards }: { feature: typeof features[0], index: number, totalCards: number }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ["start end", "end start"]
+  });
+
+  // Calculate stacking position based on scroll
+  const scale = useTransform(
+    scrollYProgress,
+    [0, 0.3, 0.5, 0.7, 1],
+    [0.8, 0.9, 1, 1, 1]
+  );
+
+  const y = useTransform(
+    scrollYProgress,
+    [0, 0.3, 0.5, 0.7, 1],
+    [100, 50, index * 20, index * 20, index * 20 - 50]
+  );
+
+  const opacity = useTransform(
+    scrollYProgress,
+    [0, 0.2, 0.5, 0.8, 1],
+    [0, 0.5, 1, 1, 0.8]
+  );
+
+  const zIndex = totalCards - index;
+
+  return (
+    <motion.div
+      ref={cardRef}
+      style={{
+        scale,
+        y,
+        opacity,
+        zIndex,
+      }}
+      className="sticky top-20 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700"
+    >
+      <div className="bg-[#00C2A8]/10 p-2 rounded-lg w-fit mb-4">
+        {feature.icon}
+      </div>
+      <h3 className="font-semibold text-lg mb-2 text-gray-800 dark:text-white">{feature.title}</h3>
+      <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{feature.description}</p>
+    </motion.div>
+  );
+};
 
 export const About = () => {
   const [aboutImages, setAboutImages] = useState<MediaItem[]>([]);
@@ -76,7 +125,7 @@ export const About = () => {
   };
 
   return (
-    <section id="about" className="py-20 bg-white dark:bg-gray-900">
+    <section id="about" className="py-12 md:py-20 bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4 md:px-8 lg:px-12">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Left Column - Image */}
@@ -192,13 +241,14 @@ export const About = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Why Choose UdyogWorks?</h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-8">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6 tracking-tight">Why Choose UdyogWorks?</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6 md:mb-8 leading-relaxed">
               At UdyogWorks, we're more than just a service provider – we're your strategic partner in digital transformation. 
               Our mission is to empower businesses with innovative solutions that drive real results.
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Desktop: Grid Layout */}
+            <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-6">
               {features.map((feature, index) => (
                 <motion.div
                   key={index}
@@ -214,6 +264,18 @@ export const About = () => {
                   <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm">{feature.description}</p>
                 </motion.div>
+              ))}
+            </div>
+
+            {/* Mobile: Stacking Cards */}
+            <div className="md:hidden relative space-y-4 min-h-[800px]">
+              {features.map((feature, index) => (
+                <StackingCard 
+                  key={index} 
+                  feature={feature} 
+                  index={index}
+                  totalCards={features.length}
+                />
               ))}
             </div>
           </motion.div>

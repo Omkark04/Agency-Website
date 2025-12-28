@@ -135,26 +135,26 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Section Header */}
         <motion.div 
-          className="text-center mb-16"
+          className="text-center mb-8 md:mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <span className="inline-block px-4 py-1.5 rounded-full bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 text-[#00C2A8] dark:text-[#00C2A8] text-sm font-semibold mb-4">
+          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 text-[#00C2A8] dark:text-[#00C2A8] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
             Special Offers
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent tracking-tight leading-tight px-4">
             Exclusive Deals & Promotions
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto">
+          <p className="hidden md:block text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
             Discover amazing offers and limited-time deals on our premium services. 
             Save big while getting the quality you deserve.
           </p>
         </motion.div>
 
-        {/* Filter Options */}
-        <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
+        {/* Filter Options - Hidden on Mobile */}
+        <div className="hidden md:flex flex-wrap items-center justify-center gap-4 mb-12">
           <label className="inline-flex items-center space-x-2 cursor-pointer">
             <input
               type="checkbox"
@@ -176,7 +176,8 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
           </label>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Desktop Grid */}
+        <div className="hidden md:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {offers.slice(0, limit).map((offer) => (
             <motion.article 
               key={offer.id} 
@@ -209,8 +210,8 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
               </div>
 
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-3">{offer.title}</h3>
-                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3">{offer.short_description || offer.description}</p>
+                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-3 tracking-tight">{offer.title}</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 leading-relaxed">{offer.short_description || offer.description}</p>
 
                 <div className="mt-3 flex items-center justify-between">
                   <div>
@@ -230,7 +231,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       href={offer.cta_link || `/offers/${offer.slug || offer.id}`}
-                      className="inline-block bg-black text-white px-4 py-2 rounded-md text-sm"
+                      className="inline-block bg-black text-white px-4 py-2 rounded-md text-sm font-semibold tracking-wide"
                     >
                       {offer.cta_text || "Claim Offer"}
                     </motion.a>
@@ -247,7 +248,64 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
               </div>
             </motion.article>
           ))}
-          
+        </div>
+
+        {/* Mobile Horizontal Scroll */}
+        <div className="md:hidden overflow-x-auto scrollbar-hide -mx-4 px-4">
+          <div className="flex gap-4 pb-4">
+            {offers.slice(0, limit).map((offer, index) => (
+              <motion.article 
+                key={offer.id} 
+                className="flex-shrink-0 w-[280px] bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <div className="relative">
+                  {renderBadge(offer)}
+                  <div className="h-40 w-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 overflow-hidden flex items-center justify-center">
+                    {(offer.imageURL || offer.image) ? (
+                      <img
+                        src={(offer.imageURL || offer.image) || undefined}
+                        alt={offer.title}
+                        className="object-cover w-full h-full"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="text-gray-400 dark:text-gray-500 text-xs">No image</div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-4">
+                  <h3 className="text-base font-bold text-gray-800 dark:text-white mb-2 line-clamp-2 tracking-tight leading-tight">{offer.title}</h3>
+                  
+                  <div className="mb-3">
+                    {offer.discounted_price ? (
+                      <div className="text-sm">
+                        <span className="text-lg font-bold">₹{offer.discounted_price}</span>{" "}
+                        {offer.original_price ? <span className="line-through text-xs text-gray-500 ml-1">₹{offer.original_price}</span> : null}
+                      </div>
+                    ) : (
+                      <div className="text-xs text-gray-700">Starting at ₹{offer.original_price ?? "NA"}</div>
+                    )}
+                    <div className="mt-1">{renderRemaining(offer)}</div>
+                  </div>
+
+                  <motion.a
+                    whileTap={{ scale: 0.95 }}
+                    href={offer.cta_link || `/offers/${offer.slug || offer.id}`}
+                    className="block w-full text-center bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-4 py-2 rounded-lg text-sm font-semibold tracking-wide"
+                  >
+                    {offer.cta_text || "Claim Offer"}
+                  </motion.a>
+                </div>
+
+                <div className="h-1 bg-gradient-to-r from-[#00C2A8] to-[#0066FF]" />
+              </motion.article>
+            ))}
+          </div>
         </div>
 
         {/* VIEW ALL OFFERS BUTTON */}
