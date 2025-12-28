@@ -20,11 +20,12 @@ const SITE_TITLE = 'UdyogWorks';
 const DEFAULT_DESCRIPTION = 'Transform your business with UdyogWorks. Expert services in web development, data analytics, digital marketing, and business consulting.';
 const DEFAULT_IMAGE = 'https://udyogworks.in/og-image.jpg';
 const SITE_URL = 'https://udyogworks.in';
+const DEFAULT_KEYWORDS = 'business development, web development agencies, digital solutions, digital marketing agency, business consulting, UdyogWorks, top web agencies, design, technology, education';
 
 export const SEOHead: React.FC<SEOHeadProps> = ({
   title,
   description = DEFAULT_DESCRIPTION,
-  keywords,
+  keywords = DEFAULT_KEYWORDS,
   image = DEFAULT_IMAGE,
   url = SITE_URL,
   type = 'website',
