@@ -116,17 +116,17 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
           : 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md'
           }`}
       >
-        <div className="py-4 max-w-7xl w-full px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-28">
+        <div className="py-3 md:py-4 max-w-7xl w-full px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-4 sm:gap-8 md:gap-28">
 
             {/* Logo - Left Side */}
-            <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group flex-shrink-0">
+            <Link to="/" className="flex items-center space-x-1.5 sm:space-x-2 md:space-x-3 group flex-shrink-0">
               <img
                 src={logo}
                 alt="UdyogWorks Logo"
-                className="h-10 sm:h-12 transition-transform duration-300 group-hover:scale-105"
+                className="h-8 sm:h-10 md:h-12 transition-transform duration-300 group-hover:scale-105"
               />
-              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent">
+              <span className="text-base sm:text-lg md:text-xl font-bold bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent">
                 UdyogWorks
               </span>
             </Link>
@@ -202,16 +202,16 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
 
 
             {/* Mobile Menu Toggle */}
-            <div className="lg:hidden">
+            <div className="lg:hidden -mr-1">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300"
+                className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300"
                 aria-label="Toggle menu"
               >
                 {isMobileMenuOpen ? (
-                  <X size={24} className="text-gray-700 dark:text-gray-300" />
+                  <X size={26} className="text-gray-700 dark:text-gray-300" />
                 ) : (
-                  <Menu size={24} className="text-gray-700 dark:text-gray-300" />
+                  <Menu size={26} className="text-gray-700 dark:text-gray-300" />
                 )}
               </button>
             </div>
@@ -220,17 +220,17 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
 
           {/* Mobile Menu */}
           <div
-            className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-[600px] opacity-100 mt-4' : 'max-h-0 opacity-0'
+            className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-[600px] opacity-100 mt-3' : 'max-h-0 opacity-0'
               }`}
           >
-            <div className="py-4 space-y-1 border-t border-gray-200 dark:border-gray-700">
+            <div className="py-3 space-y-1 border-t border-gray-200 dark:border-gray-700">
               {/* Mobile Navigation Links */}
               {navLinks.map(link => (
                 <a
                   key={link.name}
                   href={link.href}
                   onClick={(e) => handleNavigation(e, link.href)}
-                  className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r
+                  className="block px-3 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r
                     hover:from-[#00C2A8]/10 hover:to-[#0066FF]/10 hover:text-[#00C2A8]
                     rounded-lg transition-all duration-300 font-medium"
                 >
@@ -240,12 +240,12 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
 
 
               {/* Mobile Auth Section */}
-              <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+              <div className="pt-3 mt-3 border-t border-gray-200 dark:border-gray-700 space-y-2.5">
                 {!user ? (
                   <>
                     <button
                       onClick={() => openAuthModal('login')}
-                      className="w-full px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100
+                      className="w-full px-3 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100
                         dark:hover:bg-gray-800 rounded-lg transition-all duration-300 font-medium
                         flex items-center justify-center gap-2"
                     >
@@ -256,7 +256,7 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
 
                     <button
                       onClick={() => openAuthModal('signup')}
-                      className="w-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-4 py-3
+                      className="w-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-3 py-2.5
                         rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300
                         flex items-center justify-center gap-2"
                     >
@@ -276,7 +276,7 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                         navigate(getDashboardRoute());
                         setIsMobileMenuOpen(false);
                       }}
-                      className="w-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-4 py-3 rounded-lg
+                      className="w-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-3 py-2.5 rounded-lg
                         font-medium shadow-md hover:shadow-lg transition-all duration-300
                         flex items-center justify-center gap-2"
                     >
@@ -286,7 +286,7 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
 
                     <button
                       onClick={handleLogout}
-                      className="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-lg
+                      className="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2.5 rounded-lg
                         font-medium shadow-md hover:shadow-lg transition-all duration-300
                         flex items-center justify-center gap-2"
                     >

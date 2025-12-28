@@ -148,7 +148,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
         />
       )}
      
-      <section id='home' className="relative overflow-x-hidden text-white pt-40 pb-12 md:pb-12">
+      <section id='home' className="relative overflow-x-hidden text-white pt-12 md:pt-40 pb-12 md:pb-12">
         {/* Mobile Background - Show only on mobile */}
         <div className="block md:hidden">
           {mobileHeroBackground ? (
@@ -211,18 +211,32 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
             <div className="absolute inset-0 bg-gradient-to-br from-[#0B2545] to-[#1a365d] z-0" />
           )}
         </div>
-        <div className="container mx-auto px-4 md:px-8 lg:px-12 relative z-10">
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-start">
+        <div className="container mx-auto px-4 md:px-8 lg:px-12 relative z-10 overflow-x-hidden">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-start overflow-x-hidden">
             {/* Left Content */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="z-10 space-y-6 md:space-y-8"
+              className="z-10 space-y-6 md:space-y-8 w-full max-w-full overflow-x-hidden"
             >
-              <h1 className="text-xl sm:text-2xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 md:mb-6 break-words max-w-full pr-4">
+              <h1 className="
+                text-2xl
+                sm:text-2xl 
+                md:text-5xl 
+                lg:text-6xl 
+                font-bold 
+                leading-tight 
+                mb-4 md:mb-6
+                max-w-[80%] sm:max-w-full
+                break-words
+                hyphens-auto
+                overflow-wrap-anywhere
+                word-wrap-break-word
+              ">
                 We Build, Create & Grow Your Business Digitally
               </h1>
+
               <p className="hidden md:block text-xl text-gray-300 mb-8">
                 Business development agency powering growth through design, technology & education.
               </p>
@@ -264,7 +278,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                     Our Services
                   </motion.h3>
 
-                  <div className="relative overflow-hidden">
+                  <div className="relative overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
                     {/* Gradient edges */}
                     <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0B2545] to-transparent z-10 pointer-events-none" />
                     <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0B2545] to-transparent z-10 pointer-events-none" />
@@ -376,6 +390,39 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                   </div>
                 </div>
               )}
+
+              {/* Stats - Mobile Only (below departments) */}
+              <div className="block md:hidden mt-6 w-full max-w-full overflow-x-hidden">
+                <div className="grid grid-cols-3 gap-2 w-full">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-2"
+                  >
+                    <div className="text-xl font-bold text-[#00C2A8]">{stats.clients}+</div>
+                    <div className="text-[10px] text-gray-300 mt-0.5">Happy Clients</div>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-2"
+                  >
+                    <div className="text-xl font-bold text-[#00C2A8]">{stats.projects}+</div>
+                    <div className="text-[10px] text-gray-300 mt-0.5">Projects Completed</div>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-2"
+                  >
+                    <div className="text-xl font-bold text-[#00C2A8]">{stats.satisfaction}%</div>
+                    <div className="text-[10px] text-gray-300 mt-0.5">Satisfaction Rate</div>
+                  </motion.div>
+                </div>
+              </div>
 
             </motion.div>
 

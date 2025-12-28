@@ -46,7 +46,7 @@ const WhatsappFloat = () => {
 
 
   return (
-    <div className="fixed bottom-5 right-6 z-40 flex flex-col items-end">
+    <div className="fixed bottom-20 md:bottom-5 right-6 z-40 flex flex-col items-end">
       {/* Tooltip */}
       {showTooltip && (
         <div
@@ -94,21 +94,6 @@ const WhatsappFloat = () => {
           </span>
         </a>
       </div>
-
-
-      {/* Close button for mobile */}
-      {isMobile && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsVisible(false);
-          }}
-          className="mt-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded shadow"
-          aria-label="Hide WhatsApp button"
-        >
-          Close
-        </button>
-      )}
     </div>
   );
 };

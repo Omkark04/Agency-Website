@@ -48,7 +48,7 @@ export const ContactFloat = () => {
   );
 
   return (
-    <div className="fixed bottom-24 right-6 z-40 flex flex-col items-end" ref={popupRef}>
+    <div className="fixed bottom-36 md:bottom-24 right-6 z-40 flex flex-col items-end" ref={popupRef}>
       {/* Contact Info Popup */}
       {showPopup && (
         <div

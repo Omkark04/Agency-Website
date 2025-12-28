@@ -28,11 +28,11 @@ export const LandingPage = () => {
 
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+    <div className={`min-h-screen overflow-x-hidden ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <Header onAuthButtonClick={() => setIsAuthModalOpen(true)} />
 
 
-      <main className="mt-20">
+      <main className="mt-20 overflow-x-hidden">
         <Hero onGetStartedClick={() => setIsAuthModalOpen(true)} />
         <Services />
         <Offers />
