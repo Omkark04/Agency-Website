@@ -97,3 +97,19 @@ export const fetchHeroBackground = async (): Promise<MediaItem | null> => {
     return null;
   }
 };
+
+export const fetchMobileHeroBackground = async (): Promise<MediaItem | null> => {
+  try {
+    const response = await api.get<MediaItem[]>('/api/media/', {
+      params: {
+        caption__icontains: 'Mobile Hero',
+        ordering: '-created_at'
+      }
+    });
+    // Return the first matching media item (image or video) for mobile
+    return response.data.length > 0 ? response.data[0] : null;
+  } catch (error) {
+    console.error('Error fetching mobile hero background:', error);
+    return null;
+  }
+};

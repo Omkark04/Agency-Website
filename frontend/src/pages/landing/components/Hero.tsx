@@ -1,11 +1,13 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle, Image as ImageIcon, Building2, Instagram, Facebook } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { fetchHeroImages, fetchHeroBackground } from '../../../api/media';
+import { fetchHeroImages, fetchHeroBackground, fetchMobileHeroBackground } from '../../../api/media';
 import type { MediaItem } from '../../../api/media';
 import { getTestimonialStats } from '../../../api/testinomials';
 import { listDepartments, type Department } from '../../../api/departments';
+import { listServices, type Service } from '../../../api/services';
 import { useProtectedNavigation } from '../../../hooks/useProtectedNavigation';
+import { useNavigate } from 'react-router-dom';
 import AuthModal from './AuthModal';
 
 
@@ -14,11 +16,14 @@ import AuthModal from './AuthModal';
 
 export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) => {
   const { navigateTo, showAuthModal, setShowAuthModal } = useProtectedNavigation();
+  const navigate = useNavigate();
   const [heroImages, setHeroImages] = useState<MediaItem[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [heroBackground, setHeroBackground] = useState<MediaItem | null>(null);
+  const [mobileHeroBackground, setMobileHeroBackground] = useState<MediaItem | null>(null);
   const [backgroundLoading, setBackgroundLoading] = useState(true);
   const [stats, setStats] = useState({
     clients: 100,
@@ -32,7 +37,9 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
     loadHeroImages();
     loadStats();
     loadDepartments();
+    loadServices();
     loadHeroBackground();
+    loadMobileHeroBackground();
   }, []);
 
 
@@ -82,7 +89,16 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
       const response = await listDepartments({ is_active: true });
       setDepartments(response.data);
     } catch (error) {
-      console.error('Failed to load departments:', error);
+      console.error('Error loading departments:', error);
+    }
+  };
+
+  const loadServices = async () => {
+    try {
+      const response = await listServices({ is_active: true });
+      setServices(response.data);
+    } catch (error) {
+      console.error('Error loading services:', error);
     }
   };
 
@@ -95,6 +111,15 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
       console.error('Failed to load hero background:', error);
     } finally {
       setBackgroundLoading(false);
+    }
+  };
+
+  const loadMobileHeroBackground = async () => {
+    try {
+      const background = await fetchMobileHeroBackground();
+      setMobileHeroBackground(background);
+    } catch (error) {
+      console.error('Failed to load mobile hero background:', error);
     }
   };
 
@@ -123,37 +148,69 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
         />
       )}
      
-      <section id='home' className="relative overflow-hidden text-white pt-40 md:pb-12">
-        {/* Dynamic Background - Image or Video */}
-        {!backgroundLoading && heroBackground ? (
-          heroBackground.media_type === 'video' ? (
-            <>
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute inset-0 w-full h-full object-cover z-0"
-              >
-                <source src={heroBackground.url} type="video/mp4" />
-              </video>
-              {/* Overlay for better text readability */}
-              <div className="absolute inset-0 bg-black/40 z-[1]" />
-            </>
+      <section id='home' className="relative overflow-x-hidden text-white pt-40 pb-12 md:pb-12">
+        {/* Mobile Background - Show only on mobile */}
+        <div className="block md:hidden">
+          {mobileHeroBackground ? (
+            mobileHeroBackground.media_type === 'video' ? (
+              <>
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="absolute inset-0 w-full h-full object-cover z-0"
+                >
+                  <source src={mobileHeroBackground.url} type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-black/40 z-[1]" />
+              </>
+            ) : (
+              <>
+                <div
+                  className="absolute inset-0 w-full h-full bg-cover bg-center z-0"
+                  style={{ backgroundImage: `url(${mobileHeroBackground.url})` }}
+                />
+                <div className="absolute inset-0 bg-black/40 z-[1]" />
+              </>
+            )
           ) : (
-            <>
-              <div
-                className="absolute inset-0 w-full h-full bg-cover bg-center z-0"
-                style={{ backgroundImage: `url(${heroBackground.url})` }}
-              />
-              {/* Overlay for better text readability */}
-              <div className="absolute inset-0 bg-black/40 z-[1]" />
-            </>
-          )
-        ) : (
-          // Fallback gradient background
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0B2545] to-[#1a365d] z-0" />
-        )}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#0B2545] to-[#1a365d] z-0" />
+          )}
+        </div>
+
+        {/* Desktop Background - Show only on desktop */}
+        <div className="hidden md:block">
+          {!backgroundLoading && heroBackground ? (
+            heroBackground.media_type === 'video' ? (
+              <>
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="absolute inset-0 w-full h-full object-cover z-0"
+                >
+                  <source src={heroBackground.url} type="video/mp4" />
+                </video>
+                {/* Overlay for better text readability */}
+                <div className="absolute inset-0 bg-black/40 z-[1]" />
+              </>
+            ) : (
+              <>
+                <div
+                  className="absolute inset-0 w-full h-full bg-cover bg-center z-0"
+                  style={{ backgroundImage: `url(${heroBackground.url})` }}
+                />
+                {/* Overlay for better text readability */}
+                <div className="absolute inset-0 bg-black/40 z-[1]" />
+              </>
+            )
+          ) : (
+            // Fallback gradient background
+            <div className="absolute inset-0 bg-gradient-to-br from-[#0B2545] to-[#1a365d] z-0" />
+          )}
+        </div>
         <div className="container mx-auto px-4 md:px-8 lg:px-12 relative z-10">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-start">
             {/* Left Content */}
@@ -161,200 +218,173 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              className="z-10 space-y-8"
+              className="z-10 space-y-6 md:space-y-8"
             >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+              <h1 className="text-xl sm:text-2xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 md:mb-6 break-words max-w-full pr-4">
                 We Build, Create & Grow Your Business Digitally
               </h1>
-              <p className="text-xl text-gray-300 mb-8">
+              <p className="hidden md:block text-xl text-gray-300 mb-8">
                 Business development agency powering growth through design, technology & education.
               </p>
              
-              <div className="flex flex-col sm:flex-row gap-4 mb-12">
+              {/* Services Carousel - Mobile Only */}
+              {services.length > 0 && (
+                <div className="block md:hidden mt-6 w-full -mx-4">
+                  <style>{`
+                    @keyframes marquee-services {
+                      0% { transform: translateX(0); }
+                      100% { transform: translateX(-50%); }
+                    }
+                    .animate-marquee-services {
+                      animation: marquee-services 25s linear infinite;
+                    }
+                    .animate-marquee-services:hover {
+                      animation-play-state: paused;
+                    }
+                  `}</style>
+
+                  <motion.h3
+                    className="text-base font-semibold text-white/90 mb-3 px-4 flex items-center gap-2"
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                  >
+                    <motion.div
+                      animate={{
+                        rotate: [0, 10, -10, 0],
+                        scale: [1, 1.1, 1.1, 1]
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatDelay: 3
+                      }}
+                    >
+                      <CheckCircle className="h-5 w-5 text-[#00C2A8]" />
+                    </motion.div>
+                    Our Services
+                  </motion.h3>
+
+                  <div className="relative overflow-hidden">
+                    {/* Gradient edges */}
+                    <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0B2545] to-transparent z-10 pointer-events-none" />
+                    <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0B2545] to-transparent z-10 pointer-events-none" />
+
+                    <div className="flex gap-4 w-max animate-marquee-services">
+                      {[...services, ...services].map((service, index) => (
+                        <motion.div
+                          key={`${service.id}-mobile-${index}`}
+                          onClick={() => navigateTo('/client-dashboard/services')}
+                          className="flex-shrink-0 w-[140px] bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3 cursor-pointer hover:bg-white/15 transition-all"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <div className="flex flex-col items-center gap-2 text-center">
+                            {service.logo ? (
+                              <img
+                                src={service.logo}
+                                alt={service.title}
+                                className="w-10 h-10 object-contain"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-lg flex items-center justify-center">
+                                <CheckCircle className="w-6 h-6 text-white" />
+                              </div>
+                            )}
+                            <span className="text-sm font-medium text-white line-clamp-2">
+                              {service.title}
+                            </span>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="w-full max-w-xs mt-6 md:mt-0">
                 <button
                   onClick={() => navigateTo('/client-dashboard/services')}
-                  className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-3 px-8 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-105"
+                  className="w-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-3 px-8 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-105"
                 >
                   View Services
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </button>
               </div>
 
+              {/* Departments List - Mobile Only */}
+              {departments.length > 0 && (
+                <div className="block md:hidden mt-6 -mx-4">
+                  <style>{`
+                    @keyframes marquee-departments {
+                      0% { transform: translateX(0); }
+                      100% { transform: translateX(-50%); }
+                    }
+                    .animate-marquee-departments {
+                      animation: marquee-departments 20s linear infinite;
+                    }
+                    .animate-marquee-departments:hover {
+                      animation-play-state: paused;
+                    }
+                  `}</style>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 mt-12">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0 }}
-                className="text-center"
-              >
-                <div className="text-3xl font-bold text-[#00C2A8]">{stats.clients}+</div>
-                <div className="text-sm text-gray-300">Happy Clients</div>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-center"
-              >
-                <div className="text-3xl font-bold text-[#00C2A8]">{stats.projects}+</div>
-                <div className="text-sm text-gray-300">Projects Completed</div>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="text-center"
-              >
-                <div className="text-3xl font-bold text-[#00C2A8]">{stats.satisfaction}%</div>
-                <div className="text-sm text-gray-300">Satisfaction Rate</div>
-              </motion.div>
-            </div>
-
-
-            {/* Departments List - Enhanced with Creative Animations */}
-            {departments.length > 0 && (
-              <motion.div
-                className="mt-12"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.6 }}
-              >
-                <motion.h3
-                  className="text-lg font-semibold text-white/90 mb-6 flex items-center gap-2"
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                >
-                  <motion.div
-                    animate={{
-                      rotate: [0, 10, -10, 0],
-                      scale: [1, 1.1, 1.1, 1]
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      repeatDelay: 3
-                    }}
+                  <motion.h3
+                    className="text-base font-semibold text-white/90 mb-3 px-4 flex items-center gap-2"
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
                   >
-                    <Building2 className="h-5 w-5 text-[#00C2A8]" />
-                  </motion.div>
-                  Our Departments
-                </motion.h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {departments.map((dept, index) => (
                     <motion.div
-                      key={dept.id}
-                      initial={{ opacity: 0, y: 30, scale: 0.8 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      animate={{
+                        rotate: [0, 10, -10, 0],
+                        scale: [1, 1.1, 1.1, 1]
+                      }}
                       transition={{
-                        delay: 0.7 + index * 0.1,
-                        duration: 0.5,
-                        type: "spring",
-                        stiffness: 100
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatDelay: 3
                       }}
-                      whileHover={{
-                        scale: 1.05,
-                        y: -5,
-                        transition: { duration: 0.2 }
-                      }}
-                      className="relative group cursor-pointer"
                     >
-                      {/* Animated gradient background */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-br from-[#00C2A8]/20 via-[#0066FF]/20 to-purple-500/20 rounded-xl opacity-0 group-hover:opacity-100 blur-xl"
-                        animate={{
-                          scale: [1, 1.2, 1],
-                          rotate: [0, 5, -5, 0]
-                        }}
-                        transition={{
-                          duration: 3,
-                          repeat: Infinity,
-                          ease: "easeInOut"
-                        }}
-                      />
-                     
-                      {/* Card content */}
-                      <motion.div
-                        className="relative bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 overflow-hidden"
-                        whileHover={{
-                          borderColor: "rgba(0, 194, 168, 0.5)",
-                          boxShadow: "0 0 20px rgba(0, 194, 168, 0.3)"
-                        }}
-                      >
-                        {/* Floating particles effect on hover */}
-                        <motion.div
-                          className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-cyan-400/20 to-transparent rounded-full"
-                          animate={{
-                            scale: [1, 1.5, 1],
-                            opacity: [0.3, 0.6, 0.3]
-                          }}
-                          transition={{
-                            duration: 2,
-                            repeat: Infinity,
-                            ease: "easeInOut"
-                          }}
-                        />
-                       
-                        <div className="flex items-center gap-3 relative z-10">
-                          {dept.logo ? (
-                            <motion.img
-                              src={dept.logo}
-                              alt={dept.title}
-                              className="w-10 h-10 object-contain rounded-lg"
-                              whileHover={{ rotate: 360 }}
-                              transition={{ duration: 0.6 }}
-                            />
-                          ) : (
-                            <motion.div
-                              className="w-10 h-10 bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-lg flex items-center justify-center shadow-lg"
-                              whileHover={{
-                                rotate: [0, -10, 10, 0],
-                                scale: 1.1
-                              }}
-                              transition={{ duration: 0.4 }}
-                            >
-                              <Building2 className="h-5 w-5 text-white" />
-                            </motion.div>
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <motion.p
-                              className="text-sm font-semibold text-white truncate"
-                              initial={{ opacity: 0.9 }}
-                              whileHover={{
-                                opacity: 1,
-                                x: 3,
-                                color: "#00C2A8"
-                              }}
-                              transition={{ duration: 0.2 }}
-                            >
-                              {dept.title}
-                            </motion.p>
-                            <motion.div
-                              className="h-0.5 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] mt-1"
-                              initial={{ scaleX: 0 }}
-                              whileHover={{ scaleX: 1 }}
-                              transition={{ duration: 0.3 }}
-                              style={{ transformOrigin: "left" }}
-                            />
-                          </div>
-                        </div>
-                      </motion.div>
+                      <Building2 className="h-5 w-5 text-[#00C2A8]" />
                     </motion.div>
-                  ))}
+                    Our Departments
+                  </motion.h3>
+
+                  <div className="relative overflow-hidden">
+                    {/* Gradient edges */}
+                    <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0B2545] to-transparent z-10 pointer-events-none" />
+                    <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0B2545] to-transparent z-10 pointer-events-none" />
+
+                    <div className="flex gap-4 w-max animate-marquee-departments">
+                      {[...departments, ...departments].map((dept, index) => (
+                        <motion.div
+                          key={`${dept.id}-mobile-${index}`}
+                          onClick={() => navigate('/pricing-plans')}
+                          className="flex-shrink-0 w-[200px] bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 cursor-pointer"
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <div className="flex items-center gap-3">
+                            {dept.logo ? (
+                              <img src={dept.logo} alt={dept.title} className="w-12 h-12 object-contain rounded-lg" />
+                            ) : (
+                              <div className="w-12 h-12 bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-lg flex items-center justify-center">
+                                <Building2 className="h-6 w-6 text-white" />
+                              </div>
+                            )}
+                            <p className="text-sm font-semibold text-white line-clamp-2">{dept.title}</p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </motion.div>
-            )}
+              )}
+
             </motion.div>
 
-
-            {/* Right Content - Dynamic Hero Image Gallery */}
+            {/* Right Content - Dynamic Hero Image Gallery - Desktop Only */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative"
+              className="hidden md:block relative"
             >
             <div className="relative z-10">
               <div className="bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-2xl p-1 shadow-2xl">
@@ -468,6 +498,172 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               </motion.div>
             </div>
             </motion.div>
+
+
+            {/* Departments - Desktop Only */}
+            {departments.length > 0 && (
+              <motion.div
+                className="hidden md:block"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+              >
+                  <motion.h3
+                    className="text-lg font-semibold text-white/90 mb-6 flex items-center gap-2"
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                  >
+                    <motion.div
+                      animate={{
+                        rotate: [0, 10, -10, 0],
+                        scale: [1, 1.1, 1.1, 1]
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatDelay: 3
+                      }}
+                    >
+                      <Building2 className="h-5 w-5 text-[#00C2A8]" />
+                    </motion.div>
+                    Our Departments
+                  </motion.h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {departments.map((dept, index) => (
+                    <motion.div
+                      key={dept.id}
+                      initial={{ opacity: 0, y: 30, scale: 0.8 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{
+                        delay: 0.7 + index * 0.1,
+                        duration: 0.5,
+                        type: "spring",
+                        stiffness: 100
+                      }}
+                      whileHover={{
+                        scale: 1.05,
+                        y: -5,
+                        transition: { duration: 0.2 }
+                      }}
+                      className="relative group cursor-pointer"
+                    >
+                      {/* Animated gradient background */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-br from-[#00C2A8]/20 via-[#0066FF]/20 to-purple-500/20 rounded-xl opacity-0 group-hover:opacity-100 blur-xl"
+                        animate={{
+                          scale: [1, 1.2, 1],
+                          rotate: [0, 5, -5, 0]
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                      />
+                     
+                      {/* Card content */}
+                      <motion.div
+                        className="relative bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 overflow-hidden"
+                        whileHover={{
+                          borderColor: "rgba(0, 194, 168, 0.5)",
+                          boxShadow: "0 0 20px rgba(0, 194, 168, 0.3)"
+                        }}
+                      >
+                        {/* Floating particles effect on hover */}
+                        <motion.div
+                          className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-cyan-400/20 to-transparent rounded-full"
+                          animate={{
+                            scale: [1, 1.5, 1],
+                            opacity: [0.3, 0.6, 0.3]
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                        />
+                       
+                        <div className="flex items-center gap-3 relative z-10">
+                          {dept.logo ? (
+                            <motion.img
+                              src={dept.logo}
+                              alt={dept.title}
+                              className="w-10 h-10 object-contain rounded-lg"
+                              whileHover={{ rotate: 360 }}
+                              transition={{ duration: 0.6 }}
+                            />
+                          ) : (
+                            <motion.div
+                              className="w-10 h-10 bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-lg flex items-center justify-center shadow-lg"
+                              whileHover={{
+                                rotate: [0, -10, 10, 0],
+                                scale: 1.1
+                              }}
+                              transition={{ duration: 0.4 }}
+                            >
+                              <Building2 className="h-5 w-5 text-white" />
+                            </motion.div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <motion.p
+                              className="text-sm font-semibold text-white truncate"
+                              initial={{ opacity: 0.9 }}
+                              whileHover={{
+                                opacity: 1,
+                                x: 3,
+                                color: "#00C2A8"
+                              }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              {dept.title}
+                            </motion.p>
+                            <motion.div
+                              className="h-0.5 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] mt-1"
+                              initial={{ scaleX: 0 }}
+                              whileHover={{ scaleX: 1 }}
+                              transition={{ duration: 0.3 }}
+                              style={{ transformOrigin: "left" }}
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+                        {/* Stats - Desktop Only */}
+            <div className="hidden md:grid grid-cols-3 gap-8 mb-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0 }}
+                className="text-center"
+              >
+                <div className="text-4xl font-bold text-[#00C2A8]">{stats.clients}+</div>
+                <div className="text-sm text-gray-300 mt-2">Happy Clients</div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-center"
+              >
+                <div className="text-4xl font-bold text-[#00C2A8]">{stats.projects}+</div>
+                <div className="text-sm text-gray-300 mt-2">Projects Completed</div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-center"
+              >
+                <div className="text-4xl font-bold text-[#00C2A8]">{stats.satisfaction}%</div>
+                <div className="text-sm text-gray-300 mt-2">Satisfaction Rate</div>
+              </motion.div>
+            </div>
           </div>
 
           {/* Animated background dots */}
