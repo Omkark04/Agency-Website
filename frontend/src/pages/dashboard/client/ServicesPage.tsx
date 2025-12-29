@@ -124,9 +124,11 @@ const ServiceCard = ({ service, onSelect, index }: { service: Service; onSelect:
       <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
      
       {/* Main card */}
-      <div className="relative bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-3xl p-6 border border-white/20 dark:border-gray-700/30 shadow-2xl hover:shadow-3xl transition-all duration-500 overflow-hidden">
-        {/* Floating particles */}
-        <FloatingParticles />
+      <div className="relative bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-sm md:backdrop-blur-xl rounded-3xl p-6 border border-white/20 dark:border-gray-700/30 shadow-xl md:shadow-2xl hover:shadow-3xl transition-all duration-500 overflow-hidden">
+        {/* Floating particles - Desktop Only */}
+        <div className="hidden md:block">
+          <FloatingParticles />
+        </div>
        
         {/* Hover glow effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-purple-500/0 to-cyan-500/0 group-hover:from-blue-500/5 group-hover:via-purple-500/5 group-hover:to-cyan-500/5 transition-all duration-700 rounded-3xl" />
@@ -521,35 +523,23 @@ const PremiumStats = ({ services, stats }: { services: Service[], stats: any }) 
       value: services.length,
       icon: Rocket,
       color: "from-blue-500 to-cyan-500",
-      change: "+12%",
-      trend: "up"
+      desktopOnly: false
     },
     {
       id: 2,
       title: "Avg. Rating",
-      value: stats?.average_rating ? `${stats.average_rating.toFixed(1)}/5` : "4.8/5",
+      value: stats?.average_rating !== undefined ? `${stats.average_rating.toFixed(1)}/5` : "0.0/5",
       icon: Star,
       color: "from-amber-500 to-orange-500",
-      change: "+0.2",
-      trend: "up"
+      desktopOnly: true // Only show on desktop
     },
     {
       id: 3,
       title: "Client Satisfaction",
-      value: stats?.average_rating ? `${Math.round((stats.average_rating / 5) * 100)}%` : "98%",
+      value: stats?.average_rating !== undefined ? `${Math.round((stats.average_rating / 5) * 100)}%` : "0%",
       icon: ShieldCheck,
       color: "from-emerald-500 to-green-500",
-      change: "+3%",
-      trend: "up"
-    },
-    {
-      id: 4,
-      title: "Support Available",
-      value: "24/7",
-      icon: Clock,
-      color: "from-purple-500 to-pink-500",
-      change: "Always",
-      trend: "stable"
+      desktopOnly: false
     }
   ];
 
@@ -558,58 +548,35 @@ const PremiumStats = ({ services, stats }: { services: Service[], stats: any }) 
 
   return (
     <>
-      {/* Mobile Scrollable View */}
-      <div className="flex lg:hidden w-full overflow-x-auto pb-4 gap-4 mb-10 snap-x snap-mandatory scrollbar-hide">
-        {displayStats.map((stat, index) => (
-          <div key={stat.id} className="min-w-[70vw] sm:min-w-[48vw] flex-none snap-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1, duration: 0.5 }}
-          whileHover={{ y: -5, scale: 1.02 }}
-          className="h-full"
-        >
-          {/* Animated background */}
-          <div className={`absolute -inset-0.5 bg-gradient-to-r ${stat.color} rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-500`} />
-         
-          <div className="relative bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">{stat.title}</p>
-                <div className="flex items-baseline">
+      {/* Mobile View - Only non-desktopOnly stats */}
+      <div 
+        className="flex lg:hidden overflow-x-auto pb-4 pl-6 pr-6 gap-4 mb-10 snap-x snap-mandatory scrollbar-hide"
+        style={{ touchAction: 'pan-x' }}
+      >
+        {displayStats.filter(stat => !stat.desktopOnly).map((stat, index) => (
+          <div key={stat.id} className="w-40 flex-shrink-0 snap-center">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+              className="h-full relative group"
+            >
+              <div className={`absolute -inset-0.5 bg-gradient-to-r ${stat.color} rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-500`} />
+              <div className="relative bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-4 border border-white/20 dark:border-gray-700/30 shadow-xl h-full">
+                <div className="flex flex-col h-full justify-center aspect-square">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">{stat.title}</p>
                   <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                     {stat.value}
                   </div>
-                  {stat.change && (
-                    <span className={`ml-3 text-sm font-bold px-2 py-1 rounded-full ${stat.trend === 'up' ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' : 'bg-blue-500/20 text-blue-700 dark:text-blue-400'}`}>
-                      {stat.change}
-                    </span>
-                  )}
                 </div>
               </div>
-              <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg`}>
-                <stat.icon className="w-6 h-6 text-white" />
-              </div>
-            </div>
-           
-            {/* Animated progress bar */}
-            <div className="mt-4 h-1 bg-gray-200/50 dark:bg-gray-700/50 rounded-full overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: "100%" }}
-                transition={{ delay: index * 0.1 + 0.5, duration: 1.5 }}
-                className={`h-full bg-gradient-to-r ${stat.color} rounded-full`}
-              />
-            </div>
-          </div>
-
             </motion.div>
           </div>
         ))}
       </div>
-
-      {/* Desktop Grid View */}
-      <div className="hidden lg:grid grid-cols-4 gap-6 mb-10">
+      
+      {/* Desktop View - All stats in a 3-column grid */}
+      <div className="hidden lg:grid grid-cols-3 gap-6 mb-10">
         {displayStats.map((stat, index) => (
           <motion.div
             key={stat.id}
@@ -624,15 +591,8 @@ const PremiumStats = ({ services, stats }: { services: Service[], stats: any }) 
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">{stat.title}</p>
-                  <div className="flex items-baseline">
-                    <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                      {stat.value}
-                    </div>
-                    {stat.change && (
-                      <span className={`ml-3 text-sm font-bold px-2 py-1 rounded-full ${stat.trend === 'up' ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' : 'bg-blue-500/20 text-blue-700 dark:text-blue-400'}`}>
-                        {stat.change}
-                      </span>
-                    )}
+                  <div className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                    {stat.value}
                   </div>
                 </div>
                 <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg`}>
@@ -704,7 +664,7 @@ const PremiumFilters = ({
                 <Input
                   type="text"
                   placeholder="Search services, features, or categories..."
-                  className="pl-12 pr-10 py-3 border border-gray-200/50 dark:border-gray-700/50 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg focus:shadow-2xl transition-all duration-300"
+                  className="w-full pl-12 pr-10 py-3 border border-gray-200/50 dark:border-gray-700/50 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg focus:shadow-2xl transition-all duration-300"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -906,7 +866,8 @@ const ServicesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
- 
+  const [visibleCount, setVisibleCount] = useState(3); // Progressive loading state
+
   const [modalStep, setModalStep] = useState<'select-plan' | 'fill-form'>('select-plan');
   const [selectedPriceCard, setSelectedPriceCard] = useState<any>(null);
   const [formLoading, setFormLoading] = useState(false);
@@ -1063,10 +1024,13 @@ const ServicesPage = () => {
 
 
 
+      {/* Premium Stats - Full width on mobile for scrolling */}
+      <div className="lg:max-w-7xl lg:mx-auto lg:px-6 pt-6">
+        <PremiumStats services={services} stats={testimonialStats} />
+      </div>
+
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-10">
-        {/* Premium Stats */}
-        <PremiumStats services={services} stats={testimonialStats} />
 
 
 
@@ -1138,36 +1102,60 @@ const ServicesPage = () => {
                 ))}
              </div>
 
-             {/* Mobile Department View */}
+             {/* Mobile Department View - Progressive Loading */}
              <div className="lg:hidden space-y-8">
-               {Array.from(new Set(filteredServices.map(s => s.department_title || 'Other Services'))).sort().map((dept, deptIndex) => {
-                  const deptServices = filteredServices.filter(s => (s.department_title || 'Other Services') === dept);
-                  if (deptServices.length === 0) return null;
-                  
-                  return (
-                    <motion.div 
-                      key={dept} 
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: deptIndex * 0.1 }}
-                    >
-                      <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent px-1 mb-3">
-                        {dept}
-                      </h3>
-                      <div className="flex w-full overflow-x-auto pb-6 gap-4 snap-x snap-mandatory scrollbar-hide touch-pan-x">
-                         {deptServices.map((service, idx) => (
-                            <div key={service.id} className="min-w-[75vw] sm:min-w-[45vw] snap-center">
-                               <ServiceCard
-                                 service={service}
-                                 onSelect={() => openServiceModal(service)}
-                                 index={idx}
-                               />
+               {(() => {
+                 const departments = Array.from(new Set(filteredServices.map(s => s.department_title || 'Other Services'))).sort();
+                 const visibleDepartments = departments.slice(0, visibleCount);
+                 
+                 return (
+                   <>
+                     {visibleDepartments.map((dept, deptIndex) => {
+                        const deptServices = filteredServices.filter(s => (s.department_title || 'Other Services') === dept);
+                        if (deptServices.length === 0) return null;
+                        
+                        return (
+                          <motion.div 
+                            key={dept} 
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: deptIndex * 0.1 }}
+                            viewport={{ once: true }}
+                          >
+                            <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent px-1 mb-3">
+                              {dept}
+                            </h3>
+                            <div className="flex w-full overflow-x-auto pb-6 gap-4 snap-x snap-mandatory scrollbar-hide touch-pan-x">
+                               {deptServices.map((service, idx) => (
+                                  <div key={service.id} className="min-w-[85vw] sm:min-w-[45vw] snap-center">
+                                     <ServiceCard
+                                       service={service}
+                                       onSelect={() => openServiceModal(service)}
+                                       index={idx}
+                                     />
+                                  </div>
+                               ))}
                             </div>
-                         ))}
-                      </div>
-                    </motion.div>
-                  )
-               })}
+                          </motion.div>
+                        )
+                     })}
+
+                     {/* Load More Button (Mobile Only) */}
+                     {visibleCount < departments.length && (
+                       <div className="flex justify-center pt-4 pb-8">
+                         <motion.button
+                           whileHover={{ scale: 1.05 }}
+                           whileTap={{ scale: 0.95 }}
+                           onClick={() => setVisibleCount(prev => prev + 2)}
+                           className="px-6 py-2.5 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold shadow-lg"
+                         >
+                           Load More Departments
+                         </motion.button>
+                       </div>
+                     )}
+                   </>
+                 );
+               })()}
              </div>
           </motion.div>
         )}
