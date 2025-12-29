@@ -1,13 +1,13 @@
 # payments/receipt_generator.py
 """
-PDF generation utility for payment receipts using WeasyPrint
+PDF generation utility for payment receipts using xhtml2pdf
 """
 try:
-    from weasyprint import HTML
-    WEASYPRINT_AVAILABLE = True
-except (ImportError, OSError) as e:
-    WEASYPRINT_AVAILABLE = False
-    print(f"Warning: WeasyPrint not available - PDF generation disabled: {e}")
+    from xhtml2pdf import pisa
+    PDF_AVAILABLE = True
+except ImportError as e:
+    PDF_AVAILABLE = False
+    print(f"Warning: xhtml2pdf not available - PDF generation disabled: {e}")
 
 from django.template.loader import render_to_string
 from django.conf import settings
@@ -309,8 +309,9 @@ class ReceiptPDFGenerator:
         """
         
         from django.template import Template, Context
+        from django.utils.safestring import mark_safe
         template = Template(html_template)
-        context['css_styles'] = css_styles
+        context['css_styles'] = mark_safe(css_styles)
         html_content = template.render(Context(context))
         
         return html_content
@@ -322,17 +323,23 @@ class ReceiptPDFGenerator:
         Returns:
             BytesIO: PDF file content
         """
-        if not WEASYPRINT_AVAILABLE:
+        if not PDF_AVAILABLE:
             raise RuntimeError(
-                "WeasyPrint is not available. PDF generation requires GTK+ libraries."
+                "xhtml2pdf is not available. PDF generation requires xhtml2pdf library."
             )
         
         try:
             html_content = self.get_html_content()
             pdf_file = BytesIO()
             
-            # Generate PDF
-            HTML(string=html_content).write_pdf(pdf_file)
+            # Generate PDF from HTML
+            pisa_status = pisa.CreatePDF(
+                html_content,
+                dest=pdf_file
+            )
+            
+            if pisa_status.err:
+                raise RuntimeError(f"PDF generation failed with error code: {pisa_status.err}")
             
             # Validate PDF was generated
             pdf_file.seek(0)
@@ -351,3 +358,4 @@ class ReceiptPDFGenerator:
             return pdf_file
         except Exception as e:
             raise RuntimeError(f"PDF generation failed: {str(e)}")
+

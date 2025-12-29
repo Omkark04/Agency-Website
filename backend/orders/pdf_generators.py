@@ -1,15 +1,13 @@
 # orders/pdf_generators.py
 """
-PDF generation utilities for Estimations and Invoices using WeasyPrint
+PDF generation utilities for Estimations and Invoices using xhtml2pdf
 """
 try:
-    from weasyprint import HTML, CSS
-    WEASYPRINT_AVAILABLE = True
-except (ImportError, OSError) as e:
-    # WeasyPrint requires GTK+ on Windows which may not be installed
-    # PDF generation will be disabled but the system will still work
-    WEASYPRINT_AVAILABLE = False
-    print(f"Warning: WeasyPrint not available - PDF generation disabled: {e}")
+    from xhtml2pdf import pisa
+    PDF_AVAILABLE = True
+except ImportError as e:
+    PDF_AVAILABLE = False
+    print(f"Warning: xhtml2pdf not available - PDF generation disabled: {e}")
 
 from django.template.loader import render_to_string
 from django.conf import settings
@@ -39,222 +37,208 @@ class EstimationPDFGenerator:
             "generated_date": datetime.now().strftime("%B %d, %Y"),
         }
         
-        # Shared CSS styles for the modern geometric design
+        # Simplified CSS for xhtml2pdf compatibility
         css_styles = """
             @page {
                 size: A4;
-                margin: 0;
+                margin: 20mm;
             }
             body {
-                font-family: 'Helvetica', 'Arial', sans-serif;
+                font-family: Helvetica, Arial, sans-serif;
                 color: #333;
                 margin: 0;
                 padding: 0;
-                font-size: 14px;
+                font-size: 11pt;
             }
-            .header-bg {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 200px;
+            .header {
                 background-color: #1a233a;
-                z-index: -1;
-                overflow: hidden;
-            }
-            .header-shape {
-                position: absolute;
-                top: 0;
-                right: 30%;
-                width: 100px;
-                height: 100%;
-                background-color: #ff9f00;
-                transform: skewX(-20deg);
-                z-index: 0;
-            }
-            .header-shape-2 {
-                position: absolute;
-                top: 0;
-                right: 25%;
-                width: 20px;
-                height: 100%;
-                background-color: #1a233a;
-                transform: skewX(-20deg);
-                z-index: 1;
-            }
-            .container {
-                padding: 40px;
-                padding-top: 40px;
-                position: relative;
-            }
-            .header-content {
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-                margin-bottom: 60px;
                 color: white;
-                height: 120px;
+                padding: 20px;
+                margin: -20mm -20mm 20px -20mm;
             }
-            .logo-section h1 {
-                margin: 0;
-                font-size: 28px;
-                font-weight: 800;
+            .header-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .header-table td {
+                padding: 10px;
+                vertical-align: top;
+            }
+            .company-name {
+                font-size: 24pt;
+                font-weight: bold;
                 text-transform: uppercase;
-                letter-spacing: 1px;
+                margin: 0;
             }
-            .logo-section p {
-                margin: 5px 0 0;
-                font-size: 12px;
-                opacity: 0.8;
+            .company-tagline {
+                font-size: 9pt;
+                margin: 5px 0 0 0;
+                opacity: 0.9;
                 letter-spacing: 2px;
             }
             .doc-title {
+                font-size: 36pt;
+                font-weight: bold;
+                color: #ff9f00;
+                margin: 0;
                 text-align: right;
             }
-            .doc-title h1 {
-                margin: 0;
-                font-size: 42px;
-                color: #ff9f00;
-                font-weight: 800;
-                letter-spacing: 1px;
-            }
-            .doc-title p {
-                margin: 5px 0 0;
-                font-size: 14px;
-                color: white;
-                letter-spacing: 1px;
+            .doc-id {
+                font-size: 10pt;
+                margin: 5px 0 0 0;
+                text-align: right;
             }
             
-            .info-grid {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 40px;
-                gap: 40px;
+            .info-section {
+                width: 100%;
+                margin: 20px 0;
+                border-collapse: collapse;
             }
-            .info-box {
-                flex: 1;
+            .info-section td {
+                padding: 15px;
+                vertical-align: top;
+                width: 50%;
             }
             .info-header {
                 background-color: #1a233a;
                 color: white;
                 padding: 8px 15px;
                 font-weight: bold;
-                display: inline-block;
-                min-width: 150px;
                 margin-bottom: 10px;
-                position: relative;
+                display: inline-block;
             }
-            .info-header::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                right: -10px;
-                width: 20px;
-                height: 100%;
-                background-color: #ff9f00;
-                transform: skewX(-20deg);
-                z-index: -1;
+            .info-box {
+                background-color: #f9fafb;
+                padding: 15px;
+                border: 1px solid #e5e7eb;
             }
-            .info-details h3 {
-                margin: 0 0 5px;
-                font-size: 16px;
+            .client-name {
+                font-size: 14pt;
+                font-weight: bold;
                 color: #1a233a;
+                margin: 0 0 5px 0;
             }
-            .info-details p {
-                margin: 2px 0;
-                font-size: 13px;
+            .info-detail {
+                margin: 3px 0;
+                font-size: 10pt;
                 color: #555;
             }
             
-            table {
+            .items-table {
                 width: 100%;
-                border-collapse: separate;
-                border-spacing: 0;
-                margin-bottom: 30px;
+                border-collapse: collapse;
+                margin: 20px 0;
             }
-            th {
+            .items-table th {
                 background-color: #ff9f00;
                 color: white;
-                padding: 12px 15px;
+                padding: 12px;
                 text-align: left;
                 font-weight: bold;
-                text-transform: uppercase;
-                font-size: 13px;
+                font-size: 10pt;
             }
-            th:first-child {
-                border-top-left-radius: 4px;
-                border-bottom-left-radius: 4px;
-            }
-            th:last-child {
-                border-top-right-radius: 4px;
-                border-bottom-right-radius: 4px;
+            .items-table th.text-right {
                 text-align: right;
             }
-            td {
-                padding: 15px;
+            .items-table th.text-center {
+                text-align: center;
+            }
+            .items-table td {
+                padding: 12px;
                 border-bottom: 1px solid #eee;
-                font-size: 13px;
-                color: #333;
+                font-size: 10pt;
             }
-            td:last-child {
+            .items-table td.text-right {
                 text-align: right;
-                font-weight: bold;
             }
-            tr:last-child td {
+            .items-table td.text-center {
+                text-align: center;
+            }
+            .item-desc {
+                font-size: 9pt;
+                color: #666;
+                margin-top: 3px;
+            }
+            .items-table tr:last-child td {
                 border-bottom: 2px solid #1a233a;
             }
             
             .footer-section {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 30px;
+                width: 100%;
+                margin: 20px 0;
+                border-collapse: collapse;
             }
-            .payment-info, .terms-info {
-                flex: 1;
+            .footer-section td {
+                padding: 15px;
+                vertical-align: top;
             }
-            .totals-section {
+            .timeline-box {
+                background-color: #f3f4f6;
+                padding: 15px;
+                border-left: 4px solid #ff9f00;
+            }
+            .notes-box {
+                background-color: #f9fafb;
+                padding: 15px;
+                border: 1px solid #e5e7eb;
+                margin-top: 15px;
+            }
+            
+            .totals-table {
                 width: 300px;
+                margin-left: auto;
+                border-collapse: collapse;
             }
-            .total-row {
-                display: flex;
-                justify-content: space-between;
-                padding: 5px 0;
-                font-size: 14px;
+            .totals-table td {
+                padding: 8px;
+                font-size: 11pt;
+            }
+            .totals-table .label {
+                text-align: left;
+                color: #666;
+            }
+            .totals-table .value {
+                text-align: right;
+                font-weight: bold;
             }
             .grand-total {
                 background-color: #ff9f00;
                 color: white;
-                padding: 10px 15px;
-                display: flex;
-                justify-content: space-between;
+                padding: 12px;
                 font-weight: bold;
-                font-size: 16px;
-                margin-top: 10px;
-                border-radius: 4px;
+                font-size: 13pt;
             }
             
-            .bottom-footer {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                height: 40px;
-                background-color: #1a233a;
-                border-top: 5px solid #ff9f00;
-            }
             .thank-you {
-                margin-top: 40px;
-                font-size: 16px;
+                margin-top: 30px;
+                font-size: 13pt;
                 font-weight: bold;
                 color: #1a233a;
             }
+            .validity {
+                font-size: 9pt;
+                color: #888;
+                margin-top: 10px;
+            }
             .signature-line {
-                margin-top: 60px;
-                width: 200px;
+                margin-top: 40px;
+                padding-top: 40px;
                 border-top: 1px solid #333;
                 text-align: center;
-                padding-top: 5px;
+                font-size: 10pt;
+                color: #666;
+                width: 200px;
                 float: right;
+            }
+            
+            .footer {
+                background-color: #1a233a;
+                color: white;
+                padding: 15px 20px;
+                margin: 40px -20mm -20mm -20mm;
+                border-top: 5px solid #ff9f00;
+                text-align: center;
+                font-size: 9pt;
             }
         """
 
@@ -268,123 +252,124 @@ class EstimationPDFGenerator:
             </style>
         </head>
         <body>
-            <div class="header-bg">
-                <div class="header-shape"></div>
-                <div class="header-shape-2"></div>
-            </div>
-            
-            <div class="container">
-                <div class="header-content">
-                    <div class="logo-section">
-                        <h1>{{ company_name }}</h1>
-                        <p>DIGITAL AGENCY</p>
-                    </div>
-                    <div class="doc-title">
-                        <h1>ESTIMATION</h1>
-                        <p>ID NO: {{ estimation.uuid }}</p>
-                    </div>
-                </div>
-                
-                <div class="info-grid">
-                    <div class="info-box">
-                        <div class="info-header">Estimation To :</div>
-                        <div class="info-details">
-                            <h3>{{ client.get_full_name|default:client.email }}</h3>
-                            {% if client.company %}<p>{{ client.company }}</p>{% endif %}
-                            <p>{{ client.email }}</p>
-                            {% if client.phone %}<p>{{ client.phone }}</p>{% endif %}
-                        </div>
-                    </div>
-                    <div class="info-box">
-                        <div class="info-header">Estimation From :</div>
-                        <div class="info-details">
-                            <h3>{{ company_name }}</h3>
-                            <p>{{ company_address }}</p>
-                            <p>{{ company_email }}</p>
-                            <p>{{ company_phone }}</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Description</th>
-                            <th style="text-align: center;">Quantity</th>
-                            <th style="text-align: right;">Price</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in estimation.cost_breakdown %}
-                        <tr>
-                            <td>
-                                <strong>{{ item.item }}</strong>
-                                {% if item.description %}<br><span style="font-size: 11px; color: #666;">{{ item.description }}</span>{% endif %}
-                            </td>
-                            <td style="text-align: center;">{{ item.quantity|default:1 }}</td>
-                            <td style="text-align: right;">{{ item.rate|floatformat:2 }}</td>
-                            <td>{{ item.amount|floatformat:2 }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
+            <div class="header">
+                <table class="header-table">
+                    <tr>
+                        <td style="width: 60%;">
+                            <div class="company-name">{{ company_name }}</div>
+                            <div class="company-tagline">DIGITAL AGENCY</div>
+                        </td>
+                        <td style="width: 40%;">
+                            <div class="doc-title">ESTIMATION</div>
+                            <div class="doc-id">ID NO: {{ estimation.uuid }}</div>
+                        </td>
+                    </tr>
                 </table>
-                
-                <div class="footer-section">
-                    <div class="terms-info">
-                        <div class="info-header">Estimated Timeline :</div>
-                        <p style="margin-top: 5px;">{{ estimation.estimated_timeline_days }} days from project start</p>
+            </div>
+
+            <table class="info-section">
+                <tr>
+                    <td>
+                        <div class="info-header">Estimation To :</div>
+                        <div class="info-box">
+                            <p class="client-name">{{ client.get_full_name|default:client.email }}</p>
+                            {% if client.company %}<p class="info-detail">{{ client.company }}</p>{% endif %}
+                            <p class="info-detail">{{ client.email }}</p>
+                            {% if client.phone %}<p class="info-detail">{{ client.phone }}</p>{% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="info-header">Estimation From :</div>
+                        <div class="info-box">
+                            <p class="client-name">{{ company_name }}</p>
+                            <p class="info-detail">{{ company_address }}</p>
+                            <p class="info-detail">{{ company_email }}</p>
+                            <p class="info-detail">{{ company_phone }}</p>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-right">Price</th>
+                        <th class="text-right">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in estimation.cost_breakdown %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.item }}</strong>
+                            {% if item.description %}<div class="item-desc">{{ item.description }}</div>{% endif %}
+                        </td>
+                        <td class="text-center">{{ item.quantity|default:1 }}</td>
+                        <td class="text-right">₹{{ item.rate|floatformat:2 }}</td>
+                        <td class="text-right">₹{{ item.amount|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <table class="footer-section">
+                <tr>
+                    <td style="width: 50%;">
+                        <div class="timeline-box">
+                            <div class="info-header">Estimated Timeline :</div>
+                            <p class="info-detail" style="margin-top: 10px;">
+                                {{ estimation.estimated_timeline_days }} days from project start
+                            </p>
+                        </div>
                         
                         {% if estimation.client_notes %}
-                        <div style="margin-top: 20px;">
+                        <div class="notes-box">
                             <div class="info-header">Notes :</div>
-                            <p style="font-size: 12px; color: #666; max-width: 90%;">{{ estimation.client_notes }}</p>
+                            <p class="info-detail" style="margin-top: 10px;">{{ estimation.client_notes }}</p>
                         </div>
                         {% endif %}
-                    </div>
-                    
-                    <div class="totals-section">
-                        <div class="total-row">
-                            <span>Subtotal:</span>
-                            <span>{{ estimation.subtotal|floatformat:2 }}</span>
-                        </div>
-                        {% if estimation.tax_percentage > 0 %}
-                        <div class="total-row">
-                            <span>Tax ({{ estimation.tax_percentage }}%):</span>
-                            <span>{{ estimation.tax_amount|floatformat:2 }}</span>
-                        </div>
-                        {% endif %}
-                        <div class="grand-total">
-                            <span>TOTAL</span>
-                            <span>{{ estimation.total_amount|floatformat:2 }}</span>
-                        </div>
+                    </td>
+                    <td style="width: 50%;">
+                        <table class="totals-table">
+                            <tr>
+                                <td class="label">Subtotal:</td>
+                                <td class="value">₹{{ estimation.subtotal|floatformat:2 }}</td>
+                            </tr>
+                            {% if estimation.tax_percentage > 0 %}
+                            <tr>
+                                <td class="label">Tax ({{ estimation.tax_percentage }}%):</td>
+                                <td class="value">₹{{ estimation.tax_amount|floatformat:2 }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr class="grand-total">
+                                <td>TOTAL</td>
+                                <td style="text-align: right;">₹{{ estimation.total_amount|floatformat:2 }}</td>
+                            </tr>
+                        </table>
                         
                         <div class="signature-line">
                             Authorized Signature
                         </div>
-                    </div>
-                </div>
-                
-                <div class="thank-you">
-                    Thanks for your business!
-                </div>
-                
-                <div style="font-size: 11px; color: #888; margin-top: 10px;">
-                    This estimation is valid until {{ estimation.valid_until|default:"further notice" }}.
-                </div>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="thank-you">Thanks for your business!</div>
+            <div class="validity">This estimation is valid until {{ estimation.valid_until|default:"further notice" }}.</div>
+
+            <div class="footer">
+                {{ company_name }} | {{ company_email }} | {{ company_phone }}
             </div>
-            
-            <div class="bottom-footer"></div>
         </body>
         </html>
         """
         
         from django.template import Template, Context
+        from django.utils.safestring import mark_safe
         template = Template(html_template)
-        # We need to render the CSS separately or inject it into the context if passing as variable, 
-        # but here we are using {{ css_styles }} in the template string which will be replaced by Django template engine
-        # if we pass css_styles in context.
-        context['css_styles'] = css_styles
+        context['css_styles'] = mark_safe(css_styles)
         html_content = template.render(Context(context))
         
         return html_content
@@ -396,18 +381,24 @@ class EstimationPDFGenerator:
         Returns:
             BytesIO: PDF file content
         """
-        if not WEASYPRINT_AVAILABLE:
+        if not PDF_AVAILABLE:
             raise RuntimeError(
-                "WeasyPrint is not available. PDF generation requires GTK+ libraries. "
-                "See: https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#windows"
+                "xhtml2pdf is not available. PDF generation requires xhtml2pdf library. "
+                "Install with: pip install xhtml2pdf"
             )
         
         try:
             html_content = self.get_html_content()
             pdf_file = BytesIO()
             
-            # Generate PDF
-            HTML(string=html_content).write_pdf(pdf_file)
+            # Generate PDF from HTML
+            pisa_status = pisa.CreatePDF(
+                html_content,
+                dest=pdf_file
+            )
+            
+            if pisa_status.err:
+                raise RuntimeError(f"PDF generation failed with error code: {pisa_status.err}")
             
             # Validate PDF was generated
             pdf_file.seek(0)
@@ -879,8 +870,9 @@ class InvoicePDFGenerator:
         """
         
         from django.template import Template, Context
+        from django.utils.safestring import mark_safe
         template = Template(html_template)
-        context['css_styles'] = css_styles
+        context['css_styles'] = mark_safe(css_styles)
         html_content = template.render(Context(context))
         
         return html_content
@@ -892,17 +884,43 @@ class InvoicePDFGenerator:
         Returns:
             BytesIO: PDF file content
         """
-        if not WEASYPRINT_AVAILABLE:
+        if not PDF_AVAILABLE:
             raise RuntimeError(
-                "WeasyPrint is not available. PDF generation requires GTK+ libraries. "
-                "See: https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#windows"
+                "xhtml2pdf is not available. PDF generation requires xhtml2pdf library. "
+                "Install with: pip install xhtml2pdf"
             )
         
-        html_content = self.get_html_content()
-        pdf_file = BytesIO()
-        HTML(string=html_content).write_pdf(pdf_file)
-        pdf_file.seek(0)
-        return pdf_file
+        try:
+            html_content = self.get_html_content()
+            pdf_file = BytesIO()
+            
+            # Generate PDF from HTML
+            pisa_status = pisa.CreatePDF(
+                html_content,
+                dest=pdf_file
+            )
+            
+            if pisa_status.err:
+                raise RuntimeError(f"PDF generation failed with error code: {pisa_status.err}")
+            
+            # Validate PDF was generated
+            pdf_file.seek(0)
+            pdf_content = pdf_file.read()
+            
+            if len(pdf_content) == 0:
+                raise RuntimeError("Generated PDF is empty")
+            
+            # Check if it's a valid PDF (starts with %PDF)
+            if not pdf_content.startswith(b'%PDF'):
+                raise RuntimeError("Generated file is not a valid PDF")
+            
+            # Reset file pointer
+            pdf_file = BytesIO(pdf_content)
+            pdf_file.seek(0)
+            
+            return pdf_file
+        except Exception as e:
+            raise RuntimeError(f"PDF generation failed: {str(e)}")
     
     def upload_to_dropbox(self):
         """
