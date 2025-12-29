@@ -1,8 +1,2 @@
 [phases.setup]
-nixPkgs = ["cairo", "pango", "gdk-pixbuf"]
-
-[phases.build]
-cmds = ["pip install -r requirements.txt"]
-
-[start]
-cmd = "python manage.py migrate && gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT"
+nixPkgs = ["python310", "cairo", "pango", "gdk-pixbuf"]
