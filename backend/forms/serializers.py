@@ -70,16 +70,27 @@ class ServiceFormSubmissionSerializer(serializers.ModelSerializer):
     service_title = serializers.CharField(source='service.title', read_only=True)
     submitted_by_name = serializers.CharField(source='submitted_by.username', read_only=True)
     order_id = serializers.IntegerField(source='order.id', read_only=True)
+    form_fields = serializers.SerializerMethodField()
     
     class Meta:
         model = ServiceFormSubmission
         fields = [
-            'id', 'form', 'form_title', 'service', 'service_title',
+            'id', 'form', 'form_title', 'form_fields', 'service', 'service_title',
             'submitted_by', 'submitted_by_name', 'client_email',
             'data', 'files', 'submission_summary', 
             'order', 'order_id', 'created_at'
         ]
         read_only_fields = ['id', 'order', 'submission_summary', 'created_at']
+    
+    def get_form_fields(self, obj):
+        """Return form fields with id-to-label mapping"""
+        fields_data = {}
+        for field in obj.form.fields.all():
+            fields_data[str(field.id)] = {
+                'label': field.label,
+                'type': field.field_type,
+            }
+        return fields_data
     
     def validate(self, attrs):
         """Validate submission data against form fields"""

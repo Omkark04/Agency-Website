@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
 
+interface Department {
+  id: number;
+  title: string;
+}
+
 interface User {
   id: string;
   username: string;
@@ -9,6 +14,8 @@ interface User {
   role: string;
   first_name?: string;
   last_name?: string;
+  department?: Department | null;
+  avatar_url?: string;
 }
 
 interface AuthState {
@@ -62,33 +69,6 @@ export const useAuth = () => {
       localStorage.setItem('refresh', refresh);
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('role', user?.role || ''); // Store role separately
-
-      // ✅ Fetch department for service_head users
-      if (user?.role === 'service_head') {
-
-        try {
-          const deptResponse = await api.get('/api/user/department/');
-          const { department, has_department } = deptResponse.data;
-          
-
-          
-          if (has_department && department) {
-            // Store department in localStorage
-            localStorage.setItem('userDepartment', JSON.stringify(department));
-            // Add department to user object
-            user = { ...user, department }; // Update the user object
-            localStorage.setItem('user', JSON.stringify(user));
-
-          } else {
-            // No department assigned
-            localStorage.setItem('userDepartment', 'null');
-
-          }
-        } catch (error) {
-
-          localStorage.setItem('userDepartment', 'null');
-        }
-      }
 
       setAuth({ user, loading: false, error: null });
       

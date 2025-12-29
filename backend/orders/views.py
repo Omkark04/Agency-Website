@@ -14,6 +14,7 @@ from .serializers import OrderSerializer, OfferSerializer
 
 # Import your role-based permission helpers
 from accounts.permissions import IsAdmin, IsTeamHead
+from accounts.utils import get_user_department
 
 # Simple permission class used for public read-only access
 class AllowAnyReadOnly(drf_permissions.BasePermission):
@@ -86,8 +87,9 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         # Service Head & Team Member - Filter by Department
         if user.role in ['service_head', 'team_member']:
-            if user.department:
-                return qs.filter(service__department=user.department)
+            department = get_user_department(user)
+            if department:
+                return qs.filter(service__department=department)
             return Order.objects.none()
 
         # Fallback
@@ -140,8 +142,9 @@ class OrderViewSet(viewsets.ModelViewSet):
         elif user.role == 'client':
             orders = Order.objects.filter(client=user)
         elif user.role in ['service_head', 'team_member']:
-            if user.department:
-                orders = Order.objects.filter(service__department=user.department)
+            department = get_user_department(user)
+            if department:
+                orders = Order.objects.filter(service__department=department)
             else:
                 orders = Order.objects.none()
         else:
@@ -205,8 +208,9 @@ class OrderViewSet(viewsets.ModelViewSet):
         elif user.role == 'client':
             orders = Order.objects.filter(client=user)
         elif user.role in ['service_head', 'team_member']:
-            if user.department:
-                orders = Order.objects.filter(service__department=user.department)
+            department = get_user_department(user)
+            if department:
+                orders = Order.objects.filter(service__department=department)
             else:
                 orders = Order.objects.none()
         else:

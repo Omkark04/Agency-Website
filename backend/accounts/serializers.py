@@ -89,14 +89,38 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class LoginUserSerializer(serializers.ModelSerializer):
     """Lightweight serializer for login response - avoids circular references"""
-    department_id = serializers.IntegerField(source='department.id', read_only=True, allow_null=True)
-    department_title = serializers.CharField(source='department.title', read_only=True, allow_null=True)
+    department = serializers.SerializerMethodField()
     
     class Meta:
         model = User
         fields = ["id", "username", "email", "role", "first_name", "last_name", "phone", 
-                  "department_id", "department_title", "avatar_url"]
+                  "department", "avatar_url"]
         read_only_fields = fields
+    
+    def get_department(self, obj):
+        """
+        Return department data if user has one.
+        Checks both direct department field AND departments_managed (for service heads).
+        """
+        # First try direct department field (for team members)
+        if obj.department:
+            return {
+                "id": obj.department.id,
+                "title": obj.department.title,
+            }
+        
+        # Fall back to departments_managed (for service heads assigned as team_head)
+        try:
+            managed_dept = obj.departments_managed.first()
+            if managed_dept:
+                return {
+                    "id": managed_dept.id,
+                    "title": managed_dept.title,
+                }
+        except AttributeError:
+            pass
+        
+        return None
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -176,13 +200,23 @@ class ServiceHeadProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "username", "email", "department", "service"]
     
     def get_department_info(self, obj):
+        # Check direct department field first
         if obj.department:
             return {"id": obj.department.id, "title": obj.department.title}
+        
+        # Check departments_managed (team_head assignment)
+        try:
+            managed_dept = obj.departments_managed.first()
+            if managed_dept:
+                return {"id": managed_dept.id, "title": managed_dept.title}
+        except AttributeError:
+            pass
+        
         return None
     
     def get_service_info(self, obj):
         if obj.service:
-            return {"id": obj.service.id, "title": obj.service.title}
+            return {" id": obj.service.id, "title": obj.service.title}
         return None
 
 class TeamMemberProfileSerializer(serializers.ModelSerializer):

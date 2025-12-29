@@ -426,12 +426,43 @@ export default function Orders() {
                 </div>
               </div>
 
+              {/* Price Card Section - Show if price_card_id exists in data */}
+              {selectedSubmission.data?.price_card_id && (() => {
+                const order = orders.find(o => o.id === selectedSubmission.order_id);
+                if (order?.price_card_title) {
+                  return (
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-700">
+                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                        <FiDollarSign className="h-5 w-5 text-blue-600" />
+                        Selected Price Plan
+                      </h3>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-lg font-bold text-gray-900 dark:text-white">{order.price_card_title}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">Plan ID: {selectedSubmission.data.price_card_id}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">₹{order.price_card_price?.toLocaleString()}</p>
+                          <p className="text-xs text-gray-500">Total Price</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Submission Data</h3>
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-3">
                   {Object.entries(selectedSubmission.data || {}).map(([key, value]: [string, any]) => {
-                    // Try to get field label from form fields
-                    const fieldLabel = `Field ${key}`;
+                    // Get field label from form_fields mapping
+                    const fieldLabel = selectedSubmission.form_fields?.[key]?.label || `Field ${key}`;
+                    const fieldType = selectedSubmission.form_fields?.[key]?.type;
+                    
+                    // Skip rendering file fields and price_card_id (they're shown separately)
+                    if (fieldType === 'file' || key === 'price_card_id') return null;
+                    
                     return (
                       <div key={key} className="border-b border-gray-200 dark:border-gray-700 pb-2 last:border-0">
                         <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{fieldLabel}</p>
@@ -444,7 +475,7 @@ export default function Orders() {
                 </div>
               </div>
 
-              {/* Uploaded Files Section - Check both files object and individual file fields */}
+              {/* Uploaded Files Section */}
               {(() => {
                 const hasFiles = selectedSubmission.files && Object.keys(selectedSubmission.files).length > 0;
                 const fileEntries = hasFiles ? Object.entries(selectedSubmission.files) : [];
@@ -454,24 +485,44 @@ export default function Orders() {
                 return (
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Uploaded Files</h3>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {fileEntries.map(([fieldId, urls]: [string, any]) => {
+                        const fieldLabel = selectedSubmission.form_fields?.[fieldId]?.label || `Field ${fieldId}`;
                         const urlArray = Array.isArray(urls) ? urls : [urls];
                         return (
                           <div key={fieldId} className="space-y-2">
-                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Field {fieldId}</p>
-                            {urlArray.filter(Boolean).map((url, index) => (
-                              <a
-                                key={index}
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
-                              >
-                                <FiDownload className="h-4 w-4" />
-                                <span className="text-sm font-medium truncate">{url.split('/').pop() || `File ${index + 1}`}</span>
-                              </a>
-                            ))}
+                            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{fieldLabel}</p>
+                            <div className="grid grid-cols-2 gap-3">
+                              {urlArray.filter(Boolean).map((url, index) => {
+                                const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url);
+                                if (isImage) {
+                                  return (
+                                    <a
+                                      key={index}
+                                      href={url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="block overflow-hidden rounded-lg border-2 border-gray-200 hover:border-blue-500 transition-colors"
+                                    >
+                                      <img src={url} alt={`Upload ${index + 1}`} className="w-full h-auto" />
+                                    </a>
+                                  );
+                                } else {
+                                  return (
+                                    <a
+                                      key={index}
+                                      href={url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                                    >
+                                      <FiDownload className="h-4 w-4" />
+                                      <span className="text-sm font-medium truncate">{url.split('/').pop() || `File ${index + 1}`}</span>
+                                    </a>
+                                  );
+                                }
+                              })}
+                            </div>
                           </div>
                         );
                       })}

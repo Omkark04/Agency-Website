@@ -10,6 +10,7 @@ from payments.models import Transaction
 from accounts.models import User
 from services.models import Service
 from accounts.permissions import IsTeamHeadOrAdmin
+from accounts.utils import get_user_department
 
 
 class TeamHeadDashboardMetricsView(APIView):
@@ -23,13 +24,14 @@ class TeamHeadDashboardMetricsView(APIView):
         user = request.user
         
         # Get team head's department
-        if not user.department:
+        department = get_user_department(user)
+        if not department:
             return Response(
                 {'error': 'User does not have a department assigned'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        department_id = user.department.id
+        department_id = department.id
         
         # Date range for recent activity (last 30 days)
         thirty_days_ago = timezone.now() - timedelta(days=30)
@@ -104,8 +106,8 @@ class TeamHeadDashboardMetricsView(APIView):
             'services_performance': list(services_performance),
             'recent_orders': list(recent_orders_data),
             'department': {
-                'id': user.department.id,
-                'title': user.department.title,
+                'id': department.id,
+                'title': department.title,
             }
         })
 
@@ -119,14 +121,15 @@ class TeamHeadServicePerformanceView(APIView):
     def get(self, request):
         user = request.user
         
-        if not user.department:
+        department = get_user_department(user)
+        if not department:
             return Response(
                 {'error': 'User does not have a department assigned'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         service_stats = Service.objects.filter(
-            department_id=user.department.id
+            department_id=department.id
         ).annotate(
             total_orders=Count('orders'),
             total_revenue=Sum('orders__price'),

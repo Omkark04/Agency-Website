@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Eye, EyeOff } from 'lucide-react';
+import { X, Eye, EyeOff, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
 import SocialLoginButtons from '@/components/auth/SocialLoginButtons';
@@ -13,6 +13,13 @@ interface AuthModalProps {
   isOpen?: boolean;
   onClose?: () => void;
   defaultMode?: AuthMode;
+}
+
+interface PasswordValidation {
+  minLength: boolean;
+  hasAlphabet: boolean;
+  hasNumber: boolean;
+  hasSpecialChar: boolean;
 }
 
 
@@ -35,6 +42,23 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
     password: '',
   });
 
+  const [passwordValidation, setPasswordValidation] = useState<PasswordValidation>({
+    minLength: false,
+    hasAlphabet: false,
+    hasNumber: false,
+    hasSpecialChar: false,
+  });
+
+  // Validate password requirements
+  const validatePassword = (password: string): PasswordValidation => {
+    return {
+      minLength: password.length >= 6,
+      hasAlphabet: /[a-zA-Z]/.test(password),
+      hasNumber: /[0-9]/.test(password),
+      hasSpecialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+    };
+  };
+
 
   const isControlled = isOpen !== undefined;
 
@@ -53,6 +77,11 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Validate password in real-time for signup mode
+    if (name === 'password' && mode === 'signup') {
+      setPasswordValidation(validatePassword(value));
+    }
   };
 
 
@@ -61,6 +90,16 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
     e.preventDefault();
     setError('');
 
+    // Validate password requirements for signup
+    if (mode === 'signup') {
+      const validation = validatePassword(formData.password);
+      const isValid = validation.minLength && validation.hasAlphabet && validation.hasNumber && validation.hasSpecialChar;
+      
+      if (!isValid) {
+        setError('Please ensure your password meets all the requirements');
+        return;
+      }
+    }
 
     try {
       if (mode === 'login') {
@@ -183,6 +222,46 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
             </button>
           </div>
 
+          {/* Password Requirements - Only show in signup mode */}
+          {mode === 'signup' && formData.password && (
+            <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Password Requirements:</p>
+              <div className="space-y-1">
+                <div className={`flex items-center text-xs ${passwordValidation.minLength ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {passwordValidation.minLength ? (
+                    <Check size={14} className="mr-1" />
+                  ) : (
+                    <X size={14} className="mr-1" />
+                  )}
+                  <span>At least 6 characters</span>
+                </div>
+                <div className={`flex items-center text-xs ${passwordValidation.hasAlphabet ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {passwordValidation.hasAlphabet ? (
+                    <Check size={14} className="mr-1" />
+                  ) : (
+                    <X size={14} className="mr-1" />
+                  )}
+                  <span>At least one letter (a-z, A-Z)</span>
+                </div>
+                <div className={`flex items-center text-xs ${passwordValidation.hasNumber ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {passwordValidation.hasNumber ? (
+                    <Check size={14} className="mr-1" />
+                  ) : (
+                    <X size={14} className="mr-1" />
+                  )}
+                  <span>At least one number (0-9)</span>
+                </div>
+                <div className={`flex items-center text-xs ${passwordValidation.hasSpecialChar ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {passwordValidation.hasSpecialChar ? (
+                    <Check size={14} className="mr-1" />
+                  ) : (
+                    <X size={14} className="mr-1" />
+                  )}
+                  <span>At least one special character (!@#$%^&*...)</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
 
