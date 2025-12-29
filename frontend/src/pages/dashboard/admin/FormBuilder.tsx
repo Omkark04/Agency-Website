@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import {
   Save, Eye, Plus, Trash2, GripVertical, Settings,
   Type, Hash, AlignLeft, FileText, ChevronDown, CheckSquare, Upload,
-  Search, Edit, Copy, List
+  Search, Edit, Copy, List, X
 } from 'lucide-react';
 import { createForm, updateForm, getForm, createField, updateField, deleteField, listForms, deleteForm } from '../../../api/forms';
 import type { ServiceForm, FormField } from '../../../api/forms';
@@ -776,19 +776,52 @@ const FieldEditorModal = ({ field, onSave, onClose }: any) => {
 
           {(editedField.field_type === 'dropdown' || editedField.field_type === 'multi_select') && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Options (one per line)
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Options
               </label>
-              <textarea
-                value={(editedField.options || []).join('\n')}
-                onChange={(e) => setEditedField({ 
-                  ...editedField, 
-                  options: e.target.value.split('\n').filter(o => o.trim()) 
-                })}
-                rows={5}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm"
-                placeholder="Option 1&#10;Option 2&#10;Option 3"
-              />
+              <div className="space-y-2">
+                {((editedField.options && editedField.options.length > 0) ? editedField.options : ['']).map((option, index) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={option}
+                      onChange={(e) => {
+                        const newOptions = [...((editedField.options && editedField.options.length > 0) ? editedField.options : [''])];
+                        newOptions[index] = e.target.value;
+                        setEditedField({ ...editedField, options: newOptions.filter(o => o.trim() || newOptions.indexOf(o) === index) });
+                      }}
+                      placeholder={`Option ${index + 1}`}
+                      className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                    {((editedField.options?.length || 0) > 1) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newOptions = (editedField.options || ['']).filter((_, i) => i !== index);
+                          setEditedField({ ...editedField, options: newOptions.length > 0 ? newOptions : [''] });
+                        }}
+                        className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                        title="Remove option"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditedField({
+                      ...editedField,
+                      options: [...(editedField.options || ['']), '']
+                    });
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors font-medium"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Option
+                </button>
+              </div>
             </div>
           )}
 

@@ -1207,40 +1207,41 @@ const ServicesPage = () => {
 
       {/* Premium Service Request Modal */}
       <Dialog open={isModalOpen} onOpenChange={handleCloseModal}>
-        <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-hidden p-0 border-0 bg-transparent">
+        <DialogContent className="sm:max-w-[900px] max-h-[95vh] p-0 border-0 bg-transparent">
           {selectedService && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 backdrop-blur-xl rounded-3xl shadow-3xl overflow-hidden"
+              className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 backdrop-blur-xl rounded-3xl shadow-3xl overflow-hidden flex flex-col max-h-[95vh]"
             >
               {/* Modal header gradient */}
               <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500" />
              
-              <div className="p-6">
+              {/* Header - Fixed */}
+              <div className="p-4 sm:p-6 flex-shrink-0">
                 <DialogHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <DialogTitle className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent truncate">
                         {selectedService.title}
                       </DialogTitle>
-                      <DialogDescription className="text-gray-600 dark:text-gray-400 mt-2">
+                      <DialogDescription className="text-gray-600 dark:text-gray-400 mt-2 text-sm sm:text-base">
                         {modalStep === 'select-plan' ? 'Choose your perfect plan' : 'Complete your service request'}
                       </DialogDescription>
                     </div>
                    
                     {selectedService.is_featured && (
-                      <div className="flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-lg">
-                        <Star className="w-4 h-4 mr-2 fill-current" />
-                        Premium Service
+                      <div className="hidden sm:flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs sm:text-sm font-bold shadow-lg flex-shrink-0">
+                        <Star className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 fill-current" />
+                        Premium
                       </div>
                     )}
                   </div>
                 </DialogHeader>
+              </div>
 
-
-
-
+              {/* Scrollable Content Area */}
+              <div className="overflow-y-auto flex-1 px-4 sm:px-6 pb-4 sm:pb-6" style={{ maxHeight: 'calc(95vh - 120px)' }}>
                 {formLoading ? (
                   <div className="py-16 text-center">
                     <motion.div
