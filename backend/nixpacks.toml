@@ -1,2 +1,3 @@
+# ReportLab PDF generation - pure Python, no system dependencies
 [phases.setup]
 nixPkgs = ["python310", "gcc"]
