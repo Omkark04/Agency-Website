@@ -476,28 +476,22 @@ const StatsCard = ({ title, value, icon: Icon, change, color, index, trend }: an
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-gray-100/5 dark:from-gray-900/5 dark:to-gray-800/5 rounded-3xl" />
       
-      {/* Floating particles */}
-      <FloatingParticles />
+      {/* Floating particles - hidden on mobile */}
+      <div className="hidden md:block">
+        <FloatingParticles />
+      </div>
       
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wide mb-2">{title}</p>
-            <div className="flex items-baseline">
-              <p className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                {typeof value === 'string' ? value : count.toLocaleString()}
-              </p>
-              {change && (
-                <span className={`ml-4 flex items-center text-sm font-bold px-3 py-1.5 rounded-full backdrop-blur-sm ${change > 0 ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' : 'bg-rose-500/20 text-rose-700 dark:text-rose-300'}`}>
-                  {change > 0 ? <TrendingUp className="h-4 w-4 mr-1.5" /> : <TrendingDown className="h-4 w-4 mr-1.5" />}
-                  {Math.abs(change)}%
-                </span>
-              )}
-            </div>
+            <p className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              {typeof value === 'string' ? value : count.toLocaleString()}
+            </p>
           </div>
-          <div className={`relative p-4 rounded-2xl ${color} shadow-2xl transition-transform duration-700 hover:scale-110 hover:rotate-12`}>
+          {/* Icon - hidden on mobile */}
+          <div className={`hidden lg:block relative p-4 rounded-2xl ${color} shadow-2xl transition-transform duration-700 hover:scale-110 hover:rotate-12`}>
             <Icon className="h-7 w-7 text-white" />
-            {/* Icon glow */}
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-white/0 via-white/0 to-white/0 hover:from-white/20 hover:via-white/10 hover:to-white/20 transition-all duration-500" />
           </div>
         </div>
@@ -960,7 +954,10 @@ export default function MyProjects() {
     <div className="p-6 animate-fadeIn relative min-h-screen">
       {/* Animated background */}
       <div className="fixed inset-0 bg-gradient-to-br from-blue-50/20 via-white to-purple-50/20 dark:from-gray-900 dark:via-gray-900 dark:to-blue-900/10 -z-10" />
-      <FloatingParticles />
+      {/* FloatingParticles - hidden on mobile */}
+      <div className="hidden md:block">
+        <FloatingParticles />
+      </div>
       
       {/* Premium Header */}
       <PremiumHeader />

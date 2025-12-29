@@ -808,7 +808,10 @@ const PremiumFilters = ({
 const PremiumHeader = ({ }: { services: Service[] }) => {
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-white via-gray-50 to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/20 border-b border-gray-200/50 dark:border-gray-700/30">
-      <FloatingParticles />
+      {/* FloatingParticles - hidden on mobile */}
+      <div className="hidden md:block">
+        <FloatingParticles />
+      </div>
      
       {/* Animated gradient background */}
       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-transparent to-purple-500/10 animate-gradient" />
@@ -1016,7 +1019,10 @@ const ServicesPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-blue-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/10">
-      <FloatingParticles />
+      {/* FloatingParticles - hidden on mobile */}
+      <div className="hidden md:block">
+        <FloatingParticles />
+      </div>
      
       {/* Premium Header */}
       <PremiumHeader services={services} />

@@ -123,7 +123,10 @@ const DocumentCard = ({ document, type, index }: { document: any; type: 'estimat
      
       {/* Main card */}
       <div className="relative bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-2xl hover:shadow-3xl transition-all duration-500 overflow-hidden">
-        <FloatingParticles />
+        {/* FloatingParticles - hidden on mobile */}
+        <div className="hidden md:block">
+          <FloatingParticles />
+        </div>
        
         {/* Hover glow effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-purple-500/0 to-cyan-500/0 group-hover:from-blue-500/5 group-hover:via-purple-500/5 group-hover:to-cyan-500/5 transition-all duration-700 rounded-2xl" />
@@ -355,7 +358,10 @@ const PremiumHeader = () => {
       transition={{ duration: 0.6 }}
       className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 dark:from-gray-900 dark:via-blue-900/10 dark:to-cyan-900/10 p-8 mb-8 border border-white/20 dark:border-gray-700/30"
     >
-      <FloatingParticles />
+      {/* FloatingParticles - hidden on mobile */}
+      <div className="hidden md:block">
+        <FloatingParticles />
+      </div>
      
       {/* Animated gradient background */}
       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-cyan-500/5 animate-gradient" />
@@ -824,7 +830,10 @@ export default function Documents() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-blue-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/10 p-6">
-      <FloatingParticles />
+      {/* FloatingParticles - hidden on mobile */}
+      <div className="hidden md:block">
+        <FloatingParticles />
+      </div>
      
       {/* Premium Header */}
       <PremiumHeader />

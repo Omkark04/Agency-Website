@@ -108,7 +108,10 @@ const NotificationCard = ({ notification, index, onMarkAsRead }: any) => {
           ? 'border-gray-200/50 dark:border-gray-700/30'
           : 'border-blue-200/50 dark:border-blue-700/30 shadow-lg'
       } ${isHovered ? 'shadow-xl' : ''}`}>
-        <FloatingParticles />
+        {/* FloatingParticles - hidden on mobile */}
+        <div className="hidden md:block">
+          <FloatingParticles />
+        </div>
        
         {/* Unread indicator */}
         {!notification.is_read && (
@@ -278,7 +281,10 @@ const PremiumHeader = ({ unreadCount, onMarkAllRead }: any) => {
       transition={{ duration: 0.6 }}
       className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 dark:from-gray-900 dark:via-blue-900/10 dark:to-cyan-900/10 p-8 mb-8 border border-white/20 dark:border-gray-700/30"
     >
-      <FloatingParticles />
+      {/* FloatingParticles - hidden on mobile */}
+      <div className="hidden md:block">
+        <FloatingParticles />
+      </div>
      
       {/* Animated gradient background */}
       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-cyan-500/5 animate-gradient" />
@@ -660,7 +666,10 @@ export default function Notifications() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-blue-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/10 p-6">
-      <FloatingParticles />
+      {/* FloatingParticles - hidden on mobile */}
+      <div className="hidden md:block">
+        <FloatingParticles />
+      </div>
      
       {/* Premium Header */}
       <PremiumHeader
