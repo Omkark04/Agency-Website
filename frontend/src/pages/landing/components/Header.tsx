@@ -124,7 +124,9 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
               <img
                 src={logo}
                 alt="UdyogWorks Logo"
-                className="h-8 sm:h-10 md:h-12 transition-transform duration-300 group-hover:scale-105"
+                width="48"
+                height="48"
+                className="h-8 sm:h-10 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
               <span className="text-base sm:text-lg md:text-xl font-bold bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent">
                 UdyogWorks

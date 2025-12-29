@@ -638,6 +638,8 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                             <motion.img
                               src={dept.logo}
                               alt={dept.title}
+                              width="40"
+                              height="40"
                               className="w-10 h-10 object-contain rounded-lg"
                               whileHover={{ rotate: 360 }}
                               transition={{ duration: 0.6 }}
