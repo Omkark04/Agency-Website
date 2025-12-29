@@ -301,10 +301,10 @@ class PaymentProcessor:
             pass
         
         # Update payment request if exists
-        payment_request = getattr(payment_order, 'payment_request', None)
-        if payment_request and hasattr(payment_request, 'first'):
-            pr = payment_request.first()
-            if pr:
+        if hasattr(payment_order, 'payment_request'):
+            payment_requests = payment_order.payment_request.all()
+            for pr in payment_requests:
+                logger.info(f"Marking payment request {pr.id} as paid")
                 pr.mark_paid()
         
         # Generate receipt PDF (non-blocking)
