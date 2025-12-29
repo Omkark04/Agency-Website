@@ -307,14 +307,18 @@ class PaymentProcessor:
                 logger.info(f"Marking payment request {pr.id} as paid")
                 pr.mark_paid()
         
-        # Generate receipt PDF (non-blocking)
-        receipt_pdf = None
+        # Generate receipt PDF and upload to Dropbox (non-blocking)
         try:
             from .receipt_generator import ReceiptPDFGenerator
             generator = ReceiptPDFGenerator(transaction)
-            receipt_pdf = generator.generate()
+            result = generator.upload_to_dropbox()
+            transaction.receipt_pdf_url = result['url']
+            transaction.receipt_pdf_dropbox_path = result['path']
+            transaction.save(update_fields=['receipt_pdf_url', 'receipt_pdf_dropbox_path'])
+            logger.info(f"Receipt PDF generated and uploaded for transaction {transaction.id}")
         except Exception as e:
-            logger.error(f"Receipt PDF generation failed: {e}")
+            logger.error(f"Receipt PDF generation/upload failed: {e}")
+            # Non-blocking - payment still succeeds
         
         # Send all emails asynchronously to prevent SMTP timeouts from blocking verification
         import threading

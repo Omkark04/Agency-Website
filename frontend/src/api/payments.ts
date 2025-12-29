@@ -75,3 +75,7 @@ export const listPaymentRequests = (params?: { status?: string }) =>
 export const downloadReceipt = (transactionId: string): string => {
   return `${api.defaults.baseURL}/payments/receipt/${transactionId}/`;
 };
+
+// List user transactions
+export const listTransactions = () =>
+  api.get<Transaction[]>('/api/payments/transactions/');

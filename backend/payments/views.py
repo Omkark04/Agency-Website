@@ -292,6 +292,35 @@ def list_payment_requests(request):
     return Response(serializer.data)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_transactions(request):
+    """
+    List user's successful transactions with receipt PDFs
+    """
+    user = request.user
+    
+    # Clients can only see their own transactions
+    # Admin and service heads can see all
+    if user.role == 'admin':
+        queryset = Transaction.objects.all()
+    elif user.role == 'service_head':
+        queryset = Transaction.objects.filter(
+            order__service__department__team_head=user
+        )
+    else:
+        queryset = Transaction.objects.filter(user=user)
+    
+    # Filter for successful, verified transactions only
+    queryset = queryset.filter(
+        status='success',
+        is_verified=True
+    ).select_related('order', 'user', 'payment_order').order_by('-completed_at')
+    
+    serializer = TransactionSerializer(queryset, many=True)
+    return Response(serializer.data)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def verify_payment(request):

@@ -269,6 +269,10 @@ class Transaction(models.Model):
     # Gateway response
     gateway_response = models.JSONField(default=dict, blank=True)
     
+    # Receipt PDF tracking
+    receipt_pdf_url = models.URLField(max_length=500, blank=True)
+    receipt_pdf_dropbox_path = models.CharField(max_length=500, blank=True)
+    
     # Additional metadata
     metadata = models.JSONField(default=dict, blank=True)
     

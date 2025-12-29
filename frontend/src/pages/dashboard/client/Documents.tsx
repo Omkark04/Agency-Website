@@ -57,6 +57,8 @@ import { listPaymentRequests } from '../../../api/payments';
 import type { Estimation } from '../../../types/estimations';
 import type { Invoice } from '../../../types/invoices';
 import type { PaymentRequest } from '../../../api/payments';
+import type { Transaction } from '../../../types/payments';
+import { listTransactions } from '../../../api/payments';
 import { format } from 'date-fns';
 import api from '../../../api/api';
 
@@ -440,7 +442,7 @@ const PremiumFilterBar = ({
   setActiveTab,
   estimations,
   invoices,
-  paymentRequests
+  transactions
 }: any) => {
   const [showFilters, setShowFilters] = useState(false);
 
@@ -515,7 +517,7 @@ const PremiumFilterBar = ({
                 animate={{ scale: 1 }}
                 className="ml-2 px-2 py-0.5 text-xs font-bold rounded-full bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-600"
               >
-                {paymentRequests.length}
+                {transactions?.length || 0}
               </motion.span>
             </motion.button>
           </div>
@@ -749,7 +751,7 @@ export default function Documents() {
   const [activeTab, setActiveTab] = useState<'estimations' | 'invoices' | 'receipts'>('estimations');
   const [estimations, setEstimations] = useState<Estimation[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [paymentRequests, setPaymentRequests] = useState<PaymentRequest[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -766,17 +768,14 @@ export default function Documents() {
       setError(null);
 
 
-      const [estimationsRes, invoicesRes, paymentsRes] = await Promise.all([
+      const [estimationsRes, invoicesRes, transactionsRes] = await Promise.all([
         listEstimations().catch((err) => {
-
           return { data: [] };
         }),
         listInvoices().catch((err) => {
-
           return { data: [] };
         }),
-        listPaymentRequests({ status: 'paid' }).catch((err) => {
-
+        listTransactions().catch((err) => {
           return { data: [] };
         })
       ]);
@@ -784,7 +783,7 @@ export default function Documents() {
 
       setEstimations(estimationsRes.data || []);
       setInvoices(invoicesRes.data || []);
-      setPaymentRequests(paymentsRes.data || []);
+      setTransactions(transactionsRes.data || []);
     } catch (err: any) {
 
       setError('Failed to load documents');
@@ -877,7 +876,7 @@ export default function Documents() {
         setActiveTab={setActiveTab}
         estimations={estimations}
         invoices={invoices}
-        paymentRequests={paymentRequests}
+        transactions={transactions}
       />
      
       {/* Documents Grid */}
@@ -996,7 +995,7 @@ export default function Documents() {
               </>
             )
           ) : activeTab === 'receipts' ? (
-            paymentRequests.length === 0 ? (
+            transactions.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1023,9 +1022,10 @@ export default function Documents() {
               </motion.div>
             ) : (
               <>
+
                 {/* Mobile (Horizontal Scroll) */}
                 <div className="flex lg:hidden overflow-x-auto pb-6 gap-6 snap-x snap-mandatory scrollbar-hide -mx-6 px-6">
-                  {paymentRequests.map((receipt, index) => (
+                  {transactions.map((receipt, index) => (
                     <div key={receipt.id} className="min-w-[85vw] snap-center">
                       <motion.div
                         initial={{ opacity: 0, y: 50, scale: 0.95 }}
@@ -1040,7 +1040,7 @@ export default function Documents() {
                             </div>
                             <div>
                               <h3 className="text-lg font-bold text-gray-900 dark:text-white">Payment Receipt</h3>
-                              <p className="text-sm text-gray-500">#{receipt.id}</p>
+                              <p className="text-sm text-gray-500">#{receipt.transaction_id.substring(0, 10)}...</p>
                             </div>
                           </div>
                           <span className="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-700">
@@ -1053,9 +1053,8 @@ export default function Documents() {
                           <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Amount Paid</p>
                           <div className="flex items-baseline">
                             <span className="text-3xl font-black bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
-                              ₹{parseFloat(receipt.amount).toLocaleString()}
+                              {receipt.currency} {parseFloat(receipt.amount).toLocaleString()}
                             </span>
-                            <span className="ml-2 text-sm font-medium text-gray-500">{receipt.currency}</span>
                           </div>
                         </div>
 
@@ -1069,7 +1068,7 @@ export default function Documents() {
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-gray-500 dark:text-gray-400">Paid on</span>
                             <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                              {receipt.paid_at && format(new Date(receipt.paid_at), 'MMM dd, yyyy')}
+                              {receipt.completed_at && format(new Date(receipt.completed_at), 'MMM dd, yyyy')}
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
@@ -1080,13 +1079,15 @@ export default function Documents() {
                           </div>
                         </div>
 
-                        <button
-                          onClick={() => window.open(`${api.defaults.baseURL}/payments/receipt/${receipt.id}/`, '_blank')}
-                          className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                        >
-                          <Download className="w-5 h-5 mr-2" />
-                          Download Receipt
-                        </button>
+                        {receipt.receipt_pdf_url && (
+                          <button
+                            onClick={() => window.open(receipt.receipt_pdf_url, '_blank')}
+                            className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                          >
+                            <Download className="w-5 h-5 mr-2" />
+                            Download Receipt
+                          </button>
+                        )}
                       </motion.div>
                     </div>
                   ))}
@@ -1094,7 +1095,7 @@ export default function Documents() {
 
                 {/* Desktop (Grid) */}
                 <div className="hidden lg:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {paymentRequests.map((receipt, index) => (
+                  {transactions.map((receipt, index) => (
                     <motion.div
                       key={receipt.id}
                       initial={{ opacity: 0, y: 50, scale: 0.95 }}
@@ -1110,7 +1111,7 @@ export default function Documents() {
                           </div>
                           <div>
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white">Payment Receipt</h3>
-                            <p className="text-sm text-gray-500">#{receipt.id}</p>
+                            <p className="text-sm text-gray-500">#{receipt.transaction_id.substring(0, 10)}...</p>
                           </div>
                         </div>
                         <span className="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-700">
@@ -1123,9 +1124,8 @@ export default function Documents() {
                         <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Amount Paid</p>
                         <div className="flex items-baseline">
                           <span className="text-3xl font-black bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
-                            ₹{parseFloat(receipt.amount).toLocaleString()}
+                            {receipt.currency} {parseFloat(receipt.amount).toLocaleString()}
                           </span>
-                          <span className="ml-2 text-sm font-medium text-gray-500">{receipt.currency}</span>
                         </div>
                       </div>
 
@@ -1139,7 +1139,7 @@ export default function Documents() {
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-500 dark:text-gray-400">Paid on</span>
                           <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                            {receipt.paid_at && format(new Date(receipt.paid_at), 'MMM dd, yyyy')}
+                            {receipt.completed_at && format(new Date(receipt.completed_at), 'MMM dd, yyyy')}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
@@ -1150,13 +1150,15 @@ export default function Documents() {
                         </div>
                       </div>
 
-                      <button
-                        onClick={() => window.open(`${api.defaults.baseURL}/payments/receipt/${receipt.id}/`, '_blank')}
-                        className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                      >
-                        <Download className="w-5 h-5 mr-2" />
-                        Download Receipt
-                      </button>
+                      {receipt.receipt_pdf_url && (
+                        <button
+                          onClick={() => window.open(receipt.receipt_pdf_url, '_blank')}
+                          className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                        >
+                          <Download className="w-5 h-5 mr-2" />
+                          Download Receipt
+                        </button>
+                      )}
                     </motion.div>
                   ))}
                 </div>

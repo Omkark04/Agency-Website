@@ -32,6 +32,7 @@ export interface Transaction {
   currency: string;
   payment_method?: string;
   status: 'pending' | 'success' | 'failed' | 'refunded';
+  status_display?: string;
   error_code?: string;
   error_message?: string;
   retry_count: number;
@@ -40,11 +41,15 @@ export interface Transaction {
   refund_amount?: string;
   refund_reason?: string;
   refunded_at?: string;
+  receipt_pdf_url?: string;
+  receipt_pdf_dropbox_path?: string;
   gateway_response?: Record<string, any>;
   metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
   completed_at?: string;
+  gateway_display?: string;
+  payment_method_display?: string;
 }
 
 export interface PaymentOrderCreateData {

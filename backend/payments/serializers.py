@@ -130,21 +130,25 @@ class TransactionSerializer(serializers.ModelSerializer):
     order_title = serializers.CharField(source='order.title', read_only=True)
     client_email = serializers.EmailField(source='user.email', read_only=True)
     can_retry = serializers.BooleanField(read_only=True)
+    gateway_display = serializers.CharField(source='get_gateway_display', read_only=True)
+    payment_method_display = serializers.CharField(source='get_payment_method_display', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
     
     class Meta:
         model = Transaction
         fields = [
-            'id', 'order', 'order_title', 'user', 'client_email',
-            'payment_order', 'gateway', 'transaction_id', 'signature',
-            'is_verified', 'amount', 'currency', 'payment_method',
-            'status', 'error_code', 'error_message', 'retry_count',
-            'max_retries', 'can_retry', 'refund_amount', 'refund_reason',
-            'refunded_at', 'gateway_response', 'metadata',
-            'created_at', 'updated_at', 'completed_at'
+            'id', 'uuid', 'order', 'order_title', 'user', 'client_email',
+            'payment_order', 'gateway', 'gateway_display', 'transaction_id',
+            'signature', 'is_verified', 'amount', 'currency',
+            'payment_method', 'payment_method_display', 'status', 'status_display',
+            'error_code', 'error_message', 'retry_count', 'max_retries',
+            'can_retry', 'refund_amount', 'refund_reason', 'refunded_at',
+            'receipt_pdf_url', 'receipt_pdf_dropbox_path',
+            'gateway_response', 'metadata', 'created_at', 'updated_at', 'completed_at'
         ]
         read_only_fields = [
-            'id', 'transaction_id', 'is_verified', 'created_at',
-            'updated_at', 'completed_at'
+            'id', 'uuid', 'transaction_id', 'is_verified', 'receipt_pdf_url',
+            'receipt_pdf_dropbox_path', 'created_at', 'updated_at', 'completed_at'
         ]
 
 
