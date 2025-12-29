@@ -53,12 +53,11 @@ import {
 } from 'lucide-react';
 import { listEstimations } from '../../../api/estimations';
 import { listInvoices } from '../../../api/invoices';
-import { listPaymentRequests } from '../../../api/payments';
+import { listPaymentRequests, listTransactions, downloadReceipt } from '../../../api/payments';
 import type { Estimation } from '../../../types/estimations';
 import type { Invoice } from '../../../types/invoices';
 import type { PaymentRequest } from '../../../api/payments';
 import type { Transaction } from '../../../types/payments';
-import { listTransactions } from '../../../api/payments';
 import { format } from 'date-fns';
 import api from '../../../api/api';
 
@@ -83,19 +82,93 @@ const FloatingParticles = () => (
 
 
 // Premium Document Card Component
-const DocumentCard = ({ document, type, index }: { document: any; type: 'estimation' | 'invoice'; index: number }) => {
+const DocumentCard = ({ document, type, index }: { document: any; type: 'estimation' | 'invoice' | 'receipt'; index: number }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
  
-  const getStatusConfig = getStatusBadgeConfig(type === 'estimation' ? document.status : document.status);
+  // Normalize status for receipts
+  let status = document.status;
+  if (type === 'receipt') {
+     status = document.status === 'success' ? 'paid' : document.status;
+  }
+  
+  const getStatusConfig = getStatusBadgeConfig(status);
   const cardRef = useRef<HTMLDivElement>(null);
 
+  // Extract display data based on type
+  let title, subtitle, date, amount, validUntil, pdfUrl, filename;
+  
+  if (type === 'estimation') {
+    title = document.title;
+    subtitle = document.description;
+    date = document.created_at;
+    amount = document.total_amount;
+    validUntil = document.valid_until;
+    pdfUrl = document.pdf_url;
+    filename = `estimation-${document.id}.pdf`;
+  } else if (type === 'invoice') {
+    title = document.invoice_number;
+    subtitle = document.title;
+    date = document.created_at;
+    amount = document.total_amount;
+    validUntil = document.due_date;
+    pdfUrl = document.pdf_url;
+    filename = `invoice-${document.id}.pdf`;
+  } else {
+    // Receipt
+    title = "Payment Receipt";
+    subtitle = document.order_title ? `Order: ${document.order_title}` : `#${document.transaction_id.substring(0, 18)}...`;
+    date = document.completed_at || document.created_at;
+    amount = document.amount;
+    validUntil = null;
+    pdfUrl = document.receipt_pdf_url;
+    filename = `receipt-${document.transaction_id}.pdf`;
+  }
+  
+  const handleCardDownload = async () => {
+    if (type === 'receipt') {
+      const url = document.receipt_pdf_url;
+      if (url && typeof url === 'string') {
+        let finalUrl = url;
+        // Force download if it's a Dropbox URL
+        if (finalUrl.includes('dropbox.com')) {
+          if (finalUrl.includes('?dl=0')) {
+            finalUrl = finalUrl.replace('?dl=0', '?dl=1');
+          } else if (!finalUrl.includes('?dl=1') && !finalUrl.includes('&dl=1')) {
+            finalUrl += finalUrl.includes('?') ? '&dl=1' : '?dl=1';
+          }
+        }
+        window.open(finalUrl, '_blank');
+      } else if (document.transaction_id) {
+        // Fallback to API if no direct URL
+        try {
+          const url = await downloadReceipt(document.transaction_id);
+          let finalUrl = url;
+          // Force download if it's a Dropbox URL
+          if (finalUrl.includes('dropbox.com')) {
+            if (finalUrl.includes('?dl=0')) {
+              finalUrl = finalUrl.replace('?dl=0', '?dl=1');
+            } else if (!finalUrl.includes('?dl=1') && !finalUrl.includes('&dl=1')) {
+              finalUrl += finalUrl.includes('?') ? '&dl=1' : '?dl=1';
+            }
+          }
+          window.open(finalUrl, '_blank');
+        } catch (error) {
+          console.error('Failed to download receipt:', error);
+        }
+      }
+    } else {
+      if (pdfUrl && typeof pdfUrl === 'string') {
+         window.open(pdfUrl, '_blank');
+      }
+    }
+  };
 
   const formatCurrency = (amount: string) => {
-    const num = parseFloat(amount);
+    const num = parseFloat(amount || '0');
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'INR',
+      currency: document.currency || 'INR', // Use document currency
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(num);
@@ -181,10 +254,10 @@ const DocumentCard = ({ document, type, index }: { document: any; type: 'estimat
             transition={{ delay: index * 0.05 + 0.3 }}
           >
             <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent group-hover:from-blue-600 group-hover:to-cyan-600 transition-all duration-500 mb-2 truncate">
-              {type === 'estimation' ? document.title : document.invoice_number}
+              {title}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
-              {type === 'estimation' ? document.description : document.title}
+              {subtitle}
             </p>
           </motion.div>
          
@@ -219,7 +292,7 @@ const DocumentCard = ({ document, type, index }: { document: any; type: 'estimat
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Amount</span>
               </div>
               <span className="text-lg font-black text-gray-900 dark:text-white">
-                {formatCurrency(type === 'estimation' ? document.total_amount : document.total_amount)}
+                {formatCurrency(amount)}
               </span>
             </motion.div>
            
@@ -233,13 +306,13 @@ const DocumentCard = ({ document, type, index }: { document: any; type: 'estimat
             >
               <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                 <Calendar className="w-4 h-4 mr-2 text-blue-500" />
-                <span>{format(new Date(document.created_at), 'MMM dd, yyyy')}</span>
+                <span>{format(new Date(date), 'MMM dd, yyyy')}</span>
               </div>
              
-              {(document.valid_until || document.due_date) && (
+              {validUntil && (
                 <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                   <Clock className="w-4 h-4 mr-2 text-amber-500" />
-                  <span>Until: {format(new Date(document.valid_until || document.due_date), 'MMM dd')}</span>
+                  <span>Until: {format(new Date(validUntil), 'MMM dd')}</span>
                 </div>
               )}
             </motion.div>
@@ -287,7 +360,7 @@ const DocumentCard = ({ document, type, index }: { document: any; type: 'estimat
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => handleDownload(document.pdf_url, `${type}-${document.id}.pdf`)}
+                  onClick={handleCardDownload}
                   className={`flex-1 flex items-center justify-center px-4 py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r ${getStatusConfig.gradient} shadow-lg hover:shadow-xl transition-all duration-300`}
                 >
                   <Download className="w-4 h-4 mr-2" />
@@ -648,7 +721,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: Clock,
       borderColor: 'border-gray-200/50 dark:border-gray-700/50',
       label: 'Draft',
-      emoji: '??'
+      emoji: '📄'
     },
     sent: {
       bg: 'bg-gradient-to-r from-blue-50/80 to-blue-100/80 dark:from-blue-900/20 dark:to-blue-800/30',
@@ -657,7 +730,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: Clock,
       borderColor: 'border-blue-200/50 dark:border-blue-700/50',
       label: 'Sent',
-      emoji: '??',
+      emoji: '✉️',
       pulse: true
     },
     approved: {
@@ -667,7 +740,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: CheckCircle,
       borderColor: 'border-green-200/50 dark:border-green-700/50',
       label: 'Approved',
-      emoji: '?'
+      emoji: '✅'
     },
     rejected: {
       bg: 'bg-gradient-to-r from-red-50/80 to-rose-50/80 dark:from-red-900/20 dark:to-rose-900/20',
@@ -676,7 +749,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: XCircle,
       borderColor: 'border-red-200/50 dark:border-red-700/50',
       label: 'Rejected',
-      emoji: '?'
+      emoji: '❌'
     },
     expired: {
       bg: 'bg-gradient-to-r from-gray-50/80 to-gray-100/80 dark:from-gray-900/20 dark:to-gray-800/30',
@@ -685,7 +758,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: XCircle,
       borderColor: 'border-gray-200/50 dark:border-gray-700/50',
       label: 'Expired',
-      emoji: '?'
+      emoji: '🚫'
     },
     pending: {
       bg: 'bg-gradient-to-r from-yellow-50/80 to-amber-50/80 dark:from-yellow-900/20 dark:to-amber-900/20',
@@ -694,7 +767,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: Clock,
       borderColor: 'border-yellow-200/50 dark:border-yellow-700/50',
       label: 'Pending',
-      emoji: '?',
+      emoji: '⏳',
       pulse: true
     },
     partial: {
@@ -704,7 +777,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: Clock,
       borderColor: 'border-orange-200/50 dark:border-orange-700/50',
       label: 'Partially Paid',
-      emoji: '??',
+      emoji: '🟠',
       pulse: true
     },
     paid: {
@@ -714,7 +787,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: CheckCircle,
       borderColor: 'border-green-200/50 dark:border-green-700/50',
       label: 'Paid',
-      emoji: '??'
+      emoji: '💰'
     },
     overdue: {
       bg: 'bg-gradient-to-r from-red-50/80 to-pink-50/80 dark:from-red-900/20 dark:to-pink-900/20',
@@ -723,7 +796,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: XCircle,
       borderColor: 'border-red-200/50 dark:border-red-700/50',
       label: 'Overdue',
-      emoji: '??',
+      emoji: '🚨',
       pulse: true
     },
     cancelled: {
@@ -733,7 +806,7 @@ const getStatusBadgeConfig = (status: string) => {
       icon: XCircle,
       borderColor: 'border-gray-200/50 dark:border-gray-700/50',
       label: 'Cancelled',
-      emoji: '??'
+      emoji: '🗑️'
     },
   };
  
@@ -1023,143 +1096,26 @@ export default function Documents() {
             ) : (
               <>
 
-                {/* Mobile (Horizontal Scroll) */}
                 <div className="flex lg:hidden overflow-x-auto pb-6 gap-6 snap-x snap-mandatory scrollbar-hide -mx-6 px-6">
                   {transactions.map((receipt, index) => (
                     <div key={receipt.id} className="min-w-[85vw] snap-center">
-                      <motion.div
-                        initial={{ opacity: 0, y: 50, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        transition={{ duration: 0.6, delay: index * 0.05 }}
-                        className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-2xl"
-                      >
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center space-x-3">
-                            <div className="p-3 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl shadow-lg">
-                              <Receipt className="w-6 h-6 text-white" />
-                            </div>
-                            <div>
-                              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Payment Receipt</h3>
-                              <p className="text-sm text-gray-500">#{receipt.transaction_id.substring(0, 10)}...</p>
-                            </div>
-                          </div>
-                          <span className="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-700">
-                            <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
-                            Paid
-                          </span>
-                        </div>
-                        
-                        <div className="mb-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/10 dark:to-amber-900/10 rounded-xl border border-orange-200 dark:border-orange-700">
-                          <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Amount Paid</p>
-                          <div className="flex items-baseline">
-                            <span className="text-3xl font-black bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
-                              {receipt.currency} {parseFloat(receipt.amount).toLocaleString()}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="space-y-3 mb-4">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-500 dark:text-gray-400">Order</span>
-                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                              {receipt.order_title || `#${receipt.order}`}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-500 dark:text-gray-400">Paid on</span>
-                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                              {receipt.completed_at && format(new Date(receipt.completed_at), 'MMM dd, yyyy')}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-500 dark:text-gray-400">Gateway</span>
-                            <span className="text-sm font-semibold text-gray-900 dark:text-white capitalize">
-                              {receipt.gateway}
-                            </span>
-                          </div>
-                        </div>
-
-                        {receipt.receipt_pdf_url && (
-                          <button
-                            onClick={() => window.open(receipt.receipt_pdf_url, '_blank')}
-                            className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                          >
-                            <Download className="w-5 h-5 mr-2" />
-                            Download Receipt
-                          </button>
-                        )}
-                      </motion.div>
+                      <DocumentCard
+                        document={receipt}
+                        type="receipt"
+                        index={index}
+                      />
                     </div>
                   ))}
                 </div>
 
-                {/* Desktop (Grid) */}
                 <div className="hidden lg:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {transactions.map((receipt, index) => (
-                    <motion.div
+                    <DocumentCard
                       key={receipt.id}
-                      initial={{ opacity: 0, y: 50, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ duration: 0.6, delay: index * 0.05 }}
-                      whileHover={{ y: -8, scale: 1.02 }}
-                      className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-2xl hover:shadow-3xl transition-all duration-500"
-                    >
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-3 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl shadow-lg">
-                            <Receipt className="w-6 h-6 text-white" />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Payment Receipt</h3>
-                            <p className="text-sm text-gray-500">#{receipt.transaction_id.substring(0, 10)}...</p>
-                          </div>
-                        </div>
-                        <span className="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-700">
-                          <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
-                          Paid
-                        </span>
-                      </div>
-                      
-                      <div className="mb-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/10 dark:to-amber-900/10 rounded-xl border border-orange-200 dark:border-orange-700">
-                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Amount Paid</p>
-                        <div className="flex items-baseline">
-                          <span className="text-3xl font-black bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
-                            {receipt.currency} {parseFloat(receipt.amount).toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3 mb-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-500 dark:text-gray-400">Order</span>
-                          <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                            {receipt.order_title || `#${receipt.order}`}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-500 dark:text-gray-400">Paid on</span>
-                          <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                            {receipt.completed_at && format(new Date(receipt.completed_at), 'MMM dd, yyyy')}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-500 dark:text-gray-400">Gateway</span>
-                          <span className="text-sm font-semibold text-gray-900 dark:text-white capitalize">
-                            {receipt.gateway}
-                          </span>
-                        </div>
-                      </div>
-
-                      {receipt.receipt_pdf_url && (
-                        <button
-                          onClick={() => window.open(receipt.receipt_pdf_url, '_blank')}
-                          className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                        >
-                          <Download className="w-5 h-5 mr-2" />
-                          Download Receipt
-                        </button>
-                      )}
-                    </motion.div>
+                      document={receipt}
+                      type="receipt"
+                      index={index}
+                    />
                   ))}
                 </div>
               </>

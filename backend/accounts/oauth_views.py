@@ -64,20 +64,11 @@ class GoogleCallbackView(APIView):
             }
             
             # Debug logging
-            print(f"🔍 Google OAuth Debug:")
-            print(f"  Code (first 20 chars): {code[:20]}...")
-            print(f"  Redirect URI: {redirect_uri}")
-            print(f"  Client ID: {os.getenv('GOOGLE_CLIENT_ID')[:20]}...")
-            
             token_response = requests.post(token_url, data=token_data)
             token_json = token_response.json()
             
-            print(f"  Response status: {token_response.status_code}")
-            print(f"  Response: {token_json}")
-            
             if 'error' in token_json:
                 error_msg = token_json.get('error_description', token_json.get('error', 'Failed to get access token'))
-                print(f"  ❌ Error: {error_msg}")
                 return Response(
                     {'error': error_msg},
                     status=status.HTTP_400_BAD_REQUEST
@@ -165,20 +156,11 @@ class LinkedInCallbackView(APIView):
             }
             
             # Debug logging
-            print(f"🔍 LinkedIn OAuth Debug:")
-            print(f"  Code (first 20 chars): {code[:20]}...")
-            print(f"  Redirect URI: {redirect_uri}")
-            print(f"  Client ID: {os.getenv('LINKEDIN_CLIENT_ID')}")
-            
             token_response = requests.post(token_url, data=token_data)
             token_json = token_response.json()
             
-            print(f"  Response status: {token_response.status_code}")
-            print(f"  Response: {token_json}")
-            
             if 'error' in token_json:
                 error_msg = token_json.get('error_description', token_json.get('error', 'Failed to get access token'))
-                print(f"  ❌ Error: {error_msg}")
                 return Response(
                     {'error': error_msg},
                     status=status.HTTP_400_BAD_REQUEST

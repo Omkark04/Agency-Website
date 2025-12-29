@@ -39,8 +39,6 @@ export default function Orders() {
   const loadOrders = async () => {
     setLoading(true);
     try {
-      console.log('Orders.tsx: Starting to load orders...');
-      
       // Add department filter for service_head users
       const params: any = {};
       if (user?.role === 'service_head' && (user as any).department) {
@@ -52,14 +50,9 @@ export default function Orders() {
         listOrders(params),
         listSubmissions().catch(() => ({ data: [] }))
       ]);
-      console.log('Orders.tsx: Raw ordersRes:', ordersRes);
-      console.log('Orders.tsx: ordersRes.data:', ordersRes.data);
-      console.log('Orders.tsx: Is array?', Array.isArray(ordersRes.data));
       
       // Ensure orders is always an array
       const ordersData = Array.isArray(ordersRes.data) ? ordersRes.data : ((ordersRes.data as any)?.results || []);
-      console.log('Orders.tsx: Final ordersData:', ordersData);
-      console.log('Orders.tsx: ordersData length:', ordersData.length);
       
       setOrders(ordersData);
       setSubmissions(submissionsRes.data);

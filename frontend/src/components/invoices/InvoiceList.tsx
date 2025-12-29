@@ -45,7 +45,6 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ orderId, onInvoiceClick }) =>
       link.click();
       document.body.removeChild(link);
       
-      console.log('✅ PDF download initiated from Dropbox');
     } catch (error) {
       console.error('Download failed:', error);
       alert('Failed to download PDF');

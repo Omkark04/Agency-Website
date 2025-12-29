@@ -41,11 +41,7 @@ export default function OrderManagementPage() {
 
   const fetchWorkflowInfo = async () => {
     try {
-      console.log('=== Fetching Workflow Info for Order ID:', orderId);
       const response = await getWorkflowInfo(parseInt(orderId!));
-      console.log('=== Workflow Info Response:', response);
-      console.log('=== Workflow Info Data:', response.data);
-      console.log('=== Current Status Display:', response.data?.current_status_display);
       setWorkflowInfo(response.data);
     } catch (error: any) {
       console.error('=== Failed to fetch workflow info:', error);
@@ -57,11 +53,8 @@ export default function OrderManagementPage() {
 
   const fetchOrderDetails = async () => {
     try {
-      console.log('=== Fetching Order Details for Order ID:', orderId);
       // Use API client instead of raw fetch
       const response = await getOrder(parseInt(orderId!));
-      console.log('=== Order Details Response:', response);
-      console.log('=== Order Details Data:', response.data);
       setOrder(response.data);
     } catch (error: any) {
       console.error('=== Failed to fetch order details:', error);

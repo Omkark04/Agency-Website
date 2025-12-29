@@ -10,7 +10,7 @@ import {
   User,
   FileText
 } from 'lucide-react';
-import type { PaymentRequest } from '../../api/payments';
+import { downloadReceipt, type PaymentRequest } from '../../api/payments';
 
 interface PaymentRequestCardProps {
   paymentRequest: PaymentRequest;
@@ -206,11 +206,48 @@ const PaymentRequestCard = ({
             </motion.button>
           )}
 
-          {isPaid && onDownloadReceipt && (
+          {isPaid && (paymentRequest.receipt_pdf_url || (onDownloadReceipt && paymentRequest.transaction_id)) && (
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => paymentRequest.paid_at && onDownloadReceipt(paymentRequest.id.toString())}
+              onClick={async () => {
+                const url = paymentRequest.receipt_pdf_url;
+                if (url && typeof url === 'string') {
+                  let finalUrl = url;
+                  // Force download if it's a Dropbox URL
+                  if (finalUrl.includes('dropbox.com')) {
+                    if (finalUrl.includes('?dl=0')) {
+                      finalUrl = finalUrl.replace('?dl=0', '?dl=1');
+                    } else if (!finalUrl.includes('?dl=1') && !finalUrl.includes('&dl=1')) {
+                      finalUrl += finalUrl.includes('?') ? '&dl=1' : '?dl=1';
+                    }
+                  }
+                  window.open(finalUrl, '_blank');
+                } else if (paymentRequest.transaction_id) {
+                  try {
+                    const fetchedUrl = await downloadReceipt(paymentRequest.transaction_id);
+                    let finalUrl = fetchedUrl;
+                    if (finalUrl.includes('dropbox.com')) {
+                        if (finalUrl.includes('?dl=0')) {
+                          finalUrl = finalUrl.replace('?dl=0', '?dl=1');
+                        } else if (!finalUrl.includes('?dl=1') && !finalUrl.includes('&dl=1')) {
+                          finalUrl += finalUrl.includes('?') ? '&dl=1' : '?dl=1';
+                        }
+                    }
+                    window.open(finalUrl, '_blank');
+                  } catch (err) {
+                    console.error("Failed to download receipt", err);
+                  }
+                } else if (onDownloadReceipt && paymentRequest.transaction_id) {
+                   // Legacy Fallback if needed, but above covers it.
+                   // onDownloadReceipt logic is likely obsolete if we handle it here, 
+                   // but keeping it safe if onDownloadReceipt does something else.
+                   // Actually onDownloadReceipt in parent probably just did what we are doing.
+                   // Let's call it just in case if the above logic fails? 
+                   // No, sticking to direct call is better.
+                   onDownloadReceipt(paymentRequest.transaction_id);
+                }
+              }}
               className="flex-1 flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <Download className="w-5 h-5 mr-2" />

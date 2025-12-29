@@ -12,15 +12,34 @@ class PaymentRequestSerializer(serializers.ModelSerializer):
     client_email = serializers.EmailField(source='order.client.email', read_only=True)
     is_expired = serializers.BooleanField(read_only=True)
     
+    receipt_pdf_url = serializers.SerializerMethodField()
+    transaction_id = serializers.SerializerMethodField()
+    
     class Meta:
         model = PaymentRequest
         fields = [
             'id', 'order', 'order_title', 'requested_by', 'requested_by_email',
             'client_email', 'amount', 'gateway', 'currency', 'status',
             'payment_link', 'notes', 'metadata', 'payment_order',
-            'created_at', 'updated_at', 'expires_at', 'paid_at', 'is_expired'
+            'created_at', 'updated_at', 'expires_at', 'paid_at', 'is_expired',
+            'receipt_pdf_url', 'transaction_id'
         ]
         read_only_fields = ['id', 'payment_link', 'payment_order', 'created_at', 'updated_at', 'paid_at']
+
+    def get_receipt_pdf_url(self, obj):
+        # Look for successful transaction linked to this payment request
+        if obj.payment_order:
+            transaction = obj.payment_order.transactions.filter(status='success').first()
+            if transaction:
+                return transaction.receipt_pdf_url
+        return None
+
+    def get_transaction_id(self, obj):
+        if obj.payment_order:
+            transaction = obj.payment_order.transactions.filter(status='success').first()
+            if transaction:
+                return transaction.transaction_id
+        return None
 
 
 class PaymentRequestCreateSerializer(serializers.Serializer):

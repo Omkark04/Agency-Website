@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -805,19 +805,41 @@ def download_receipt(request, transaction_id):
                 {'error': 'You do not have permission to download this receipt'},
                 status=status.HTTP_403_FORBIDDEN
             )
+            
+        # Redirect to stored PDF if available
+        # Get URL or generate if missing
+        if transaction.receipt_pdf_url:
+            url = transaction.receipt_pdf_url
+            # Force download for Dropbox URLs
+            if 'dropbox.com' in url:
+                if '?dl=0' in url:
+                    url = url.replace('?dl=0', '?dl=1')
+                elif '?dl=1' not in url and '&dl=1' not in url:
+                    url += '&dl=1' if '?' in url else '?dl=1'
+            return Response({'url': url})
         
-        # Generate receipt PDF
+        # Fallback: Generate receipt PDF on-the-fly and return URL (or base64 logic if needed, but sticking to URL preference)
         from .receipt_generator import ReceiptPDFGenerator
-        from django.http import HttpResponse
         
         generator = ReceiptPDFGenerator(transaction)
-        pdf_file = generator.generate()
+        # Upload to dropbox to get a URL
+        upload_result = generator.upload_to_dropbox() 
+        # Note: upload_to_dropbox returns metadata including 'url' or similar? 
+        # Checking receipt_generator.py again in my mind... upload_to_dropbox returns result from dropbox_service.upload_pdf
+        # Assuming we save it to transaction:
         
-        # Create HTTP response with PDF
-        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="receipt_{transaction_id}.pdf"'
-        
-        return response
+        transaction.receipt_pdf_url = upload_result.get('url') or upload_result.get('download_url')
+        transaction.receipt_pdf_dropbox_path = upload_result.get('file_path')
+        transaction.save()
+
+        url = transaction.receipt_pdf_url
+        if 'dropbox.com' in url:
+             if '?dl=0' in url:
+                url = url.replace('?dl=0', '?dl=1')
+             elif '?dl=1' not in url and '&dl=1' not in url:
+                url += '&dl=1' if '?' in url else '?dl=1'
+
+        return Response({'url': url})
     
     except Transaction.DoesNotExist:
         return Response(

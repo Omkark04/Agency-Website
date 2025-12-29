@@ -21,13 +21,7 @@ class PaymentOrderAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
 
 
-@admin.register(Transaction)
-class TransactionAdmin(admin.ModelAdmin):
-    list_display = ['id', 'transaction_id', 'order', 'gateway', 'amount', 'status', 'is_verified', 'created_at']
-    list_filter = ['gateway', 'status', 'is_verified', 'payment_method', 'created_at']
-    search_fields = ['transaction_id', 'order__title', 'user__email']
-    readonly_fields = ['created_at', 'updated_at', 'completed_at']
-    date_hierarchy = 'created_at'
+admin.site.register(Transaction)
 
 
 @admin.register(WebhookLog)

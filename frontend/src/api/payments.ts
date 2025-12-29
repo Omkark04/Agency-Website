@@ -58,6 +58,8 @@ export interface PaymentRequest {
   created_at: string;
   expires_at: string;
   paid_at: string | null;
+  receipt_pdf_url?: string;
+  transaction_id?: string;
 }
 
 // Create payment request (admin/service head only)
@@ -72,8 +74,9 @@ export const listPaymentRequests = (params?: { status?: string }) =>
   api.get<PaymentRequest[]>('/api/payments/requests/', { params });
 
 // Download receipt PDF
-export const downloadReceipt = (transactionId: string): string => {
-  return `${api.defaults.baseURL}/payments/receipt/${transactionId}/`;
+export const downloadReceipt = async (transactionId: string): Promise<string> => {
+  const response = await api.get<{ url: string }>(`/api/payments/receipt/${transactionId}/`);
+  return response.data.url;
 };
 
 // List user transactions

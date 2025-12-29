@@ -301,19 +301,35 @@ class PaymentProcessor:
             pass
         
         # Update payment request if exists
+        # Check direct relationship first
         if hasattr(payment_order, 'payment_request'):
             payment_requests = payment_order.payment_request.all()
             for pr in payment_requests:
-                logger.info(f"Marking payment request {pr.id} as paid")
+                logger.info(f"Marking linked payment request {pr.id} as paid")
                 pr.mark_paid()
+        
+        # Also check for any pending payment requests for this order with matching amount
+        # This handles cases where the link wasn't established during creation
+        from .models import PaymentRequest
+        matching_requests = PaymentRequest.objects.filter(
+            order=order,
+            status='pending',
+            amount=payment_order.amount
+        )
+        for pr in matching_requests:
+            logger.info(f"Marking matching payment request {pr.id} as paid")
+            pr.mark_paid()
+            # Link it to the payment order for future reference
+            pr.payment_order = payment_order
+            pr.save()
         
         # Generate receipt PDF and upload to Dropbox (non-blocking)
         try:
             from .receipt_generator import ReceiptPDFGenerator
             generator = ReceiptPDFGenerator(transaction)
             result = generator.upload_to_dropbox()
-            transaction.receipt_pdf_url = result['url']
-            transaction.receipt_pdf_dropbox_path = result['path']
+            transaction.receipt_pdf_url = result['download_url']
+            transaction.receipt_pdf_dropbox_path = result['file_path']
             transaction.save(update_fields=['receipt_pdf_url', 'receipt_pdf_dropbox_path'])
             logger.info(f"Receipt PDF generated and uploaded for transaction {transaction.id}")
         except Exception as e:
