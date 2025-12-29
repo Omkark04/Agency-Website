@@ -91,6 +91,7 @@ class PaymentOrderCreateSerializer(serializers.Serializer):
     order_id = serializers.IntegerField()
     gateway = serializers.ChoiceField(choices=['razorpay', 'paypal'])
     currency = serializers.CharField(default='INR', max_length=3)
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2, min_value=0, required=False)
     
     def validate_order_id(self, value):
         """Validate that order exists and belongs to user"""
@@ -113,6 +114,12 @@ class PaymentOrderCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError("Razorpay only supports INR currency")
         elif data['gateway'] == 'paypal' and data['currency'] not in ['USD', 'EUR', 'GBP']:
             raise serializers.ValidationError("PayPal supports USD, EUR, GBP currencies")
+        
+        # Validate amount doesn't exceed order price if provided
+        if 'amount' in data and data['amount']:
+            order = Order.objects.get(id=data['order_id'])
+            if data['amount'] > order.price:
+                raise serializers.ValidationError({"amount": "Payment amount cannot exceed order price"})
         
         return data
 

@@ -439,7 +439,8 @@ const PremiumFilterBar = ({
   activeTab,
   setActiveTab,
   estimations,
-  invoices
+  invoices,
+  paymentRequests
 }: any) => {
   const [showFilters, setShowFilters] = useState(false);
 
@@ -494,6 +495,27 @@ const PremiumFilterBar = ({
                 className="ml-2 px-2 py-0.5 text-xs font-bold rounded-full bg-gradient-to-r from-emerald-500/20 to-green-500/20 text-emerald-600"
               >
                 {invoices.length}
+              </motion.span>
+            </motion.button>
+           
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setActiveTab('receipts')}
+              className={`flex items-center px-6 py-3.5 text-sm font-bold transition-all duration-300 relative ${
+                activeTab === 'receipts'
+                  ? 'bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-600 dark:text-orange-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              <CreditCard className="w-4 h-4 mr-2" />
+              Payment Receipts
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="ml-2 px-2 py-0.5 text-xs font-bold rounded-full bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-600"
+              >
+                {paymentRequests.length}
               </motion.span>
             </motion.button>
           </div>
@@ -855,6 +877,7 @@ export default function Documents() {
         setActiveTab={setActiveTab}
         estimations={estimations}
         invoices={invoices}
+        paymentRequests={paymentRequests}
       />
      
       {/* Documents Grid */}
@@ -919,7 +942,7 @@ export default function Documents() {
                 </div>
               </>
             )
-          ) : (
+          ) : activeTab === 'invoices' ? (
             filteredInvoices.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -972,7 +995,174 @@ export default function Documents() {
                 </div>
               </>
             )
-          )}
+          ) : activeTab === 'receipts' ? (
+            paymentRequests.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-3xl p-12 border border-white/20 dark:border-gray-700/30 shadow-xl text-center"
+              >
+                <CreditCard className="w-20 h-20 text-gray-300 dark:text-gray-600 mx-auto mb-6 animate-float-slow" />
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-3">
+                  No Payment Receipts Found
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-8">
+                  {searchQuery
+                    ? 'Try adjusting your search criteria'
+                    : 'Your payment receipts will appear here after successful payments'
+                  }
+                </p>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    Clear Search
+                  </button>
+                )}
+              </motion.div>
+            ) : (
+              <>
+                {/* Mobile (Horizontal Scroll) */}
+                <div className="flex lg:hidden overflow-x-auto pb-6 gap-6 snap-x snap-mandatory scrollbar-hide -mx-6 px-6">
+                  {paymentRequests.map((receipt, index) => (
+                    <div key={receipt.id} className="min-w-[85vw] snap-center">
+                      <motion.div
+                        initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ duration: 0.6, delay: index * 0.05 }}
+                        className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-2xl"
+                      >
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="p-3 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl shadow-lg">
+                              <Receipt className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Payment Receipt</h3>
+                              <p className="text-sm text-gray-500">#{receipt.id}</p>
+                            </div>
+                          </div>
+                          <span className="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-700">
+                            <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
+                            Paid
+                          </span>
+                        </div>
+                        
+                        <div className="mb-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/10 dark:to-amber-900/10 rounded-xl border border-orange-200 dark:border-orange-700">
+                          <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Amount Paid</p>
+                          <div className="flex items-baseline">
+                            <span className="text-3xl font-black bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+                              ₹{parseFloat(receipt.amount).toLocaleString()}
+                            </span>
+                            <span className="ml-2 text-sm font-medium text-gray-500">{receipt.currency}</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3 mb-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-500 dark:text-gray-400">Order</span>
+                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                              {receipt.order_title || `#${receipt.order}`}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-500 dark:text-gray-400">Paid on</span>
+                            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                              {receipt.paid_at && format(new Date(receipt.paid_at), 'MMM dd, yyyy')}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-500 dark:text-gray-400">Gateway</span>
+                            <span className="text-sm font-semibold text-gray-900 dark:text-white capitalize">
+                              {receipt.gateway}
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => window.open(`${api.defaults.baseURL}/payments/receipt/${receipt.id}/`, '_blank')}
+                          className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                        >
+                          <Download className="w-5 h-5 mr-2" />
+                          Download Receipt
+                        </button>
+                      </motion.div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop (Grid) */}
+                <div className="hidden lg:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {paymentRequests.map((receipt, index) => (
+                    <motion.div
+                      key={receipt.id}
+                      initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ duration: 0.6, delay: index * 0.05 }}
+                      whileHover={{ y: -8, scale: 1.02 }}
+                      className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-2xl hover:shadow-3xl transition-all duration-500"
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="p-3 bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl shadow-lg">
+                            <Receipt className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Payment Receipt</h3>
+                            <p className="text-sm text-gray-500">#{receipt.id}</p>
+                          </div>
+                        </div>
+                        <span className="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-700">
+                          <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
+                          Paid
+                        </span>
+                      </div>
+                      
+                      <div className="mb-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/10 dark:to-amber-900/10 rounded-xl border border-orange-200 dark:border-orange-700">
+                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Amount Paid</p>
+                        <div className="flex items-baseline">
+                          <span className="text-3xl font-black bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+                            ₹{parseFloat(receipt.amount).toLocaleString()}
+                          </span>
+                          <span className="ml-2 text-sm font-medium text-gray-500">{receipt.currency}</span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 mb-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Order</span>
+                          <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {receipt.order_title || `#${receipt.order}`}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Paid on</span>
+                          <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {receipt.paid_at && format(new Date(receipt.paid_at), 'MMM dd, yyyy')}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Gateway</span>
+                          <span className="text-sm font-semibold text-gray-900 dark:text-white capitalize">
+                            {receipt.gateway}
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => window.open(`${api.defaults.baseURL}/payments/receipt/${receipt.id}/`, '_blank')}
+                        className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                      >
+                        <Download className="w-5 h-5 mr-2" />
+                        Download Receipt
+                      </button>
+                    </motion.div>
+                  ))}
+                </div>
+              </>
+            )
+          ) : null}
         </motion.div>
       </AnimatePresence>
 

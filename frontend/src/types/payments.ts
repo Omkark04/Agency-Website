@@ -51,6 +51,7 @@ export interface PaymentOrderCreateData {
   order_id: number;
   gateway: 'razorpay' | 'paypal';
   currency: string;
+  amount?: number;  // Optional: for partial payments (payment requests)
 }
 
 export interface PaymentVerificationData {

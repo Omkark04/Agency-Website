@@ -651,11 +651,12 @@ export default function OrdersPage() {
       setPayingRequestId(paymentRequest.id);
       setLoadingPayments(true);
 
-      // Create payment order
+      // Create payment order with payment request amount
       const orderResponse = await createPaymentOrder({
         order_id: paymentRequest.order,
         gateway: 'razorpay',
-        currency: paymentRequest.currency || 'INR'
+        currency: paymentRequest.currency || 'INR',
+        amount: parseFloat(paymentRequest.amount)  // Use payment request amount, not full order amount
       });
       
       const razorpayData = orderResponse.data;

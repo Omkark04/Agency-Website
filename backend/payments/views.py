@@ -65,16 +65,20 @@ class PaymentOrderViewSet(viewsets.ModelViewSet):
         order_id = serializer.validated_data['order_id']
         gateway = serializer.validated_data['gateway']
         currency = serializer.validated_data['currency']
+        amount = serializer.validated_data.get('amount')  # Optional amount for partial payments
         
         try:
             order = Order.objects.get(id=order_id)
+            
+            # Use provided amount or fall back to full order price
+            payment_amount = amount if amount is not None else order.price
             
             # Create payment order based on gateway
             if gateway == 'razorpay':
                 razorpay_service = RazorpayService()
                 payment_order = razorpay_service.create_order(
                     order=order,
-                    amount=order.price,
+                    amount=payment_amount,
                     currency=currency
                 )
                 
@@ -102,7 +106,7 @@ class PaymentOrderViewSet(viewsets.ModelViewSet):
                 paypal_service = PayPalService()
                 payment_order = paypal_service.create_order(
                     order=order,
-                    amount=order.price,
+                    amount=payment_amount,
                     currency=currency
                 )
                 
