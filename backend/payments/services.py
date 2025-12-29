@@ -265,6 +265,9 @@ class PaymentProcessor:
         from django.utils.html import strip_tags
         from django.conf import settings
         from django.utils import timezone
+        import logging
+        
+        logger = logging.getLogger(__name__)
         
         # Update payment order status
         payment_order.status = "paid"
