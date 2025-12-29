@@ -165,6 +165,7 @@ MIDDLEWARE = [
     # Security middleware
     "middleware.logging_middleware.RequestLoggingMiddleware",  # Log all requests
     "middleware.logging_middleware.SecurityHeadersMiddleware",  # Add security headers
+    "middleware.logging_middleware.CORSErrorHandlingMiddleware",  # Ensure CORS headers on errors
     "axes.middleware.AxesMiddleware",  # Track failed logins
 ]
 
@@ -365,10 +366,6 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
-
-# CORS
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
 
 # Email settings (Gmail SMTP)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

@@ -103,12 +103,38 @@ class RazorpayService:
             print(f"Webhook signature verification error: {e}")
             return False
     
-    def fetch_payment(self, payment_id):
-        """Fetch payment details from Razorpay"""
+    def fetch_payment(self, payment_id, timeout=10):
+        """
+        Fetch payment details from Razorpay
+        
+        Args:
+            payment_id: Razorpay payment ID
+            timeout: Request timeout in seconds (default: 10)
+        
+        Returns:
+            dict: Payment details or None on error
+        """
+        import logging
+        logger = logging.getLogger(__name__)
+        
         try:
-            return self.client.payment.fetch(payment_id)
+            # Set timeout for the request to prevent hanging
+            import requests
+            response = requests.get(
+                f"https://api.razorpay.com/v1/payments/{payment_id}",
+                auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET),
+                timeout=timeout
+            )
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.Timeout:
+            logger.error(f"Timeout fetching payment {payment_id} from Razorpay (timeout={timeout}s)")
+            return None
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Request error fetching payment from Razorpay: {e}")
+            return None
         except Exception as e:
-            print(f"Error fetching payment: {e}")
+            logger.error(f"Error fetching payment {payment_id}: {e}")
             return None
 
 

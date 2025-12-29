@@ -101,3 +101,53 @@ class SecurityHeadersMiddleware:
             )
         
         return response
+
+
+class CORSErrorHandlingMiddleware:
+    """
+    Ensure CORS headers are present on all responses, including error responses.
+    This middleware runs after the view and ensures that even 500 errors have CORS headers.
+    """
+    
+    def __init__(self, get_response):
+        self.get_response = get_response
+    
+    def __call__(self, request):
+        from django.conf import settings
+        
+        # Get the response
+        response = self.get_response(request)
+        
+        # Only add CORS headers if not already present (django-cors-headers should handle most cases)
+        # But ensure they're present on error responses which might bypass the CORS middleware
+        origin = request.META.get('HTTP_ORIGIN')
+        
+        if origin and not response.has_header('Access-Control-Allow-Origin'):
+            # Check if origin is allowed
+            allowed = False
+            
+            # Check if all origins are allowed
+            if getattr(settings, 'CORS_ALLOW_ALL_ORIGINS', False):
+                allowed = True
+            # Check if origin is in allowed list
+            elif hasattr(settings, 'CORS_ALLOWED_ORIGINS'):
+                if origin in settings.CORS_ALLOWED_ORIGINS:
+                    allowed = True
+            
+            if allowed:
+                response['Access-Control-Allow-Origin'] = origin
+                
+                # Add credentials header if configured
+                if getattr(settings, 'CORS_ALLOW_CREDENTIALS', False):
+                    response['Access-Control-Allow-Credentials'] = 'true'
+                
+                # Add allowed methods
+                if hasattr(settings, 'CORS_ALLOW_METHODS'):
+                    response['Access-Control-Allow-Methods'] = ', '.join(settings.CORS_ALLOW_METHODS)
+                
+                # Add allowed headers
+                if hasattr(settings, 'CORS_ALLOW_HEADERS'):
+                    response['Access-Control-Allow-Headers'] = ', '.join(settings.CORS_ALLOW_HEADERS)
+        
+        return response
+

@@ -299,9 +299,18 @@ def verify_payment(request):
     Verify payment after client-side completion
     POST /api/payments/verify/
     """
+    import logging
+    import traceback
+    
+    logger = logging.getLogger(__name__)
+    
+    # Log incoming request for debugging
+    logger.info(f"Payment verification request from user {request.user.id}: {request.data}")
+    
     serializer = PaymentVerificationSerializer(data=request.data)
     
     if not serializer.is_valid():
+        logger.warning(f"Payment verification validation failed: {serializer.errors}")
         return Response(
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
@@ -315,36 +324,76 @@ def verify_payment(request):
             razorpay_payment_id = serializer.validated_data['razorpay_payment_id']
             razorpay_signature = serializer.validated_data['razorpay_signature']
             
-            # Verify signature
-            razorpay_service = RazorpayService()
-            is_valid = razorpay_service.verify_signature(
-                razorpay_order_id,
-                razorpay_payment_id,
-                razorpay_signature
-            )
+            logger.info(f"Verifying Razorpay payment: order_id={razorpay_order_id}, payment_id={razorpay_payment_id}")
             
-            if not is_valid:
+            try:
+                # Verify signature
+                razorpay_service = RazorpayService()
+                is_valid = razorpay_service.verify_signature(
+                    razorpay_order_id,
+                    razorpay_payment_id,
+                    razorpay_signature
+                )
+                
+                if not is_valid:
+                    logger.warning(f"Invalid Razorpay signature for payment {razorpay_payment_id}")
+                    return Response(
+                        {'error': 'Invalid payment signature'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            except Exception as sig_error:
+                logger.error(f"Signature verification error: {sig_error}")
+                logger.error(traceback.format_exc())
                 return Response(
-                    {'error': 'Invalid payment signature'},
-                    status=status.HTTP_400_BAD_REQUEST
+                    {'error': 'Failed to verify payment signature', 'details': str(sig_error)},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
             
             # Get payment order
-            payment_order = PaymentOrder.objects.get(gateway_order_id=razorpay_order_id)
+            try:
+                payment_order = PaymentOrder.objects.get(gateway_order_id=razorpay_order_id)
+                logger.info(f"Found payment order: {payment_order.id} for order {payment_order.order.id}")
+            except PaymentOrder.DoesNotExist:
+                logger.error(f"Payment order not found for gateway_order_id: {razorpay_order_id}")
+                return Response(
+                    {'error': 'Payment order not found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
             
-            # Fetch payment details from Razorpay
-            payment_details = razorpay_service.fetch_payment(razorpay_payment_id)
+            # Fetch payment details from Razorpay with timeout protection
+            payment_details = {}
+            try:
+                logger.info(f"Fetching payment details from Razorpay for {razorpay_payment_id}")
+                payment_details = razorpay_service.fetch_payment(razorpay_payment_id)
+                if payment_details is None:
+                    logger.warning("Razorpay fetch_payment returned None, using empty dict")
+                    payment_details = {}
+            except Exception as fetch_error:
+                logger.error(f"Failed to fetch payment details from Razorpay: {fetch_error}")
+                logger.error(traceback.format_exc())
+                # Continue with empty payment_details - don't fail the verification
+                payment_details = {}
             
             # Process successful payment
-            transaction = PaymentProcessor.process_payment_success(
-                payment_order=payment_order,
-                transaction_data={
-                    'transaction_id': razorpay_payment_id,
-                    'signature': razorpay_signature,
-                    'payment_method': payment_details.get('method', 'other'),
-                    'gateway_response': payment_details
-                }
-            )
+            try:
+                logger.info(f"Processing payment success for order {payment_order.order.id}")
+                transaction = PaymentProcessor.process_payment_success(
+                    payment_order=payment_order,
+                    transaction_data={
+                        'transaction_id': razorpay_payment_id,
+                        'signature': razorpay_signature,
+                        'payment_method': payment_details.get('method', 'other') if payment_details else 'other',
+                        'gateway_response': payment_details
+                    }
+                )
+                logger.info(f"Payment processed successfully: transaction {transaction.id}")
+            except Exception as process_error:
+                logger.error(f"Failed to process payment success: {process_error}")
+                logger.error(traceback.format_exc())
+                return Response(
+                    {'error': 'Failed to process payment', 'details': str(process_error)},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
             
             return Response({
                 'success': True,
@@ -356,28 +405,55 @@ def verify_payment(request):
             paypal_payment_id = serializer.validated_data['paypal_payment_id']
             paypal_payer_id = serializer.validated_data['paypal_payer_id']
             
-            # Execute PayPal payment
-            paypal_service = PayPalService()
-            result = paypal_service.execute_payment(paypal_payment_id, paypal_payer_id)
+            logger.info(f"Verifying PayPal payment: payment_id={paypal_payment_id}, payer_id={paypal_payer_id}")
             
-            if not result['success']:
+            try:
+                # Execute PayPal payment
+                paypal_service = PayPalService()
+                result = paypal_service.execute_payment(paypal_payment_id, paypal_payer_id)
+                
+                if not result['success']:
+                    logger.warning(f"PayPal payment execution failed: {result.get('error')}")
+                    return Response(
+                        {'error': 'PayPal payment execution failed', 'details': result.get('error')},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            except Exception as paypal_error:
+                logger.error(f"PayPal execution error: {paypal_error}")
+                logger.error(traceback.format_exc())
                 return Response(
-                    {'error': 'PayPal payment execution failed', 'details': result.get('error')},
-                    status=status.HTTP_400_BAD_REQUEST
+                    {'error': 'Failed to execute PayPal payment', 'details': str(paypal_error)},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
             
             # Get payment order
-            payment_order = PaymentOrder.objects.get(gateway_order_id=paypal_payment_id)
+            try:
+                payment_order = PaymentOrder.objects.get(gateway_order_id=paypal_payment_id)
+            except PaymentOrder.DoesNotExist:
+                logger.error(f"Payment order not found for PayPal payment_id: {paypal_payment_id}")
+                return Response(
+                    {'error': 'Payment order not found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
             
             # Process successful payment
-            transaction = PaymentProcessor.process_payment_success(
-                payment_order=payment_order,
-                transaction_data={
-                    'transaction_id': paypal_payment_id,
-                    'payment_method': 'paypal',
-                    'gateway_response': result['payment']
-                }
-            )
+            try:
+                transaction = PaymentProcessor.process_payment_success(
+                    payment_order=payment_order,
+                    transaction_data={
+                        'transaction_id': paypal_payment_id,
+                        'payment_method': 'paypal',
+                        'gateway_response': result['payment']
+                    }
+                )
+                logger.info(f"PayPal payment processed successfully: transaction {transaction.id}")
+            except Exception as process_error:
+                logger.error(f"Failed to process PayPal payment: {process_error}")
+                logger.error(traceback.format_exc())
+                return Response(
+                    {'error': 'Failed to process payment', 'details': str(process_error)},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
             
             return Response({
                 'success': True,
@@ -386,19 +462,18 @@ def verify_payment(request):
             })
         
         else:
+            logger.warning(f"Invalid gateway specified: {gateway}")
             return Response(
                 {'error': 'Invalid gateway'},
                 status=status.HTTP_400_BAD_REQUEST
             )
     
-    except PaymentOrder.DoesNotExist:
-        return Response(
-            {'error': 'Payment order not found'},
-            status=status.HTTP_404_NOT_FOUND
-        )
     except Exception as e:
+        # Catch-all for any unexpected errors
+        logger.error(f"Unexpected error in verify_payment: {e}")
+        logger.error(traceback.format_exc())
         return Response(
-            {'error': str(e)},
+            {'error': 'An unexpected error occurred during payment verification', 'details': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
