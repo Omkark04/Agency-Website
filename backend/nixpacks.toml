@@ -1,2 +1,2 @@
 [phases.setup]
-nixPkgs = ["python310", "cairo", "pango", "gdk-pixbuf", "glib"]
+nixPkgs = ["python310", "cairo", "pango", "gdk-pixbuf", "glib", "gcc"]
