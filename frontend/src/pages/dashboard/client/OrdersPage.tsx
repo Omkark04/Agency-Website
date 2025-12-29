@@ -148,7 +148,10 @@ const PremiumStatsCard = ({
      
       {/* Main card */}
       <div className="relative bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-2xl hover:shadow-3xl transition-all duration-500 overflow-hidden">
-        <FloatingParticles />
+        {/* FloatingParticles - hidden on mobile */}
+        <div className="hidden md:block">
+          <FloatingParticles />
+        </div>
        
         <div className="relative z-10">
           <div className="flex items-start justify-between mb-6">
@@ -165,26 +168,6 @@ const PremiumStatsCard = ({
                 >
                   {typeof value === 'string' ? value : displayValue.toLocaleString()}
                 </motion.p>
-               
-                {change && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 + 0.5 }}
-                    className={`ml-4 flex items-center px-3 py-1.5 rounded-full text-sm font-bold backdrop-blur-sm ${
-                      change > 0
-                        ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'
-                        : 'bg-rose-500/20 text-rose-700 dark:text-rose-400'
-                    }`}
-                  >
-                    {change > 0 ? (
-                      <TrendingUp className="w-4 h-4 mr-1.5" />
-                    ) : (
-                      <TrendingDown className="w-4 h-4 mr-1.5" />
-                    )}
-                    {Math.abs(change)}%
-                  </motion.span>
-                )}
               </div>
              
               {subtitle && (
@@ -192,10 +175,11 @@ const PremiumStatsCard = ({
               )}
             </div>
            
+          {/* Icon - hidden on mobile */}
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
-              className={`p-4 rounded-2xl bg-gradient-to-r ${color} shadow-2xl`}
+              className={`hidden lg:block p-4 rounded-2xl bg-gradient-to-r ${color} shadow-2xl`}
             >
               <Icon className="w-7 h-7 text-white" />
             </motion.div>
@@ -356,7 +340,10 @@ const PremiumOrderRow = ({ order, index }: { order: Order; index: number }) => {
 const PremiumHeader = () => {
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 dark:from-gray-900 dark:via-blue-900/10 dark:to-cyan-900/10 rounded-3xl p-8 mb-8 border border-white/20 dark:border-gray-700/30">
-      <FloatingParticles />
+      {/* FloatingParticles - hidden on mobile */}
+      <div className="hidden md:block">
+        <FloatingParticles />
+      </div>
      
       {/* Animated gradient background */}
       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-cyan-500/5 animate-gradient" />
@@ -650,9 +637,9 @@ export default function OrdersPage() {
 
   const statsCards = [
     { title: "Total Orders", value: totalOrders, icon: Package, color: "from-blue-500 to-cyan-500", subtitle: "All time orders" },
-    { title: "Active Orders", value: activeOrders, icon: Clock, change: 12, color: "from-purple-500 to-pink-500", subtitle: "Currently processing" },
-    { title: "Completed", value: completedOrders, icon: CheckCircle, change: 8, color: "from-emerald-500 to-green-500", subtitle: "Successfully delivered" },
-    { title: "Total Spent", value: `₹${totalSpent.toLocaleString()}`, icon: DollarSign, change: -2, color: "from-amber-500 to-orange-500", subtitle: "Total amount spent" }
+    { title: "Active Orders", value: activeOrders, icon: Clock, color: "from-purple-500 to-pink-500", subtitle: "Currently processing" },
+    { title: "Completed", value: completedOrders, icon: CheckCircle, color: "from-emerald-500 to-green-500", subtitle: "Successfully delivered" },
+    { title: "Total Spent", value: `₹${totalSpent.toLocaleString()}`, icon: DollarSign, color: "from-amber-500 to-orange-500", subtitle: "Total amount spent" }
   ];
 
 
@@ -701,7 +688,10 @@ export default function OrdersPage() {
 
   return (
     <div className="p-6 min-h-screen bg-gradient-to-br from-white via-gray-50 to-blue-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/10">
-      <FloatingParticles />
+      {/* FloatingParticles - hidden on mobile */}
+      <div className="hidden md:block">
+        <FloatingParticles />
+      </div>
      
       {/* Premium Header */}
       <PremiumHeader />
@@ -718,7 +708,6 @@ export default function OrdersPage() {
                   title={stat.title}
                   value={stat.value}
                   icon={stat.icon}
-                  change={stat.change}
                   color={stat.color}
                   subtitle={stat.subtitle}
                   index={i}
@@ -735,7 +724,6 @@ export default function OrdersPage() {
                   title={stat.title}
                   value={stat.value}
                   icon={stat.icon}
-                  change={stat.change}
                   color={stat.color}
                   subtitle={stat.subtitle}
                   index={i}
@@ -761,10 +749,6 @@ export default function OrdersPage() {
               <div className="text-right">
                 <div className="text-3xl font-black bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                   ₹{avgOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </div>
-                <div className="flex items-center justify-end mt-2">
-                  <TrendingUp className="w-4 h-4 text-emerald-500 mr-1.5" />
-                  <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">+5.2% from last month</span>
                 </div>
               </div>
             </div>
