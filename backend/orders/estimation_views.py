@@ -152,11 +152,16 @@ def generate_estimation_pdf(request, estimation_id):
             logger.info("Uploading to Cloudinary...")
             result = pdf_generator.upload_to_dropbox()
             
-            logger.info(f"PDF generated successfully: {result['url']}")
+            # Save PDF URL and file path to estimation
+            estimation.pdf_url = result['download_url']
+            estimation.pdf_file_path = result['file_path']
+            estimation.save(update_fields=['pdf_url', 'pdf_file_path'])
+            
+            logger.info(f"PDF generated successfully: {result['download_url']}")
             return Response({
                 'success': True,
                 'message': 'PDF generated successfully',
-                'pdf_url': result['url'],
+                'pdf_url': result['download_url'],
                 'pdf_file_path': result['file_path']
             })
         except RuntimeError as e:
