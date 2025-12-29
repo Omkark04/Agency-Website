@@ -304,56 +304,152 @@ class PaymentProcessor:
             if pr:
                 pr.mark_paid()
         
-        # Generate receipt PDF
+        # Generate receipt PDF (non-blocking)
         receipt_pdf = None
         try:
             from .receipt_generator import ReceiptPDFGenerator
             generator = ReceiptPDFGenerator(transaction)
             receipt_pdf = generator.generate()
         except Exception as e:
-            print(f"Receipt PDF generation failed: {e}")
+            logger.error(f"Receipt PDF generation failed: {e}")
         
-        # Send email to client with receipt
-        if payment_order.user and payment_order.user.email:
-            try:
-                html_message = render_to_string('emails/payment_success_client.html', {
-                    'client_name': payment_order.user.get_full_name() or payment_order.user.email,
-                    'order_id': order.id,
-                    'order_title': order.title,
-                    'amount': payment_order.amount,
-                    'currency': payment_order.currency,
-                    'transaction_id': transaction.transaction_id,
-                    'payment_method': transaction.get_payment_method_display(),
-                    'payment_date': transaction.completed_at.strftime('%B %d, %Y'),
-                    'dashboard_link': f"{settings.FRONTEND_URL}/client-dashboard/orders/{order.id}",
-                    'company_email': settings.COMPANY_EMAIL,
-                })
-                
-                plain_message = strip_tags(html_message)
-                
-                email = EmailMessage(
-                    subject=f'Payment Receipt - Order #{order.id}',
-                    body=plain_message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[payment_order.user.email],
-                )
-                email.content_subtype = "html"
-                email.body = html_message
-                
-                # Attach receipt PDF if generated
-                if receipt_pdf:
-                    receipt_pdf.seek(0)
-                    email.attach(
-                        f'receipt_{transaction.transaction_id}.pdf',
-                        receipt_pdf.read(),
-                        'application/pdf'
+        # Send all emails asynchronously to prevent SMTP timeouts from blocking verification
+        import threading
+        
+        def send_emails_async():
+            """Send all emails in background thread"""
+            import logging
+            logger = logging.getLogger(__name__)
+            
+            # Send email to client with receipt
+            if payment_order.user and payment_order.user.email:
+                try:
+                    html_message = render_to_string('emails/payment_success_client.html', {
+                        'client_name': payment_order.user.get_full_name() or payment_order.user.email,
+                        'order_id': order.id,
+                        'order_title': order.title,
+                        'amount': payment_order.amount,
+                        'currency': payment_order.currency,
+                        'transaction_id': transaction.transaction_id,
+                        'payment_method': transaction.get_payment_method_display(),
+                        'payment_date': transaction.completed_at.strftime('%B %d, %Y'),
+                        'dashboard_link': f"{settings.FRONTEND_URL}/client-dashboard/orders/{order.id}",
+                        'company_email': settings.COMPANY_EMAIL,
+                    })
+                    
+                    plain_message = strip_tags(html_message)
+                    
+                    email = EmailMessage(
+                        subject=f'Payment Receipt - Order #{order.id}',
+                        body=plain_message,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        to=[payment_order.user.email],
                     )
-                
-                email.send(fail_silently=True)
+                    email.content_subtype = "html"
+                    email.body = html_message
+                    
+                    # Attach receipt PDF if generated
+                    if receipt_pdf:
+                        receipt_pdf.seek(0)
+                        email.attach(
+                            f'receipt_{transaction.transaction_id}.pdf',
+                            receipt_pdf.read(),
+                            'application/pdf'
+                        )
+                    
+                    # Set timeout for SMTP connection
+                    from django.core.mail import get_connection
+                    connection = get_connection(timeout=10)
+                    email.connection = connection
+                    email.send(fail_silently=True)
+                    logger.info(f"Client email sent successfully for transaction {transaction.id}")
+                except Exception as e:
+                    logger.error(f"Failed to send client email: {e}")
+            
+            # Send email and notification to admin users
+            try:
+                from accounts.models import User
+                admin_users = User.objects.filter(role="admin")
+                for admin in admin_users:
+                    # Send email
+                    try:
+                        html_message = render_to_string('emails/payment_success_admin.html', {
+                            'admin_name': admin.get_full_name() or 'Admin',
+                            'client_name': payment_order.user.get_full_name() or payment_order.user.email,
+                            'client_email': payment_order.user.email,
+                            'order_id': order.id,
+                            'order_title': order.title,
+                            'amount': payment_order.amount,
+                            'currency': payment_order.currency,
+                            'gateway': payment_order.get_gateway_display(),
+                            'transaction_id': transaction.transaction_id,
+                            'payment_date': transaction.completed_at.strftime('%B %d, %Y %I:%M %p'),
+                            'dashboard_link': f"{settings.FRONTEND_URL}/admin/orders/{order.id}",
+                        })
+                        
+                        plain_message = strip_tags(html_message)
+                        
+                        from django.core.mail import get_connection
+                        connection = get_connection(timeout=10)
+                        send_mail(
+                            subject=f'Payment Received - Order #{order.id}',
+                            message=plain_message,
+                            from_email=settings.DEFAULT_FROM_EMAIL,
+                            recipient_list=[admin.email],
+                            html_message=html_message,
+                            fail_silently=True,
+                            connection=connection
+                        )
+                    except Exception as e:
+                        logger.error(f"Failed to send admin email: {e}")
             except Exception as e:
-                print(f"Failed to send client email: {e}")
+                logger.error(f"Failed to process admin emails: {e}")
+            
+            # Send email to service head if applicable
+            try:
+                if hasattr(order.service, 'department') and order.service.department and order.service.department.team_head:
+                    service_head = order.service.department.team_head
+                    try:
+                        html_message = render_to_string('emails/payment_success_admin.html', {
+                            'admin_name': service_head.get_full_name() or 'Service Head',
+                            'client_name': payment_order.user.get_full_name() or payment_order.user.email,
+                            'client_email': payment_order.user.email,
+                            'order_id': order.id,
+                            'order_title': order.title,
+                            'amount': payment_order.amount,
+                            'currency': payment_order.currency,
+                            'gateway': payment_order.get_gateway_display(),
+                            'transaction_id': transaction.transaction_id,
+                            'payment_date': transaction.completed_at.strftime('%B %d, %Y %I:%M %p'),
+                            'dashboard_link': f"{settings.FRONTEND_URL}/service-head/orders/{order.id}",
+                        })
+                        
+                        plain_message = strip_tags(html_message)
+                        
+                        from django.core.mail import get_connection
+                        connection = get_connection(timeout=10)
+                        send_mail(
+                            subject=f'Payment Received - Order #{order.id}',
+                            message=plain_message,
+                            from_email=settings.DEFAULT_FROM_EMAIL,
+                            recipient_list=[service_head.email],
+                            html_message=html_message,
+                            fail_silently=True,
+                            connection=connection
+                        )
+                    except Exception as e:
+                        logger.error(f"Failed to send service head email: {e}")
+            except Exception as e:
+                logger.error(f"Failed to process service head email: {e}")
+            
+            logger.info(f"Email sending complete for transaction {transaction.id}")
         
-        # Send notification to client
+        # Start email sending in background thread (daemon so it doesn't block shutdown)
+        email_thread = threading.Thread(target=send_emails_async, daemon=True)
+        email_thread.start()
+        logger.info(f"Started async email sending for transaction {transaction.id}")
+        
+        # Send notification to client (quick, non-blocking)
         Notification.objects.create(
             user=payment_order.user,
             title="Payment Successful",
@@ -362,39 +458,10 @@ class PaymentProcessor:
             order=order
         )
         
-        # Send email and notification to admin users
+        # Send notifications to admin users (quick, non-blocking)
         from accounts.models import User
         admin_users = User.objects.filter(role="admin")
         for admin in admin_users:
-            # Send email
-            try:
-                html_message = render_to_string('emails/payment_success_admin.html', {
-                    'admin_name': admin.get_full_name() or 'Admin',
-                    'client_name': payment_order.user.get_full_name() or payment_order.user.email,
-                    'client_email': payment_order.user.email,
-                    'order_id': order.id,
-                    'order_title': order.title,
-                    'amount': payment_order.amount,
-                    'currency': payment_order.currency,
-                    'gateway': payment_order.get_gateway_display(),
-                    'transaction_id': transaction.transaction_id,
-                    'payment_date': transaction.completed_at.strftime('%B %d, %Y %I:%M %p'),
-                    'dashboard_link': f"{settings.FRONTEND_URL}/admin/orders/{order.id}",
-                })
-                
-                plain_message = strip_tags(html_message)
-                
-                send_mail(
-                    subject=f'Payment Received - Order #{order.id}',
-                    message=plain_message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[admin.email],
-                    html_message=html_message,
-                    fail_silently=True,
-                )
-            except Exception as e:
-                print(f"Failed to send admin email: {e}")
-            
             # Create dashboard notification
             Notification.objects.create(
                 user=admin,
@@ -404,45 +471,18 @@ class PaymentProcessor:
                 order=order
             )
         
-        # Send email to service head if applicable
+        
+        # Send notification to service head if applicable
         if hasattr(order.service, 'department') and order.service.department and order.service.department.team_head:
             service_head = order.service.department.team_head
-            try:
-                html_message = render_to_string('emails/payment_success_admin.html', {
-                    'admin_name': service_head.get_full_name() or 'Service Head',
-                    'client_name': payment_order.user.get_full_name() or payment_order.user.email,
-                    'client_email': payment_order.user.email,
-                    'order_id': order.id,
-                    'order_title': order.title,
-                    'amount': payment_order.amount,
-                    'currency': payment_order.currency,
-                    'gateway': payment_order.get_gateway_display(),
-                    'transaction_id': transaction.transaction_id,
-                    'payment_date': transaction.completed_at.strftime('%B %d, %Y %I:%M %p'),
-                    'dashboard_link': f"{settings.FRONTEND_URL}/service-head/orders/{order.id}",
-                })
-                
-                plain_message = strip_tags(html_message)
-                
-                send_mail(
-                    subject=f'Payment Received - Order #{order.id}',
-                    message=plain_message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[service_head.email],
-                    html_message=html_message,
-                    fail_silently=True,
-                )
-                
-                # Create dashboard notification
-                Notification.objects.create(
-                    user=service_head,
-                    title="Payment Received",
-                    message=f"Payment of {payment_order.currency} {payment_order.amount} received for Order #{order.id}",
-                    notification_type="payment_received",
-                    order=order
-                )
-            except Exception as e:
-                print(f"Failed to send service head email: {e}")
+            # Create dashboard notification
+            Notification.objects.create(
+                user=service_head,
+                title="Payment Received",
+                message=f"Payment of {payment_order.currency} {payment_order.amount} received for Order #{order.id}",
+                notification_type="payment_received",
+                order=order
+            )
         
         return transaction
     
