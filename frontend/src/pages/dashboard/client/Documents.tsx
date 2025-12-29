@@ -53,9 +53,12 @@ import {
 } from 'lucide-react';
 import { listEstimations } from '../../../api/estimations';
 import { listInvoices } from '../../../api/invoices';
+import { listPaymentRequests } from '../../../api/payments';
 import type { Estimation } from '../../../types/estimations';
 import type { Invoice } from '../../../types/invoices';
+import type { PaymentRequest } from '../../../api/payments';
 import { format } from 'date-fns';
+import api from '../../../api/api';
 
 
 // Floating particles system
@@ -721,9 +724,10 @@ const handleDownload = (pdfUrl: string, filename: string) => {
 
 
 export default function Documents() {
-  const [activeTab, setActiveTab] = useState<'estimations' | 'invoices'>('estimations');
+  const [activeTab, setActiveTab] = useState<'estimations' | 'invoices' | 'receipts'>('estimations');
   const [estimations, setEstimations] = useState<Estimation[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [paymentRequests, setPaymentRequests] = useState<PaymentRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -740,12 +744,16 @@ export default function Documents() {
       setError(null);
 
 
-      const [estimationsRes, invoicesRes] = await Promise.all([
+      const [estimationsRes, invoicesRes, paymentsRes] = await Promise.all([
         listEstimations().catch((err) => {
 
           return { data: [] };
         }),
         listInvoices().catch((err) => {
+
+          return { data: [] };
+        }),
+        listPaymentRequests({ status: 'paid' }).catch((err) => {
 
           return { data: [] };
         })
@@ -754,6 +762,7 @@ export default function Documents() {
 
       setEstimations(estimationsRes.data || []);
       setInvoices(invoicesRes.data || []);
+      setPaymentRequests(paymentsRes.data || []);
     } catch (err: any) {
 
       setError('Failed to load documents');

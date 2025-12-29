@@ -72,7 +72,6 @@ export const listPaymentRequests = (params?: { status?: string }) =>
   api.get<PaymentRequest[]>('/api/payments/requests/', { params });
 
 // Download receipt PDF
-export const downloadReceipt = (transactionId: string) =>
-  api.get(`/api/payments/receipt/${transactionId}/`, {
-    responseType: 'blob'
-  });
+export const downloadReceipt = (transactionId: string): string => {
+  return `${api.defaults.baseURL}/payments/receipt/${transactionId}/`;
+};

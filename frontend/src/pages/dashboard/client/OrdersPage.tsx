@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { listOrders, type Order } from '../../../api/orders';
+import { listPaymentRequests, createPaymentOrder, verifyPayment, type PaymentRequest } from '../../../api/payments';
+import { completeRazorpayPayment } from '../../../utils/razorpay';
+import PaymentRequestCard from '../../../components/payments/PaymentRequestCard';
+import api from '../../../api/api';
 import {
   CreditCard,
   Eye,
@@ -608,10 +612,16 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
+  
+  // Payment requests state
+  const [paymentRequests, setPaymentRequests] = useState<PaymentRequest[]>([]);
+  const [loadingPayments, setLoadingPayments] = useState(false);
+  const [payingRequestId, setPayingRequestId] = useState<number | null>(null);
 
 
   useEffect(() => {
     fetchOrders();
+    fetchPaymentRequests();
   }, []);
 
 
@@ -624,6 +634,82 @@ export default function OrdersPage() {
       console.error('Error fetching orders:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPaymentRequests = async () => {
+    try {
+      const response = await listPaymentRequests();
+      setPaymentRequests(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error('Error fetching payment requests:', error);
+    }
+  };
+
+  const handlePayNow = async (paymentRequest: PaymentRequest) => {
+    try {
+      setPayingRequestId(paymentRequest.id);
+      setLoadingPayments(true);
+
+      // Create payment order
+      const orderResponse = await createPaymentOrder({
+        order_id: paymentRequest.order,
+        gateway: 'razorpay',
+        currency: paymentRequest.currency || 'INR'
+      });
+      
+      const razorpayData = orderResponse.data;
+
+      // Type guard to ensure we have Razorpay data
+      if (razorpayData.gateway !== 'razorpay') {
+        throw new Error('Invalid payment gateway');
+      }
+
+      // Open Razorpay checkout
+      const verificationData = await completeRazorpayPayment(
+        razorpayData.razorpay_key,
+        razorpayData.gateway_order_id,
+        parseFloat(razorpayData.amount),
+        razorpayData.order_details,
+        razorpayData.customer
+      );
+
+      if (!verificationData) {
+        // User closed the modal
+        setPayingRequestId(null);
+        setLoadingPayments(false);
+        return;
+      }
+
+      // Verify payment
+      await verifyPayment({
+        gateway: 'razorpay',
+        razorpay_order_id: verificationData.razorpay_order_id,
+        razorpay_payment_id: verificationData.razorpay_payment_id,
+        razorpay_signature: verificationData.razorpay_signature
+      });
+
+      // Success! Refresh data
+      await fetchPaymentRequests();
+      await fetchOrders();
+      
+      alert('Payment successful! Your receipt is ready for download.');
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      alert(error.message || 'Payment failed. Please try again.');
+    } finally {
+      setPayingRequestId(null);
+      setLoadingPayments(false);
+    }
+  };
+
+  const handleDownloadReceipt = (transactionId: string) => {
+    try {
+      const receiptUrl = `${api.defaults.baseURL}/payments/receipt/${transactionId}/`;
+      window.open(receiptUrl, '_blank');
+    } catch (error) {
+      console.error('Error downloading receipt:', error);
+      alert('Failed to download receipt');
     }
   };
 
@@ -899,6 +985,38 @@ export default function OrdersPage() {
           )}
         </motion.div>
       </div>
+
+
+      {/* Payment Requests Section */}
+      {paymentRequests.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mt-8"
+        >
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-2">
+              Payment Requests
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Outstanding payment requests from your service providers
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {paymentRequests.map((paymentRequest) => (
+              <PaymentRequestCard
+                key={paymentRequest.id}
+                paymentRequest={paymentRequest}
+                onPayNow={handlePayNow}
+                onDownloadReceipt={handleDownloadReceipt}
+                loading={payingRequestId === paymentRequest.id && loadingPayments}
+              />
+            ))}
+          </div>
+        </motion.div>
+      )}
 
 
       {/* Animation Styles */}
