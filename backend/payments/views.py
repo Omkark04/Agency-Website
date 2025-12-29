@@ -189,39 +189,47 @@ def create_payment_request(request):
         payment_request.payment_link = payment_link
         payment_request.save()
         
-        # Send email to client
+        # Send email to client asynchronously (don't block the response)
         if order.client and order.client.email:
-            try:
-                gateway_display = "Razorpay" if gateway == "razorpay" else "PayPal"
-                
-                html_message = render_to_string('emails/payment_request.html', {
-                    'client_name': order.client.get_full_name() or order.client.email,
-                    'order_id': order.id,
-                    'order_title': order.title,
-                    'amount': amount,
-                    'currency': currency,
-                    'gateway_display': gateway_display,
-                    'payment_link': payment_link,
-                    'expires_at': payment_request.expires_at.strftime('%B %d, %Y'),
-                    'notes': notes,
-                    'requested_by': request.user.get_full_name() or request.user.email,
-                    'company_email': settings.COMPANY_EMAIL,
-                    'company_phone': getattr(settings, 'COMPANY_PHONE', ''),
-                })
-                
-                plain_message = strip_tags(html_message)
-                
-                send_mail(
-                    subject=f'Payment Request for Order #{order.id}',
-                    message=plain_message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[order.client.email],
-                    html_message=html_message,
-                    fail_silently=True,
-                )
-            except Exception as email_error:
-                # Log email error but don't fail the request
-                print(f"Failed to send email: {email_error}")
+            import threading
+            
+            def send_email_async():
+                try:
+                    gateway_display = "Razorpay" if gateway == "razorpay" else "PayPal"
+                    
+                    html_message = render_to_string('emails/payment_request.html', {
+                        'client_name': order.client.get_full_name() or order.client.email,
+                        'order_id': order.id,
+                        'order_title': order.title,
+                        'amount': amount,
+                        'currency': currency,
+                        'gateway_display': gateway_display,
+                        'payment_link': payment_link,
+                        'expires_at': payment_request.expires_at.strftime('%B %d, %Y'),
+                        'notes': notes,
+                        'requested_by': request.user.get_full_name() or request.user.email,
+                        'company_email': settings.COMPANY_EMAIL,
+                        'company_phone': getattr(settings, 'COMPANY_PHONE', ''),
+                    })
+                    
+                    plain_message = strip_tags(html_message)
+                    
+                    send_mail(
+                        subject=f'Payment Request for Order #{order.id}',
+                        message=plain_message,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[order.client.email],
+                        html_message=html_message,
+                        fail_silently=True,
+                    )
+                except Exception as email_error:
+                    # Log email error but don't fail the request
+                    print(f"Failed to send email (async): {email_error}")
+            
+            # Start email sending in background thread
+            email_thread = threading.Thread(target=send_email_async)
+            email_thread.daemon = True
+            email_thread.start()
         
         # Create dashboard notification
         if order.client:
