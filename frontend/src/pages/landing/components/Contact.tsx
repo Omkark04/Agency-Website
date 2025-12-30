@@ -303,7 +303,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900 dark:text-white">Call Us</h4>
-                    <a href="tel:+919876543210" className="text-gray-600 dark:text-gray-400 hover:underline">+91 98765 43210</a>
+                    <a href="tel:+918010957676" className="text-gray-600 dark:text-gray-400 hover:underline">+91 80109 57676</a>
                   </div>
                 </div>
               </div>
@@ -354,7 +354,7 @@ const Contact = () => {
                 <h4 className="font-bold text-xl mb-2">Need Immediate Assistance?</h4>
                 <p className="mb-4 text-white/90">Chat with our team on WhatsApp for quick responses.</p>
                 <a 
-                  href="https://wa.me/919876543210"
+                  href="https://wa.me/918010957676"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#25D366] font-medium rounded-lg hover:bg-opacity-90 transition-all duration-300"

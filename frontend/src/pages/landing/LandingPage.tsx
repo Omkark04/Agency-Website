@@ -16,13 +16,15 @@ import ContactFloat from './components/ContactFloat';
 import { SEOHead } from '../../components/shared/SEOHead';
 import BackToTop from '../../components/ui/BackToTop';
 import IntroAnimation from '../../components/animations/IntroAnimation';
+import { useIntro } from '../../context/IntroContext';
 
 
 export const LandingPage = () => {
+  const { hasViewedIntro, setHasViewedIntro } = useIntro();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [showIntro, setShowIntro] = useState(true);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [showIntro, setShowIntro] = useState(!hasViewedIntro);
+  const [isLoaded, setIsLoaded] = useState(hasViewedIntro);
 
 
   useEffect(() => {
@@ -34,6 +36,7 @@ export const LandingPage = () => {
   const handleIntroComplete = () => {
     setShowIntro(false);
     setIsLoaded(true);
+    setHasViewedIntro(true);
   };
 
 
@@ -61,7 +64,7 @@ export const LandingPage = () => {
             ],
             "contactPoint": {
               "@type": "ContactPoint",
-              "telephone": "+91-9876543210",
+              "telephone": "+91-8010957676",
               "contactType": "customer service"
             }
           }}
@@ -69,7 +72,7 @@ export const LandingPage = () => {
         <Header onAuthButtonClick={() => setIsAuthModalOpen(true)} />
 
 
-        <main className="mt-20 overflow-x-hidden">
+        <main className="mt-14 md:mt-20 overflow-x-hidden">
           <Hero onGetStartedClick={() => setIsAuthModalOpen(true)} />
           <Services />
           <Offers />

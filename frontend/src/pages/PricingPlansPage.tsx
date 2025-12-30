@@ -10,6 +10,8 @@ import { listPriceCards } from '../api/pricecards';
 import type { PriceCard } from '../api/pricecards';
 import { listServices } from '../api/services';
 import type { Service } from '../api/services';
+import { fetchDesktopPriceHeroImages, fetchMobilePriceHeroImages, type MediaItem } from '../api/media';
+import { AnimatePresence } from 'framer-motion';
 import { useProtectedNavigation } from '../hooks/useProtectedNavigation';
 import { Button as MovingBorderContainer } from "@/components/ui/moving-border";
 import DynamicFormRenderer from '../components/forms/DynamicFormRenderer';
@@ -22,6 +24,8 @@ import {
 } from '@/components/ui/dialog';
 import { SEOHead } from '../components/shared/SEOHead';
 import { useAuth } from '../hooks/useAuth';
+import IntroAnimation from '../components/animations/IntroAnimation';
+import { useIntro } from '../context/IntroContext';
 
 export default function PricingPlansPage() {
   const [cards, setCards] = useState<PriceCard[]>([]);
@@ -32,7 +36,14 @@ export default function PricingPlansPage() {
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [selectedTier, setSelectedTier] = useState<'basic' | 'medium' | 'premium' | null>(null);
   const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 1000000 });
+
   const [showFilters, setShowFilters] = useState(false);
+
+  // Header Images State
+  const [desktopImages, setDesktopImages] = useState<MediaItem[]>([]);
+  const [mobileImages, setMobileImages] = useState<MediaItem[]>([]);
+  const [currentDesktopIndex, setCurrentDesktopIndex] = useState(0);
+  const [currentMobileIndex, setCurrentMobileIndex] = useState(0);
 
   // Modal state for form
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,27 +56,63 @@ export default function PricingPlansPage() {
   const navigate = useNavigate();
   const { navigateTo } = useProtectedNavigation();
   const { user } = useAuth();
+  const { hasViewedPricingIntro, setHasViewedPricingIntro } = useIntro();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const [showIntro, setShowIntro] = useState(!hasViewedPricingIntro);
+
+  const handleIntroComplete = () => {
+    setShowIntro(false);
+    setHasViewedPricingIntro(true);
+  };
 
   useEffect(() => {
     fetchData();
     
-    // Read department from URL query parameter
+    // Read department or service from URL query parameter
     const deptParam = searchParams.get('department');
-    if (deptParam) {
+    const serviceParam = searchParams.get('service');
+
+    if (serviceParam) {
+      setSelectedService(Number(serviceParam));
+    } else if (deptParam) {
       setSelectedDepartment(Number(deptParam));
     }
   }, []);
 
+  // Auto-rotate desktop images
+  useEffect(() => {
+    if (desktopImages.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentDesktopIndex((prev) => (prev + 1) % desktopImages.length);
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [desktopImages.length]);
+
+  // Auto-rotate mobile images
+  useEffect(() => {
+    if (mobileImages.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentMobileIndex((prev) => (prev + 1) % mobileImages.length);
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [mobileImages.length]);
+
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [cardsRes, servicesRes] = await Promise.all([
+      const [cardsRes, servicesRes, desktopImgs, mobileImgs] = await Promise.all([
         listPriceCards(),
-        listServices({ is_active: true })
+        listServices({ is_active: true }),
+        fetchDesktopPriceHeroImages(),
+        fetchMobilePriceHeroImages()
       ]);
       setCards(cardsRes.data);
       setServices(servicesRes.data);
+      setDesktopImages(desktopImgs);
+      setMobileImages(mobileImgs);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -224,20 +271,19 @@ export default function PricingPlansPage() {
       );
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 py-20">
-        <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00C2A8]"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
+      <AnimatePresence>
+        {showIntro && (
+          <IntroAnimation
+            onComplete={handleIntroComplete}
+            title="Our Services"
+            subtitle={null}
+            duration={2000}
+          />
+        )}
+      </AnimatePresence>
       <SEOHead 
         title="Pricing Plans"
         description="Choose the perfect plan for your business needs. Transparent pricing for web development, design, and digital marketing services."
@@ -246,8 +292,52 @@ export default function PricingPlansPage() {
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-hidden">
         
         {/* New Hero Section */}
-        <div className="w-full bg-gradient-to-r from-[#00C2A8]/10 via-[#0066FF]/10 to-purple-500/10 border-b border-gray-200 dark:border-gray-800 mb-8 md:mb-12">
-            <div className="container mx-auto px-4 py-12 md:py-16 text-center">
+        <div className="relative w-full border-b border-gray-200 dark:border-gray-800 mb-8 md:mb-12 overflow-hidden min-h-[200px] md:min-h-[250px]">
+            {/* Background Images */}
+            <div className="absolute inset-0 z-0">
+                {/* Desktop Carousel */}
+                <div className="hidden md:block w-full h-full relative">
+                    <AnimatePresence mode="wait">
+                        {desktopImages.length > 0 ? (
+                            <motion.img
+                                key={currentDesktopIndex}
+                                src={desktopImages[currentDesktopIndex].url}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 1 }}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div key="desktop-gradient" className="w-full h-full bg-gradient-to-r from-[#00C2A8]/10 via-[#0066FF]/10 to-purple-500/10" />
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* Mobile Carousel */}
+                 <div className="md:hidden w-full h-full relative">
+                    <AnimatePresence mode="wait">
+                        {mobileImages.length > 0 ? (
+                            <motion.img
+                                key={currentMobileIndex}
+                                src={mobileImages[currentMobileIndex].url}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 1 }}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div key="mobile-gradient" className="w-full h-full bg-gradient-to-r from-[#00C2A8]/10 via-[#0066FF]/10 to-purple-500/10" />
+                        )}
+                    </AnimatePresence>
+                </div>
+                
+                {/* Gradient Overlay for Text Readability */}
+                <div className="absolute inset-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-[2px]" />
+            </div>
+
+            <div className="relative z-10 container mx-auto px-4 py-16 md:py-20 text-center">
                  <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}

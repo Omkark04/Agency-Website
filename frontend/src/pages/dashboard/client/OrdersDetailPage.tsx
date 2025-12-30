@@ -14,6 +14,8 @@ import type { WorkflowInfo } from '../../../types/workflow';
 import type { Estimation } from '../../../types/estimations';
 import type { Invoice } from '../../../types/invoices';
 import { getOrder, type Order } from '../../../api/orders';
+import { getOrderTransactions } from '../../../api/payments';
+import { Transaction } from '../../../types/payments';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 
@@ -106,6 +108,14 @@ const PremiumBackNavigation = () => {
 };
 
 
+// Helper to get order title
+const getOrderTitle = (order: Order) => {
+  if (order.form_submission_data?.data?.['Project Title']) {
+    return order.form_submission_data.data['Project Title'];
+  }
+  return order.title || `Order #${order.id}`;
+};
+
 // Premium Order Header Component
 const PremiumOrderHeader = ({ order }: { order: Order | null }) => {
   const [isStatusHovered, setIsStatusHovered] = useState(false);
@@ -134,16 +144,12 @@ const PremiumOrderHeader = ({ order }: { order: Order | null }) => {
               <motion.div
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.6 }}
-                className="p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 shadow-2xl"
+                className="hidden md:block p-3 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 shadow-2xl"
               >
                 <Package className="w-7 h-7 text-white" />
               </motion.div>
              
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white bg-clip-text text-transparent">
-                  {order.title || `Order #${order.id}`}
-                  <Rocket className="inline w-8 h-8 ml-4 text-blue-500 animate-float" />
-                </h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-2">
                   {order.service_title} • Tracking order #{order.id} • Real-time updates enabled
                 </p>
@@ -184,7 +190,7 @@ const PremiumOrderHeader = ({ order }: { order: Order | null }) => {
           </div>
          
           {/* Quick stats */}
-          <div className="flex flex-col sm:flex-row lg:flex-col gap-3">
+          <div className="hidden md:flex flex-col sm:flex-row lg:flex-col gap-3">
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -219,7 +225,6 @@ const PremiumTabs = ({ activeTab, setActiveTab }: any) => {
     { id: 'payments', label: 'Payments', icon: CreditCard, color: 'from-emerald-500 to-green-500' },
     { id: 'estimations', label: 'Estimations', icon: Calculator, color: 'from-purple-500 to-pink-500' },
     { id: 'invoices', label: 'Invoices', icon: Receipt, color: 'from-amber-500 to-orange-500' },
-    { id: 'tasks', label: 'Tasks', icon: CheckSquare, color: 'from-indigo-500 to-blue-500' },
     { id: 'progress', label: 'Progress', icon: TrendingUp, color: 'from-rose-500 to-red-500' },
   ];
 
@@ -282,7 +287,7 @@ const PremiumTabs = ({ activeTab, setActiveTab }: any) => {
 
 
 // Premium Order Overview Component
-const OrderOverview = ({ order }: { order: Order | null }) => {
+const OrderOverview = ({ order, transactions }: { order: Order | null; transactions: Transaction[] }) => {
   if (!order) return <div className="p-8 text-center text-gray-500">Loading order details...</div>;
 
   const calculateDaysElapsed = (startDate?: string) => {
@@ -294,21 +299,18 @@ const OrderOverview = ({ order }: { order: Order | null }) => {
     return `${diffDays} Days`;
   };
 
-  const calculateDaysRemaining = (dueDate?: string) => {
-    if (!dueDate) return 'TBD';
-    const due = new Date(dueDate);
-    const now = new Date();
-    if (now > due) return 'Overdue';
-    const diffTime = Math.abs(due.getTime() - now.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return `${diffDays} Days`;
+  const calculateEstimatedDelivery = (startDate?: string, deliveryDays?: number) => {
+    if (!startDate || !deliveryDays) return 'TBD';
+    const start = new Date(startDate);
+    start.setDate(start.getDate() + deliveryDays);
+    return start.toLocaleDateString();
   };
 
   const stats = [
     { label: 'Total Invested', value: `₹${order.price}`, icon: DollarSign, color: 'from-emerald-500 to-green-500' },
     { label: 'Time Elapsed', value: calculateDaysElapsed(order.created_at), icon: Clock, color: 'from-blue-500 to-cyan-500' },
-    { label: 'Completion', value: `${order.progress}%`, icon: TrendingUp, color: 'from-purple-500 to-pink-500' },
-    { label: 'Next Delivery', value: calculateDaysRemaining(order.due_date), icon: Target, color: 'from-amber-500 to-orange-500' },
+    { label: 'Est. Delivery', value: calculateEstimatedDelivery(order.created_at, order.pricing_plan?.delivery_days), icon: Target, color: 'from-amber-500 to-orange-500' },
+    { label: 'Remaining Amount', value: `₹${order.remaining_amount || 0}`, icon: CreditCard, color: 'from-rose-500 to-red-500' },
   ];
 
   return (
@@ -317,8 +319,8 @@ const OrderOverview = ({ order }: { order: Order | null }) => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {/* Stats Grid - Horizontal Scroll on Mobile, Grid on Desktop */}
+      <div className="flex overflow-x-auto pb-4 gap-4 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-4 mb-6 snap-x snap-mandatory">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -328,25 +330,25 @@ const OrderOverview = ({ order }: { order: Order | null }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -5, scale: 1.02 }}
-              className="relative group"
+              className="relative group min-w-[140px] snap-center"
             >
-              <div className={`absolute -inset-0.5 bg-gradient-to-r ${stat.color} rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-500`} />
+              <div className={`hidden md:block absolute -inset-0.5 bg-gradient-to-r ${stat.color} rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-500`} />
              
-              <div className="relative bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-xl">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">{stat.label}</p>
-                    <p className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              <div className="relative bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-4 md:p-4 border border-white/20 dark:border-gray-700/30 shadow-xl aspect-square md:aspect-auto flex flex-col justify-center items-center md:items-start md:justify-between h-full">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full">
+                  <div className="text-center md:text-left">
+                    <p className="text-xs md:text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1 md:mb-1">{stat.label}</p>
+                    <p className="text-lg md:text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                       {stat.value}
                     </p>
                   </div>
-                  <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg`}>
+                  <div className={`hidden md:block p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg`}>
                     <Icon className="w-6 h-6 text-white" />
                   </div>
                 </div>
                
-                {/* Progress indicator */}
-                <div className="mt-4 h-1.5 bg-gray-200/50 dark:bg-gray-700/50 rounded-full overflow-hidden">
+                {/* Progress indicator - Hidden on Mobile */}
+                <div className="hidden md:block mt-4 h-1.5 bg-gray-200/50 dark:bg-gray-700/50 rounded-full overflow-hidden w-full">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${order.progress}%` }}
@@ -363,15 +365,16 @@ const OrderOverview = ({ order }: { order: Order | null }) => {
       </div>
 
 
-      {/* Order Details Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Order Summary Card */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 }}
-          className="lg:col-span-2"
-        >
+      {/* Order Details Grid - Horizontal Scroll on Mobile */}
+      <div className="flex flex-col md:grid md:grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="flex overflow-x-auto pb-4 gap-6 md:contents snap-x snap-mandatory">
+          {/* Order Summary Card */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            className="lg:col-span-2 min-w-[85vw] md:min-w-0 snap-center"
+          >
           <div className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-xl h-full">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">Order Summary</h3>
@@ -386,12 +389,13 @@ const OrderOverview = ({ order }: { order: Order | null }) => {
            
             <div className="space-y-4">
               {[
-                { label: 'Service Type', value: order.service_title || 'N/A', icon: Code },
-                { label: 'Start Date', value: order.created_at ? new Date(order.created_at).toLocaleDateString() : 'N/A', icon: Calendar },
-                { label: 'Estimated Delivery', value: order.due_date ? new Date(order.due_date).toLocaleDateString() : 'TBD', icon: Target },
-                // Priority removed
+                { label: 'Service Title', value: order.service_title || 'N/A', icon: Code, hidden: false },
+                { label: 'Start Date', value: order.created_at ? new Date(order.created_at).toLocaleDateString() : 'N/A', icon: Calendar, hidden: false },
+                { label: 'Estimated Delivery', value: calculateEstimatedDelivery(order.created_at, order.pricing_plan?.delivery_days), icon: Target, hidden: false },
+                { label: 'Paid Amount', value: `₹${order.total_paid || 0}`, icon: DollarSign, hidden: false },
               ].map((item, index) => {
                 const Icon = item.icon;
+                if (item.hidden) return null;
                 return (
                   <motion.div
                     key={item.label}
@@ -414,23 +418,84 @@ const OrderOverview = ({ order }: { order: Order | null }) => {
               {/* Order Requirements from Form */}
               {order.details && (
                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7 }}
-                    className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
+                    className="mt-6"
                   >
-                    <div className="flex items-center mb-2">
+                    <h4 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center">
                        <FileText className="w-4 h-4 text-blue-500 mr-2" />
-                       <span className="font-medium text-gray-700 dark:text-gray-300">Order Requirements</span>
+                       Requirements
+                    </h4>
+                    <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50 overflow-hidden">
+                       <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap leading-relaxed">
+                         {order.details}
+                       </p>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
-                      {order.details}
-                    </p>
                  </motion.div>
               )}
             </div>
           </div>
         </motion.div>
+
+        {/* Recent Payments Card */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.5 }}
+          className="min-w-[85vw] md:min-w-0 snap-center h-full"
+        >
+          <div className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-xl h-full flex flex-col">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Recent Payments</h3>
+              <div className="p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
+                <DollarSign className="w-4 h-4 text-green-500" />
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-auto -mx-2 px-2 custom-scrollbar max-h-[400px]">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-100 dark:border-gray-700">
+                    <th className="py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">Transaction ID</th>
+                    <th className="py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">Amount</th>
+                    <th className="py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 text-right">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                  {transactions && transactions.length > 0 ? (
+                    transactions.map((tx) => (
+                      <tr key={tx.id} className="group hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                        <td className="py-3 pr-2">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[100px]" title={tx.transaction_id}>
+                            {tx.transaction_id}
+                          </p>
+                        </td>
+                        <td className="py-3 px-2">
+                          <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                            {tx.currency} {tx.amount}
+                          </span>
+                        </td>
+                        <td className="py-3 pl-2 text-right">
+                          <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                            {tx.completed_at ? new Date(tx.completed_at).toLocaleDateString() : '-'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={3} className="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                        No transactions yet
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </motion.div>
+        </div>
       </div>
     </motion.div>
   );
@@ -460,13 +525,16 @@ export default function OrderDetailPage() {
   const [workflowInfo, setWorkflowInfo] = useState<WorkflowInfo | null>(null);
   const [selectedEstimation, setSelectedEstimation] = useState<Estimation | null>(null);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+
   const [order, setOrder] = useState<Order | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
 
   useEffect(() => {
     if (orderId) {
       fetchOrder();
       fetchWorkflowInfo();
+      fetchTransactions();
     }
   }, [orderId]);
 
@@ -476,6 +544,15 @@ export default function OrderDetailPage() {
       setOrder(response.data);
     } catch (error) {
       console.error('Failed to fetch order:', error);
+    }
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      const response = await getOrderTransactions(parseInt(orderId!));
+      setTransactions(response.data);
+    } catch (error) {
+      console.error('Failed to fetch transactions:', error);
     }
   };
 
@@ -510,7 +587,7 @@ export default function OrderDetailPage() {
       <AnimatePresence mode="wait">
         {activeTab === 'overview' && (
           <PremiumTabWrapper value="overview">
-            <OrderOverview order={order} />
+            <OrderOverview order={order} transactions={transactions} />
           </PremiumTabWrapper>
         )}
        
@@ -655,7 +732,7 @@ export default function OrderDetailPage() {
 
 
       {/* Animation Styles */}
-      <style jsx global>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

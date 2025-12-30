@@ -7,10 +7,13 @@ from .models import Order, Offer
 
 # Import Service for PrimaryKeyRelatedField
 try:
-    from services.models import Service
+    from services.models import Service, PriceCard
+    from services.serializers import PriceCardSerializer
 except Exception:
     # fallback if import path differs; DRF will raise if queryset invalid
     Service = None
+    PriceCard = None
+    PriceCardSerializer = None
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -20,6 +23,15 @@ class OrderSerializer(serializers.ModelSerializer):
     price_card_price = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True)
     total_paid = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
     remaining_amount = serializers.SerializerMethodField()
+    service_title = serializers.ReadOnlyField(source='service.title')
+    pricing_plan = PriceCardSerializer(read_only=True)
+    pricing_plan_id = serializers.PrimaryKeyRelatedField(
+        queryset=PriceCard.objects.all() if PriceCard else None,
+        source='pricing_plan',
+        write_only=True,
+        required=False,
+        allow_null=True
+    )
     
     # Form submission details
     form_submission_data = serializers.SerializerMethodField()
@@ -27,7 +39,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
-            'id', 'client', 'client_email', 'service', 'pricing_plan',
+            'id', 'client', 'client_email', 'service', 'service_title', 'pricing_plan', 'pricing_plan_id',
             'title', 'details', 'price', 'status', 'due_date',
             'whatsapp_number', 'price_card_title', 'price_card_price',
             'form_submission', 'total_paid', 'remaining_amount',

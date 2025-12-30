@@ -284,6 +284,38 @@ export default function MediaLibrary() {
                 </li>
               </ul>
             </div>
+            
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-blue-100 mt-6">
+              <h3 className="font-bold text-gray-900 mb-4 text-lg flex items-center gap-2">
+                <FiInfo className="text-blue-600" />
+                Special Media Captions
+              </h3>
+              <p className="text-sm text-gray-600 mb-3">
+                Use these exact captions to display images in specific sections:
+              </p>
+              <ul className="space-y-2 text-sm text-gray-700">
+                <li className="flex items-center justify-between bg-white p-2 rounded-lg border border-blue-100">
+                  <span className="font-medium">Landing Hero BG</span>
+                  <code className="bg-gray-100 px-2 py-0.5 rounded text-xs text-blue-600 font-mono">Hero Background</code>
+                </li>
+                <li className="flex items-center justify-between bg-white p-2 rounded-lg border border-blue-100">
+                  <span className="font-medium">Mobile Hero BG</span>
+                  <code className="bg-gray-100 px-2 py-0.5 rounded text-xs text-blue-600 font-mono">Mobile Hero</code>
+                </li>
+                <li className="flex items-center justify-between bg-white p-2 rounded-lg border border-blue-100">
+                  <span className="font-medium">About Us Images</span>
+                  <code className="bg-gray-100 px-2 py-0.5 rounded text-xs text-blue-600 font-mono">about</code>
+                </li>
+                 <li className="flex items-center justify-between bg-white p-2 rounded-lg border border-blue-100">
+                  <span className="font-medium">Pricing Desktop Header</span>
+                  <code className="bg-gray-100 px-2 py-0.5 rounded text-xs text-blue-600 font-mono">desktop price</code>
+                </li>
+                 <li className="flex items-center justify-between bg-white p-2 rounded-lg border border-blue-100">
+                  <span className="font-medium">Pricing Mobile Header</span>
+                  <code className="bg-gray-100 px-2 py-0.5 rounded text-xs text-blue-600 font-mono">price mobile</code>
+                </li>
+              </ul>
+            </div>
             <button 
               onClick={handleUpload}
               disabled={!file || uploading}

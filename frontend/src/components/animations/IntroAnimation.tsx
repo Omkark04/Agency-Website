@@ -3,24 +3,31 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface IntroAnimationProps {
   onComplete: () => void;
+  title?: string;
+  subtitle?: string | null;
+  duration?: number;
 }
 
-export const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
+export const IntroAnimation = ({ 
+  onComplete, 
+  title = "UdyogWorks", 
+  subtitle = "Business Development & Marketing Agency",
+  duration = 4000 
+}: IntroAnimationProps) => {
   const [showSlogan, setShowSlogan] = useState(false);
   const [scaleOut, setScaleOut] = useState(false);
 
   useEffect(() => {
-    // Timeline (4 seconds total):
-    // 0s: Show logo
-    // 0.5s: Show slogan
-    // 2s: Hide slogan
-    // 2.5s: Start scale out
-    // 4s: Complete
+    // Calculate timeline based on duration
+    const sloganDelay = duration * 0.125;      // 12.5%
+    const hideSloganDelay = duration * 0.5;    // 50%
+    const scaleOutDelay = duration * 0.625;    // 62.5%
+    const completeDelay = duration;            // 100%
 
-    const sloganTimer = setTimeout(() => setShowSlogan(true), 500);
-    const hideSloganTimer = setTimeout(() => setShowSlogan(false), 2000);
-    const scaleOutTimer = setTimeout(() => setScaleOut(true), 2500);
-    const completeTimer = setTimeout(() => onComplete(), 4000);
+    const sloganTimer = setTimeout(() => setShowSlogan(true), sloganDelay);
+    const hideSloganTimer = setTimeout(() => setShowSlogan(false), hideSloganDelay);
+    const scaleOutTimer = setTimeout(() => setScaleOut(true), scaleOutDelay);
+    const completeTimer = setTimeout(() => onComplete(), completeDelay);
 
     return () => {
       clearTimeout(sloganTimer);
@@ -28,14 +35,14 @@ export const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
       clearTimeout(scaleOutTimer);
       clearTimeout(completeTimer);
     };
-  }, [onComplete]);
+  }, [onComplete, duration]);
 
   return (
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.8 }}
         className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
         style={{
           background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%)',
@@ -55,22 +62,22 @@ export const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
           }
           
           .intro-text {
-            -webkit-text-fill-color: transparent;
-            -webkit-text-stroke: 3px #F8FAFC;
-            text-stroke: 3px #F8FAFC;
+            color: #ffffff !important;
             font-weight: 900;
             letter-spacing: 0.05em;
+            text-shadow: 0 0 20px rgba(34, 211, 238, 0.8),
+                         0 0 40px rgba(34, 211, 238, 0.5),
+                         0 0 60px rgba(34, 211, 238, 0.3);
             animation: smoothGlow 2s ease-in-out infinite;
-            will-change: filter;
+            will-change: filter, opacity;
           }
           
           .intro-slogan {
-            -webkit-text-fill-color: transparent;
-            -webkit-text-stroke: 1.5px #94A3B8;
-            text-stroke: 1.5px #94A3B8;
+            color: #94A3B8 !important;
             font-weight: 600;
             letter-spacing: 0.03em;
-            filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.4));
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.5),
+                         0 0 20px rgba(34, 211, 238, 0.3);
           }
         `}</style>
 
@@ -85,11 +92,11 @@ export const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
             }}
             transition={{
               scale: { 
-                duration: scaleOut ? 1.5 : 0.8, 
+                duration: scaleOut ? (duration * 0.375 / 1000) : (duration * 0.2 / 1000), 
                 ease: [0.34, 1.56, 0.64, 1]
               },
               opacity: { 
-                duration: scaleOut ? 1 : 0.8,
+                duration: scaleOut ? (duration * 0.25 / 1000) : (duration * 0.2 / 1000),
                 ease: "easeOut"
               }
             }}
@@ -98,12 +105,12 @@ export const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
               lineHeight: 1.2
             }}
           >
-            UdyogWorks
+            {title}
           </motion.h1>
 
           {/* Slogan */}
           <AnimatePresence>
-            {showSlogan && !scaleOut && (
+            {showSlogan && !scaleOut && subtitle && (
               <motion.p
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -114,7 +121,7 @@ export const IntroAnimation = ({ onComplete }: IntroAnimationProps) => {
                 }}
                 className="intro-slogan text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-center mt-4 md:mt-6"
               >
-                Business Development & Marketing Agency
+                {subtitle}
               </motion.p>
             )}
           </AnimatePresence>

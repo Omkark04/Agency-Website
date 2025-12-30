@@ -113,3 +113,35 @@ export const fetchMobileHeroBackground = async (): Promise<MediaItem | null> => 
     return null;
   }
 };
+
+export const fetchDesktopPriceHeroImages = async (): Promise<MediaItem[]> => {
+  try {
+    const response = await api.get<MediaItem[]>('/api/media/', {
+      params: {
+        caption__icontains: 'desktop price',
+        media_type: 'image',
+        ordering: '-created_at'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching desktop price hero images:', error);
+    return [];
+  }
+};
+
+export const fetchMobilePriceHeroImages = async (): Promise<MediaItem[]> => {
+  try {
+    const response = await api.get<MediaItem[]>('/api/media/', {
+      params: {
+        caption__icontains: 'price mobile',
+        media_type: 'image',
+        ordering: '-created_at'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching mobile price hero images:', error);
+    return [];
+  }
+};

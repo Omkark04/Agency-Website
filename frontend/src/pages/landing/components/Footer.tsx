@@ -50,8 +50,8 @@ export const Footer = () => {
         : services.length > 0
           ? services.map(service => ({
               name: service.title,
-              url: `/client-dashboard/services#${service.slug || service.id}`
-            }))
+              url: `/pricing-plans?service=${service.id}`
+            })).concat([{ name: 'View All Services →', url: '/pricing-plans' }])
           : [{ name: 'No services found', url: '#' }]
     },
     {

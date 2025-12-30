@@ -258,14 +258,14 @@ export default function HelpCenter() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="/#contact"
+              href="mailto:udyogworks.official@gmail.com"
               className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#0066FF] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
             >
               <Mail className="h-5 w-5 mr-2" />
               Contact Us
             </a>
             <a
-              href="tel:+918208776319"
+              href="tel:+918010957676"
               className="inline-flex items-center justify-center px-6 py-3 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-lg hover:bg-white/20 transition-colors border border-white/20"
             >
               <Phone className="h-5 w-5 mr-2" />

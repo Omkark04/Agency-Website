@@ -66,7 +66,7 @@ export const ContactFloat = () => {
                 className="text-white hover:text-gray-200 ml-2"
                 aria-label="Close popup"
               >
-                <X size={20} />
+                <X size={20} className='text-black'/>
               </button>
             </div>
           </div>
@@ -83,13 +83,13 @@ export const ContactFloat = () => {
             </a>
 
             <a
-              href="tel:+918390498423"
+              href="tel:+918010957676"
               className="flex items-center text-sm hover:text-[#0066FF] transition-colors group"
             >
               <div className="bg-blue-100 dark:bg-blue-900 p-2 rounded-full mr-3 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
                 <FaPhoneAlt className="text-[#0066FF]" />
               </div>
-              <span className="text-sm">+91 8390498423</span>
+              <span className="text-sm">+91 8010957676</span>
             </a>
 
             <a

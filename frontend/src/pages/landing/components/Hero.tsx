@@ -7,6 +7,7 @@ import { getTestimonialStats } from '../../../api/testinomials';
 import { listDepartments, type Department } from '../../../api/departments';
 import { listServices, type Service } from '../../../api/services';
 import { useProtectedNavigation } from '../../../hooks/useProtectedNavigation';
+import { useAuth } from '../../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import AuthModal from './AuthModal';
 
@@ -16,6 +17,7 @@ import AuthModal from './AuthModal';
 
 export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) => {
   const { navigateTo, showAuthModal, setShowAuthModal } = useProtectedNavigation();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [heroImages, setHeroImages] = useState<MediaItem[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -287,7 +289,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                       {[...services, ...services].map((service, index) => (
                         <motion.div
                           key={`${service.id}-mobile-${index}`}
-                          onClick={() => navigateTo('/client-dashboard/services')}
+                          onClick={() => isAuthenticated ? navigate('/client-dashboard/services') : navigate('/pricing-plans')}
                           className="flex-shrink-0 w-[140px] bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3 cursor-pointer hover:bg-white/15 transition-all"
                           whileTap={{ scale: 0.95 }}
                         >
@@ -318,7 +320,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
 
               <div className="w-full max-w-xs mt-6 md:mt-0">
                 <button
-                  onClick={() => navigateTo('/pricing-plan')}
+                  onClick={() => isAuthenticated ? navigate('/client-dashboard/services') : navigate('/pricing-plans')}
                   className="w-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-3 px-8 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-105"
                 >
                   View Services

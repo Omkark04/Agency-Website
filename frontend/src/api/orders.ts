@@ -15,6 +15,8 @@ export interface Order {
   due_date?: string;
   created_at?: string;
   updated_at?: string;
+  total_paid?: number;
+  remaining_amount?: number;
   // Price card details
   price_card_title?: string;
   price_card_price?: string | number;
@@ -28,6 +30,14 @@ export interface Order {
   estimation_count?: number;
   invoice_count?: number;
   receipt_count?: number;
+
+  // Form submission data
+  form_submission_data?: {
+    id: number;
+    data: Record<string, any>;
+    files: any;
+    summary: string;
+  };
 }
 
 export const listOrders = (params?: any) => api.get<Order[]>('/api/orders/', { params });

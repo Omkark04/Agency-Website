@@ -272,6 +272,11 @@ class PaymentProcessor:
         # Update payment order status
         payment_order.status = "paid"
         payment_order.save()
+
+        # Update order total_paid
+        order = payment_order.order
+        order.total_paid = order.total_paid + Decimal(payment_order.amount)
+        order.save(update_fields=['total_paid'])
         
         # Create/update transaction
         transaction, created = Transaction.objects.update_or_create(
