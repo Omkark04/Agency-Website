@@ -34,10 +34,16 @@ class PortfolioProject(models.Model):
 
     video = models.URLField(null=True, blank=True)
 
+    priority = models.PositiveIntegerField(
+        default=999,
+        help_text="Display priority (lower number = higher priority)"
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "portfolio_projects"
+        ordering = ["priority", "-created_at"]
 
     def __str__(self):
         return self.title

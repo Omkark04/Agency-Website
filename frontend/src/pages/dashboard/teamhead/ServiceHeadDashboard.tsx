@@ -35,12 +35,16 @@ export const ServiceHeadDashboard: React.FC = () => {
         console.log('✅ ServiceHead Dashboard: Received metrics:', data);
         setMetrics(data);
         
-        // Fetch portfolio count separately
-        try {
-          const { data: portfolios } = await listPortfolios();
-          setPortfolioCount(portfolios.length);
-        } catch (err) {
-          console.error('Failed to fetch portfolios:', err);
+        // Fetch portfolio count separately - filter by department
+        if (data.department?.id) {
+          try {
+            const { data: portfolios } = await listPortfolios({ 
+              service__department: data.department.id 
+            });
+            setPortfolioCount(portfolios.length);
+          } catch (err) {
+            console.error('Failed to fetch portfolios:', err);
+          }
         }
         
         setError(null);

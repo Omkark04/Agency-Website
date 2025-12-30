@@ -41,10 +41,17 @@ class UploadMediaView(APIView):
         if not file:
             return Response({"error": "No file uploaded"}, status=400)
         
-        # Validate file size (10MB limit matching frontend)
-        max_size = 10 * 1024 * 1024  # 10MB
+        # Validate file size - different limits for images and videos
+        if file.content_type.startswith('video/'):
+            max_size = 50 * 1024 * 1024  # 50MB for videos
+        else:
+            max_size = 10 * 1024 * 1024  # 10MB for images
+            
         if file.size > max_size:
-            return Response({"error": "File size exceeds 10MB limit"}, status=400)
+            size_limit_mb = max_size / (1024 * 1024)
+            return Response({
+                "error": f"File size exceeds {size_limit_mb:.0f}MB limit"
+            }, status=400)
         
         # Validate file type
         allowed_types = [
@@ -53,7 +60,9 @@ class UploadMediaView(APIView):
             'video/mp4', 'video/webm', 'video/quicktime'
         ]
         if file.content_type not in allowed_types:
-            return Response({"error": "File type not allowed. Supported: JPG, PNG, GIF, WebP, SVG, MP4, WebM, MOV"}, status=400)
+            return Response({
+                "error": f"File type '{file.content_type}' not allowed. Supported types: JPG, PNG, GIF, WebP, SVG, MP4, WebM, MOV"
+            }, status=400)
         
         # Upload to Cloudinary
         try:

@@ -1,6 +1,6 @@
 import api from './api';
 
-export const listPortfolios = () => api.get('/api/portfolio/');
+export const listPortfolios = (params?: { service__department?: number }) => api.get('/api/portfolio/', { params });
 export const createPortfolio = (data: any) => api.post('/api/portfolio/', data);
 export const updatePortfolio = (id: number, data: any) => api.put(`/api/portfolio/${id}/`, data);
 export const deletePortfolio = (id: number) => api.delete(`/api/portfolio/${id}/`);
@@ -81,6 +81,7 @@ export interface PortfolioProject {
 export const fetchPortfolioProjects = async (params?: {
   is_featured?: boolean;
   service?: number;
+  service__department?: number;
   limit?: number;
 }): Promise<PortfolioProject[]> => {
   try {

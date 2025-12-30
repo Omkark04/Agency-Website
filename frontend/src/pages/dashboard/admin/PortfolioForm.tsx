@@ -20,6 +20,7 @@ interface PortfolioData {
   client_name: string;
   description: string;
   service: string;
+  priority?: number;
   featured_image: string | null;
   images: string[];
   video: string | null;
@@ -48,6 +49,7 @@ export default function PortfolioForm({ initial, onSaved }: PortfolioFormProps) 
   const [client, setClient] = useState(initial?.client_name || '');
   const [description, setDescription] = useState(initial?.description || '');
   const [service, setService] = useState(initial?.service || '');
+  const [priority, setPriority] = useState(initial?.priority || 999);
   
   // Services dropdown
   const [services, setServices] = useState<Service[]>([]);
@@ -323,6 +325,7 @@ export default function PortfolioForm({ initial, onSaved }: PortfolioFormProps) 
         description: description.trim(),
         client_name: client.trim(),
         service,
+        priority: Number(priority),
         featured_image: featuredImageUrl,
         images: galleryUrls,
         video: videoUrl,
@@ -338,9 +341,18 @@ export default function PortfolioForm({ initial, onSaved }: PortfolioFormProps) 
       onSaved();
     } catch (err: any) {
       console.error('Portfolio submission error:', err);
-      setErrors({
-        general: err?.response?.data?.message || 'Failed to save portfolio. Please try again.'
-      });
+      
+      // Extract specific error message from backend
+      let errorMessage = 'Failed to save portfolio. Please try again.';
+      if (err?.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (err?.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+      
+      setErrors({ general: errorMessage });
     } finally {
       setLoading(false);
       setUploadProgress(0);
@@ -430,6 +442,23 @@ export default function PortfolioForm({ initial, onSaved }: PortfolioFormProps) 
               ))}
             </select>
             {errors.service && <p className="text-red-500 text-xs mt-0.5">{errors.service}</p>}
+          </div>
+
+          {/* Priority */}
+          <div>
+            <label className="font-semibold block mb-1 text-sm text-gray-700">
+              Priority
+            </label>
+            <input
+              type="number"
+              value={priority}
+              onChange={e => setPriority(Number(e.target.value))}
+              className="w-full border border-gray-300 px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="999"
+              min="1"
+              disabled={loading}
+            />
+            <p className="text-xs text-gray-500 mt-0.5">Lower number = higher priority (default: 999)</p>
           </div>
 
           {/* Description */}
