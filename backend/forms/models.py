@@ -41,7 +41,7 @@ class ServiceForm(models.Model):
 
 class ServiceFormField(models.Model):
     """Individual field in a service form"""
-    FIELD_TYPES = [
+    FIELD_TYPE_CHOICES = [
         ('text', 'Text'),
         ('number', 'Number'),
         ('short_text', 'Short Text'),
@@ -50,6 +50,7 @@ class ServiceFormField(models.Model):
         ('checkbox', 'Checkbox'),
         ('multi_select', 'Multi Select'),
         ('media', 'Media Upload'),
+        ('date', 'Date'),
     ]
     
     form = models.ForeignKey(
@@ -58,7 +59,7 @@ class ServiceFormField(models.Model):
         related_name='fields'
     )
     label = models.CharField(max_length=255)
-    field_type = models.CharField(max_length=20, choices=FIELD_TYPES)
+    field_type = models.CharField(max_length=20, choices=FIELD_TYPE_CHOICES)
     required = models.BooleanField(default=False)
     placeholder = models.CharField(max_length=255, blank=True)
     help_text = models.TextField(blank=True)

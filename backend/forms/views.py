@@ -26,7 +26,8 @@ class ServiceFormViewSet(viewsets.ModelViewSet):
     serializer_class = ServiceFormSerializer
     
     def get_permissions(self):
-        if self.action in ['retrieve', 'list']:
+        # Allow public access to retrieve, list, and submit actions
+        if self.action in ['retrieve', 'list', 'submit']:
             return [AllowAny()]
         return [IsAdminOrServiceHead()]
     
@@ -62,29 +63,64 @@ class ServiceFormViewSet(viewsets.ModelViewSet):
         For multipart: files are uploaded to Cloudinary first, then URLs stored.
         For JSON: expects file URLs already uploaded.
         """
-        form = self.get_object()
+        # Extensive debug logging
+        print("\n" + "="*80)
+        print("FORM SUBMISSION DEBUG")
+        print("="*80)
+        print(f"User: {request.user}")
+        print(f"User ID: {request.user.id if request.user.is_authenticated else 'Anonymous'}")
+        print(f"User Role: {getattr(request.user, 'role', 'N/A')}")
+        print(f"Is Authenticated: {request.user.is_authenticated}")
+        print(f"Form ID (pk): {pk}")
+        print(f"Request Method: {request.method}")
+        print(f"Content Type: {request.content_type}")
+        print(f"Permission Classes: {[p.__class__.__name__ for p in self.get_permissions()]}")
+        print(f"Request Data Keys: {list(request.data.keys())}")
+        print("="*80 + "\n")
+        
+        try:
+            form = self.get_object()
+            print(f"✓ Form retrieved: {form.id} - {form.title}")
+            print(f"✓ Form is_active: {form.is_active}")
+        except Exception as e:
+            print(f"✗ Error getting form: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            raise
         
         if not form.is_active:
+            print(f"✗ Form {form.id} is not active")
             return Response(
                 {'error': 'This form is not currently accepting submissions'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
         # Parse submission data
-        if request.content_type and 'multipart' in request.content_type:
-            # Handle multipart submission
-            submission_data = self._handle_multipart_submission(request, form)
-        else:
-            # Handle JSON submission
-            submission_data = self._handle_json_submission(request, form)
+        print(f"Parsing submission data...")
+        try:
+            if request.content_type and 'multipart' in request.content_type:
+                print("→ Using multipart handler")
+                submission_data = self._handle_multipart_submission(request, form)
+            else:
+                print("→ Using JSON handler")
+                submission_data = self._handle_json_submission(request, form)
+            print(f"✓ Submission data parsed successfully")
+            print(f"Submission data keys: {list(submission_data.keys())}")
+        except Exception as e:
+            print(f"✗ Error parsing submission data: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            raise
         
         if 'error' in submission_data:
+            logger.error(f"Submission data error: {submission_data}")
             return Response(submission_data, status=status.HTTP_400_BAD_REQUEST)
         
         # Create submission
         serializer = ServiceFormSubmissionSerializer(data=submission_data)
         if serializer.is_valid():
             submission = serializer.save()
+            logger.info(f"Submission created successfully: {submission.id}")
             
             return Response({
                 'success': True,
@@ -94,6 +130,7 @@ class ServiceFormViewSet(viewsets.ModelViewSet):
                 'order_number': f"ORD-{submission.order.id:05d}" if submission.order else None
             }, status=status.HTTP_201_CREATED)
         
+        logger.error(f"Serializer errors: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def _handle_json_submission(self, request, form):
