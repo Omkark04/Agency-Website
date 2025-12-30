@@ -52,6 +52,8 @@ const FormBuilder = () => {
   const [allForms, setAllForms] = useState<ServiceForm[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [departmentFilter, setDepartmentFilter] = useState<number | 'all'>('all');
+  const [departments, setDepartments] = useState<any[]>([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [formToDelete, setFormToDelete] = useState<ServiceForm | null>(null);
   const [showHistory, setShowHistory] = useState(true);
@@ -60,6 +62,7 @@ const FormBuilder = () => {
     if (!isServiceHeadWithoutDept && user) {
       loadServices();
       loadOffers();
+      loadDepartments();
       loadAllForms();
       if (id) {
         loadForm(parseInt(id));
@@ -70,24 +73,17 @@ const FormBuilder = () => {
 
   const loadServices = async () => {
     try {
-      console.log('🔍 FormBuilder: Loading services...');
-      console.log('👤 Current user:', user);
-      console.log('🏢 User department:', (user as any)?.department);
-      
       // Add department filter for service_head users
       const params: any = {};
       if (user?.role === 'service_head' && (user as any).department) {
         const dept = (user as any).department;
         params.department = typeof dept === 'object' ? dept.id : dept;
-        console.log('✅ Adding department filter:', params.department);
       }
       
-      console.log('📡 API call params:', params);
       const response = await listServices(params);
-      console.log('📦 Services received:', response.data.length);
       setServices(response.data);
     } catch (error) {
-      console.error('❌ Error loading services:', error);
+      console.error('Error loading services:', error);
     }
   };
 
@@ -97,7 +93,16 @@ const FormBuilder = () => {
       const data = response.data.results || response.data;
       setOffers(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('❌ Error loading offers:', error);
+      console.error('Error loading offers:', error);
+    }
+  };
+
+  const loadDepartments = async () => {
+    try {
+      const response = await api.get('/api/departments/');
+      setDepartments(response.data || []);
+    } catch (error) {
+      console.error('Error loading departments:', error);
     }
   };
 
@@ -360,6 +365,51 @@ const FormBuilder = () => {
       {showHistory && (
         <div className="mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+            {/* Stats Cards */}
+            <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
+                <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">Total Forms</div>
+                <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+                  {allForms.filter(f => {
+                    if (departmentFilter === 'all') return true;
+                    const service = services.find(s => s.id === f.service);
+                    return service?.department === departmentFilter || service?.department?.id === departmentFilter;
+                  }).length}
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 p-4 rounded-lg border border-green-200 dark:border-green-700">
+                <div className="text-sm font-medium text-green-600 dark:text-green-400 mb-1">Active Forms</div>
+                <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+                  {allForms.filter(f => {
+                    if (departmentFilter === 'all') return f.is_active;
+                    const service = services.find(s => s.id === f.service);
+                    const matchesDept = service?.department === departmentFilter || service?.department?.id === departmentFilter;
+                    return f.is_active && matchesDept;
+                  }).length}
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Inactive Forms</div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  {allForms.filter(f => {
+                    if (departmentFilter === 'all') return !f.is_active;
+                    const service = services.find(s => s.id === f.service);
+                    const matchesDept = service?.department === departmentFilter || service?.department?.id === departmentFilter;
+                    return !f.is_active && matchesDept;
+                  }).length}
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-4 rounded-lg border border-purple-200 dark:border-purple-700">
+                <div className="text-sm font-medium text-purple-600 dark:text-purple-400 mb-1">Departments</div>
+                <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+                  {departments.length}
+                </div>
+              </div>
+            </div>
+
             {/* Search and Filters */}
             <div className="mb-6 flex flex-col md:flex-row gap-4">
               <div className="flex-1 relative">
@@ -372,6 +422,18 @@ const FormBuilder = () => {
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
+              <select
+                value={departmentFilter}
+                onChange={(e) => setDepartmentFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-black dark:text-white"
+              >
+                <option value="all">All Departments</option>
+                {departments.map(dept => (
+                  <option className="text-black dark:text-white" key={dept.id} value={dept.id}>
+                    {dept.title}
+                  </option>
+                ))}
+              </select>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
@@ -421,7 +483,15 @@ const FormBuilder = () => {
                       const matchesStatus = statusFilter === 'all' ||
                                           (statusFilter === 'active' && f.is_active) ||
                                           (statusFilter === 'inactive' && !f.is_active);
-                      return matchesSearch && matchesStatus;
+                      
+                      // Department filter
+                      let matchesDept = true;
+                      if (departmentFilter !== 'all') {
+                        const service = services.find(s => s.id === f.service);
+                        matchesDept = service?.department === departmentFilter || service?.department?.id === departmentFilter;
+                      }
+                      
+                      return matchesSearch && matchesStatus && matchesDept;
                     })
                     .map((formItem) => (
                       <tr key={formItem.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
@@ -493,7 +563,15 @@ const FormBuilder = () => {
                 const matchesStatus = statusFilter === 'all' ||
                                     (statusFilter === 'active' && f.is_active) ||
                                     (statusFilter === 'inactive' && !f.is_active);
-                return matchesSearch && matchesStatus;
+                
+                // Department filter
+                let matchesDept = true;
+                if (departmentFilter !== 'all') {
+                  const service = services.find(s => s.id === f.service);
+                  matchesDept = service?.department === departmentFilter || service?.department?.id === departmentFilter;
+                }
+                
+                return matchesSearch && matchesStatus && matchesDept;
               }).length === 0 && (
                 <div className="text-center py-12">
                   <FileText className="h-12 w-12 mx-auto mb-3 text-gray-400 opacity-50" />
