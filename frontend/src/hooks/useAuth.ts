@@ -121,7 +121,6 @@ export const useAuth = () => {
 
       return { user };
     } catch (error: any) {
-      console.error('Registration error:', error.response?.data);
       const errorMsg = error.response?.data?.detail || error.response?.data || 'Registration failed';
       setAuth(prev => ({ ...prev, error: errorMsg, loading: false }));
       throw new Error(errorMsg);
