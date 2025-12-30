@@ -238,7 +238,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               </h1>
 
               <p className="hidden md:block text-xl text-gray-300 mb-8">
-                Business development agency powering growth through design, technology & education.
+                Business development & Marketing Agency powering growth through design & technology.
               </p>
              
               {/* Services Carousel - Mobile Only */}
@@ -318,7 +318,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
 
               <div className="w-full max-w-xs mt-6 md:mt-0">
                 <button
-                  onClick={() => navigateTo('/client-dashboard/services')}
+                  onClick={() => navigateTo('/pricing-plan')}
                   className="w-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-3 px-8 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-105"
                 >
                   View Services
@@ -372,8 +372,8 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                       {[...departments, ...departments].map((dept, index) => (
                         <motion.div
                           key={`${dept.id}-mobile-${index}`}
-                          onClick={() => navigate('/pricing-plans')}
-                          className="flex-shrink-0 w-[200px] bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 cursor-pointer"
+                          onClick={() => navigate(`/pricing-plans?department=${dept.id}`)}
+                          className="flex-shrink-0 w-[200px] bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 cursor-pointer hover:bg-white/15 transition-all"
                           whileTap={{ scale: 0.95 }}
                         >
                           <div className="flex items-center gap-3">
@@ -595,6 +595,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                         y: -5,
                         transition: { duration: 0.2 }
                       }}
+                      onClick={() => navigate(`/pricing-plans?department=${dept.id}`)}
                       className="relative group cursor-pointer"
                     >
                       {/* Animated gradient background */}

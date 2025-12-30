@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Upload, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { getFormByService, submitForm } from '../../api/forms';
 import { uploadMedia } from '../../api/media';
 import type { ServiceForm, FormField } from '../../api/forms';
+import { useAuth } from '../../hooks/useAuth';
+import AuthModal from '../../pages/landing/components/AuthModal';
+import OrderInitiationAnimation from '../animations/OrderInitiationAnimation';
 
 interface DynamicFormRendererProps {
   serviceId: number;
@@ -12,6 +16,9 @@ interface DynamicFormRendererProps {
 }
 
 const DynamicFormRenderer = ({ serviceId, priceCardId, onSuccess }: DynamicFormRendererProps) => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  
   const [form, setForm] = useState<ServiceForm | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -24,6 +31,14 @@ const DynamicFormRenderer = ({ serviceId, priceCardId, onSuccess }: DynamicFormR
     message: string;
     orderId?: number;
   } | null>(null);
+  
+  // Authentication and animation states
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState<{
+    data: Record<string, any>;
+    files: Record<string, File[]>;
+  } | null>(null);
+  const [showAnimation, setShowAnimation] = useState(false);
 
   useEffect(() => {
     loadForm();
@@ -143,13 +158,55 @@ const DynamicFormRenderer = ({ serviceId, priceCardId, onSuccess }: DynamicFormR
       return;
     }
     
+    // Check authentication before submitting
+    if (!isAuthenticated) {
+      // Store form data for later submission
+      setPendingFormData({
+        data: formData,
+        files: fileData
+      });
+      setShowAuthModal(true);
+      return;
+    }
+    
+    // If authenticated, proceed with submission
+    await submitFormData();
+  };
+  
+  // Handle successful authentication
+  const handleAuthSuccess = async () => {
+    setShowAuthModal(false);
+    
+    // Wait a bit for auth state to update
+    // This ensures the access token is properly set in localStorage
+    // and the auth context has updated before we submit the form
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Submit the pending form data
+    await submitFormData();
+  };
+  
+  // Actual form submission logic
+  const submitFormData = async () => {
     setSubmitting(true);
     setSubmitStatus(null);
     
     try {
+      // Use pending data if available, otherwise use current form data
+      const dataToSubmit = pendingFormData?.data || formData;
+      const filesToSubmit = pendingFormData?.files || fileData;
+      
       // Upload files first if any
-      if (Object.keys(fileData).length > 0) {
+      if (Object.keys(filesToSubmit).length > 0) {
+        // Temporarily set fileData for upload
+        const currentFileData = fileData;
+        setFileData(filesToSubmit);
+        
         const uploadSuccess = await uploadFiles();
+        
+        // Restore original fileData
+        setFileData(currentFileData);
+        
         if (!uploadSuccess) {
           setSubmitting(false);
           return;
@@ -158,15 +215,14 @@ const DynamicFormRenderer = ({ serviceId, priceCardId, onSuccess }: DynamicFormR
       
       // Submit form
       const submissionData: any = {
-        data: formData,
+        data: dataToSubmit,
         files: uploadedFiles,
-        client_email: formData['email'] || ''
+        client_email: dataToSubmit['email'] || ''
       };
       
       // Include price_card_id if provided
       if (priceCardId) {
         submissionData.data.price_card_id = priceCardId;
-        console.log('📋 Including price_card_id in submission:', priceCardId);
       }
       
       const response = await submitForm(form!.id!, submissionData);
@@ -177,27 +233,49 @@ const DynamicFormRenderer = ({ serviceId, priceCardId, onSuccess }: DynamicFormR
         orderId: response.data.order_id
       });
       
-      // Reset form
-      setFormData({});
-      setFileData({});
-      setUploadedFiles({});
+      // Clear pending data
+      setPendingFormData(null);
       
-      // Call success callback
-      if (onSuccess && response.data.order_id) {
-        onSuccess(response.data.order_id);
-      }
+      // Show animation
+      setShowAnimation(true);
       
-      // Scroll to success message
+      // Wait for animation, then close modal
       setTimeout(() => {
-        document.getElementById('form-status')?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+        setShowAnimation(false);
+        
+        // Reset form
+        setFormData({});
+        setFileData({});
+        setUploadedFiles({});
+        
+        // Call success callback to close modal
+        if (onSuccess) {
+          onSuccess(response.data.order_id);
+        }
+      }, 3000);
       
     } catch (error: any) {
       console.error('Error submitting form:', error);
-      setSubmitStatus({
-        success: false,
-        message: error.response?.data?.error || 'Failed to submit form. Please try again.'
-      });
+      
+      // Check if it's an authentication error
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        setSubmitStatus({
+          success: false,
+          message: 'Authentication error. Please try signing in again.'
+        });
+        // Clear pending data and show auth modal again
+        setPendingFormData({
+          data: formData,
+          files: fileData
+        });
+        setShowAuthModal(true);
+      } else {
+        setSubmitStatus({
+          success: false,
+          message: error.response?.data?.error || error.response?.data?.message || 'Failed to submit form. Please try again.'
+        });
+      }
+      setPendingFormData(null);
     } finally {
       setSubmitting(false);
     }
@@ -369,91 +447,107 @@ const DynamicFormRenderer = ({ serviceId, priceCardId, onSuccess }: DynamicFormR
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      {/* Status Message */}
-      {submitStatus && (
-        <motion.div
-          id="form-status"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`mb-6 p-4 rounded-lg flex items-start gap-3 ${
-            submitStatus.success
-              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-              : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-          }`}
-        >
-          {submitStatus.success ? (
-            <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
-          ) : (
-            <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
-          )}
-          <div>
-            <p className="font-medium">{submitStatus.message}</p>
-            {submitStatus.orderId && (
-              <p className="text-sm mt-1">
-                Order #{submitStatus.orderId} has been created. We'll contact you shortly!
-              </p>
+    <>
+      <div className="max-w-3xl mx-auto">
+        {/* Status Message */}
+        {submitStatus && (
+          <motion.div
+            id="form-status"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`mb-6 p-4 rounded-lg flex items-start gap-3 ${
+              submitStatus.success
+                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+            }`}
+          >
+            {submitStatus.success ? (
+              <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+            ) : (
+              <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
             )}
-          </div>
-        </motion.div>
-      )}
-
-      {/* Form */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          {form.title}
-        </h2>
-        {form.description && (
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            {form.description}
-          </p>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {form.fields?.map((field: FormField) => (
-            <div key={field.id}>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {field.label}
-                {field.required && <span className="text-red-500 ml-1">*</span>}
-              </label>
-              {field.help_text && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                  {field.help_text}
-                </p>
-              )}
-              {renderField(field)}
-              {errors[field.id!.toString()] && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                  {errors[field.id!.toString()]}
+            <div>
+              <p className="font-medium">{submitStatus.message}</p>
+              {submitStatus.orderId && (
+                <p className="text-sm mt-1">
+                  Order #{submitStatus.orderId} has been created. We'll contact you shortly!
                 </p>
               )}
             </div>
-          ))}
+          </motion.div>
+        )}
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all ${
-              submitting
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:opacity-90'
-            }`}
-          >
-            {submitting ? (
-              <>
-                <Loader className="h-5 w-5 animate-spin" />
-                Submitting...
-              </>
-            ) : (
-              <>
-                <Send className="h-5 w-5" />
-                Submit
-              </>
-            )}
-          </button>
-        </form>
+        {/* Form */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            {form.title}
+          </h2>
+          {form.description && (
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              {form.description}
+            </p>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {form.fields?.map((field: FormField) => (
+              <div key={field.id}>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {field.label}
+                  {field.required && <span className="text-red-500 ml-1">*</span>}
+                </label>
+                {field.help_text && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    {field.help_text}
+                  </p>
+                )}
+                {renderField(field)}
+                {errors[field.id!.toString()] && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {errors[field.id!.toString()]}
+                  </p>
+                )}
+              </div>
+            ))}
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all ${
+                submitting
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:opacity-90'
+              }`}
+            >
+              {submitting ? (
+                <>
+                  <Loader className="h-5 w-5 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Send className="h-5 w-5" />
+                  Submit
+                </>
+              )}
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
+      
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        defaultMode="login"
+        onAuthSuccess={handleAuthSuccess}
+      />
+      
+      {/* Order Initiation Animation */}
+      <OrderInitiationAnimation
+        isVisible={showAnimation}
+        onComplete={() => setShowAnimation(false)}
+      />
+    </>
   );
 };
 

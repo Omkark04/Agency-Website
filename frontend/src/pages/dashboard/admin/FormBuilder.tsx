@@ -30,6 +30,8 @@ const FormBuilder = () => {
   const { user } = useAuth();
   const isServiceHeadWithoutDept = user?.role === 'service_head' && !(user as any).department;
   const [loading, setLoading] = useState(false);
+  const [loadingForms, setLoadingForms] = useState(true); // For initial forms list load
+  const [duplicating, setDuplicating] = useState(false); // For form duplication
   const [services, setServices] = useState<any[]>([]);
   const [offers, setOffers] = useState<any[]>([]);
   const [form, setForm] = useState<Partial<ServiceForm>>({
@@ -113,10 +115,13 @@ const FormBuilder = () => {
 
   const loadAllForms = async () => {
     try {
+      setLoadingForms(true);
       const response = await listForms();
       setAllForms(response.data || []);
     } catch (error) {
       console.error('Error loading forms:', error);
+    } finally {
+      setLoadingForms(false);
     }
   };
 
@@ -137,21 +142,47 @@ const FormBuilder = () => {
 
   const handleDuplicateForm = async (formToDuplicate: ServiceForm) => {
     try {
-      const duplicatedForm = {
+      setDuplicating(true);
+      // First, fetch the full form with all its fields
+      const fullFormResponse = await getForm(formToDuplicate.id!);
+      const originalForm = fullFormResponse.data;
+      
+      // Create the duplicated form (without fields first)
+      const duplicatedFormData = {
         ...formToDuplicate,
         title: `${formToDuplicate.title} (Copy)`,
         is_active: false
       };
-      delete duplicatedForm.id;
-      delete duplicatedForm.created_at;
-      delete duplicatedForm.updated_at;
+      delete duplicatedFormData.id;
+      delete duplicatedFormData.created_at;
+      delete duplicatedFormData.updated_at;
+      delete duplicatedFormData.fields; // Remove fields from form creation
       
-      const response = await createForm(duplicatedForm);
-      alert('Form duplicated successfully!');
-      navigate(`/dashboard/forms/${response.data.id}`);
+      const newFormResponse = await createForm(duplicatedFormData);
+      const newFormId = newFormResponse.data.id;
+      
+      // Now duplicate all fields from the original form
+      if (originalForm.fields && originalForm.fields.length > 0) {
+        for (const field of originalForm.fields) {
+          const newField: any = {
+            ...field,
+            form: newFormId
+          };
+          delete newField.id;
+          delete newField.created_at;
+          delete newField.updated_at;
+          
+          await createField(newField);
+        }
+      }
+      
+      alert('Form duplicated successfully with all fields!');
+      navigate(`/dashboard/forms/${newFormId}`);
     } catch (error) {
       console.error('Error duplicating form:', error);
       alert('Error duplicating form');
+    } finally {
+      setDuplicating(false);
     }
   };
 
@@ -254,6 +285,20 @@ const FormBuilder = () => {
     return <NoDepartmentMessage />;
   }
 
+  // Show loading state when fetching form data
+  if (loading && id) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Loading form...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
@@ -339,6 +384,14 @@ const FormBuilder = () => {
 
             {/* Forms Table */}
             <div className="overflow-x-auto">
+              {loadingForms ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p className="text-gray-600 dark:text-gray-400">Loading forms...</p>
+                  </div>
+                </div>
+              ) : (
               <table className="w-full">
                 <thead className="bg-gray-50 dark:bg-gray-900">
                   <tr>
@@ -409,8 +462,9 @@ const FormBuilder = () => {
                             </button>
                             <button
                               onClick={() => handleDuplicateForm(formItem)}
-                              className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded"
-                              title="Duplicate"
+                              disabled={duplicating}
+                              className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                              title={duplicating ? "Duplicating..." : "Duplicate"}
                             >
                               <Copy className="h-4 w-4" />
                             </button>
@@ -430,8 +484,9 @@ const FormBuilder = () => {
                     ))}
                 </tbody>
               </table>
+              )}
               
-              {allForms.filter(f => {
+              {!loadingForms && allForms.filter(f => {
                 const matchesSearch = f.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                                     f.service_title?.toLowerCase().includes(searchQuery.toLowerCase());
                 const matchesStatus = statusFilter === 'all' ||

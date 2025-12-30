@@ -31,6 +31,7 @@ export default function ServiceForm({
   const [selectedMembers, setSelectedMembers] = useState<number[]>(
     initial?.team_members || []
   );
+  const [priority, setPriority] = useState<number>(initial?.priority || 999);
   const [isActive, setIsActive] = useState(initial?.is_active ?? true);
 
   // ✅ LOGO STATES (MATCHING YOUR DEPARTMENT FORM STYLE)
@@ -107,6 +108,7 @@ export default function ServiceForm({
         short_description: shortDesc,
         long_description: longDesc,
         department: departmentId === '' ? undefined : departmentId,
+        priority,
         is_active: isActive,
         team_members: selectedMembers,
       };
@@ -251,6 +253,24 @@ export default function ServiceForm({
         </select>
         <p className="service-form__help-text">
           Hold Ctrl/Cmd to select multiple team members for this service
+        </p>
+      </div>
+
+      {/* Priority Input */}
+      <div className="service-form__group">
+        <label className="service-form__label">
+          Display Priority (lower = higher priority)
+        </label>
+        <Input 
+          type="number"
+          min="1"
+          value={priority} 
+          onChange={e => setPriority(Number(e.target.value))} 
+          required 
+          placeholder="Enter priority number (e.g., 1, 2, 3...)"
+        />
+        <p style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.5rem' }}>
+          Lower numbers appear first. Each service must have a unique priority.
         </p>
       </div>
 

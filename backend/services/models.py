@@ -17,6 +17,12 @@ class Department(models.Model):
         related_name="departments_managed"
     )
 
+    priority = models.PositiveIntegerField(
+        default=999,
+        unique=True,
+        help_text="Display priority (lower number = higher priority, must be unique)"
+    )
+
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -30,10 +36,11 @@ class Department(models.Model):
 
     class Meta:
         db_table = "departments"
-        ordering = ["title"]
+        ordering = ["priority", "title"]
         indexes = [
             models.Index(fields=['is_active']),
             models.Index(fields=['created_at']),
+            models.Index(fields=['priority']),
         ]
 class Service(models.Model):
     id = models.AutoField(primary_key=True)
@@ -58,6 +65,12 @@ class Service(models.Model):
         help_text="Team members assigned to this service"
     )
 
+    priority = models.PositiveIntegerField(
+        default=999,
+        unique=True,
+        help_text="Display priority within department (lower number = higher priority, must be unique)"
+    )
+
     is_active = models.BooleanField(default=True)
     created_by = models.ForeignKey(
         "accounts.User",
@@ -79,11 +92,12 @@ class Service(models.Model):
 
     class Meta:
         db_table = "services"
-        ordering = ["department", "title"]
+        ordering = ["department__priority", "priority", "title"]
         indexes = [
             models.Index(fields=['is_active']),
             models.Index(fields=['department', 'is_active']),
             models.Index(fields=['created_at']),
+            models.Index(fields=['priority']),
         ]
 
 class PriceCard(models.Model):

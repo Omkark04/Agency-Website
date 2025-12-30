@@ -17,6 +17,7 @@ export default function DepartmentForm({ initial, onSaved }: any) {
   const [teamHeadId, setTeamHeadId] = useState<number | null>(
     initial?.team_head?.id || null
   );
+  const [priority, setPriority] = useState<number>(initial?.priority || 999);
   const [isActive, setIsActive] = useState(initial?.is_active ?? true);
   const [teamHeads, setTeamHeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -71,6 +72,7 @@ export default function DepartmentForm({ initial, onSaved }: any) {
         logo: logoUrl, 
         short_description: shortDescription,
         team_head_id: teamHeadId || null,
+        priority,
         is_active: isActive,
       };
 
@@ -181,6 +183,25 @@ export default function DepartmentForm({ initial, onSaved }: any) {
             </option>
           ))}
         </select>
+      </div>
+
+      {/* Priority Input */}
+      <div className="department-form__group">
+        <label className="department-form__label">
+          Display Priority (lower = higher priority)
+        </label>
+        <Input 
+          type="number"
+          min="1"
+          value={priority} 
+          onChange={e => setPriority(Number(e.target.value))} 
+          required 
+          placeholder="Enter priority number (e.g., 1, 2, 3...)"
+          className="department-form__input"
+        />
+        <p style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.5rem' }}>
+          Lower numbers appear first. Each department must have a unique priority.
+        </p>
       </div>
 
       {/* Active Toggle */}

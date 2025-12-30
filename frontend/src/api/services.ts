@@ -18,6 +18,7 @@ export interface Service {
   department_title?: string;
   icon_name: 'palette' | 'laptop-code' | 'graduation-cap' | 'megaphone' | 'chart-line' | 'code' | 'mobile' | 'brush';
   gradient_colors: string; // e.g., "from-[#00C2A8] to-[#00A5C2]"
+  priority: number;
   is_featured: boolean;
   is_active: boolean;
   original_price?: number; // Pricing for the service

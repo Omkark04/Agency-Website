@@ -13,6 +13,7 @@ import { getWorkflowInfo } from '../../../api/workflow';
 import type { WorkflowInfo } from '../../../types/workflow';
 import type { Estimation } from '../../../types/estimations';
 import type { Invoice } from '../../../types/invoices';
+import { getOrder, type Order } from '../../../api/orders';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 
@@ -106,9 +107,10 @@ const PremiumBackNavigation = () => {
 
 
 // Premium Order Header Component
-const PremiumOrderHeader = ({ orderId }: { orderId: number }) => {
+const PremiumOrderHeader = ({ order }: { order: Order | null }) => {
   const [isStatusHovered, setIsStatusHovered] = useState(false);
 
+  if (!order) return null;
 
   return (
     <motion.div
@@ -139,11 +141,11 @@ const PremiumOrderHeader = ({ orderId }: { orderId: number }) => {
              
               <div>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-400 dark:to-white bg-clip-text text-transparent">
-                  Order Details
+                  {order.title || `Order #${order.id}`}
                   <Rocket className="inline w-8 h-8 ml-4 text-blue-500 animate-float" />
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-2">
-                  Tracking order #{orderId} • Real-time updates enabled
+                  {order.service_title} • Tracking order #{order.id} • Real-time updates enabled
                 </p>
               </div>
             </div>
@@ -168,8 +170,8 @@ const PremiumOrderHeader = ({ orderId }: { orderId: number }) => {
                     <Clock className="w-5 h-5 text-blue-500" />
                   </motion.div>
                   <div>
-                    <div className="font-bold text-blue-700 dark:text-blue-400">In Progress</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">Active • Updated 2 min ago</div>
+                    <div className="font-bold text-blue-700 dark:text-blue-400 capitalize">{order.status.replace('_', ' ')}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Active • Updated just now</div>
                   </div>
                   <motion.div
                     animate={{ scale: [1, 1.2, 1] }}
@@ -279,15 +281,35 @@ const PremiumTabs = ({ activeTab, setActiveTab }: any) => {
 };
 
 
-// Premium Overview Content
-const PremiumOverviewContent = () => {
-  const stats = [
-    { label: 'Total Amount', value: '₹24,999', icon: DollarSign, color: 'from-emerald-500 to-green-500' },
-    { label: 'Tasks Completed', value: '8/12', icon: CheckSquare, color: 'from-blue-500 to-cyan-500' },
-    { label: 'Days Active', value: '14', icon: Calendar, color: 'from-purple-500 to-pink-500' },
-    { label: 'Team Members', value: '5', icon: Users, color: 'from-amber-500 to-orange-500' },
-  ];
+// Premium Order Overview Component
+const OrderOverview = ({ order }: { order: Order | null }) => {
+  if (!order) return <div className="p-8 text-center text-gray-500">Loading order details...</div>;
 
+  const calculateDaysElapsed = (startDate?: string) => {
+    if (!startDate) return '0 Days';
+    const start = new Date(startDate);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+    return `${diffDays} Days`;
+  };
+
+  const calculateDaysRemaining = (dueDate?: string) => {
+    if (!dueDate) return 'TBD';
+    const due = new Date(dueDate);
+    const now = new Date();
+    if (now > due) return 'Overdue';
+    const diffTime = Math.abs(due.getTime() - now.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return `${diffDays} Days`;
+  };
+
+  const stats = [
+    { label: 'Total Invested', value: `₹${order.price}`, icon: DollarSign, color: 'from-emerald-500 to-green-500' },
+    { label: 'Time Elapsed', value: calculateDaysElapsed(order.created_at), icon: Clock, color: 'from-blue-500 to-cyan-500' },
+    { label: 'Completion', value: `${order.progress}%`, icon: TrendingUp, color: 'from-purple-500 to-pink-500' },
+    { label: 'Next Delivery', value: calculateDaysRemaining(order.due_date), icon: Target, color: 'from-amber-500 to-orange-500' },
+  ];
 
   return (
     <motion.div
@@ -327,7 +349,7 @@ const PremiumOverviewContent = () => {
                 <div className="mt-4 h-1.5 bg-gray-200/50 dark:bg-gray-700/50 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: `${Math.random() * 70 + 30}%` }}
+                    animate={{ width: `${order.progress}%` }}
                     transition={{ delay: index * 0.1 + 0.3, duration: 1.5 }}
                     className={`h-full bg-gradient-to-r ${stat.color} rounded-full relative`}
                   >
@@ -364,11 +386,10 @@ const PremiumOverviewContent = () => {
            
             <div className="space-y-4">
               {[
-                { label: 'Service Type', value: 'Web Development', icon: Code },
-                { label: 'Start Date', value: 'Dec 15, 2024', icon: Calendar },
-                { label: 'Estimated Delivery', value: 'Jan 30, 2025', icon: Target },
-                { label: 'Priority Level', value: 'High', icon: Zap },
-                { label: 'Client Contact', value: 'john@example.com', icon: Users },
+                { label: 'Service Type', value: order.service_title || 'N/A', icon: Code },
+                { label: 'Start Date', value: order.created_at ? new Date(order.created_at).toLocaleDateString() : 'N/A', icon: Calendar },
+                { label: 'Estimated Delivery', value: order.due_date ? new Date(order.due_date).toLocaleDateString() : 'TBD', icon: Target },
+                // Priority removed
               ].map((item, index) => {
                 const Icon = item.icon;
                 return (
@@ -389,67 +410,24 @@ const PremiumOverviewContent = () => {
                   </motion.div>
                 );
               })}
-            </div>
-          </div>
-        </motion.div>
 
-
-        {/* Quick Actions Card */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <div className="bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-xl h-full">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Quick Actions</h3>
-           
-            <div className="space-y-3">
-              {[
-                { label: 'Download Invoice', icon: Download, color: 'from-blue-500 to-cyan-500' },
-                { label: 'Share Progress', icon: Share2, color: 'from-purple-500 to-pink-500' },
-                { label: 'Contact Support', icon: HelpCircle, color: 'from-emerald-500 to-green-500' },
-                { label: 'View Documents', icon: FileText, color: 'from-amber-500 to-orange-500' },
-              ].map((action, index) => (
-                <motion.button
-                  key={action.label}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                  whileHover={{ x: 5, scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r ${action.color} shadow-lg hover:shadow-xl transition-all duration-300`}
-                >
-                  <action.icon className="w-4 h-4 mr-3" />
-                  {action.label}
-                  <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
-                </motion.button>
-              ))}
-            </div>
-           
-            {/* Recent Activity */}
-            <div className="mt-8 pt-6 border-t border-gray-200/50 dark:border-gray-700/50">
-              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Recent Activity</h4>
-              <div className="space-y-2">
-                {[
-                  { time: '2 min ago', activity: 'Task completed by team' },
-                  { time: '1 hour ago', activity: 'Payment received' },
-                  { time: '3 hours ago', activity: 'Progress updated' },
-                ].map((activity, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 + index * 0.1 }}
-                    className="flex items-center text-sm"
+              {/* Order Requirements from Form */}
+              {order.details && (
+                 <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.7 }}
+                    className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700/50"
                   >
-                    <div className="w-2 h-2 rounded-full bg-emerald-500 mr-3" />
-                    <div className="flex-1">
-                      <div className="text-gray-900 dark:text-white">{activity.activity}</div>
-                      <div className="text-gray-500 dark:text-gray-400 text-xs">{activity.time}</div>
+                    <div className="flex items-center mb-2">
+                       <FileText className="w-4 h-4 text-blue-500 mr-2" />
+                       <span className="font-medium text-gray-700 dark:text-gray-300">Order Requirements</span>
                     </div>
-                  </motion.div>
-                ))}
-              </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+                      {order.details}
+                    </p>
+                 </motion.div>
+              )}
             </div>
           </div>
         </motion.div>
@@ -482,13 +460,24 @@ export default function OrderDetailPage() {
   const [workflowInfo, setWorkflowInfo] = useState<WorkflowInfo | null>(null);
   const [selectedEstimation, setSelectedEstimation] = useState<Estimation | null>(null);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [order, setOrder] = useState<Order | null>(null);
 
 
   useEffect(() => {
     if (orderId) {
+      fetchOrder();
       fetchWorkflowInfo();
     }
   }, [orderId]);
+
+  const fetchOrder = async () => {
+    try {
+      const response = await getOrder(parseInt(orderId!));
+      setOrder(response.data);
+    } catch (error) {
+      console.error('Failed to fetch order:', error);
+    }
+  };
 
 
   const fetchWorkflowInfo = async () => {
@@ -512,7 +501,7 @@ export default function OrderDetailPage() {
       <PremiumBackNavigation />
      
       {/* Premium Order Header */}
-      <PremiumOrderHeader orderId={parseInt(orderId!)} />
+      <PremiumOrderHeader order={order} />
      
       {/* Premium Tabs */}
       <PremiumTabs activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -521,7 +510,7 @@ export default function OrderDetailPage() {
       <AnimatePresence mode="wait">
         {activeTab === 'overview' && (
           <PremiumTabWrapper value="overview">
-            <PremiumOverviewContent />
+            <OrderOverview order={order} />
           </PremiumTabWrapper>
         )}
        
@@ -662,44 +651,6 @@ export default function OrderDetailPage() {
         transition={{ delay: 0.8 }}
         className="fixed bottom-8 right-8 flex flex-col items-end space-y-3 z-50"
       >
-        {/* Main Action Button */}
-        <motion.div
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          className="relative"
-        >
-          <div className="absolute -inset-3 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 rounded-full blur-xl opacity-70" />
-          <button className="relative flex items-center px-6 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300">
-            <MoreVertical className="w-6 h-6" />
-          </button>
-        </motion.div>
-       
-        {/* Action Menu Items */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ delay: 1 }}
-          className="flex flex-col space-y-2"
-        >
-          {[
-            { icon: Download, label: 'Export', color: 'from-emerald-500 to-green-500' },
-            { icon: Share2, label: 'Share', color: 'from-purple-500 to-pink-500' },
-            { icon: Bell, label: 'Notify', color: 'from-amber-500 to-orange-500' },
-            { icon: Settings, label: 'Settings', color: 'from-gray-500 to-slate-500' },
-          ].map((action, index) => (
-            <motion.button
-              key={action.label}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1 + index * 0.1 }}
-              whileHover={{ x: -5 }}
-              className="flex items-center px-4 py-2.5 rounded-xl bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <action.icon className={`w-4 h-4 mr-2.5 bg-gradient-to-r ${action.color} bg-clip-text text-transparent`} />
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{action.label}</span>
-            </motion.button>
-          ))}
-        </motion.div>
       </motion.div>
 
 

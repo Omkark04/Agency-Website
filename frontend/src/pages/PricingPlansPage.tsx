@@ -5,7 +5,7 @@ import {
   ChevronRight, ArrowLeft, Sparkles, Clock, RefreshCw, Star,
   Globe, Smartphone, Palette, Code, BarChart, LineChart, Eye
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { listPriceCards } from '../api/pricecards';
 import type { PriceCard } from '../api/pricecards';
 import { listServices } from '../api/services';
@@ -21,6 +21,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { SEOHead } from '../components/shared/SEOHead';
+import { useAuth } from '../hooks/useAuth';
 
 export default function PricingPlansPage() {
   const [cards, setCards] = useState<PriceCard[]>([]);
@@ -43,10 +44,17 @@ export default function PricingPlansPage() {
 
   const navigate = useNavigate();
   const { navigateTo } = useProtectedNavigation();
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     fetchData();
+    
+    // Read department from URL query parameter
+    const deptParam = searchParams.get('department');
+    if (deptParam) {
+      setSelectedDepartment(Number(deptParam));
+    }
   }, []);
 
   const fetchData = async () => {
@@ -109,6 +117,8 @@ export default function PricingPlansPage() {
     setSelectedService(null);
     setSelectedTier(null);
     setPriceRange({ min: 0, max: 1000000 });
+    // Clear URL query parameters
+    setSearchParams({});
   };
 
   const openFormWithPriceCard = (card: PriceCard) => {
@@ -245,11 +255,26 @@ export default function PricingPlansPage() {
                  >
                     <span className="inline-block px-4 py-1.5 rounded-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-[#00C2A8] text-sm font-semibold mb-6 shadow-sm">
                         <Sparkles className="inline-block w-4 h-4 mr-2" />
-                        Complete Catalog
+                        {selectedDepartment 
+                          ? departments.find(d => d.id === selectedDepartment)?.name || 'Complete Catalog'
+                          : 'Complete Catalog'
+                        }
                     </span>
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">
-                        All Pricing Plans
+                        {selectedDepartment 
+                          ? `${departments.find(d => d.id === selectedDepartment)?.name} Plans`
+                          : 'All Pricing Plans'
+                        }
                     </h1>
+                    {selectedDepartment && (
+                      <button
+                        onClick={resetFilters}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 transition-all shadow-sm"
+                      >
+                        <X className="w-4 h-4" />
+                        Clear Filter
+                      </button>
+                    )}
                  </motion.div>
             </div>
         </div>

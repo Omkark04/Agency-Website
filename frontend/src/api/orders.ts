@@ -7,12 +7,27 @@ export interface Order {
   pricing_plan_id?: number | null;
   title: string;
   details?: string;
-  price: string;
-  total_price?: number; // Added for OrdersPage compatibility
-  service_title?: string; // Added for OrdersPage compatibility
+  price: string | number;
+  total_price?: number;
+  service_title?: string;
   status: string;
+  progress: number;
   due_date?: string;
   created_at?: string;
+  updated_at?: string;
+  // Price card details
+  price_card_title?: string;
+  price_card_price?: string | number;
+  pricing_plan?: {
+    id: number;
+    title: string;
+    price: number;
+    delivery_days: number;
+  };
+  // Document counts
+  estimation_count?: number;
+  invoice_count?: number;
+  receipt_count?: number;
 }
 
 export const listOrders = (params?: any) => api.get<Order[]>('/api/orders/', { params });

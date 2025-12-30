@@ -13,6 +13,7 @@ interface AuthModalProps {
   isOpen?: boolean;
   onClose?: () => void;
   defaultMode?: AuthMode;
+  onAuthSuccess?: () => void;
 }
 
 interface PasswordValidation {
@@ -23,7 +24,7 @@ interface PasswordValidation {
 }
 
 
-export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalProps) => {
+export const AuthModal = ({ isOpen, onClose, defaultMode = 'login', onAuthSuccess }: AuthModalProps) => {
   const { login, register, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -105,18 +106,18 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
       if (mode === 'login') {
         const res = await login(formData.email, formData.password);
 
-
         const userRole =
           res?.user?.role ||
           localStorage.getItem('role');
           console.log(userRole);
 
-
-        if (userRole === 'admin') navigate('/dashboard');
-        else if (userRole === 'service_head') navigate('/dashboard/service-head');
-        else if (userRole === 'team_member') navigate('/team-member-dashboard');
-        else navigate('/client-dashboard');
-
+        // Only navigate if onAuthSuccess is not provided
+        if (!onAuthSuccess) {
+          if (userRole === 'admin') navigate('/dashboard');
+          else if (userRole === 'service_head') navigate('/dashboard/service-head');
+          else if (userRole === 'team_member') navigate('/team-member-dashboard');
+          else navigate('/client-dashboard');
+        }
 
       } else {
         await register({
@@ -128,13 +129,18 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
           role: 'client',
         });
 
-
-        navigate('/client-dashboard');
+        // Only navigate if onAuthSuccess is not provided
+        if (!onAuthSuccess) {
+          navigate('/client-dashboard');
+        }
       }
-
 
       toggleModal();
 
+      // Call onAuthSuccess callback if provided
+      if (onAuthSuccess) {
+        onAuthSuccess();
+      }
 
       // ✅ RESET FORM AFTER SUCCESS
       setFormData({
@@ -144,7 +150,6 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login' }: AuthModalP
         email: '',
         password: '',
       });
-
 
     } catch (err: any) {
       setError(err.message || 'Authentication failed');

@@ -35,6 +35,100 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Payment Request Details Modal
+const PaymentRequestDetailsModal = ({ paymentRequest, onClose }: { paymentRequest: PaymentRequest | null; onClose: () => void }) => {
+  if (!paymentRequest) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in" onClick={onClose}>
+      <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between flex-shrink-0">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Payment Request Details
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <X className="h-6 w-6 text-gray-500" />
+          </button>
+        </div>
+        
+        <div className="p-6 space-y-6 overflow-y-auto flex-1">
+          {/* Request Info */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Request ID</p>
+              <p className="font-semibold text-gray-900 dark:text-white">#{paymentRequest.id}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Order ID</p>
+              <p className="font-semibold text-gray-900 dark:text-white">#{paymentRequest.order}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
+                paymentRequest.status === 'paid' 
+                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                  : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+              }`}>
+                {paymentRequest.status === 'paid' ? '✓ Paid' : '⏳ Pending'}
+              </span>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Created</p>
+              <p className="font-semibold text-gray-900 dark:text-white">
+                {new Date(paymentRequest.created_at).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+
+          {/* Amount Section */}
+          <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-lg p-6 border-2 border-orange-200 dark:border-orange-700">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-orange-600" />
+              Amount Due
+            </h3>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-3xl font-black text-orange-600 dark:text-orange-400">
+                  ₹{parseFloat(paymentRequest.amount).toLocaleString()}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Currency: {paymentRequest.currency || 'INR'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Transaction Details */}
+          {paymentRequest.transaction_id && (
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Transaction Details</h3>
+              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400">Transaction ID</p>
+                <p className="font-mono text-gray-900 dark:text-white break-all">{paymentRequest.transaction_id}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Payment Date */}
+          {paymentRequest.paid_at && (
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Payment Date</h3>
+              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                <p className="text-gray-900 dark:text-white">
+                  {new Date(paymentRequest.paid_at).toLocaleString()}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 // Floating particles system
 const FloatingParticles = () => (
@@ -105,6 +199,14 @@ const PremiumStatsCard = ({
   subtitle
 }: any) => {
   const [displayValue, setDisplayValue] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+ 
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
  
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -128,7 +230,36 @@ const PremiumStatsCard = ({
     return () => clearTimeout(timer);
   }, [value, index]);
 
+  // Mobile: no animations, no icons
+  if (isMobile) {
+    return (
+      <div className="relative">
+        {/* Main card - Square on mobile with fixed height */}
+        <div className="relative bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-4 border border-white/20 dark:border-gray-700/30 shadow-lg aspect-square flex flex-col justify-between min-h-[140px]">
+          <div className="relative z-10 flex-1 flex flex-col justify-between">
+            <div>
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                {title}
+              </p>
+              <p className="text-2xl font-black bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent line-clamp-1">
+                {typeof value === 'string' ? value : displayValue.toLocaleString()}
+              </p>
+            </div>
+            {subtitle && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 line-clamp-2">{subtitle}</p>
+            )}
+          </div>
+         
+          {/* Simple progress bar on mobile */}
+          <div className="h-1 bg-gray-200/50 dark:bg-gray-700/50 rounded-full overflow-hidden mt-3">
+            <div className={`h-full bg-gradient-to-r ${color} rounded-full`} style={{ width: '100%' }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
+  // Desktop: full animations
   return (
     <motion.div
       initial={{ opacity: 0, y: 50, scale: 0.95 }}
@@ -152,10 +283,7 @@ const PremiumStatsCard = ({
      
       {/* Main card */}
       <div className="relative bg-gradient-to-br from-white/90 to-gray-50/90 dark:from-gray-900/90 dark:to-gray-800/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-gray-700/30 shadow-2xl hover:shadow-3xl transition-all duration-500 overflow-hidden">
-        {/* FloatingParticles - hidden on mobile */}
-        <div className="hidden md:block">
-          <FloatingParticles />
-        </div>
+        <FloatingParticles />
        
         <div className="relative z-10">
           <div className="flex items-start justify-between mb-6">
@@ -179,11 +307,10 @@ const PremiumStatsCard = ({
               )}
             </div>
            
-          {/* Icon - hidden on mobile */}
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
-              className={`hidden lg:block p-4 rounded-2xl bg-gradient-to-r ${color} shadow-2xl`}
+              className={`p-4 rounded-2xl bg-gradient-to-r ${color} shadow-2xl`}
             >
               <Icon className="w-7 h-7 text-white" />
             </motion.div>
@@ -211,7 +338,97 @@ const PremiumStatsCard = ({
 const PremiumOrderRow = ({ order, index }: { order: Order; index: number }) => {
   const statusConfig = getStatusColor(order.status);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
  
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+ 
+  // Mobile: no animations, keep all columns like desktop
+  if (isMobile) {
+    return (
+      <tr className="border-b border-gray-200/50 dark:border-gray-700/50">
+        {/* Order ID */}
+        <td className="px-4 py-4 whitespace-nowrap">
+          <div className="flex items-center space-x-2">
+            <div className={`p-2 rounded-lg bg-gradient-to-r ${statusConfig.gradient} shadow-md`}>
+              <FileText className="w-3 h-3 text-white" />
+            </div>
+            <div>
+              <span className="text-sm font-bold text-gray-900 dark:text-white">#{order.id}</span>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Order ID</p>
+            </div>
+          </div>
+        </td>
+       
+        {/* Service Title */}
+        <td className="px-4 py-4 whitespace-nowrap">
+          <div className="max-w-xs">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+              {order.title || 'N/A'}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+              {order.service_title || 'Service'}
+            </p>
+          </div>
+        </td>
+       
+        {/* Status Badge */}
+        <td className="px-4 py-4 whitespace-nowrap">
+          <span className={`inline-flex items-center px-2.5 py-1.5 text-xs font-bold rounded-lg ${statusConfig.bg} ${statusConfig.text} border ${statusConfig.borderColor}`}>
+            <span className="mr-1.5">{statusConfig.icon}</span>
+            {formatStatus(order.status)}
+          </span>
+        </td>
+       
+        {/* Amount */}
+        <td className="px-4 py-4 whitespace-nowrap">
+          <div className="flex items-center space-x-1.5">
+            <div className="p-1 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-lg">
+              <DollarSign className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div>
+              <span className="text-sm font-black text-gray-900 dark:text-white">
+                ₹{order.price || '0'}
+              </span>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Amount</p>
+            </div>
+          </div>
+        </td>
+       
+        {/* Date */}
+        <td className="px-4 py-4 whitespace-nowrap">
+          <div className="flex items-center space-x-1.5">
+            <div className="p-1 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-lg">
+              <Calendar className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                {new Date(order.created_at || new Date()).toLocaleDateString()}
+              </span>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Order Date</p>
+            </div>
+          </div>
+        </td>
+       
+        {/* Actions - Always visible */}
+        <td className="px-4 py-4 whitespace-nowrap">
+          <Link
+            to={`/client-dashboard/orders/${order.id}`}
+            className="flex items-center px-3 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-lg shadow-md text-sm"
+          >
+            <Eye className="w-3.5 h-3.5 mr-1.5" />
+            View
+          </Link>
+        </td>
+      </tr>
+    );
+  }
+ 
+  // Desktop: full animations and hover effects
   return (
     <motion.tr
       initial={{ opacity: 0, y: 20 }}
@@ -617,6 +834,7 @@ export default function OrdersPage() {
   const [paymentRequests, setPaymentRequests] = useState<PaymentRequest[]>([]);
   const [loadingPayments, setLoadingPayments] = useState(false);
   const [payingRequestId, setPayingRequestId] = useState<number | null>(null);
+  const [selectedPaymentRequest, setSelectedPaymentRequest] = useState<PaymentRequest | null>(null);
 
 
   useEffect(() => {
@@ -719,7 +937,7 @@ export default function OrdersPage() {
   const totalOrders = orders.length;
   const activeOrders = orders.filter(o => o.status.includes('progress') || o.status.includes('done') || o.status === 'approved').length;
   const completedOrders = orders.filter(o => o.status === 'completed' || o.status === 'closed' || o.status === 'payment_done').length;
-  const totalSpent = orders.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0);
+  const totalSpent = orders.reduce((sum, o) => sum + (Number(o.price) || 0), 0);
   const avgOrderValue = totalOrders > 0 ? totalSpent / totalOrders : 0;
 
   const statsCards = [
@@ -790,7 +1008,7 @@ export default function OrdersPage() {
           {/* Mobile Stats (Horizontal Scroll) */}
           <div className="flex lg:hidden overflow-x-auto pb-4 gap-4 snap-x snap-mandatory scrollbar-hide -mx-6 px-6">
             {statsCards.map((stat, i) => (
-              <div key={i} className="min-w-[70vw] snap-center">
+              <div key={i} className="min-w-[30vw] snap-center">
                 <PremiumStatsCard
                   title={stat.title}
                   value={stat.value}
@@ -989,7 +1207,24 @@ export default function OrdersPage() {
 
 
       {/* Payment Requests Section */}
-      {paymentRequests.length > 0 && (
+      {loadingPayments && paymentRequests.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mt-8 bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700"
+        >
+          <div className="flex items-center justify-center">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="inline-block"
+            >
+              <CreditCard className="w-12 h-12 text-orange-500" />
+            </motion.div>
+            <p className="ml-4 text-gray-600 dark:text-gray-400 text-lg">Loading payment requests...</p>
+          </div>
+        </motion.div>
+      ) : paymentRequests.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -1005,7 +1240,8 @@ export default function OrdersPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Desktop: Grid layout */}
+          <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-6">
             {paymentRequests.map((paymentRequest) => (
               <PaymentRequestCard
                 key={paymentRequest.id}
@@ -1016,55 +1252,168 @@ export default function OrdersPage() {
               />
             ))}
           </div>
+
+          {/* Mobile: Horizontal scroll with compact cards */}
+          <div className="md:hidden flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide -mx-6 px-6">
+            {paymentRequests.map((paymentRequest) => (
+              <div key={paymentRequest.id} className="min-w-[85vw] snap-center">
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-md">
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg">
+                        <CreditCard className="w-4 h-4 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-gray-900 dark:text-white">Payment Request</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">#{paymentRequest.id}</p>
+                      </div>
+                    </div>
+                    {paymentRequest.status === 'paid' ? (
+                      <span className="px-3 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full text-xs font-bold">
+                        ✓ Paid
+                      </span>
+                    ) : (
+                      <span className="px-3 py-1 bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 rounded-full text-xs font-bold">
+                        ⏳ Pending
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Amount */}
+                  <div className="mb-4 p-3 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-lg">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Amount Due</p>
+                    <p className="text-2xl font-black text-orange-600 dark:text-orange-400">
+                      ₹{parseFloat(paymentRequest.amount).toLocaleString()}
+                    </p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2">
+                    {paymentRequest.status === 'pending' ? (
+                      <button
+                        onClick={() => handlePayNow(paymentRequest)}
+                        disabled={payingRequestId === paymentRequest.id && loadingPayments}
+                        className="flex-1 flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-bold rounded-lg shadow-md transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {payingRequestId === paymentRequest.id && loadingPayments ? (
+                          <>
+                            <motion.div
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                              className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
+                            />
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <CreditCard className="w-4 h-4 mr-2" />
+                            Pay Now
+                          </>
+                        )}
+                      </button>
+                    ) : paymentRequest.transaction_id ? (
+                      <button
+                        onClick={() => handleDownloadReceipt(paymentRequest.transaction_id!)}
+                        className="flex-1 flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold rounded-lg shadow-md transition-all duration-300"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Receipt
+                      </button>
+                    ) : null}
+                    
+                    {/* Eye button for mobile - view full details */}
+                    <button
+                      onClick={() => setSelectedPaymentRequest(paymentRequest)}
+                      className="p-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </motion.div>
       )}
 
 
+      {/* Payment Request Details Modal */}
+      <PaymentRequestDetailsModal 
+        paymentRequest={selectedPaymentRequest} 
+        onClose={() => setSelectedPaymentRequest(null)} 
+      />
+
       {/* Animation Styles */}
       <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
+        /* Desktop animations */
+        @media (min-width: 768px) {
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
           }
-          to {
-            opacity: 1;
-            transform: translateY(0);
+
+          @keyframes slideUp {
+            from {
+              opacity: 0;
+              transform: translateY(40px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          @keyframes float {
+            0%, 100% {
+              transform: translateY(0px);
+            }
+            50% {
+              transform: translateY(-20px);
+            }
+          }
+
+          @keyframes float-slow {
+            0%, 100% {
+              transform: translateY(0px);
+            }
+            50% {
+              transform: translateY(-10px);
+            }
+          }
+
+          .animate-fadeIn {
+            animation: fadeIn 0.6s ease-out;
+          }
+
+          .animate-slideUp {
+            animation: slideUp 0.5s ease-out;
+          }
+
+          .animate-float {
+            animation: float 6s ease-in-out infinite;
+          }
+
+          .animate-float-slow {
+            animation: float-slow 8s ease-in-out infinite;
           }
         }
 
-
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(40px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
+        /* Mobile: disable animations */
+        @media (max-width: 767px) {
+          .animate-fadeIn,
+          .animate-slideUp,
+          .animate-float,
+          .animate-float-slow {
+            animation: none !important;
           }
         }
-
-
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-20px);
-          }
-        }
-
-
-        @keyframes float-slow {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-        }
-
 
         @keyframes gradient {
           0% {
@@ -1078,7 +1427,6 @@ export default function OrdersPage() {
           }
         }
 
-
         @keyframes shimmer {
           0% {
             transform: translateX(-100%);
@@ -1088,65 +1436,23 @@ export default function OrdersPage() {
           }
         }
 
-
-        .animate-fadeIn {
-          animation: fadeIn 0.6s ease-out;
-        }
-
-
-        .animate-slideUp {
-          animation: slideUp 0.5s ease-out;
-        }
-
-
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-
-
-        .animate-float-slow {
-          animation: float-slow 8s ease-in-out infinite;
-        }
-
-
         .animate-gradient {
           background-size: 200% 200%;
-          animation: gradient 8s ease infinite;
+          animation: gradient 15s ease infinite;
         }
-
 
         .animate-shimmer {
           animation: shimmer 2s infinite;
         }
 
-
-        /* Smooth scrolling */
-        html {
-          scroll-behavior: smooth;
+        /* Hide scrollbar */
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
 
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
-        }
-
-
-        ::-webkit-scrollbar-track {
-          background: rgba(59, 130, 246, 0.1);
-          border-radius: 4px;
-        }
-
-
-        ::-webkit-scrollbar-thumb {
-          background: linear-gradient(180deg, #3b82f6, #06b6d4);
-          border-radius: 4px;
-        }
-
-
-        ::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(180deg, #2563eb, #0891b2);
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
     </div>

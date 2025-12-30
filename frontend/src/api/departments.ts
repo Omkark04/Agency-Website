@@ -7,6 +7,7 @@ export interface Department {
   logo?: string | null;
   short_description?: string;
   team_head?: number | null;
+  priority: number;
   is_active: boolean;
   created_at: string;
 }

@@ -39,6 +39,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
             "short_description",
             "team_head",
             "team_head_id",
+            "priority",
             "is_active",
             "created_at",
         ]

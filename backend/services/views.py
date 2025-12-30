@@ -20,12 +20,12 @@ from .serializers import (
 User = get_user_model()
 
 class DepartmentViewSet(viewsets.ModelViewSet):
-    queryset = Department.objects.prefetch_related('services').all().order_by("title")
+    queryset = Department.objects.prefetch_related('services').all().order_by("priority", "title")
     serializer_class = DepartmentSerializer
     permission_classes = [AllowAny]
 
 class ServiceViewSet(viewsets.ModelViewSet):
-    queryset = Service.objects.all().order_by("department", "title")
+    queryset = Service.objects.all().order_by("department__priority", "priority", "title")
     serializer_class = ServiceSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend]
@@ -99,7 +99,7 @@ class PricingStatsView(generics.GenericAPIView):
 
 class PublicServiceListView(generics.ListAPIView):
     """Public endpoint for listing services (no auth required)"""
-    queryset = Service.objects.filter(is_active=True).select_related('department').prefetch_related('team_members').order_by('department', 'title')
+    queryset = Service.objects.filter(is_active=True).select_related('department').prefetch_related('team_members').order_by('department__priority', 'priority', 'title')
     serializer_class = ServiceSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend]
