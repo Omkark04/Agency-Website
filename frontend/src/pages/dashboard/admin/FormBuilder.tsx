@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Save, Eye, Plus, Trash2, GripVertical, Settings,
-  Type, Hash, AlignLeft, FileText, ChevronDown, CheckSquare, Upload,
+  Type, Hash, AlignLeft, FileText, ChevronDown, CheckSquare, Upload, Calendar,
   Search, Edit, Copy, List, X
 } from 'lucide-react';
 import { createForm, updateForm, getForm, createField, updateField, deleteField, listForms, deleteForm } from '../../../api/forms';
@@ -14,14 +14,15 @@ import { useAuth } from '../../../hooks/useAuth';
 import { NoDepartmentMessage } from '../../../components/dashboard/NoDepartmentMessage';
 
 const FIELD_TYPES = [
-  { type: 'text', label: 'Text', icon: Type },
-  { type: 'number', label: 'Number', icon: Hash },
+  { type: 'text', label: 'Text Input', icon: Type },
   { type: 'short_text', label: 'Short Text', icon: AlignLeft },
-  { type: 'long_text', label: 'Long Text', icon: FileText },
+  { type: 'long_text', label: 'Long Text', icon: AlignLeft },
+  { type: 'number', label: 'Number', icon: Hash },
   { type: 'dropdown', label: 'Dropdown', icon: ChevronDown },
-  { type: 'checkbox', label: 'Checkbox', icon: CheckSquare },
   { type: 'multi_select', label: 'Multi Select', icon: CheckSquare },
-  { type: 'media', label: 'File Upload', icon: Upload },
+  { type: 'checkbox', label: 'Checkbox', icon: CheckSquare },
+  { type: 'date', label: 'Date', icon: Calendar },
+  { type: 'media', label: 'Media Upload', icon: Upload },
 ];
 
 const FormBuilder = () => {

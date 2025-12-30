@@ -139,7 +139,6 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login', onAuthSucces
 
       } else {
         await register({
-          name: formData.name,
           username: formData.username,
           phone: formData.phone,
           email: formData.email,

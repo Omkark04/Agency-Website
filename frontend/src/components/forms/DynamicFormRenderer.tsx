@@ -225,7 +225,17 @@ const DynamicFormRenderer = ({ serviceId, priceCardId, onSuccess }: DynamicFormR
         submissionData.data.price_card_id = priceCardId;
       }
       
+      console.log('='.repeat(80));
+      console.log('FORM SUBMISSION DEBUG');
+      console.log('='.repeat(80));
+      console.log('Form ID:', form!.id);
+      console.log('Submission Data:', JSON.stringify(submissionData, null, 2));
+      console.log('Auth Token:', localStorage.getItem('access') ? 'Present' : 'Missing');
+      console.log('User:', localStorage.getItem('user'));
+      console.log('='.repeat(80));
+      
       const response = await submitForm(form!.id!, submissionData);
+      console.log('✓ Form submitted successfully:', response.data);
       
       setSubmitStatus({
         success: true,
@@ -384,6 +394,18 @@ const DynamicFormRenderer = ({ serviceId, priceCardId, onSuccess }: DynamicFormR
               {field.placeholder || field.label}
             </span>
           </label>
+        );
+
+      case 'date':
+        return (
+          <input
+            type="date"
+            value={value || ''}
+            onChange={(e) => handleInputChange(fieldId, e.target.value)}
+            placeholder={field.placeholder}
+            className={inputClasses}
+            required={field.required}
+          />
         );
 
       case 'media':

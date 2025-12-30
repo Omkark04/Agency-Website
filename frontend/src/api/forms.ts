@@ -5,7 +5,7 @@ export interface FormField {
   id?: number;
   form?: number;
   label: string;
-  field_type: 'text' | 'number' | 'short_text' | 'long_text' | 'dropdown' | 'checkbox' | 'multi_select' | 'media';
+  field_type: 'text' | 'number' | 'short_text' | 'long_text' | 'dropdown' | 'checkbox' | 'multi_select' | 'media' | 'date';
   required: boolean;
   placeholder?: string;
   help_text?: string;

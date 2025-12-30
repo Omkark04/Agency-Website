@@ -508,7 +508,7 @@ export const Services = () => {
     {/* Form Modal */}
     {showFormModal && selectedServiceId && (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto my-8 shadow-2xl">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] my-8 shadow-2xl flex flex-col">
           {/* Enhanced Modal Header */}
           <div className="sticky top-0 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] p-6 flex items-center justify-between z-10 rounded-t-2xl">
             <div className="flex-1">
@@ -535,7 +535,7 @@ export const Services = () => {
             </button>
           </div>
           
-          <div className="p-6">
+          <div className="p-6 overflow-y-auto flex-1">
             <DynamicFormRenderer 
               serviceId={selectedServiceId}
               onSuccess={(orderId) => {

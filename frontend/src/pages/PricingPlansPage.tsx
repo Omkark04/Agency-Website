@@ -292,7 +292,7 @@ export default function PricingPlansPage() {
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-hidden">
         
         {/* New Hero Section */}
-        <div className="relative w-full border-b border-gray-200 dark:border-gray-800 mb-8 md:mb-12 overflow-hidden min-h-[200px] md:min-h-[250px]">
+        <div className="relative w-full border-b border-gray-200 dark:border-gray-800 mb-8 md:mb-12 overflow-hidden aspect-square md:aspect-auto md:h-[50vh]">
             {/* Background Images */}
             <div className="absolute inset-0 z-0">
                 {/* Desktop Carousel */}
@@ -350,7 +350,7 @@ export default function PricingPlansPage() {
                           : 'Complete Catalog'
                         }
                     </span>
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6">
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-6 leading-tight pb-4">
                         {selectedDepartment 
                           ? `${departments.find(d => d.id === selectedDepartment)?.name} Plans`
                           : 'All Pricing Plans'
@@ -691,7 +691,7 @@ export default function PricingPlansPage() {
             >
               <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#00C2A8] via-[#0066FF] to-[#00C2A8]" />
              
-              <div className="p-6">
+              <div className="p-6 max-h-[calc(90vh-8rem)] overflow-y-auto">
                 <DialogHeader>
                   <div className="flex items-start justify-between">
                     <div>

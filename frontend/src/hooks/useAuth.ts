@@ -95,7 +95,6 @@ export const useAuth = () => {
   };
 
   const register = async (userData: {
-    name: string;
     username: string;
     phone: string;
     email: string;
@@ -117,12 +116,13 @@ export const useAuth = () => {
 
       setAuth({ user, loading: false, error: null });
       
-      // Clients always go to client dashboard after registration
-      navigate('/client-dashboard');
+      // Don't navigate automatically - let the calling component handle navigation
+      // This allows form submission flow to complete without interruption
 
       return { user };
     } catch (error: any) {
-      const errorMsg = error.response?.data?.detail || 'Registration failed';
+      console.error('Registration error:', error.response?.data);
+      const errorMsg = error.response?.data?.detail || error.response?.data || 'Registration failed';
       setAuth(prev => ({ ...prev, error: errorMsg, loading: false }));
       throw new Error(errorMsg);
     }
