@@ -41,6 +41,7 @@ export interface Estimation {
   sent_at?: string;
   approved_at?: string;
   rejected_at?: string;
+  valid_until?: string;
 }
 
 export interface EstimationCreateData {
