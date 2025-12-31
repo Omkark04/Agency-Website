@@ -277,14 +277,7 @@ export default function OrderManagementPage() {
       {/* Payment Section */}
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold mb-4">Payment Management</h2>
-        <div className="space-y-4">
-          <PaymentGatewaySelector
-            orderId={parseInt(orderId!)}
-            orderTitle="Order Title"
-            amount="10000"
-          />
-          <PaymentHistory orderId={parseInt(orderId!)} />
-        </div>
+        <PaymentHistory orderId={parseInt(orderId!)} />
       </div>
 
       {/* Estimations Section */}

@@ -278,12 +278,21 @@ def generate_invoice(request, order_id):
     Generate invoice for an order
     POST /api/orders/<order_id>/invoices/generate/
     """
+    import logging
+    import traceback
+    logger = logging.getLogger(__name__)
+    
     try:
+        logger.info(f"Invoice generation request for order {order_id} from user {request.user.id}")
+        logger.info(f"Request data: {request.data}")
+        
         order = Order.objects.get(id=order_id)
+        logger.info(f"Found order: {order.title}")
         
         # Check permissions
         user = request.user
         if user.role not in ['admin', 'service_head']:
+            logger.warning(f"Unauthorized invoice generation attempt by user {user.id} with role {user.role}")
             return Response(
                 {'error': 'Only admins and service heads can generate invoices'},
                 status=status.HTTP_403_FORBIDDEN
@@ -293,40 +302,83 @@ def generate_invoice(request, order_id):
         data = request.data.copy()
         data['order_id'] = order.id
         
+        logger.info(f"Validating invoice data with serializer")
         serializer = InvoiceGenerateSerializer(data=data)
         
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Create invoice
-        invoice_data = serializer.validated_data
-        invoice = Invoice.objects.create(
-            order=order,
-            estimation_id=invoice_data.get('estimation_id'),
-            title=invoice_data['title'],
-            line_items=invoice_data['line_items'],
-            tax_percentage=invoice_data.get('tax_percentage', 0),
-            discount_amount=invoice_data.get('discount_amount', 0),
-            due_date=invoice_data.get('due_date'),
-            notes=invoice_data.get('notes', ''),
-            terms_and_conditions=invoice_data.get('terms_and_conditions', ''),
-            created_by=user,
-            status='draft'
-        )
-        
-        # Generate PDF
-        pdf_generator = InvoicePDFGenerator(invoice)
-        pdf_generator.upload_to_dropbox()
-        
-        # Send notification to client
-        if order.client:
-            Notification.objects.create(
-                user=order.client,
-                title="Invoice Generated",
-                message=f"Invoice {invoice.invoice_number} has been generated for Order #{order.id}",
-                notification_type="invoice_generated"
+            logger.error(f"Invoice validation failed: {serializer.errors}")
+            logger.error(f"Request data: {request.data}")
+            return Response(
+                {
+                    'error': 'Validation failed',
+                    'details': serializer.errors
+                },
+                status=status.HTTP_400_BAD_REQUEST
             )
         
+        # Create invoice
+        logger.info("Creating invoice object")
+        invoice_data = serializer.validated_data
+        try:
+            invoice = Invoice.objects.create(
+                order=order,
+                estimation_id=invoice_data.get('estimation_id'),
+                title=invoice_data['title'],
+                line_items=invoice_data['line_items'],
+                tax_percentage=invoice_data.get('tax_percentage', 0),
+                discount_amount=invoice_data.get('discount_amount', 0),
+                due_date=invoice_data.get('due_date'),
+                notes=invoice_data.get('notes', ''),
+                terms_and_conditions=invoice_data.get('terms_and_conditions', ''),
+                created_by=user,
+                status='draft'
+            )
+            logger.info(f"Invoice created successfully: {invoice.invoice_number}")
+        except Exception as e:
+            logger.error(f"Failed to create invoice object: {str(e)}")
+            logger.error(f"Exception type: {type(e).__name__}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return Response(
+                {
+                    'error': 'Failed to create invoice',
+                    'details': str(e)
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+        # Generate PDF
+        try:
+            logger.info(f"Generating PDF for invoice {invoice.invoice_number}")
+            pdf_generator = InvoicePDFGenerator(invoice)
+            result = pdf_generator.upload_to_dropbox()
+            
+            # Save PDF URL and file path to invoice
+            invoice.pdf_url = result.get('download_url')
+            invoice.pdf_file_path = result.get('file_path')
+            invoice.save(update_fields=['pdf_url', 'pdf_file_path'])
+            
+            logger.info(f"PDF generated and saved successfully: {result.get('download_url')}")
+        except Exception as e:
+            logger.error(f"PDF generation failed for invoice {invoice.invoice_number}: {str(e)}")
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            # Don't fail the entire request if PDF generation fails
+            logger.warning("Continuing without PDF - invoice created but PDF generation failed")
+        
+        # Send notification to client
+        try:
+            if order.client:
+                Notification.objects.create(
+                    user=order.client,
+                    title="Invoice Generated",
+                    message=f"Invoice {invoice.invoice_number} has been generated for Order #{order.id}",
+                    notification_type="invoice_generated"
+                )
+                logger.info(f"Notification sent to client {order.client.id}")
+        except Exception as e:
+            logger.error(f"Failed to send notification: {str(e)}")
+            # Don't fail the request if notification fails
+        
+        logger.info(f"Invoice generation completed successfully for order {order_id}")
         return Response({
             'success': True,
             'message': 'Invoice generated successfully',
@@ -334,13 +386,20 @@ def generate_invoice(request, order_id):
         }, status=status.HTTP_201_CREATED)
     
     except Order.DoesNotExist:
+        logger.error(f"Order {order_id} not found")
         return Response(
             {'error': 'Order not found'},
             status=status.HTTP_404_NOT_FOUND
         )
     except Exception as e:
+        logger.error(f"Unexpected error in invoice generation: {str(e)}")
+        logger.error(f"Exception type: {type(e).__name__}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
         return Response(
-            {'error': str(e)},
+            {
+                'error': 'Failed to generate invoice',
+                'details': str(e)
+            },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
@@ -352,12 +411,20 @@ def download_invoice(request, invoice_id):
     Download invoice PDF
     GET /api/invoices/<invoice_id>/download/
     """
+    import logging
+    import traceback
+    logger = logging.getLogger(__name__)
+    
     try:
+        logger.info(f"Invoice download request for invoice {invoice_id} from user {request.user.id}")
+        
         invoice = Invoice.objects.get(id=invoice_id)
+        logger.info(f"Found invoice: {invoice.invoice_number}")
         
         # Check permissions
         user = request.user
         if user.role == 'client' and invoice.order.client != user:
+            logger.warning(f"Unauthorized invoice download attempt by user {user.id}")
             return Response(
                 {'error': 'You do not have permission to download this invoice'},
                 status=status.HTTP_403_FORBIDDEN
@@ -365,22 +432,130 @@ def download_invoice(request, invoice_id):
         
         # Generate PDF if not exists
         if not invoice.pdf_url:
-            pdf_generator = InvoicePDFGenerator(invoice)
-            pdf_generator.upload_to_drive()
+            logger.info(f"PDF not found for invoice {invoice.invoice_number}, generating now")
+            try:
+                pdf_generator = InvoicePDFGenerator(invoice)
+                result = pdf_generator.upload_to_dropbox()
+                logger.info(f"PDF generated successfully: {result.get('download_url')}")
+            except Exception as e:
+                logger.error(f"Failed to generate PDF for invoice {invoice.invoice_number}: {str(e)}")
+                logger.error(f"Traceback: {traceback.format_exc()}")
+                return Response(
+                    {
+                        'error': 'Failed to generate PDF',
+                        'details': str(e)
+                    },
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
         
         # Return PDF URL for download
+        logger.info(f"Returning PDF URL for invoice {invoice.invoice_number}")
         return Response({
             'pdf_url': invoice.pdf_url,
             'invoice_number': invoice.invoice_number
         })
     
     except Invoice.DoesNotExist:
+        logger.error(f"Invoice {invoice_id} not found")
         return Response(
             {'error': 'Invoice not found'},
             status=status.HTTP_404_NOT_FOUND
         )
     except Exception as e:
+        logger.error(f"Unexpected error in invoice download: {str(e)}")
+        logger.error(f"Exception type: {type(e).__name__}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
         return Response(
-            {'error': str(e)},
+            {
+                'error': 'Failed to download invoice',
+                'details': str(e)
+            },
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def generate_invoice_pdf(request, invoice_id):
+    """
+    Generate PDF for an existing invoice
+    POST /api/invoices/<invoice_id>/generate-pdf/
+    """
+    import logging
+    import traceback
+    logger = logging.getLogger(__name__)
+    
+    try:
+        logger.info(f"Attempting to generate PDF for invoice {invoice_id}")
+        invoice = Invoice.objects.get(id=invoice_id)
+        logger.info(f"Found invoice: {invoice.invoice_number}")
+        
+        # Check permissions
+        user = request.user
+        if user.role not in ['admin', 'service_head']:
+            logger.warning(f"Unauthorized PDF generation attempt by user {user.id}")
+            return Response(
+                {'error': 'Only admins and service heads can generate PDFs'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Generate and upload PDF
+        try:
+            logger.info(f"Creating PDF generator for invoice {invoice.invoice_number}")
+            pdf_generator = InvoicePDFGenerator(invoice)
+            
+            logger.info("Uploading to Dropbox...")
+            result = pdf_generator.upload_to_dropbox()
+            
+            # Save PDF URL and file path to invoice
+            invoice.pdf_url = result.get('download_url')
+            invoice.pdf_file_path = result.get('file_path')
+            invoice.save(update_fields=['pdf_url', 'pdf_file_path'])
+            
+            logger.info(f"PDF generated and saved successfully: {result.get('download_url')}")
+            return Response({
+                'success': True,
+                'message': 'PDF generated successfully',
+                'pdf_url': result.get('download_url'),
+                'pdf_file_path': result.get('file_path')
+            })
+        except RuntimeError as e:
+            # WeasyPrint not available
+            logger.error(f"WeasyPrint RuntimeError: {str(e)}")
+            return Response(
+                {
+                    'error': 'PDF generation is not available',
+                    'message': str(e),
+                    'details': 'WeasyPrint requires GTK+ libraries to be installed on Windows'
+                },
+                status=status.HTTP_503_SERVICE_UNAVAILABLE
+            )
+        except Exception as e:
+            # Log the full traceback
+            logger.error(f"Error generating PDF: {str(e)}")
+            logger.error(traceback.format_exc())
+            return Response(
+                {
+                    'error': 'Failed to generate PDF',
+                    'message': str(e),
+                    'traceback': traceback.format_exc()
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    except Invoice.DoesNotExist:
+        logger.error(f"Invoice {invoice_id} not found")
+        return Response(
+            {'error': 'Invoice not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        logger.error(traceback.format_exc())
+        return Response(
+            {
+                'error': str(e),
+                'traceback': traceback.format_exc()
+            },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )

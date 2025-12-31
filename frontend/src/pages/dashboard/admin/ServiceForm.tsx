@@ -22,6 +22,7 @@ export default function ServiceForm({
   const { user } = useAuth();
   const [department, setDepartments] = useState<any[]>([]);
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
   const [title, setTitle] = useState(initial?.title || '');
   const [shortDesc, setShortDesc] = useState(initial?.short_description || '');
   const [longDesc, setLongDesc] = useState(initial?.long_description || '');
@@ -63,6 +64,11 @@ export default function ServiceForm({
         const members = res.data.filter((u: any) => u.role === 'team_member');
         setTeamMembers(members);
       })
+      .catch(err => console.error(err));
+    
+    // Load existing services to show priority conflicts
+    api.get('/api/services/')
+      .then(res => setServices(res.data))
       .catch(err => console.error(err));
   }, []);
   // ✅ FILE SELECT
@@ -272,6 +278,59 @@ export default function ServiceForm({
         <p style={{ fontSize: '0.875rem', color: '#6b7280', marginTop: '0.5rem' }}>
           Lower numbers appear first. Each service must have a unique priority.
         </p>
+        
+        {/* Show existing service priorities */}
+        {services.length > 0 && (
+          <div style={{ 
+            marginTop: '0.75rem', 
+            padding: '0.75rem', 
+            backgroundColor: '#f9fafb', 
+            borderRadius: '0.375rem',
+            border: '1px solid #e5e7eb'
+          }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: '600', color: '#374151', marginBottom: '0.5rem' }}>
+              📋 Existing Service Priorities:
+            </p>
+            <div style={{ maxHeight: '150px', overflowY: 'auto' }}>
+              {services
+                .filter(s => !initial || s.id !== initial.id) // Exclude current service when editing
+                .sort((a, b) => a.priority - b.priority)
+                .map(service => (
+                  <div 
+                    key={service.id} 
+                    style={{ 
+                      fontSize: '0.75rem', 
+                      color: service.priority === priority ? '#dc2626' : '#6b7280',
+                      fontWeight: service.priority === priority ? '600' : '400',
+                      padding: '0.25rem 0',
+                      display: 'flex',
+                      justifyContent: 'space-between'
+                    }}
+                  >
+                    <span>{service.title}</span>
+                    <span style={{ 
+                      backgroundColor: service.priority === priority ? '#fee2e2' : '#e5e7eb',
+                      padding: '0.125rem 0.5rem',
+                      borderRadius: '0.25rem',
+                      fontWeight: '600'
+                    }}>
+                      Priority: {service.priority}
+                    </span>
+                  </div>
+                ))}
+            </div>
+            {services.some(s => s.priority === priority && (!initial || s.id !== initial.id)) && (
+              <p style={{ 
+                fontSize: '0.75rem', 
+                color: '#dc2626', 
+                marginTop: '0.5rem',
+                fontWeight: '600'
+              }}>
+                ⚠️ Priority {priority} is already in use!
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ✅ STATUS */}

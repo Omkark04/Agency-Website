@@ -21,6 +21,12 @@ export const updateInvoice = (invoiceId: number, data: Partial<Invoice>) =>
 export const deleteInvoice = (invoiceId: number) =>
   api.delete(`/api/invoices/${invoiceId}/`);
 
+// Generate PDF for invoice
+export const generateInvoicePDF = (invoiceId: number) =>
+  api.post<{ success: boolean; message: string; pdf_url: string; pdf_file_path: string }>(
+    `/api/orders/invoices/${invoiceId}/generate-pdf/`
+  );
+
 // Download invoice PDF
 export const downloadInvoice = (invoiceId: number) =>
   api.get<{ pdf_url: string; invoice_number: string }>(`/api/invoices/${invoiceId}/download/`);

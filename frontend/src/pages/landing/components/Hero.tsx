@@ -11,10 +11,6 @@ import { useAuth } from '../../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import AuthModal from './AuthModal';
 
-
-
-
-
 export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) => {
   const { navigateTo, showAuthModal, setShowAuthModal } = useProtectedNavigation();
   const { isAuthenticated } = useAuth();

@@ -1,9 +1,10 @@
 // frontend/src/components/invoices/InvoiceList.tsx
 import React, { useEffect, useState } from 'react';
-import { listInvoices } from '../../api/invoices';
+import { listInvoices, generateInvoicePDF } from '../../api/invoices';
 import type { Invoice } from '../../types/invoices';
 import { FileText, Calendar, DollarSign, Loader2, AlertCircle, Download } from 'lucide-react';
 import { format } from 'date-fns';
+import { useAuth } from '../../hooks/useAuth';
 
 interface InvoiceListProps {
   orderId?: number;
@@ -13,6 +14,8 @@ interface InvoiceListProps {
 const InvoiceList: React.FC<InvoiceListProps> = ({ orderId, onInvoiceClick }) => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState<number | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchInvoices();
@@ -48,6 +51,21 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ orderId, onInvoiceClick }) =>
     } catch (error) {
       console.error('Download failed:', error);
       alert('Failed to download PDF');
+    }
+  };
+
+  const handleGeneratePDF = async (e: React.MouseEvent, invoiceId: number) => {
+    e.stopPropagation();
+    try {
+      setGenerating(invoiceId);
+      await generateInvoicePDF(invoiceId);
+      await fetchInvoices(); // Refresh list to get PDF URL
+      alert('PDF generated successfully!');
+    } catch (error: any) {
+      console.error('Failed to generate PDF:', error);
+      alert(error.response?.data?.error || 'Failed to generate PDF');
+    } finally {
+      setGenerating(null);
     }
   };
 
@@ -130,16 +148,40 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ orderId, onInvoiceClick }) =>
             )}
           </div>
 
-          {/* Action Buttons */}
-          {invoice.pdf_url && (
+          {/* Action Buttons (Admin only) */}
+          {user && (user.role === 'admin' || user.role === 'service_head') && (
             <div className="flex gap-2 pt-3 border-t border-gray-200">
-              <button
-                onClick={(e) => handleDownloadPDF(e, invoice.pdf_url!, invoice.invoice_number)}
-                className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download PDF
-              </button>
+              {/* Generate PDF Button */}
+              {!invoice.pdf_url && (
+                <button
+                  onClick={(e) => handleGeneratePDF(e, invoice.id)}
+                  disabled={generating === invoice.id}
+                  className="flex-1 flex items-center justify-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {generating === invoice.id ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="w-4 h-4 mr-2" />
+                      Generate PDF
+                    </>
+                  )}
+                </button>
+              )}
+
+              {/* Download PDF Button */}
+              {invoice.pdf_url && (
+                <button
+                  onClick={(e) => handleDownloadPDF(e, invoice.pdf_url!, invoice.invoice_number)}
+                  className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download PDF
+                </button>
+              )}
             </div>
           )}
         </div>

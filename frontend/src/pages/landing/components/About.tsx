@@ -229,8 +229,7 @@ export const About = () => {
               </div>
             )}
             <div className="absolute -bottom-6 -right-6 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg w-3/4">
-              <div className="text-3xl font-bold text-[#00C2A8] mb-1">5+</div>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">Years of Excellence in Digital Solutions</p>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">Expereinced Teams are always ready to help you.</p>
             </div>
           </motion.div>
 

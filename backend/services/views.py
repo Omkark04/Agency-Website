@@ -43,6 +43,88 @@ class ServiceViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(department_id=department_id)
         
         return queryset
+    
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new service with enhanced error logging
+        """
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        logger.info(f"Service creation request from user {request.user.id}: {request.data}")
+        
+        serializer = self.get_serializer(data=request.data)
+        
+        if not serializer.is_valid():
+            logger.error(f"Service creation validation failed: {serializer.errors}")
+            logger.error(f"Request data: {request.data}")
+            return Response(
+                {
+                    'error': 'Validation failed',
+                    'details': serializer.errors
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            self.perform_create(serializer)
+            logger.info(f"Service created successfully: {serializer.data.get('id')}")
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except Exception as e:
+            logger.error(f"Service creation failed with exception: {str(e)}")
+            logger.error(f"Exception type: {type(e).__name__}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return Response(
+                {
+                    'error': 'Failed to create service',
+                    'details': str(e)
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    def update(self, request, *args, **kwargs):
+        """
+        Update a service with enhanced error logging
+        """
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        
+        logger.info(f"Service update request for service {instance.id} from user {request.user.id}: {request.data}")
+        
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        
+        if not serializer.is_valid():
+            logger.error(f"Service update validation failed: {serializer.errors}")
+            logger.error(f"Request data: {request.data}")
+            return Response(
+                {
+                    'error': 'Validation failed',
+                    'details': serializer.errors
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            self.perform_update(serializer)
+            logger.info(f"Service updated successfully: {serializer.data.get('id')}")
+            return Response(serializer.data)
+        except Exception as e:
+            logger.error(f"Service update failed with exception: {str(e)}")
+            logger.error(f"Exception type: {type(e).__name__}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return Response(
+                {
+                    'error': 'Failed to update service',
+                    'details': str(e)
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class PriceCardViewSet(viewsets.ModelViewSet):

@@ -35,6 +35,7 @@ urlpatterns = [
     
     # Invoice endpoints
     path('<int:order_id>/invoices/generate/', estimation_views.generate_invoice, name='generate-invoice'),
+    path('invoices/<int:invoice_id>/generate-pdf/', estimation_views.generate_invoice_pdf, name='generate-invoice-pdf'),
     path('invoices/<int:invoice_id>/download/', estimation_views.download_invoice, name='download-invoice'),
     
     # Download proxy endpoints
