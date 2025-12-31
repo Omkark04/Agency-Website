@@ -19,9 +19,15 @@ export interface Estimation {
   subtotal: string;
   tax_percentage: string;
   tax_amount: string;
+  discount_amount?: string;
   total_amount: string;
   estimated_timeline_days: number;
-  valid_until?: string;
+  delivery_date?: string;
+  department_head_name?: string;
+  department_head_email?: string;
+  department_head_phone?: string;
+  client_address?: string;
+  client_phone?: string;
   pdf_url?: string;
   pdf_public_id?: string;
   status: 'draft' | 'sent' | 'approved' | 'rejected' | 'expired';
@@ -35,7 +41,6 @@ export interface Estimation {
   sent_at?: string;
   approved_at?: string;
   rejected_at?: string;
-  is_expired: boolean;
 }
 
 export interface EstimationCreateData {
@@ -44,8 +49,16 @@ export interface EstimationCreateData {
   description?: string;
   cost_breakdown: CostBreakdownItem[];
   tax_percentage: number;
+  discount_amount?: number;
   estimated_timeline_days: number;
-  valid_until?: string;
+  delivery_date?: string;
+  department_head_name?: string;
+  department_head_email?: string;
+  department_head_phone?: string;
+  client_name?: string;
+  client_email?: string;
+  client_address?: string;
+  client_phone?: string;
   internal_notes?: string;
   client_notes?: string;
 }
