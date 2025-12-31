@@ -10,7 +10,6 @@ class EstimationSerializer(serializers.ModelSerializer):
     """Serializer for Estimation model"""
     
     order_title = serializers.CharField(source='order.title', read_only=True)
-    client_name = serializers.SerializerMethodField()
     created_by_name = serializers.SerializerMethodField()
     is_expired = serializers.BooleanField(read_only=True)
     
@@ -19,9 +18,12 @@ class EstimationSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'uuid', 'order', 'order_title', 'title', 'description',
             'cost_breakdown', 'subtotal', 'tax_percentage', 'tax_amount',
-            'total_amount', 'estimated_timeline_days', 'valid_until',
+            'discount_amount', 'total_amount', 'estimated_timeline_days',
+            'delivery_date', 'department_head_name', 'department_head_email',
+            'department_head_phone', 'client_name', 'client_email',
+            'client_address', 'client_phone',
             'pdf_url', 'pdf_file_path', 'status', 'created_by',
-            'created_by_name', 'client_name', 'internal_notes',
+            'created_by_name', 'internal_notes',
             'client_notes', 'created_at', 'updated_at', 'sent_at',
             'approved_at', 'rejected_at', 'is_expired'
         ]
@@ -31,11 +33,6 @@ class EstimationSerializer(serializers.ModelSerializer):
             'sent_at', 'approved_at', 'rejected_at'
         ]
     
-    def get_client_name(self, obj):
-        """Get client name"""
-        if obj.order.client:
-            return obj.order.client.get_full_name() or obj.order.client.email
-        return obj.order.client_email
     
     def get_created_by_name(self, obj):
         """Get creator name"""
@@ -51,7 +48,10 @@ class EstimationCreateSerializer(serializers.ModelSerializer):
         model = Estimation
         fields = [
             'order', 'title', 'description', 'cost_breakdown',
-            'tax_percentage', 'estimated_timeline_days', 'valid_until',
+            'tax_percentage', 'discount_amount', 'estimated_timeline_days',
+            'delivery_date', 'department_head_name', 'department_head_email',
+            'department_head_phone', 'client_name', 'client_email',
+            'client_address', 'client_phone',
             'internal_notes', 'client_notes'
         ]
     
@@ -94,7 +94,6 @@ class InvoiceSerializer(serializers.ModelSerializer):
     
     order_title = serializers.CharField(source='order.title', read_only=True)
     created_by_name = serializers.CharField(source='created_by.get_full_name', read_only=True)
-    client_name = serializers.CharField(source='order.client.get_full_name', read_only=True)
     balance_due = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
     is_overdue = serializers.SerializerMethodField()
     
@@ -106,8 +105,11 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'tax_percentage', 'tax_amount', 'discount_amount',
             'total_amount', 'amount_paid', 'balance_due',
             'invoice_date', 'due_date', 'pdf_url', 'pdf_file_path',
-            'status', 'created_by', 'created_by_name', 'client_name',
-            'notes', 'terms_and_conditions', 'created_at', 'updated_at',
+            'status', 'created_by', 'created_by_name',
+            'department_head_name', 'department_head_email', 'department_head_phone',
+            'client_name', 'client_email', 'client_address', 'client_phone',
+            'chairperson_name', 'vice_chairperson_name', 'notes', 'terms_and_conditions',
+            'referral_policies', 'created_at', 'updated_at',
             'sent_at', 'paid_at', 'is_overdue'
         ]
         read_only_fields = [
@@ -145,8 +147,18 @@ class InvoiceGenerateSerializer(serializers.Serializer):
     tax_percentage = serializers.DecimalField(max_digits=5, decimal_places=2, default=0)
     discount_amount = serializers.DecimalField(max_digits=12, decimal_places=2, default=0)
     due_date = serializers.DateField(required=False, allow_null=True)
+    department_head_name = serializers.CharField(required=False, allow_blank=True)
+    department_head_email = serializers.EmailField(required=False, allow_blank=True)
+    department_head_phone = serializers.CharField(required=False, allow_blank=True)
+    client_name = serializers.CharField(required=False, allow_blank=True)
+    client_email = serializers.EmailField(required=False, allow_blank=True)
+    client_address = serializers.CharField(required=False, allow_blank=True)
+    client_phone = serializers.CharField(required=False, allow_blank=True)
+    chairperson_name = serializers.CharField(required=False, allow_blank=True)
+    vice_chairperson_name = serializers.CharField(required=False, allow_blank=True)
     notes = serializers.CharField(required=False, allow_blank=True)
     terms_and_conditions = serializers.CharField(required=False, allow_blank=True)
+    referral_policies = serializers.CharField(required=False, allow_blank=True)
     
     def validate_order_id(self, value):
         """Validate order exists"""

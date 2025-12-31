@@ -3,17 +3,21 @@ from rest_framework import serializers
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
+from django.utils import timezone
+
 from .models import Order, Offer
 
-# Import Service for PrimaryKeyRelatedField
+# Import Service and PortfolioProject
 try:
     from services.models import Service, PriceCard
     from services.serializers import PriceCardSerializer
+    from portfolio.models import PortfolioProject
 except Exception:
     # fallback if import path differs; DRF will raise if queryset invalid
     Service = None
     PriceCard = None
     PriceCardSerializer = None
+    PortfolioProject = None
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -33,21 +37,51 @@ class OrderSerializer(serializers.ModelSerializer):
         allow_null=True
     )
     
+    # Portfolio Project Link
+    portfolio_project_id = serializers.PrimaryKeyRelatedField(
+        queryset=PortfolioProject.objects.all() if PortfolioProject else None, # Added conditional queryset
+        source='portfolio_project',
+        write_only=True,
+        required=False,
+        allow_null=True
+    )
+    portfolio_project_data = serializers.SerializerMethodField()
+    
     # Form submission details
     form_submission_data = serializers.SerializerMethodField()
+    department_head = serializers.SerializerMethodField()
+    
+    # Client details for PDF auto-fill
+    client_name = serializers.ReadOnlyField(source='client.get_full_name')
+    client_phone = serializers.ReadOnlyField(source='client.phone')
+    client_address = serializers.ReadOnlyField(source='client.address')
     
     class Meta:
         model = Order
         fields = [
-            'id', 'client', 'client_email', 'service', 'service_title', 'pricing_plan', 'pricing_plan_id',
-            'title', 'details', 'price', 'status', 'due_date',
+            'id', 'client', 'client_email', 'client_name', 'client_phone', 'client_address',
+            'service', 'service_title', 'pricing_plan', 'pricing_plan_id',
+            'portfolio_project', 'portfolio_project_id', 'portfolio_project_data', # Added portfolio fields
+            'title', 'details', 'price',
             'whatsapp_number', 'price_card_title', 'price_card_price',
+            'status', 'progress', 'due_date', # Added 'progress'
             'form_submission', 'total_paid', 'remaining_amount',
-            'form_submission_data', 'deliverables',
+            'form_submission_data', 'department_head', 'deliverables',
             'status_updated_at', 'status_updated_by',
             'created_at', 'updated_at'
         ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'status_updated_at', 'status_updated_by'] # Added read_only_fields
     
+    def get_portfolio_project_data(self, obj):
+        if not obj.portfolio_project:
+            return None
+        return {
+            'id': obj.portfolio_project.id,
+            'title': obj.portfolio_project.title,
+            'slug': obj.portfolio_project.slug,
+            'featured_image': obj.portfolio_project.featured_image
+        }
+
     def get_remaining_amount(self, obj):
         """Calculate remaining amount to be paid"""
         return float(obj.price) - float(obj.total_paid or 0)
@@ -61,6 +95,20 @@ class OrderSerializer(serializers.ModelSerializer):
                 'files': obj.form_submission.files,
                 'summary': obj.form_submission.submission_summary
             }
+        return None
+
+    def get_department_head(self, obj):
+        """Get department head details from service's department"""
+        try:
+            if obj.service and obj.service.department and obj.service.department.team_head:
+                head = obj.service.department.team_head
+                return {
+                    'name': head.get_full_name() or head.username,
+                    'email': head.email,
+                    'phone': head.phone or ''
+                }
+        except Exception:
+            pass
         return None
 
 

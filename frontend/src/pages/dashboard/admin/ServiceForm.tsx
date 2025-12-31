@@ -34,6 +34,7 @@ export default function ServiceForm({
   );
   const [priority, setPriority] = useState<number>(initial?.priority || 999);
   const [isActive, setIsActive] = useState(initial?.is_active ?? true);
+  const [discountPercentage, setDiscountPercentage] = useState<number>(initial?.discount_percentage || 0);
 
   // ✅ LOGO STATES (MATCHING YOUR DEPARTMENT FORM STYLE)
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -115,6 +116,7 @@ export default function ServiceForm({
         long_description: longDesc,
         department: departmentId === '' ? undefined : departmentId,
         priority,
+        discount_percentage: discountPercentage,
         is_active: isActive,
         team_members: selectedMembers,
       };
@@ -331,6 +333,24 @@ export default function ServiceForm({
             )}
           </div>
         )}
+      </div>
+
+      {/* ✅ DISCOUNT PERCENTAGE */}
+      <div className="service-form__group">
+        <label className="service-form__label">
+          Discount Percentage (%)
+        </label>
+        <Input
+          type="number"
+          min="0"
+          max="100"
+          value={discountPercentage}
+          onChange={e => setDiscountPercentage(Number(e.target.value))}
+          placeholder="0"
+        />
+        <p className="service-form__help-text">
+          Applied to all price cards in this service. Set to 0 to remove discount.
+        </p>
       </div>
 
       {/* ✅ STATUS */}

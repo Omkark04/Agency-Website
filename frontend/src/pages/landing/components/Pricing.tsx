@@ -287,9 +287,22 @@ export const Pricing = () => {
 
                                 {/* Price */}
                                 <div className="mb-6">
-                                  <div className="text-4xl font-extrabold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                                    ₹{parseFloat(card.price).toLocaleString('en-IN')}
-                                  </div>
+                                  {card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) ? (
+                                    <div className="flex flex-col">
+                                      {card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) && (
+                                        <span className="text-gray-400 dark:text-gray-500 line-through text-lg font-medium">
+                                            ₹{parseFloat(card.price).toLocaleString('en-IN')}
+                                        </span>
+                                      )}
+                                      <div className="text-4xl font-extrabold bg-gradient-to-r from-[#FF6B6B] to-[#FF8E53] bg-clip-text text-transparent">
+                                        ₹{parseFloat(card.discounted_price.toString()).toLocaleString('en-IN')}
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="text-4xl font-extrabold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                                      ₹{parseFloat(card.price).toLocaleString('en-IN')}
+                                    </div>
+                                  )}
                                 </div>
 
                                 {/* Details Grid */}
@@ -624,7 +637,7 @@ export const Pricing = () => {
                       <div>
                         <h3 className="font-bold text-blue-900 dark:text-blue-300">Selected Plan</h3>
                         <p className="text-blue-700 dark:text-blue-400 text-sm mt-1 capitalize">
-                          {selectedPriceCard.title} • ₹{parseFloat(selectedPriceCard.price).toLocaleString('en-IN')}
+                          {selectedPriceCard.title} • ₹{(selectedPriceCard.discounted_price && parseFloat(selectedPriceCard.discounted_price.toString()) < parseFloat(selectedPriceCard.price) ? parseFloat(selectedPriceCard.discounted_price.toString()) : parseFloat(selectedPriceCard.price)).toLocaleString('en-IN')}
                         </p>
                       </div>
                       <button

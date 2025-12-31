@@ -257,6 +257,13 @@ export const Services = () => {
                               </div>
                             </div>
                             
+                            {/* Discount Badge */}
+                            {service.discount_percentage && service.discount_percentage > 0 && (
+                              <div className="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow-md transform rotate-3">
+                                {service.discount_percentage}% OFF
+                              </div>
+                            )}
+
                             {/* Service Features Preview */}
                             {service.features && service.features.length > 0 && (
                               <div className="space-y-1 ml-[4.5rem]">
@@ -518,11 +525,18 @@ export const Services = () => {
               <p className="text-white/90 text-sm">
                 Fill out the form below to get started with this service
               </p>
-              {services.find(s => s.id === selectedServiceId)?.original_price && (
-                <div className="mt-2 inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-semibold">
-                  Starting at ₹{services.find(s => s.id === selectedServiceId)?.original_price?.toLocaleString()}
+              {services.find(s => s.id === selectedServiceId)?.starting_price ? (
+                <div className="mt-2 inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
+                  <span className="text-white text-sm font-semibold">
+                    Starting at ₹{services.find(s => s.id === selectedServiceId)?.starting_price?.toLocaleString()}
+                  </span>
+                  {services.find(s => s.id === selectedServiceId)?.original_price && services.find(s => s.id === selectedServiceId)?.starting_price && services.find(s => s.id === selectedServiceId)!.original_price! > services.find(s => s.id === selectedServiceId)!.starting_price! && (
+                    <span className="text-white/70 text-xs line-through">
+                      ₹{services.find(s => s.id === selectedServiceId)?.original_price?.toLocaleString()}
+                    </span>
+                  )}
                 </div>
-              )}
+              ) : null}
             </div>
             <button
               onClick={() => {

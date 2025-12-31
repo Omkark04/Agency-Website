@@ -278,13 +278,6 @@ const Contact = () => {
 
               <div className="space-y-6">
                 <div className="flex items-start">
-                  <div className="bg-[#00C2A8]/10 p-3 rounded-full mr-4">
-                    <MapPin className="h-6 w-6 text-[#00C2A8]" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white">Our Office</h4>
-                    <p className="text-gray-600 dark:text-gray-400">123 Business Avenue, Suite 456<br />Mumbai, Maharashtra 400001</p>
-                  </div>
                 </div>
 
                 <div className="flex items-start">

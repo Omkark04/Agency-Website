@@ -131,6 +131,64 @@ export default function OrderManagementPage() {
     <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold">Order Management</h1>
 
+      {/* Order Information Card */}
+      {order && (
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">{order.title}</h2>
+              <p className="text-gray-500 mb-4">{order.details}</p>
+              
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-500">Service</p>
+                  <p className="font-semibold">{order.service_title}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Client</p>
+                  <p className="font-semibold">{order.client_name || order.client_email}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Order ID</p>
+                  <p className="font-semibold">#{order.id}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Date</p>
+                  <p className="font-semibold">{new Date(order.created_at).toLocaleDateString()}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Portfolio Reference */}
+            {order.portfolio_project_data && (
+              <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                <p className="text-sm text-blue-600 font-medium mb-2">Inspired by Portfolio Project</p>
+                <div className="flex items-center gap-4">
+                  {order.portfolio_project_data.featured_image && (
+                    <img 
+                      src={order.portfolio_project_data.featured_image} 
+                      alt={order.portfolio_project_data.title}
+                      className="w-16 h-16 object-cover rounded-lg shadow-sm"
+                    />
+                  )}
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{order.portfolio_project_data.title}</h3>
+                    <a 
+                      href={`/portfolio/${order.portfolio_project_data.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 mt-1"
+                    >
+                      View Project <span aria-hidden="true">&rarr;</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Order Approval Banner */}
       {workflowInfo?.current_status === 'pending' && (
         <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-6 rounded-lg">

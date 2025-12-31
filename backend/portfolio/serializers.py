@@ -1,7 +1,7 @@
 # portfolio/serializers.py
 from rest_framework import serializers
 from django.utils.text import slugify
-from .models import PortfolioProject
+from .models import PortfolioProject, CaseStudy
 
 class PortfolioProjectSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,21 +26,27 @@ class PortfolioProjectSerializer(serializers.ModelSerializer):
         return data
 
     def validate(self, data):
-        if not data.get("featured_image"):
+        # Only require featured_image on creation, not update
+        if not self.instance and not data.get("featured_image"):
             raise serializers.ValidationError("At least one featured image is required.")
         return data
 
     def create(self, validated_data):
-        request = self.context["request"]
+        request = self.context.get("request")
 
-        validated_data["slug"] = slugify(validated_data["title"])
-        validated_data["created_by"] = request.user if request.user.is_authenticated else None
+        if "title" in validated_data:
+            validated_data["slug"] = slugify(validated_data["title"])
+        
+        if request and request.user.is_authenticated:
+            validated_data["created_by"] = request.user
 
         return super().create(validated_data)
-from rest_framework import serializers
-from .models import PortfolioProject, CaseStudy
 
-# Your existing PortfolioProjectSerializer...
+    def update(self, instance, validated_data):
+        if "title" in validated_data and validated_data["title"] != instance.title:
+            validated_data["slug"] = slugify(validated_data["title"])
+            
+        return super().update(instance, validated_data)
 
 class CaseStudySerializer(serializers.ModelSerializer):
     service_title = serializers.CharField(source='service.title', read_only=True)

@@ -545,10 +545,22 @@ export default function PricingPlansPage() {
                                                                     `}>
                                                                         {card.title}
                                                                     </div>
-                                                                    <div className="flex items-baseline gap-1">
-                                                                         <span className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">
-                                                                            ₹{parseFloat(card.price).toLocaleString('en-IN')}
-                                                                         </span>
+                                                                    <div className="flex flex-col">
+                                                                        <div className="flex items-baseline gap-2">
+                                                                            <span className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">
+                                                                            ₹{(card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) ? parseFloat(card.discounted_price.toString()) : parseFloat(card.price)).toLocaleString('en-IN')}
+                                                                            </span>
+                                                                            {card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) && (
+                                                                                <span className="text-sm text-gray-500 line-through">
+                                                                                    ₹{parseFloat(card.price).toLocaleString('en-IN')}
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                        {card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) && (
+                                                                            <span className="text-xs text-green-600 dark:text-green-400 font-semibold mt-1">
+                                                                                On Sale
+                                                                            </span>
+                                                                        )}
                                                                     </div>
                                                                     <p className="text-sm text-gray-500 mt-2 whitespace-normal break-words">
                                                                         {card.description}
@@ -643,7 +655,16 @@ export default function PricingPlansPage() {
                                                      </span>
                                                      {isPopular && <span className="text-[10px] font-bold text-[#00C2A8]">MOST POPULAR</span>}
                                                  </div>
-                                                 <div className="text-2xl font-bold mb-2">₹{parseFloat(card.price).toLocaleString('en-IN')}</div>
+                                                 <div className="mb-2">
+                                                     <div className="text-2xl font-bold">
+                                                        ₹{(card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) ? parseFloat(card.discounted_price.toString()) : parseFloat(card.price)).toLocaleString('en-IN')}
+                                                     </div>
+                                                     {card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) && (
+                                                        <div className="text-sm text-gray-500 line-through">
+                                                            ₹{parseFloat(card.price).toLocaleString('en-IN')}
+                                                        </div>
+                                                     )}
+                                                 </div>
                                                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 whitespace-normal break-words">{card.description}</p>
                                                  
                                                  <div className="flex gap-4 text-xs text-gray-500 mb-4">
@@ -715,7 +736,12 @@ export default function PricingPlansPage() {
                       <div>
                         <h3 className="font-bold text-gray-900 dark:text-white">Selected Plan</h3>
                         <p className="text-[#0066FF] dark:text-[#00C2A8] text-sm mt-1 capitalize">
-                          {selectedPriceCard.title} • ₹{parseFloat(selectedPriceCard.price).toLocaleString('en-IN')}
+                          {selectedPriceCard.title} • ₹{(selectedPriceCard.discounted_price && parseFloat(selectedPriceCard.discounted_price.toString()) < parseFloat(selectedPriceCard.price) ? parseFloat(selectedPriceCard.discounted_price.toString()) : parseFloat(selectedPriceCard.price)).toLocaleString('en-IN')}
+                          {selectedPriceCard.discounted_price && parseFloat(selectedPriceCard.discounted_price.toString()) < parseFloat(selectedPriceCard.price) && (
+                              <span className="ml-2 text-xs text-gray-500 line-through">
+                                  Original: ₹{parseFloat(selectedPriceCard.price).toLocaleString('en-IN')}
+                              </span>
+                          )}
                         </p>
                       </div>
                       <button

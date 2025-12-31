@@ -100,24 +100,35 @@ def order_estimations(request, order_id):
             data = request.data.copy()
             data['order'] = order.id
             
-            serializer = EstimationCreateSerializer(
-                data=data,
-                context={'request': request}
-            )
-            
+            serializer = EstimationCreateSerializer(data=data, context={'request': request})
             if serializer.is_valid():
-                estimation = serializer.save()
-                return Response(
-                    EstimationSerializer(estimation).data,
-                    status=status.HTTP_201_CREATED
-                )
+                estimation = serializer.save(created_by=user)
+                
+                # Generate PDF is handled downstream but we can wrap it here too just in case
+                # The serializer.save() triggers signal or logic or explicit call?
+                # In the original code, PDF generation was explicit here:
+                
+                # Generate PDF
+                try:
+                    pdf_generator = EstimationPDFGenerator(estimation)
+                    pdf_generator.upload_to_dropbox()
+                except Exception as e:
+                    # Log but don't fail the request
+                    print(f"PDF generation failed: {e}")
+                
+                return Response(EstimationSerializer(estimation).data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+            
     except Order.DoesNotExist:
+        return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
         return Response(
-            {'error': 'Order not found'},
-            status=status.HTTP_404_NOT_FOUND
+            {'error': 'Internal server error', 'detail': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
 
 
 @api_view(['POST'])
@@ -330,6 +341,19 @@ def generate_invoice(request, order_id):
                 due_date=invoice_data.get('due_date'),
                 notes=invoice_data.get('notes', ''),
                 terms_and_conditions=invoice_data.get('terms_and_conditions', ''),
+                referral_policies=invoice_data.get('referral_policies', ''),
+                # Sender details
+                department_head_name=invoice_data.get('department_head_name', ''),
+                department_head_email=invoice_data.get('department_head_email', ''),
+                department_head_phone=invoice_data.get('department_head_phone', ''),
+                # Client details
+                client_name=invoice_data.get('client_name', ''),
+                client_email=invoice_data.get('client_email', ''),
+                client_phone=invoice_data.get('client_phone', ''),
+                client_address=invoice_data.get('client_address', ''),
+                # Signature details
+                chairperson_name=invoice_data.get('chairperson_name', ''),
+                vice_chairperson_name=invoice_data.get('vice_chairperson_name', ''),
                 created_by=user,
                 status='draft'
             )

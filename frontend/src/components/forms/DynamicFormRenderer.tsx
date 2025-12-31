@@ -12,10 +12,11 @@ import OrderInitiationAnimation from '../animations/OrderInitiationAnimation';
 interface DynamicFormRendererProps {
   serviceId: number;
   priceCardId?: number; // Optional price card ID
+  portfolioProjectId?: number; // Optional portfolio project ID
   onSuccess?: (orderId: number) => void;
 }
 
-const DynamicFormRenderer = ({ serviceId, priceCardId, onSuccess }: DynamicFormRendererProps) => {
+const DynamicFormRenderer = ({ serviceId, priceCardId, portfolioProjectId, onSuccess }: DynamicFormRendererProps) => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
@@ -217,9 +218,10 @@ const DynamicFormRenderer = ({ serviceId, priceCardId, onSuccess }: DynamicFormR
       const submissionData: any = {
         data: dataToSubmit,
         files: uploadedFiles,
-        client_email: dataToSubmit['email'] || ''
+        client_email: dataToSubmit['email'] || '',
+        portfolio_project_id: portfolioProjectId // Add portfolio project ID
       };
-      
+
       // Include price_card_id if provided
       if (priceCardId) {
         submissionData.data.price_card_id = priceCardId;

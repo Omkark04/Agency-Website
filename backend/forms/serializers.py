@@ -184,15 +184,24 @@ class ServiceFormSubmissionSerializer(serializers.ModelSerializer):
                 from services.models import PriceCard
                 price_card_id = submission.data['price_card_id']
                 price_card = PriceCard.objects.get(id=price_card_id, service=submission.service)
-                price = price_card.price
+                # Use discounted_price if available, otherwise original price
+                price = price_card.discounted_price if price_card.discounted_price is not None else price_card.price
                 price_card_title = price_card.title
-                price_card_price = price_card.price
+                price_card_price = price
             except (PriceCard.DoesNotExist, ValueError):
-                # Fallback to service original_price
-                price = getattr(submission.service, 'original_price', 0) or 0
+                # Fallback to service starting price (min discounted price)
+                from django.db.models import Min
+                min_price = submission.service.price_cards.filter(is_active=True).aggregate(Min('discounted_price')).get('discounted_price__min')
+                if min_price is None:
+                    min_price = submission.service.price_cards.filter(is_active=True).aggregate(Min('price')).get('price__min')
+                price = min_price or 0
         else:
-            # Fallback to service original_price
-            price = getattr(submission.service, 'original_price', 0) or 0
+            # Fallback to service starting price (min discounted price)
+            from django.db.models import Min
+            min_price = submission.service.price_cards.filter(is_active=True).aggregate(Min('discounted_price')).get('discounted_price__min')
+            if min_price is None:
+                min_price = submission.service.price_cards.filter(is_active=True).aggregate(Min('price')).get('price__min')
+            price = min_price or 0
         
         # Create order
         order = Order.objects.create(

@@ -21,7 +21,9 @@ export interface Service {
   priority: number;
   is_featured: boolean;
   is_active: boolean;
-  original_price?: number; // Pricing for the service
+  original_price?: number; // Minimum price of active price cards
+  starting_price?: number; // Minimum discounted price
+  discount_percentage?: number; // Discount percentage
   features: ServiceFeature[];
   created_by?: any | null;
   created_at?: string;

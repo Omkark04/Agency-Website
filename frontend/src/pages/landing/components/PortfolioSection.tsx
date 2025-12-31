@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   Eye, 
   ExternalLink, 
@@ -12,17 +13,25 @@ import {
   PlayCircle,
   Filter,
   Grid,
-  List
+  List,
+  Sparkles,
+  ChevronLeft,
+  ZoomIn
 } from 'lucide-react';
 import { Button as MovingBorderContainer } from "@/components/ui/moving-border";
 import { fetchPortfolioProjects } from '../../../api/portfolio';
 import type { PortfolioProject } from '../../../api/portfolio';
 import { useProtectedNavigation } from '../../../hooks/useProtectedNavigation';
+import { useAuth } from '../../../hooks/useAuth';
+import { useToast } from '../../../components/Toast';
 import AuthModal from './AuthModal';
-
+import DynamicFormRenderer from '../../../components/forms/DynamicFormRenderer';
 
 const PortfolioSection = () => {
+  const navigate = useNavigate();
   const { navigateTo, showAuthModal, setShowAuthModal } = useProtectedNavigation();
+  const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
   const [projects, setProjects] = useState<PortfolioProject[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<PortfolioProject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +40,17 @@ const PortfolioSection = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'featured'>('newest');
+  
+  // Service form modal state
+  const [isServiceFormOpen, setIsServiceFormOpen] = useState(false);
+  const [serviceFormProject, setServiceFormProject] = useState<PortfolioProject | null>(null);
+  
+  // Image lightbox state
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  
+  // Gallery slider state for modal
+  const [galleryIndex, setGalleryIndex] = useState(0);
+
 
   useEffect(() => {
     loadProjects();
@@ -98,6 +118,42 @@ const PortfolioSection = () => {
     });
 
     setFilteredProjects(filtered);
+  };
+
+  // Handle Start Similar Project button click
+  const handleStartSimilarProject = (project: PortfolioProject) => {
+    if (!project.service) {
+      showToast('error', 'This project has no associated service');
+      return;
+    }
+    setServiceFormProject(project);
+    setIsServiceFormOpen(true);
+    setSelectedProject(null); // Close the detail modal
+  };
+
+  // Handle form submission success
+  const handleFormSuccess = (orderId: number) => {
+    showToast('success', `Order #${orderId} created successfully!`);
+    setIsServiceFormOpen(false);
+    setServiceFormProject(null);
+    
+    // Only redirect to client dashboard if user was already authenticated
+    // The DynamicFormRenderer handles its own auth flow
+    if (isAuthenticated) {
+      setTimeout(() => {
+        navigate('/client-dashboard/orders');
+      }, 2000);
+    }
+  };
+
+  // Open image in lightbox
+  const openLightbox = (imageUrl: string) => {
+    setLightboxImage(imageUrl);
+  };
+
+  // Close lightbox
+  const closeLightbox = () => {
+    setLightboxImage(null);
   };
 
   const containerVariants = {
@@ -687,6 +743,18 @@ const PortfolioSection = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 
+                {/* Eye Button to View Full Image */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openLightbox(selectedProject.featured_image);
+                  }}
+                  className="absolute top-4 right-4 p-3 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full text-white transition-all duration-300 transform hover:scale-110 z-10"
+                  title="View full image"
+                >
+                  <ZoomIn className="w-5 h-5" />
+                </button>
+                
                 {/* Video Play Button */}
                 {selectedProject.video && (
                   <button className="absolute inset-0 flex items-center justify-center group">
@@ -734,25 +802,56 @@ const PortfolioSection = () => {
                   </p>
                 </div>
 
-                {/* Additional Images */}
+                {/* Additional Images - Horizontal Slider */}
                 {selectedProject.images && selectedProject.images.length > 0 && (
                   <div className="mb-8">
                     <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
                       Gallery
                     </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {selectedProject.images.map((image: string, index: number) => (
-                        <div
-                          key={index}
-                          className="aspect-square rounded-xl overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300"
-                        >
-                          <img
-                            src={image}
-                            alt={`${selectedProject.title} - ${index + 1}`}
-                            className="w-full h-full object-cover"
-                          />
+                    <div className="relative">
+                      {/* Horizontal Scroll Container */}
+                      <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+                        <div className="flex gap-4 pb-4">
+                          {selectedProject.images.map((image: string, index: number) => (
+                            <div
+                              key={index}
+                              className="relative flex-shrink-0 w-48 sm:w-56 md:w-64 aspect-square rounded-xl overflow-hidden group cursor-pointer"
+                              onClick={() => openLightbox(image)}
+                            >
+                              <img
+                                src={image}
+                                alt={`${selectedProject.title} - ${index + 1}`}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                              />
+                              {/* Overlay */}
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300" />
+                              {/* Eye Button */}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openLightbox(image);
+                                }}
+                                className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              >
+                                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-full">
+                                  <ZoomIn className="w-6 h-6 text-white" />
+                                </div>
+                              </button>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                      {/* Scroll Indicator */}
+                      {selectedProject.images.length > 3 && (
+                        <div className="flex justify-center mt-3 gap-1">
+                          {selectedProject.images.map((_, index) => (
+                            <div 
+                              key={index}
+                              className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -786,14 +885,18 @@ const PortfolioSection = () => {
 
                 {/* CTA */}
                 <div className="mt-8 text-center">
-                  <a
-                    href="#contact"
-                    onClick={() => setSelectedProject(null)}
-                    className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
+                  <button
+                    onClick={() => handleStartSimilarProject(selectedProject)}
+                    disabled={!selectedProject.service}
+                    className={`inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
+                      selectedProject.service
+                        ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white hover:shadow-lg hover:shadow-[#00C2A8]/30'
+                        : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                    }`}
                   >
+                    <Sparkles className="w-5 h-5" />
                     Start Similar Project
-                    <ExternalLink className="w-5 h-5" />
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
@@ -808,9 +911,94 @@ const PortfolioSection = () => {
           onClose={() => setShowAuthModal(false)}
         />
       )}
+
+      {/* Service Form Modal */}
+      {isServiceFormOpen && serviceFormProject && serviceFormProject.service && (
+        <div className="fixed inset-0 z-[60] overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+              onClick={() => {
+                setIsServiceFormOpen(false);
+                setServiceFormProject(null);
+              }}
+            />
+
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="relative inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-2xl rounded-2xl"
+            >
+              {/* Modal Header */}
+              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      Start Similar Project: {serviceFormProject.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      Service: {serviceFormProject.service.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      Fill out the form below to request a custom version of this project
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsServiceFormOpen(false);
+                      setServiceFormProject(null);
+                    }}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  >
+                    <X className="h-6 w-6" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal Body */}
+              <div className="px-6 py-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+                <DynamicFormRenderer
+                  serviceId={serviceFormProject.service.id}
+                  portfolioProjectId={serviceFormProject.id}
+                  onSuccess={handleFormSuccess}
+                />
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Lightbox */}
+      {lightboxImage && (
+        <div 
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+          onClick={closeLightbox}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="relative max-w-5xl max-h-[90vh] p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={closeLightbox}
+              className="absolute top-2 right-2 z-10 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <img
+              src={lightboxImage}
+              alt="Full view"
+              className="max-w-full max-h-[85vh] object-contain rounded-lg"
+            />
+          </motion.div>
+        </div>
+      )}
     </section>
   );
 };
 
 export default PortfolioSection;
-

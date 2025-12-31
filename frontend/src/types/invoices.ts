@@ -26,6 +26,13 @@ export interface Invoice {
   balance_due: string;
   invoice_date: string;
   due_date?: string;
+  department_head_name?: string;
+  department_head_email?: string;
+  department_head_phone?: string;
+  client_address?: string;
+  client_phone?: string;
+  chairperson_name?: string;
+  vice_chairperson_name?: string;
   pdf_url?: string;
   pdf_public_id?: string;
   status: 'draft' | 'sent' | 'pending' | 'partial' | 'paid' | 'overdue' | 'cancelled';
@@ -34,6 +41,7 @@ export interface Invoice {
   client_name?: string;
   notes?: string;
   terms_and_conditions?: string;
+  referral_policies?: string;
   created_at: string;
   updated_at: string;
   sent_at?: string;
@@ -49,6 +57,16 @@ export interface InvoiceGenerateData {
   tax_percentage: number;
   discount_amount: number;
   due_date?: string;
+  department_head_name?: string;
+  department_head_email?: string;
+  department_head_phone?: string;
+  client_name?: string;
+  client_email?: string;
+  client_address?: string;
+  client_phone?: string;
+  chairperson_name?: string;
+  vice_chairperson_name?: string;
   notes?: string;
   terms_and_conditions?: string;
+  referral_policies?: string;
 }

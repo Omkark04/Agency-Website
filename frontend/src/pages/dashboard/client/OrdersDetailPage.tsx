@@ -415,6 +415,41 @@ const OrderOverview = ({ order, transactions }: { order: Order | null; transacti
                 );
               })}
 
+              {/* Portfolio Reference */}
+              {order.portfolio_project_data && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="mt-6 mb-6"
+                >
+                  <p className="font-semibold text-gray-900 dark:text-white mb-2 flex items-center">
+                    <Sparkles className="w-4 h-4 text-blue-500 mr-2" />
+                    Inspired by Portfolio
+                  </p>
+                  <div className="flex items-center gap-4 p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30">
+                    {order.portfolio_project_data.featured_image && (
+                      <img 
+                        src={order.portfolio_project_data.featured_image} 
+                        alt={order.portfolio_project_data.title}
+                        className="w-16 h-16 object-cover rounded-lg shadow-sm"
+                      />
+                    )}
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white">
+                        {order.portfolio_project_data.title}
+                      </h4>
+                      <Link 
+                        to={`/portfolio`}
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 mt-1"
+                      >
+                         View Portfolio <ChevronRight className="w-3 h-3" />
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
               {/* Order Requirements from Form */}
               {order.details && (
                  <motion.div

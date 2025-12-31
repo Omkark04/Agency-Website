@@ -1,6 +1,7 @@
 // frontend/src/components/estimations/EstimationBuilder.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createEstimation } from '../../api/estimations';
+import { getOrder } from '../../api/orders';
 import type { CostBreakdownItem, EstimationCreateData } from '../../types/estimations';
 import { Plus, Trash2, Calculator, Loader2, CheckCircle } from 'lucide-react';
 
@@ -23,14 +24,56 @@ const EstimationBuilder: React.FC<EstimationBuilderProps> = ({
       { item: '', description: '', quantity: 1, rate: 0, amount: 0 },
     ],
     tax_percentage: 18,
+    discount_amount: 0,
     estimated_timeline_days: 30,
-    valid_until: '',
+    delivery_date: '',
+    department_head_name: '',
+    department_head_email: '',
+    department_head_phone: '',
+    client_name: '',
+    client_email: '',
+    client_address: '',
+    client_phone: '',
     client_notes: '',
   });
 
+  const [serviceTitle, setServiceTitle] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Fetch order and user data to auto-fill fields
+  useEffect(() => {
+    const fetchOrderData = async () => {
+      try {
+        const response = await getOrder(orderId);
+        const orderData = response.data as any; // Backend returns more fields than typed
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const deptHead = orderData.department_head || {};
+        
+        setServiceTitle(orderData.service_title || '');
+
+        setFormData(prev => ({
+          ...prev,
+          // Auto-fill sender details from Service Deparment Head (priority) or logged-in user
+          department_head_name: deptHead.name || (user.first_name && user.last_name 
+            ? `${user.first_name} ${user.last_name}` 
+            : user.username || ''),
+          department_head_email: deptHead.email || user.email || '',
+          department_head_phone: deptHead.phone || user.phone || '',
+          // Auto-fill client details from order
+          client_name: orderData.client_name || '',
+          client_email: orderData.client_email || '',
+          client_phone: orderData.client?.phone || '',
+          client_address: orderData.client?.address || '',
+        }));
+      } catch (err) {
+        console.error('Failed to fetch order data:', err);
+      }
+    };
+
+    fetchOrderData();
+  }, [orderId]);
 
   const addLineItem = () => {
     setFormData({
@@ -70,7 +113,7 @@ const EstimationBuilder: React.FC<EstimationBuilderProps> = ({
   };
 
   const calculateTotal = () => {
-    return calculateSubtotal() + calculateTax();
+    return calculateSubtotal() + calculateTax() - (formData.discount_amount || 0);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -237,6 +280,21 @@ const EstimationBuilder: React.FC<EstimationBuilderProps> = ({
         </div>
         <div className="flex justify-between text-sm items-center">
           <div className="flex items-center">
+            <span className="text-gray-700 mr-2">Discount:</span>
+            <input
+              type="number"
+              value={formData.discount_amount}
+              onChange={(e) => setFormData({ ...formData, discount_amount: parseFloat(e.target.value) || 0 })}
+              className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+            />
+          </div>
+          <span className="font-medium text-gray-900">-₹{(formData.discount_amount || 0).toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between text-sm items-center">
+          <div className="flex items-center">
             <span className="text-gray-700 mr-2">Tax:</span>
             <input
               type="number"
@@ -257,45 +315,159 @@ const EstimationBuilder: React.FC<EstimationBuilderProps> = ({
         </div>
       </div>
 
+      {/* Sender Details */}
+      <div className="border-t pt-4">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Sender Details</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Service
+            </label>
+            <input
+              type="text"
+              value={serviceTitle}
+              disabled
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Department Head Name
+            </label>
+            <input
+              type="text"
+              value={formData.department_head_name}
+              onChange={(e) => setFormData({ ...formData, department_head_name: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Your name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Department Head Email
+            </label>
+            <input
+              type="email"
+              value={formData.department_head_email}
+              onChange={(e) => setFormData({ ...formData, department_head_email: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="your.email@udyogworks.in"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Department Head Phone
+            </label>
+            <input
+              type="tel"
+              value={formData.department_head_phone}
+              onChange={(e) => setFormData({ ...formData, department_head_phone: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="+91 XXXXXXXXXX"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Client Details */}
+      <div className="border-t pt-4">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Client Details</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Client Name
+            </label>
+            <input
+              type="text"
+              value={formData.client_name}
+              onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Client's full name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Client Email
+            </label>
+            <input
+              type="email"
+              value={formData.client_email}
+              onChange={(e) => setFormData({ ...formData, client_email: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="client@example.com"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Client Phone
+            </label>
+            <input
+              type="tel"
+              value={formData.client_phone}
+              onChange={(e) => setFormData({ ...formData, client_phone: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Client's phone number"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Client Address
+            </label>
+            <input
+              type="text"
+              value={formData.client_address}
+              onChange={(e) => setFormData({ ...formData, client_address: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Client's full address"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Additional Details */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Estimated Timeline (Days) *
-          </label>
-          <input
-            type="number"
-            value={formData.estimated_timeline_days}
-            onChange={(e) => setFormData({ ...formData, estimated_timeline_days: parseInt(e.target.value) || 0 })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            min="1"
-            required
-          />
-        </div>
+      <div className="border-t pt-4">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Details</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Estimated Timeline (Days) *
+            </label>
+            <input
+              type="number"
+              value={formData.estimated_timeline_days}
+              onChange={(e) => setFormData({ ...formData, estimated_timeline_days: parseInt(e.target.value) || 0 })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              min="1"
+              required
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Valid Until
-          </label>
-          <input
-            type="date"
-            value={formData.valid_until}
-            onChange={(e) => setFormData({ ...formData, valid_until: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Delivery Date
+            </label>
+            <input
+              type="date"
+              value={formData.delivery_date}
+              onChange={(e) => setFormData({ ...formData, delivery_date: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
 
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Notes for Client
-          </label>
-          <textarea
-            value={formData.client_notes}
-            onChange={(e) => setFormData({ ...formData, client_notes: e.target.value })}
-            rows={3}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Any additional notes or terms for the client"
-          />
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Notes for Client
+            </label>
+            <textarea
+              value={formData.client_notes}
+              onChange={(e) => setFormData({ ...formData, client_notes: e.target.value })}
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Any additional notes or terms for the client"
+            />
+          </div>
         </div>
       </div>
 

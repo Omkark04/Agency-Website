@@ -6,6 +6,7 @@ export interface PriceCard {
   department: number;
   service: number;
   price: string;
+  discounted_price?: string | number; // Discounted Price
   revisions: number;
   description?: string;
   features?: string[]; // JSON field

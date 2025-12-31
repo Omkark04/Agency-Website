@@ -66,15 +66,60 @@ class Estimation(models.Model):
         default=0,
         validators=[MinValueValidator(0)]
     )
+    discount_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        default=0,
+        validators=[MinValueValidator(0)],
+        help_text="Discount amount to be deducted from subtotal"
+    )
     
     # Timeline
     estimated_timeline_days = models.IntegerField(
         default=7,
         validators=[MinValueValidator(1)]
     )
+    delivery_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Expected delivery date for the project"
+    )
     
-    # Validity
-    valid_until = models.DateField(null=True, blank=True)
+    # Sender Details (Department Head)
+    department_head_name = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Name of department head sending the estimation"
+    )
+    department_head_email = models.EmailField(
+        blank=True,
+        help_text="Email of department head"
+    )
+    department_head_phone = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text="Phone number of department head"
+    )
+    
+    # Client Details (for PDF)
+    client_name = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Client's full name for estimation PDF"
+    )
+    client_email = models.EmailField(
+        blank=True,
+        help_text="Client's email for estimation PDF"
+    )
+    client_address = models.TextField(
+        blank=True,
+        help_text="Client's full address for estimation PDF"
+    )
+    client_phone = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text="Client's phone number for estimation PDF"
+    )
     
     # PDF storage (Dropbox)
     pdf_url = models.URLField(blank=True, help_text="Dropbox download URL for generated PDF")
@@ -126,18 +171,14 @@ class Estimation(models.Model):
         
         # Calculate tax amount
         self.tax_amount = (self.subtotal * self.tax_percentage) / 100
-        self.total_amount = self.subtotal + self.tax_amount
+        self.total_amount = self.subtotal + self.tax_amount - self.discount_amount
     
     def save(self, *args, **kwargs):
         # Auto-calculate totals before saving
         self.calculate_totals()
         super().save(*args, **kwargs)
     
-    def is_expired(self):
-        """Check if estimation has expired"""
-        if self.valid_until:
-            return timezone.now().date() > self.valid_until
-        return False
+
 
 
 class Invoice(models.Model):
@@ -238,9 +279,61 @@ class Invoice(models.Model):
         related_name="created_invoices"
     )
     
+    # Sender Details (Department Head)
+    department_head_name = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Name of department head sending the invoice"
+    )
+    department_head_email = models.EmailField(
+        blank=True,
+        help_text="Email of department head"
+    )
+    department_head_phone = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text="Phone number of department head"
+    )
+    
+    # Client Details (for PDF)
+    client_name = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Client's full name for invoice PDF"
+    )
+    client_email = models.EmailField(
+        blank=True,
+        help_text="Client's email for invoice PDF"
+    )
+    client_address = models.TextField(
+        blank=True,
+        help_text="Client's full address for invoice PDF"
+    )
+    client_phone = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text="Client's phone number for invoice PDF"
+    )
+    
+    # Signature Details
+    chairperson_name = models.CharField(
+        max_length=255,
+        default="Omkar Vaijanath Kangule",
+        help_text="Name of chairperson for signature"
+    )
+    vice_chairperson_name = models.CharField(
+        max_length=255,
+        default="Rahul Vishnu Bhatambare",
+        help_text="Name of vice-chairperson for signature"
+    )
+    
     # Notes
     notes = models.TextField(blank=True)
     terms_and_conditions = models.TextField(blank=True)
+    referral_policies = models.TextField(
+        blank=True,
+        help_text="Referral policies and team notes"
+    )
     
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)

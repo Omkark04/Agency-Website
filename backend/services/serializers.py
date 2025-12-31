@@ -54,6 +54,10 @@ class ServiceSerializer(serializers.ModelSerializer):
     # Readable team members
     team_members_details = serializers.SerializerMethodField(read_only=True)
     
+    # Calculated prices
+    original_price = serializers.SerializerMethodField()
+    starting_price = serializers.SerializerMethodField()
+    
     # Writable team members
     team_members = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.filter(role="team_member"),
@@ -64,7 +68,8 @@ class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
         fields = "__all__"
-        read_only_fields = ["id", "slug", "created_at", "updated_at", "created_by"]
+        read_only_fields = ["id", "slug", "created_at", "updated_at", "created_by", "original_price", "starting_price"]
+        # discount_percentage is writable by admin
     
     def get_team_members_details(self, obj):
         return [
@@ -76,6 +81,20 @@ class ServiceSerializer(serializers.ModelSerializer):
             }
             for member in obj.team_members.all()
         ]
+
+    def get_original_price(self, obj):
+        from django.db.models import Min
+        # Minimum price of active price cards
+        result = obj.price_cards.filter(is_active=True).aggregate(Min('price'))
+        return result.get('price__min')
+
+    def get_starting_price(self, obj):
+        from django.db.models import Min
+        # Minimum discounted price of active price cards
+        # If discounted_price is None (legacy data), fallback to price
+        # But we should ensure data is migrated.
+        result = obj.price_cards.filter(is_active=True).aggregate(Min('discounted_price'))
+        return result.get('discounted_price__min')
 
     def create(self, validated_data):
         team_members = validated_data.pop('team_members', [])
@@ -99,6 +118,7 @@ class PriceCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = PriceCard
         fields = "__all__"
+        read_only_fields = ["discounted_price", "created_at"] # discounted_price is calculated automatically
 from rest_framework import serializers
 from .models import PricingPlan, PricingComparison
 

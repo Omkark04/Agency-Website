@@ -215,10 +215,10 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
 
                 <div className="mt-3 flex items-center justify-between">
                   <div>
-                    {offer.discounted_price ? (
+                    {offer.discounted_price && offer.original_price && offer.discounted_price < offer.original_price ? (
                       <div className="text-sm">
                         <span className="text-xl font-bold">₹{offer.discounted_price}</span>{" "}
-                        {offer.original_price ? <span className="line-through text-sm text-gray-500 ml-2">₹{offer.original_price}</span> : null}
+                        <span className="line-through text-sm text-gray-500 ml-2">₹{offer.original_price}</span>
                       </div>
                     ) : (
                       <div className="text-sm text-gray-700">Starting at ₹{offer.original_price ?? "NA"}</div>
@@ -282,10 +282,10 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
                   <h3 className="text-base font-bold text-gray-800 dark:text-white mb-2 line-clamp-2 tracking-tight leading-tight">{offer.title}</h3>
                   
                   <div className="mb-3">
-                    {offer.discounted_price ? (
+                    {offer.discounted_price && offer.original_price && offer.discounted_price < offer.original_price ? (
                       <div className="text-sm">
                         <span className="text-lg font-bold">₹{offer.discounted_price}</span>{" "}
-                        {offer.original_price ? <span className="line-through text-xs text-gray-500 ml-1">₹{offer.original_price}</span> : null}
+                        <span className="line-through text-xs text-gray-500 ml-1">₹{offer.original_price}</span>
                       </div>
                     ) : (
                       <div className="text-xs text-gray-700">Starting at ₹{offer.original_price ?? "NA"}</div>

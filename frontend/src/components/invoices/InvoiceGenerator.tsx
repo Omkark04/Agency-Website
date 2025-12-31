@@ -1,6 +1,7 @@
 // frontend/src/components/invoices/InvoiceGenerator.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { generateInvoice } from '../../api/invoices';
+import { getOrder } from '../../api/orders';
 import { LineItem, InvoiceGenerateData } from '../../types/invoices';
 import { Plus, Trash2, FileText, Loader2, CheckCircle } from 'lucide-react';
 
@@ -24,13 +25,57 @@ const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({
     tax_percentage: 18,
     discount_amount: 0,
     due_date: '',
+    department_head_name: '',
+    department_head_email: '',
+    department_head_phone: '',
+    client_name: '',
+    client_email: '',
+    client_address: '',
+    client_phone: '',
+    chairperson_name: 'Omkar Vaijanath Kangule',
+    vice_chairperson_name: 'Rahul Vishnu Bhatambare',
     notes: '',
     terms_and_conditions: '',
+    referral_policies: '',
   });
 
+  const [serviceTitle, setServiceTitle] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Fetch order and user data to auto-fill fields
+  useEffect(() => {
+    const fetchOrderData = async () => {
+      try {
+        const response = await getOrder(orderId);
+        const orderData = response.data as any; // Backend returns more fields than typed
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const deptHead = orderData.department_head || {};
+        
+        setServiceTitle(orderData.service_title || '');
+        
+        setFormData(prev => ({
+          ...prev,
+          // Auto-fill sender details from Service Deparment Head (priority) or logged-in user
+          department_head_name: deptHead.name || (user.first_name && user.last_name 
+            ? `${user.first_name} ${user.last_name}` 
+            : user.username || ''),
+          department_head_email: deptHead.email || user.email || '',
+          department_head_phone: deptHead.phone || user.phone || '',
+          // Auto-fill client details from order
+          client_name: orderData.client_name || '',
+          client_email: orderData.client_email || '',
+          client_phone: orderData.client_phone || '',
+          client_address: orderData.client_address || '',
+        }));
+      } catch (err) {
+        console.error('Failed to fetch order data:', err);
+      }
+    };
+
+    fetchOrderData();
+  }, [orderId]);
 
   const addLineItem = () => {
     setFormData({
@@ -267,32 +312,190 @@ const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({
         />
       </div>
 
-      {/* Notes and Terms */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Notes
-          </label>
-          <textarea
-            value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-            rows={3}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Any additional notes..."
-          />
+      {/* Sender Details */}
+      <div className="border-t pt-4">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Sender Details</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Service
+            </label>
+            <input
+              type="text"
+              value={serviceTitle}
+              disabled
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+            />
+          </div>
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Department Head Name
+            </label>
+            <input
+              type="text"
+              value={formData.department_head_name}
+              onChange={(e) => setFormData({ ...formData, department_head_name: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Your name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Department Head Email
+            </label>
+            <input
+              type="email"
+              value={formData.department_head_email}
+              onChange={(e) => setFormData({ ...formData, department_head_email: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="your.email@udyogworks.in"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Department Head Phone
+            </label>
+            <input
+              type="tel"
+              value={formData.department_head_phone}
+              onChange={(e) => setFormData({ ...formData, department_head_phone: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="+91 XXXXXXXXXX"
+            />
+          </div>
+        </div>
+      </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Terms & Conditions
-          </label>
-          <textarea
-            value={formData.terms_and_conditions}
-            onChange={(e) => setFormData({ ...formData, terms_and_conditions: e.target.value })}
-            rows={3}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Payment terms, late fees, etc."
-          />
+      {/* Client Details */}
+      <div className="border-t pt-4">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Client Details</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Client Name
+            </label>
+            <input
+              type="text"
+              value={formData.client_name}
+              onChange={(e) => setFormData({ ...formData, client_name: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Client's full name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Client Email
+            </label>
+            <input
+              type="email"
+              value={formData.client_email}
+              onChange={(e) => setFormData({ ...formData, client_email: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="client@example.com"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Client Phone
+            </label>
+            <input
+              type="tel"
+              value={formData.client_phone}
+              onChange={(e) => setFormData({ ...formData, client_phone: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Client's phone number"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Client Address
+            </label>
+            <input
+              type="text"
+              value={formData.client_address}
+              onChange={(e) => setFormData({ ...formData, client_address: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Client's full address"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Signature Details */}
+      <div className="border-t pt-4">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Signature Details</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Chairperson Name
+            </label>
+            <input
+              type="text"
+              value={formData.chairperson_name}
+              onChange={(e) => setFormData({ ...formData, chairperson_name: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+              placeholder="Chairperson's name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Vice-Chairperson Name
+            </label>
+            <input
+              type="text"
+              value={formData.vice_chairperson_name}
+              onChange={(e) => setFormData({ ...formData, vice_chairperson_name: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+              placeholder="Vice-Chairperson's name"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Notes, Terms, and Referral Policies */}
+      <div className="border-t pt-4">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Team Notes
+            </label>
+            <textarea
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Any additional notes..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Terms & Conditions
+            </label>
+            <textarea
+              value={formData.terms_and_conditions}
+              onChange={(e) => setFormData({ ...formData, terms_and_conditions: e.target.value })}
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Payment terms, late fees, etc."
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Referral Policies
+            </label>
+            <textarea
+              value={formData.referral_policies}
+              onChange={(e) => setFormData({ ...formData, referral_policies: e.target.value })}
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Referral policies and team notes..."
+            />
+          </div>
         </div>
       </div>
 

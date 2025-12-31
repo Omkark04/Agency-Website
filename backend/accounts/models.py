@@ -27,6 +27,17 @@ class User(AbstractUser):
         null=True,
         help_text="Job title/role for team members (e.g., Voice-over Artist, Frontend Developer)"
     )
+    
+    address = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Full address of the user (used in invoices and estimations)"
+    )
+    
+    profile_completed = models.BooleanField(
+        default=False,
+        help_text="Indicates if user has completed their profile (especially for OAuth users)"
+    )
 
     service = models.ForeignKey(
         "services.Service",

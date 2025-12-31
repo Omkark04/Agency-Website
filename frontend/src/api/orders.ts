@@ -38,6 +38,15 @@ export interface Order {
     files: any;
     summary: string;
   };
+  
+  // Portfolio Reference
+  portfolio_project_id?: number | null;
+  portfolio_project_data?: {
+    id: number;
+    title: string;
+    slug: string;
+    featured_image: string;
+  };
 }
 
 export const listOrders = (params?: any) => api.get<Order[]>('/api/orders/', { params });
