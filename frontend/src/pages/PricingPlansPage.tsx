@@ -289,7 +289,18 @@ export default function PricingPlansPage() {
         description="Choose the perfect plan for your business needs. Transparent pricing for web development, design, and digital marketing services."
         url="/pricing-plans"
       />
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-hidden">
+      {loading ? (
+        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+             <div className="flex flex-col items-center gap-4">
+                 <div className="relative w-16 h-16">
+                     <div className="absolute inset-0 border-4 border-gray-200 dark:border-gray-800 rounded-full"></div>
+                     <div className="absolute inset-0 border-4 border-t-[#00C2A8] border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
+                 </div>
+                 <p className="text-gray-500 dark:text-gray-400 font-medium animate-pulse">Loading Plans...</p>
+             </div>
+         </div>
+      ) : (
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-hidden">
         
         {/* New Hero Section */}
         <div className="relative w-full border-b border-gray-200 dark:border-gray-800 mb-8 md:mb-12 overflow-hidden aspect-square md:aspect-auto md:h-[50vh]">
@@ -626,7 +637,8 @@ export default function PricingPlansPage() {
           </div>
 
         </div>
-      </div>
+        </div>
+      )}
 
        {/* Mobile Service Detail Modal */}
        <Dialog open={!!detailService} onOpenChange={handleCloseDetailModal}>

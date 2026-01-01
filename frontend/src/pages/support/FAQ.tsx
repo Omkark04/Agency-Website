@@ -285,11 +285,11 @@ export default function FAQ() {
                 Contact Us
               </a>
               <a
-                href="tel:+918010957676"
+                href="tel:+918390498423"
                 className="inline-flex items-center justify-center px-6 py-3 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-lg hover:bg-white/20 transition-colors border border-white/20"
               >
                 <Phone className="h-5 w-5 mr-2" />
-                +91 8010957676
+                +91 83904 98423
               </a>
             </div>
           </motion.div>

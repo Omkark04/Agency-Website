@@ -1,6 +1,8 @@
 // components/Services.tsx - FIXED VERSION
 import { useState, useEffect } from 'react';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../hooks/useAuth';
 import { motion } from 'framer-motion';
 import { 
   FaPalette, 
@@ -62,6 +64,8 @@ const iconColorMap = {
 
 
 export const Services = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const { navigateTo, showAuthModal: showAuthFromHook, setShowAuthModal: setShowAuthFromHook } = useProtectedNavigation();
   const [services, setServices] = useState<Service[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -291,7 +295,11 @@ export const Services = () => {
                   <div className="flex flex-col gap-3">
                     <button
                       onClick={() => {
-                        navigateTo('/client-dashboard/services');
+                        if (user) {
+                          navigate('/client-dashboard/services');
+                        } else {
+                          navigate('/pricing-plans');
+                        }
                       }}
                       className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white font-semibold tracking-wide hover:shadow-xl hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-[1.02]"
                     >
@@ -414,7 +422,11 @@ export const Services = () => {
                   <div className="flex flex-col gap-2">
                     <button
                       onClick={() => {
-                        navigateTo('/client-dashboard/services');
+                        if (user) {
+                          navigate('/client-dashboard/services');
+                        } else {
+                          navigate('/pricing-plans');
+                        }
                       }}
                       className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white text-sm font-semibold tracking-wide hover:shadow-lg transition-all duration-300"
                     >

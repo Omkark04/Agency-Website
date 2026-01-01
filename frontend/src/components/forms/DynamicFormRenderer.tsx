@@ -254,6 +254,8 @@ const DynamicFormRenderer = ({ serviceId, priceCardId, portfolioProjectId, onSuc
         if (onSuccess) {
           onSuccess(response.data.order_id);
         }
+        
+        // User stays on current page - no navigation
       }, 3000);
       
     } catch (error: any) {
