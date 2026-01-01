@@ -62,11 +62,11 @@ export const LandingPage = () => {
               "https://linkedin.com/company/udyogworks",
               "https://instagram.com/udyogworks"
             ],
-            "contactPoint": {
-              "@type": "ContactPoint",
-              "telephone": "+91-8010957676",
-              "contactType": "customer service"
-            }
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+91-8390498423",
+                "contactType": "customer service"
+              }
           }}
         />
         <Header onAuthButtonClick={() => setIsAuthModalOpen(true)} />
