@@ -167,13 +167,32 @@ const ServiceCard = ({ service, onSelect, index }: { service: Service; onSelect:
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 + 0.3 }}
-            className="absolute -top-3 -left-3"
+            className="absolute top-1 left-3 md:top-1 md:left-4 z-20"
           >
             <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/30 to-orange-500/30 rounded-xl blur" />
-              <div className="relative flex items-center px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold rounded-xl shadow-xl">
-                <Star className="w-3 h-3 mr-1.5 fill-current" />
+              <div className="hidden md:block absolute -inset-1 bg-gradient-to-r from-amber-500/30 to-orange-500/30 rounded-xl blur" />
+              <div className="relative flex items-center px-2 py-1 md:px-3 md:py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] md:text-xs font-bold rounded-lg md:rounded-xl shadow-lg md:shadow-xl">
+                <Star className="w-2.5 h-2.5 md:w-3 md:h-3 mr-1 md:mr-1.5 fill-current" />
                 FEATURED
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Discount badge */}
+        {service.discount_percentage && service.discount_percentage > 0 && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 + 0.4 }}
+            className={`absolute left-3 md:left-4 z-20 ${
+              service.is_featured ? 'top-4 md:top-7' : 'top-2 md:top-1'
+            }`}
+          >
+            <div className="relative">
+              <div className="hidden md:block absolute -inset-1 bg-gradient-to-r from-red-500/30 to-pink-500/30 rounded-xl blur" />
+              <div className="relative flex items-center px-2 py-1 md:px-3 md:py-1.5 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] md:text-xs font-bold rounded-lg md:rounded-xl shadow-lg md:shadow-xl">
+                {service.discount_percentage}% OFF
               </div>
             </div>
           </motion.div>
@@ -302,14 +321,31 @@ const ServiceCard = ({ service, onSelect, index }: { service: Service; onSelect:
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Starting from</div>
-                    <div className="text-xl font-black bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                      ₹{service.original_price.toLocaleString()}
-                    </div>
+                    {service.starting_price && service.starting_price < service.original_price ? (
+                      <div className="flex items-center gap-2">
+                        <div className="text-xl font-black bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                          ₹{service.starting_price.toLocaleString()}
+                        </div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 line-through">
+                          ₹{service.original_price.toLocaleString()}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-xl font-black bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                        ₹{service.original_price.toLocaleString()}
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div className="text-xs px-3 py-1 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-400 rounded-full font-semibold">
-                  Best Value
-                </div>
+                {service.starting_price && service.starting_price < service.original_price ? (
+                  <div className="text-xs px-3 py-1 bg-gradient-to-r from-red-100 to-pink-100 dark:from-red-900/30 dark:to-pink-900/30 text-red-700 dark:text-red-400 rounded-full font-semibold">
+                    On Sale
+                  </div>
+                ) : (
+                  <div className="text-xs px-3 py-1 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-400 rounded-full font-semibold">
+                    Best Value
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>
@@ -418,6 +454,11 @@ const ServiceListItem = ({ service, onSelect, index }: { service: Service; onSel
                     <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                   </motion.div>
                 )}
+                {service.discount_percentage && service.discount_percentage > 0 && (
+                  <span className="px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full">
+                    {service.discount_percentage}% OFF
+                  </span>
+                )}
               </div>
              
               <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-1">
@@ -431,7 +472,14 @@ const ServiceListItem = ({ service, onSelect, index }: { service: Service; onSel
                     className="flex items-center px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 border border-blue-200 dark:border-blue-700/50"
                   >
                     <DollarSign className="w-4 h-4 text-blue-600 dark:text-blue-400 mr-1.5" />
-                    <span className="font-bold text-gray-900 dark:text-white">₹{service.original_price.toLocaleString()}</span>
+                    {service.starting_price && service.starting_price < service.original_price ? (
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-gray-900 dark:text-white">₹{service.starting_price.toLocaleString()}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 line-through">₹{service.original_price.toLocaleString()}</span>
+                      </div>
+                    ) : (
+                      <span className="font-bold text-gray-900 dark:text-white">₹{service.original_price.toLocaleString()}</span>
+                    )}
                   </motion.div>
                 )}
                

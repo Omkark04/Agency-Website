@@ -547,6 +547,13 @@ export default function PricingPlansPage() {
                                                                 </div>
                                                             )}
                                                             
+                                                            {/* Discount Badge */}
+                                                            {service.discount_percentage && service.discount_percentage > 0 && (
+                                                                <div className="absolute top-0 left-0 bg-gradient-to-br from-red-500 to-pink-500 text-white text-[10px] font-bold px-3 py-1 rounded-br-xl shadow-sm z-20">
+                                                                    {service.discount_percentage}% OFF
+                                                                </div>
+                                                            )}
+                                                            
                                                             <div className="p-5 md:p-6 flex flex-col h-full">
                                                                 <div className="mb-4">
                                                                     <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase mb-3

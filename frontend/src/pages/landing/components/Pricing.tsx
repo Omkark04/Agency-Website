@@ -281,9 +281,16 @@ export const Pricing = () => {
                               {/* Content */}
                               <div className="p-6 pt-16">
                                 {/* Service Name */}
-                                <h4 className="text-xl font-bold text-gray-800 dark:text-white mb-4 line-clamp-1">
-                                  {service.title}
-                                </h4>
+                                <div className="flex items-center justify-between mb-4">
+                                  <h4 className="text-xl font-bold text-gray-800 dark:text-white line-clamp-1">
+                                    {service.title}
+                                  </h4>
+                                  {service.discount_percentage && service.discount_percentage > 0 && (
+                                    <span className="ml-2 px-2 py-1 text-xs font-bold bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full shadow-lg whitespace-nowrap">
+                                      {service.discount_percentage}% OFF
+                                    </span>
+                                  )}
+                                </div>
 
                                 {/* Price */}
                                 <div className="mb-6">
@@ -413,10 +420,19 @@ export const Pricing = () => {
                         viewport={{ once: true }}
                         className="mb-4 px-4"
                       >
-                        <h3 className="text-xl font-bold text-gray-800 dark:text-white tracking-tight leading-tight">
-                          {service.title}
-                        </h3>
-                        <div className="w-16 h-0.5 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] mt-2 rounded-full"></div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="text-xl font-bold text-gray-800 dark:text-white tracking-tight leading-tight">
+                              {service.title}
+                            </h3>
+                            <div className="w-16 h-0.5 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] mt-2 rounded-full"></div>
+                          </div>
+                          {service.discount_percentage && service.discount_percentage > 0 && (
+                            <span className="px-2 py-1 text-xs font-bold bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full shadow-lg whitespace-nowrap">
+                              {service.discount_percentage}% OFF
+                            </span>
+                          )}
+                        </div>
                       </motion.div>
 
                       {/* Horizontal Scrollable Cards */}
@@ -462,9 +478,20 @@ export const Pricing = () => {
                                   <div className="p-5 pt-14">
                                     {/* Price */}
                                     <div className="mb-4">
-                                      <div className="text-3xl font-extrabold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                                        ₹{parseFloat(card.price).toLocaleString('en-IN')}
-                                      </div>
+                                      {card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) ? (
+                                        <div className="flex flex-col">
+                                          <span className="text-gray-400 dark:text-gray-500 line-through text-sm font-medium">
+                                            ₹{parseFloat(card.price).toLocaleString('en-IN')}
+                                          </span>
+                                          <div className="text-3xl font-extrabold bg-gradient-to-r from-[#FF6B6B] to-[#FF8E53] bg-clip-text text-transparent">
+                                            ₹{parseFloat(card.discounted_price.toString()).toLocaleString('en-IN')}
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <div className="text-3xl font-extrabold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                                          ₹{parseFloat(card.price).toLocaleString('en-IN')}
+                                        </div>
+                                      )}
                                     </div>
 
                                     {/* Details Grid */}
