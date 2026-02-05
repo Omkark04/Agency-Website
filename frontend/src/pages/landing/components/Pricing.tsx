@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Zap, Star, ChevronRight, ArrowRight, Clock, RefreshCw, Sparkles, ArrowLeft } from 'lucide-react';
+import { Check, Zap, Star, ChevronRight, ArrowRight, Clock, RefreshCw, Sparkles, ArrowLeft, Eye, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { listPriceCards } from '../../../api/pricecards';
 import type { PriceCard } from '../../../api/pricecards';
@@ -26,6 +26,9 @@ export const Pricing = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPriceCard, setSelectedPriceCard] = useState<PriceCard | null>(null);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
+
+  // Modal state for viewing all features of a card
+  const [selectedCardForFeatures, setSelectedCardForFeatures] = useState<PriceCard | null>(null);
 
   useEffect(() => {
     fetchPricingData();
@@ -358,8 +361,19 @@ export const Pricing = () => {
                                         </li>
                                       ))}
                                       {card.features.length > (card.title === 'premium' ? 5 : card.title === 'medium' ? 4 : 3) && (
-                                        <li className="text-sm text-[#00C2A8] dark:text-[#00C2A8] font-medium ml-7">
-                                          +{card.features.length - (card.title === 'premium' ? 5 : card.title === 'medium' ? 4 : 3)} more features
+                                        <li className="flex items-center gap-2 text-sm text-[#00C2A8] dark:text-[#00C2A8] font-medium ml-7">
+                                          <span>+{card.features.length - (card.title === 'premium' ? 5 : card.title === 'medium' ? 4 : 3)} more features</span>
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setSelectedCardForFeatures(card);
+                                            }}
+                                            className="hidden md:inline-flex items-center gap-1 text-[#00C2A8] hover:text-[#0066FF] transition-colors"
+                                            aria-label="View all features"
+                                          >
+                                            <Eye className="w-3.5 h-3.5" />
+                                            <span className="text-xs font-medium">View All</span>
+                                          </button>
                                         </li>
                                       )}
                                     </ul>
@@ -626,6 +640,96 @@ export const Pricing = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Features Modal - Desktop Only */}
+      <Dialog open={!!selectedCardForFeatures} onOpenChange={() => setSelectedCardForFeatures(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden p-0 border-0 bg-white dark:bg-gray-900 rounded-2xl">
+          {selectedCardForFeatures && (() => {
+            const service = getService(selectedCardForFeatures.service);
+            return (
+              <div className="h-full flex flex-col">
+                <div className="p-6 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                        {service?.title}
+                      </DialogTitle>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                          selectedCardForFeatures.title === 'basic' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                          selectedCardForFeatures.title === 'medium' ? 'bg-[#00C2A8]/10 text-[#00C2A8]' :
+                          'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
+                        }`}>
+                          {selectedCardForFeatures.title}
+                        </span>
+                        <span className="text-2xl font-extrabold text-gray-900 dark:text-white">
+                          ₹{(selectedCardForFeatures.discounted_price && parseFloat(selectedCardForFeatures.discounted_price.toString()) < parseFloat(selectedCardForFeatures.price) ? parseFloat(selectedCardForFeatures.discounted_price.toString()) : parseFloat(selectedCardForFeatures.price)).toLocaleString('en-IN')}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setSelectedCardForFeatures(null)}
+                      className="p-2 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+                <div className="flex-1 overflow-y-auto p-6">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-[#00C2A8]" />
+                    All Features Included
+                  </h3>
+                  <ul className="space-y-3">
+                    {selectedCardForFeatures.features?.map((feature, i) => (
+                      <li key={i} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                        <div className="flex-shrink-0 mt-0.5">
+                          <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                            <Check className="w-3 h-3 text-green-600 dark:text-green-400 stroke-[3]" />
+                          </div>
+                        </div>
+                        <span className="text-sm text-gray-700 dark:text-gray-300 flex-1">
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 border border-[#00C2A8]/20">
+                    <div className="flex items-center gap-4 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-[#00C2A8]" />
+                        <span className="text-gray-700 dark:text-gray-300">{selectedCardForFeatures.delivery_days || 7} Days Delivery</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <RefreshCw className="w-4 h-4 text-[#0066FF]" />
+                        <span className="text-gray-700 dark:text-gray-300">{selectedCardForFeatures.revisions} Revisions</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+                  <button
+                    onClick={() => {
+                      setSelectedCardForFeatures(null);
+                      openFormWithPriceCard(selectedCardForFeatures);
+                    }}
+                    className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 group ${
+                      selectedCardForFeatures.title === 'basic'
+                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/30'
+                        : selectedCardForFeatures.title === 'medium'
+                        ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:shadow-lg hover:shadow-[#00C2A8]/30'
+                        : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg hover:shadow-purple-500/30'
+                    }`}
+                  >
+                    Choose This Plan
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
 
       {/* Service Request Modal */}
       <Dialog open={isModalOpen} onOpenChange={handleCloseModal}>

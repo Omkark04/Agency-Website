@@ -37,15 +37,29 @@ export const useAuth = () => {
     const checkAuth = async () => {
       try {
         const token = localStorage.getItem('access');
-        if (token) {
-          // You might want to validate the token with the backend
+        const refresh = localStorage.getItem('refresh');
+        
+        // Validate tokens exist and are not empty
+        if (token && refresh && token.trim() !== '' && refresh.trim() !== '') {
           const userStr = localStorage.getItem('user');
           const user = userStr ? JSON.parse(userStr) : null;
           setAuth({ user, loading: false, error: null });
         } else {
+          // Clear invalid tokens
+          if (token || refresh) {
+            localStorage.removeItem('access');
+            localStorage.removeItem('refresh');
+            localStorage.removeItem('user');
+            localStorage.removeItem('role');
+          }
           setAuth({ user: null, loading: false, error: null });
         }
       } catch (error) {
+        // Clear tokens on error
+        localStorage.removeItem('access');
+        localStorage.removeItem('refresh');
+        localStorage.removeItem('user');
+        localStorage.removeItem('role');
         setAuth({ user: null, loading: false, error: 'Failed to authenticate' });
       }
     };
@@ -131,6 +145,7 @@ export const useAuth = () => {
     localStorage.removeItem('access');
     localStorage.removeItem('refresh');
     localStorage.removeItem('user');
+    localStorage.removeItem('role');
     setAuth({ user: null, loading: false, error: null });
     navigate('/login');
   };

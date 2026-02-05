@@ -36,13 +36,10 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
-
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
-    
-
     
     // Handle 401 - Unauthorized (token refresh)
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -55,7 +52,15 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } else {
-
+        // Refresh failed - logout user and redirect to login
+        localStorage.removeItem('access');
+        localStorage.removeItem('refresh');
+        localStorage.removeItem('user');
+        localStorage.removeItem('role');
+        
+        // Redirect to login page with message
+        window.location.href = '/login?session_expired=true';
+        return Promise.reject(new Error('Session expired. Please login again.'));
       }
     }
     
