@@ -607,18 +607,18 @@ export default function PricingPlansPage() {
                                                                         </li>
                                                                     ))}
                                                                     {(card.features?.length || 0) > 5 && (
-                                                                        <li className="flex items-center gap-2 text-xs text-gray-400 pl-6">
-                                                                            <span>+{ (card.features?.length || 0) - 5 } more</span>
+                                                                        <li className="flex items-center justify-between text-xs pl-6">
+                                                                            <span className="text-gray-400">+{ (card.features?.length || 0) - 5 } more</span>
                                                                             <button
                                                                                 onClick={(e) => {
                                                                                     e.stopPropagation();
                                                                                     setSelectedCardForFeatures(card);
                                                                                 }}
-                                                                                className="hidden md:inline-flex items-center gap-1 text-[#00C2A8] hover:text-[#0066FF] transition-colors"
+                                                                                className="hidden md:inline-flex items-center gap-1 text-[#00C2A8] hover:text-[#0066FF] transition-colors font-medium"
                                                                                 aria-label="View all features"
                                                                             >
                                                                                 <Eye className="w-3.5 h-3.5" />
-                                                                                <span className="text-xs font-medium">View All</span>
+                                                                                <span>View All</span>
                                                                             </button>
                                                                         </li>
                                                                     )}
@@ -736,14 +736,14 @@ export default function PricingPlansPage() {
 
       {/* Features Modal - Desktop Only */}
       <Dialog open={!!selectedCardForFeatures} onOpenChange={() => setSelectedCardForFeatures(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden p-0 border-0 bg-white dark:bg-gray-900 rounded-2xl">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden p-0 border-0 bg-white dark:bg-gray-900 rounded-2xl">
           {selectedCardForFeatures && (() => {
             const service = services.find(s => s.id === selectedCardForFeatures.service);
             return (
-              <div className="h-full flex flex-col">
-                <div className="p-6 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
+              <div className="h-full flex flex-col max-h-[85vh]">
+                <div className="p-6 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 flex-shrink-0">
                   <div className="flex items-start justify-between">
-                    <div className="flex-1">
+                    <div className="flex-1 pr-4">
                       <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                         {service?.title}
                       </DialogTitle>
@@ -760,12 +760,6 @@ export default function PricingPlansPage() {
                         </span>
                       </div>
                     </div>
-                    <button
-                      onClick={() => setSelectedCardForFeatures(null)}
-                      className="p-2 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
                   </div>
                 </div>
                 <div className="flex-1 overflow-y-auto p-6">
