@@ -19,8 +19,8 @@ export default function FAQ() {
     // General
     {
       category: 'General',
-      question: 'What is UdyogWorks?',
-      answer: 'UdyogWorks is a comprehensive business development agency that provides digital solutions including web development, mobile apps, UI/UX design, branding, and business consulting to help businesses grow and succeed in the digital landscape.'
+      question: 'What is OneKraft?',
+      answer: 'OneKraft is a comprehensive agency that provides digital solutions including web development, mobile apps, UI/UX design, branding, and business consulting to help businesses grow and succeed in the digital landscape.'
     },
     {
       category: 'General',
@@ -123,7 +123,7 @@ export default function FAQ() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       <SEOHead 
         title="Frequently Asked Questions"
-        description="Find answers to common questions about UdyogWorks' services, pricing, technical support, and more."
+        description="Find answers to common questions about OneKraft' services, pricing, technical support, and more."
         url="/faq"
         schema={{
           "@context": "https://schema.org",
@@ -139,7 +139,7 @@ export default function FAQ() {
         }}
       />
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white py-20">
+      <div className="bg-gradient-to-br from-[#0A1F44] to-[#1a365d] text-white py-20">
         <div className="container mx-auto px-4">
           <Link to="/" className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -168,7 +168,7 @@ export default function FAQ() {
                 placeholder="Search FAQs..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C2A8] shadow-lg"
+                className="w-full pl-12 pr-4 py-4 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#015bad] shadow-lg"
               />
             </div>
           </motion.div>
@@ -191,7 +191,7 @@ export default function FAQ() {
                   onClick={() => setSelectedCategory(category)}
                   className={`px-6 py-2 rounded-full font-medium transition-all duration-300 ${
                     selectedCategory === category
-                      ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white shadow-lg'
+                      ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white shadow-lg'
                       : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                   }`}
                 >
@@ -222,7 +222,7 @@ export default function FAQ() {
                     <div className="flex items-start gap-4 flex-1 pr-4">
                       <div className={`mt-1 p-2 rounded-lg flex-shrink-0 ${
                         isOpen 
-                          ? 'bg-gradient-to-br from-[#00C2A8] to-[#0066FF] text-white' 
+                          ? 'bg-gradient-to-br from-[#015bad] to-[#0A1F44] text-white' 
                           : 'bg-gray-100 text-gray-600'
                       }`}>
                         <HelpCircle className="h-5 w-5" />
@@ -269,7 +269,7 @@ export default function FAQ() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-16 bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-2xl p-8 md:p-12 text-white text-center"
+            className="mt-16 bg-gradient-to-br from-[#015bad] to-[#0A1F44] rounded-2xl p-8 md:p-12 text-white text-center"
           >
             <HelpCircle className="h-12 w-12 mx-auto mb-4" />
             <h2 className="text-2xl md:text-3xl font-bold mb-4">Still have questions?</h2>
@@ -278,8 +278,8 @@ export default function FAQ() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="mailto:udyogworks.official@gmail.com"
-                className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#0066FF] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+                href="mailto:onekraft.official@gmail.com"
+                className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#0A1F44] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <Mail className="h-5 w-5 mr-2" />
                 Contact Us

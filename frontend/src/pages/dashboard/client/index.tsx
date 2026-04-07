@@ -50,7 +50,7 @@ const ClientDashboard = () => {
         animate={{ width: sidebarOpen ? 256 : 80 }}
       >
         <div className="p-4 flex items-center justify-between">
-          {sidebarOpen && <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">UdyogWorks</h1>}
+          {sidebarOpen && <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">OneKraft</h1>}
           <button 
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 rounded-lg hover:bg-slate-700 transition-colors"

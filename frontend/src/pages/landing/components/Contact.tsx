@@ -100,7 +100,7 @@ const Contact = () => {
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Get In Touch
           </h2>
-          <div className="w-20 h-1 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] mx-auto mb-6"></div>
+          <div className="w-20 h-1 bg-gradient-to-r from-[#015bad] to-[#0A1F44] mx-auto mb-6"></div>
           <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Have a project in mind or want to discuss how we can help? Send us a message
             and our team will get back to you shortly.
@@ -141,7 +141,7 @@ const Contact = () => {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#00C2A8] focus:border-transparent transition-all duration-300"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300"
                       placeholder="John Doe"
                       required
                     />
@@ -156,7 +156,7 @@ const Contact = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#00C2A8] focus:border-transparent transition-all duration-300"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300"
                       placeholder="john@example.com"
                       required
                     />
@@ -173,7 +173,7 @@ const Contact = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#00C2A8] focus:border-transparent transition-all duration-300"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300"
                     placeholder="+91 98765 43210"
                   />
                 </div>
@@ -186,7 +186,7 @@ const Contact = () => {
                     id="department"
                     value={selectedDepartment}
                     onChange={(e) => setSelectedDepartment(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#00C2A8] focus:border-transparent transition-all duration-300 appearance-none"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300 appearance-none"
                     required
                   >
                     <option value="">Select Department</option>
@@ -207,7 +207,7 @@ const Contact = () => {
                     name="service_id"
                     value={formData.service_id}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#00C2A8] focus:border-transparent transition-all duration-300 appearance-none"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300 appearance-none"
                     required
                     disabled={!selectedDepartment}
                   >
@@ -231,7 +231,7 @@ const Contact = () => {
                     value={formData.message}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#00C2A8] focus:border-transparent transition-all duration-300 resize-none"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300 resize-none"
                     placeholder="Tell us about your project..."
                   ></textarea>
                 </div>
@@ -239,7 +239,7 @@ const Contact = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 ${
+                  className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#015bad] to-[#0A1F44] hover:opacity-90 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 ${
                     isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
                   }`}
                 >
@@ -281,18 +281,18 @@ const Contact = () => {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="bg-[#0066FF]/10 p-3 rounded-full mr-4">
-                    <Mail className="h-6 w-6 text-[#0066FF]" />
+                  <div className="bg-[#0A1F44]/10 p-3 rounded-full mr-4">
+                    <Mail className="h-6 w-6 text-[#0A1F44]" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900 dark:text-white">Email Us</h4>
-                    <a href="mailto:info@udyogworks.com" className="text-[#0066FF] hover:underline">udyogworks.official@gmail.com</a>
+                    <a href="mailto:info@onekraft.com" className="text-[#0A1F44] hover:underline">onekraft.official@gmail.com</a>
                   </div>
                 </div>
 
                 <div className="flex items-start">
-                  <div className="bg-[#0B2545]/10 dark:bg-[#00C2A8]/10 p-3 rounded-full mr-4">
-                    <Phone className="h-6 w-6 text-[#0B2545] dark:text-[#00C2A8]" />
+                  <div className="bg-[#0A1F44]/10 dark:bg-[#015bad]/10 p-3 rounded-full mr-4">
+                    <Phone className="h-6 w-6 text-[#0A1F44] dark:text-[#F5B041]" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900 dark:text-white">Call Us</h4>
@@ -305,7 +305,7 @@ const Contact = () => {
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Follow Us</h4>
                 <div className="flex space-x-4">
                   <a
-                    href="https://facebook.com/udyogworks"
+                    href="https://facebook.com/onekraft"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300 text-[#1877F2]"
@@ -314,7 +314,7 @@ const Contact = () => {
                     <Facebook size={20} />
                   </a>
                   <a
-                    href="https://twitter.com/udyogworks"
+                    href="https://twitter.com/onekraft"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300 text-[#1DA1F2]"
@@ -323,7 +323,7 @@ const Contact = () => {
                     <Twitter size={20} />
                   </a>
                   <a
-                    href="https://instagram.com/udyogworks"
+                    href="https://instagram.com/onekraft"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300 text-[#E4405F]"
@@ -332,7 +332,7 @@ const Contact = () => {
                     <Instagram size={20} />
                   </a>
                   <a
-                    href="https://linkedin.com/company/udyogworks"
+                    href="https://linkedin.com/company/onekraft"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300 text-[#0A66C2]"
@@ -343,7 +343,7 @@ const Contact = () => {
                 </div>
               </div>
 
-              <div className="mt-12 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] p-6 rounded-xl text-white">
+              <div className="mt-12 bg-gradient-to-r from-[#015bad] to-[#0A1F44] p-6 rounded-xl text-white">
                 <h4 className="font-bold text-xl mb-2">Need Immediate Assistance?</h4>
                 <p className="mb-4 text-white/90">Chat with our team on WhatsApp for quick responses.</p>
                 <a 

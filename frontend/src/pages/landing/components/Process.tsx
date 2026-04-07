@@ -12,21 +12,21 @@ const Process = () => {
       title: 'Discover',
       icon: <FaSearch className="text-3xl md:text-4xl text-white" />,
       description: 'We analyze your business needs and goals to create a customized strategy.',
-      color: 'from-[#00C2A8] to-[#00A5C2]'
+      color: 'from-[#015bad] to-[#00A5C2]'
     },
     {
       id: 2,
       title: 'Plan',
       icon: <FaClipboardList className="text-3xl md:text-4xl text-white" />,
       description: 'Our team creates a detailed project roadmap with milestones and deliverables.',
-      color: 'from-[#0066FF] to-[#0052CC]'
+      color: 'from-[#0A1F44] to-[#0052CC]'
     },
     {
       id: 3,
       title: 'Build',
       icon: <FaCode className="text-3xl md:text-4xl text-white" />,
       description: 'We develop your solution with cutting-edge technology and best practices.',
-      color: 'from-[#0B2545] to-[#1A365D]'
+      color: 'from-[#0A1F44] to-[#1A365D]'
     },
     {
       id: 4,
@@ -47,7 +47,7 @@ const Process = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 text-[#00C2A8] dark:text-[#00C2A8] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
+          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] dark:text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
             Our Process
           </span>
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent tracking-tight leading-tight px-4">
@@ -61,7 +61,7 @@ const Process = () => {
         {/* Desktop: Timeline Layout */}
         <div className="hidden md:block relative">
           {/* Timeline line */}
-          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-[#00C2A8] via-[#0066FF] to-[#8A2BE2] transform -translate-x-1/2"></div>
+          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-[#015bad] via-[#0A1F44] to-[#8A2BE2] transform -translate-x-1/2"></div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
             {steps.map((step, index) => (
@@ -75,7 +75,7 @@ const Process = () => {
               >
                 {/* Step number on timeline */}
                 <div className="hidden lg:flex absolute top-0 left-1/2 w-12 h-12 bg-white dark:bg-gray-800 rounded-full border-4 border-white dark:border-gray-900 items-center justify-center transform -translate-x-1/2 -translate-y-6 z-10">
-                  <span className="text-lg font-bold bg-gradient-to-r bg-clip-text text-transparent from-[#00C2A8] to-[#0066FF]">
+                  <span className="text-lg font-bold bg-gradient-to-r bg-clip-text text-transparent from-[#015bad] to-[#0A1F44]">
                     0{step.id}
                   </span>
                 </div>
@@ -113,7 +113,7 @@ const Process = () => {
                 <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 h-full">
                   {/* Step Number Badge */}
                   <div className="absolute top-3 right-3 w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-bold bg-gradient-to-r bg-clip-text text-transparent from-[#00C2A8] to-[#0066FF]">
+                    <span className="text-sm font-bold bg-gradient-to-r bg-clip-text text-transparent from-[#015bad] to-[#0A1F44]">
                       0{step.id}
                     </span>
                   </div>
@@ -156,7 +156,7 @@ const Process = () => {
           </p>
           <button 
             onClick={() => navigateTo('/client-dashboard/services')}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-2.5 px-6 md:py-3 md:px-8 rounded-full text-sm md:text-base tracking-wide transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#015bad] to-[#0A1F44] hover:opacity-90 text-white font-semibold py-2.5 px-6 md:py-3 md:px-8 rounded-full text-sm md:text-base tracking-wide transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >
             Start Your Project
             <FaRocket className="w-4 h-4" />

@@ -3,9 +3,10 @@ import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Services } from '../landing/components/Services';
 import Offers from '../landing/components/Offers';
-import PortfolioSection from './components/PortfolioSection'; // Add this import
+import PortfolioSection from './components/PortfolioSection';
+import { ClientsSection } from './components/ClientsSection';
 import Process from './components/Process';
-import { Pricing } from './components/Pricing';
+
 import Testimonials from './components/Testimonials';
 import { About } from './components/About';
 import Contact from './components/Contact';
@@ -49,18 +50,18 @@ export const LandingPage = () => {
         } ${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-white text-gray-900'}`}
       >
         <SEOHead 
-          title="UdyogWorks - Business Development Agency"
+          title="OneKraft"
           description="Transform your business with expert services in web development, data analytics, digital marketing, and business consulting. Get started today!"
           schema={{
             "@context": "https://schema.org",
             "@type": "Organization",
-            "name": "UdyogWorks",
-            "url": "https://udyogworks.in",
-            "logo": "https://udyogworks.in/logo.png",
+            "name": "OneKraft",
+            "url": "https://onekraft.in",
+            "logo": "https://onekraft.in/logo.png",
             "sameAs": [
-              "https://facebook.com/udyogworks",
-              "https://linkedin.com/company/udyogworks",
-              "https://instagram.com/udyogworks"
+              "https://facebook.com/onekraft",
+              "https://linkedin.com/company/onekraft",
+              "https://instagram.com/onekraft"
             ],
               "contactPoint": {
                 "@type": "ContactPoint",
@@ -77,8 +78,9 @@ export const LandingPage = () => {
           <Services />
           <Offers />
           <PortfolioSection />
+          <ClientsSection />
           <Process />
-          <Pricing />
+
           <Testimonials />
           <About />
           <Contact />

@@ -84,11 +84,11 @@ export default function Blog() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       <SEOHead 
         title="Blog & Insights"
-        description="Read the latest insights, tips, and stories about web development, design, and digital transformation from the experts at UdyogWorks."
+        description="Read the latest insights, tips, and stories about web development, design, and digital transformation from the experts at OneKraft."
         url="/blog"
       />
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white py-20">
+      <div className="bg-gradient-to-br from-[#0A1F44] to-[#1a365d] text-white py-20">
         <div className="container mx-auto px-4">
           <Link to="/" className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -140,7 +140,7 @@ export default function Blog() {
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute top-4 left-4">
-                          <span className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-4 py-2 rounded-full text-sm font-semibold">
+                          <span className="bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white px-4 py-2 rounded-full text-sm font-semibold">
                             Featured
                           </span>
                         </div>
@@ -164,7 +164,7 @@ export default function Blog() {
                       <p className="text-gray-600 mb-6 leading-relaxed">{featuredPost.excerpt}</p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#00C2A8] to-[#0066FF] flex items-center justify-center text-white font-semibold">
+                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#015bad] to-[#0A1F44] flex items-center justify-center text-white font-semibold">
                             {getAuthorInitial(featuredPost.author)}
                           </div>
                           <div>
@@ -176,7 +176,7 @@ export default function Blog() {
                         </div>
                         <Link
                           to={`/blog/${featuredPost.id}`}
-                          className="inline-flex items-center gap-2 text-[#0066FF] font-semibold hover:gap-3 transition-all"
+                          className="inline-flex items-center gap-2 text-[#0A1F44] font-semibold hover:gap-3 transition-all"
                         >
                           Read More
                           <ArrowRight className="h-5 w-5" />
@@ -202,7 +202,7 @@ export default function Blog() {
                     onClick={() => setSelectedCategory(category)}
                     className={`px-6 py-2 rounded-full font-medium transition-all duration-300 ${
                       selectedCategory === category
-                        ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white shadow-lg'
+                        ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white shadow-lg'
                         : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                     }`}
                   >
@@ -251,20 +251,20 @@ export default function Blog() {
                         </>
                       )}
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 hover:text-[#0066FF] transition-colors">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 hover:text-[#0A1F44] transition-colors">
                       {post.title}
                     </h3>
                     <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
                     <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                       <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#00C2A8] to-[#0066FF] flex items-center justify-center text-white text-sm font-semibold">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#015bad] to-[#0A1F44] flex items-center justify-center text-white text-sm font-semibold">
                           {getAuthorInitial(post.author)}
                         </div>
                         <span className="text-sm font-medium text-gray-700">{getAuthorName(post.author)}</span>
                       </div>
                       <Link
                         to={`/blog/${post.id}`}
-                        className="text-[#0066FF] font-semibold text-sm hover:gap-2 inline-flex items-center gap-1 transition-all"
+                        className="text-[#0A1F44] font-semibold text-sm hover:gap-2 inline-flex items-center gap-1 transition-all"
                       >
                         Read
                         <ArrowRight className="h-4 w-4" />
@@ -280,7 +280,7 @@ export default function Blog() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="mt-16 bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-2xl p-8 md:p-12 text-white text-center"
+              className="mt-16 bg-gradient-to-br from-[#015bad] to-[#0A1F44] rounded-2xl p-8 md:p-12 text-white text-center"
             >
               <h2 className="text-2xl md:text-3xl font-bold mb-4">Subscribe to Our Newsletter</h2>
               <p className="text-white/90 mb-8 max-w-2xl mx-auto">
@@ -300,7 +300,7 @@ export default function Blog() {
                          alert(err.response?.data?.detail || 'Failed to subscribe.');
                        }
                      }}
-                     className="px-8 py-3 bg-white text-[#0066FF] font-bold rounded-lg hover:bg-gray-100 transition-colors shadow-lg"
+                     className="px-8 py-3 bg-white text-[#0A1F44] font-bold rounded-lg hover:bg-gray-100 transition-colors shadow-lg"
                    >
                      Subscribe Now
                    </button>
@@ -310,7 +310,7 @@ export default function Blog() {
                   <p className="text-white mb-4">Please log in to subscribe to our newsletter.</p>
                   <Link
                     to="/login"
-                    className="inline-block px-8 py-3 bg-white text-[#0066FF] font-bold rounded-lg hover:bg-gray-100 transition-colors shadow-lg"
+                    className="inline-block px-8 py-3 bg-white text-[#0A1F44] font-bold rounded-lg hover:bg-gray-100 transition-colors shadow-lg"
                   >
                     Log In to Subscribe
                   </Link>

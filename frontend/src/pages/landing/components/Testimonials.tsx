@@ -141,7 +141,7 @@ const Testimonials = () => {
   // Loading state
   if (loading && testimonials.length === 0) {
     return (
-      <section id="testimonials" className="py-20 bg-gradient-to-b from-[#0B2545] via-[#0F2B4F] to-[#0B2545] text-white overflow-hidden">
+      <section id="testimonials" className="py-20 bg-gradient-to-b from-[#0A1F44] via-[#0F2B4F] to-[#0B2545] text-white overflow-hidden">
         <div className="absolute inset-0 bg-grid-white/[0.02] bg-grid opacity-30" />
         <div className="container mx-auto px-4 md:px-8 lg:px-12 relative">
           <div className="max-w-6xl mx-auto">
@@ -161,7 +161,7 @@ const Testimonials = () => {
   }
 
   return (
-    <section id="testimonials" className="py-12 md:py-20 bg-gradient-to-b from-[#0B2545] via-[#0F2B4F] to-[#0B2545] text-white overflow-hidden relative">
+    <section id="testimonials" className="py-12 md:py-20 bg-gradient-to-b from-[#0A1F44] via-[#0F2B4F] to-[#0B2545] text-white overflow-hidden relative">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-grid opacity-30" />
       <div className="absolute top-1/4 left-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl" />
@@ -252,8 +252,8 @@ const Testimonials = () => {
             `}</style>
             <div className="hidden lg:block relative group">
               {/* Gradient Edges */}
-              <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#0B2545] to-transparent z-10 pointer-events-none" />
-              <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#0B2545] to-transparent z-10 pointer-events-none" />
+              <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#0A1F44] to-transparent z-10 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#0A1F44] to-transparent z-10 pointer-events-none" />
 
               <div className="overflow-hidden">
                 <div 

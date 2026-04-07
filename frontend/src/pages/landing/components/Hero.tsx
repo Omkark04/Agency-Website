@@ -173,7 +173,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               </>
             )
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#0B2545] to-[#1a365d] z-0" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#0A1F44] to-[#1a365d] z-0" />
           )}
         </div>
 
@@ -206,7 +206,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
             )
           ) : (
             // Fallback gradient background
-            <div className="absolute inset-0 bg-gradient-to-br from-[#0B2545] to-[#1a365d] z-0" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#0A1F44] to-[#1a365d] z-0" />
           )}
         </div>
         <div className="container mx-auto px-4 md:px-8 lg:px-12 relative z-10 overflow-x-hidden md:overflow-visible">
@@ -236,7 +236,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               </h1>
 
               <p className="hidden md:block text-xl text-gray-300 mb-8">
-                Business development & Marketing Agency powering growth through design & technology.
+                Powering growth through design & technology.
               </p>
              
               {/* Services Carousel - Mobile Only */}
@@ -271,15 +271,15 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                         repeatDelay: 3
                       }}
                     >
-                      <CheckCircle className="h-5 w-5 text-[#00C2A8]" />
+                      <CheckCircle className="h-5 w-5 text-[#F5B041]" />
                     </motion.div>
                     Our Services
                   </motion.h3>
 
                   <div className="relative overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
                     {/* Gradient edges */}
-                    <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0B2545] to-transparent z-10 pointer-events-none" />
-                    <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0B2545] to-transparent z-10 pointer-events-none" />
+                    <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0A1F44] to-transparent z-10 pointer-events-none" />
+                    <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0A1F44] to-transparent z-10 pointer-events-none" />
 
                     <div className="flex gap-4 w-max animate-marquee-services">
                       {[...services, ...services].map((service, index) => (
@@ -299,7 +299,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                                 className="w-10 h-10 object-contain"
                               />
                             ) : (
-                              <div className="w-10 h-10 bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-lg flex items-center justify-center">
+                              <div className="w-10 h-10 bg-gradient-to-br from-[#015bad] to-[#0A1F44] rounded-lg flex items-center justify-center">
                                 <CheckCircle className="w-6 h-6 text-white" />
                               </div>
                             )}
@@ -317,7 +317,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               <div className="w-full max-w-xs mt-6 md:mt-0">
                 <button
                   onClick={() => isAuthenticated ? navigate('/client-dashboard/services') : navigate('/pricing-plans')}
-                  className="w-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:opacity-90 text-white font-semibold py-3 px-8 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-105"
+                  className="w-full bg-gradient-to-r from-[#015bad] to-[#0A1F44] hover:opacity-90 text-white font-semibold py-3 px-8 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-105"
                 >
                   View Services
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -356,15 +356,15 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                         repeatDelay: 3
                       }}
                     >
-                      <Building2 className="h-5 w-5 text-[#00C2A8]" />
+                      <Building2 className="h-5 w-5 text-[#F5B041]" />
                     </motion.div>
                     Our Departments
                   </motion.h3>
 
                   <div className="relative overflow-hidden">
                     {/* Gradient edges */}
-                    <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0B2545] to-transparent z-10 pointer-events-none" />
-                    <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0B2545] to-transparent z-10 pointer-events-none" />
+                    <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0A1F44] to-transparent z-10 pointer-events-none" />
+                    <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0A1F44] to-transparent z-10 pointer-events-none" />
 
                     <div className="flex gap-4 w-max animate-marquee-departments">
                       {[...departments, ...departments].map((dept, index) => (
@@ -378,7 +378,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                             {dept.logo ? (
                               <img src={dept.logo} alt={dept.title} width="48" height="48" className="w-12 h-12 object-contain rounded-lg" />
                             ) : (
-                              <div className="w-12 h-12 bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-lg flex items-center justify-center">
+                              <div className="w-12 h-12 bg-gradient-to-br from-[#015bad] to-[#0A1F44] rounded-lg flex items-center justify-center">
                                 <Building2 className="h-6 w-6 text-white" />
                               </div>
                             )}
@@ -400,7 +400,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                     transition={{ delay: 0.2 }}
                     className="text-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-2"
                   >
-                    <div className="text-xl font-bold text-[#00C2A8]">{stats.clients}+</div>
+                    <div className="text-xl font-bold text-[#F5B041]">{stats.clients}+</div>
                     <div className="text-[10px] text-gray-300 mt-0.5">Happy Clients</div>
                   </motion.div>
                   <motion.div
@@ -409,7 +409,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                     transition={{ delay: 0.3 }}
                     className="text-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-2"
                   >
-                    <div className="text-xl font-bold text-[#00C2A8]">{stats.projects}+</div>
+                    <div className="text-xl font-bold text-[#F5B041]">{stats.projects}+</div>
                     <div className="text-[10px] text-gray-300 mt-0.5">Projects Completed</div>
                   </motion.div>
                   <motion.div
@@ -418,7 +418,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                     transition={{ delay: 0.4 }}
                     className="text-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-2"
                   >
-                    <div className="text-xl font-bold text-[#00C2A8]">{stats.satisfaction}%</div>
+                    <div className="text-xl font-bold text-[#F5B041]">{stats.satisfaction}%</div>
                     <div className="text-[10px] text-gray-300 mt-0.5">Satisfaction Rate</div>
                   </motion.div>
                 </div>
@@ -434,13 +434,13 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               className="hidden md:block relative"
             >
             <div className="relative z-10">
-              <div className="bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-2xl p-1 shadow-2xl">
+              <div className="bg-gradient-to-br from-[#015bad] to-[#0A1F44] rounded-2xl p-1 shadow-2xl">
                 <div className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden">
                   {isLoading ? (
                     // Loading skeleton
                     <div className="h-80 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
                       <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00C2A8] mx-auto mb-4"></div>
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#015bad] mx-auto mb-4"></div>
                         <span className="text-gray-400 dark:text-gray-600">Loading images...</span>
                       </div>
                     </div>
@@ -514,7 +514,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                       onClick={() => setCurrentImageIndex(index)}
                       className={`h-2 rounded-full transition-all duration-300 ${
                         index === currentImageIndex
-                          ? 'w-8 bg-gradient-to-r from-[#00C2A8] to-[#0066FF]'
+                          ? 'w-8 bg-gradient-to-r from-[#015bad] to-[#0A1F44]'
                           : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'
                       }`}
                       aria-label={`Go to image ${index + 1}`}
@@ -572,7 +572,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                         repeatDelay: 3
                       }}
                     >
-                      <Building2 className="h-5 w-5 text-[#00C2A8]" />
+                      <Building2 className="h-5 w-5 text-[#F5B041]" />
                     </motion.div>
                     Our Departments
                   </motion.h3>
@@ -598,7 +598,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                     >
                       {/* Animated gradient background */}
                       <motion.div
-                        className="absolute inset-0 bg-gradient-to-br from-[#00C2A8]/20 via-[#0066FF]/20 to-purple-500/20 rounded-xl opacity-0 group-hover:opacity-100 blur-xl"
+                        className="absolute inset-0 bg-gradient-to-br from-[#015bad]/20 via-[#0A1F44]/20 to-purple-500/20 rounded-xl opacity-0 group-hover:opacity-100 blur-xl"
                         animate={{
                           scale: [1, 1.2, 1],
                           rotate: [0, 5, -5, 0]
@@ -645,7 +645,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                             />
                           ) : (
                             <motion.div
-                              className="w-10 h-10 bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-lg flex items-center justify-center shadow-lg"
+                              className="w-10 h-10 bg-gradient-to-br from-[#015bad] to-[#0A1F44] rounded-lg flex items-center justify-center shadow-lg"
                               whileHover={{
                                 rotate: [0, -10, 10, 0],
                                 scale: 1.1
@@ -662,14 +662,14 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                               whileHover={{
                                 opacity: 1,
                                 x: 3,
-                                color: "#00C2A8"
+                                color: "#015bad"
                               }}
                               transition={{ duration: 0.2 }}
                             >
                               {dept.title}
                             </motion.p>
                             <motion.div
-                              className="h-0.5 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] mt-1"
+                              className="h-0.5 bg-gradient-to-r from-[#015bad] to-[#0A1F44] mt-1"
                               initial={{ scaleX: 0 }}
                               whileHover={{ scaleX: 1 }}
                               transition={{ duration: 0.3 }}
@@ -692,7 +692,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                 transition={{ delay: 0 }}
                 className="text-center"
               >
-                <div className="text-4xl font-bold text-[#00C2A8]">{stats.clients}+</div>
+                <div className="text-4xl font-bold text-[#F5B041]">{stats.clients}+</div>
                 <div className="text-sm text-gray-300 mt-2">Happy Clients</div>
               </motion.div>
               <motion.div
@@ -701,7 +701,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                 transition={{ delay: 0.2 }}
                 className="text-center"
               >
-                <div className="text-4xl font-bold text-[#00C2A8]">{stats.projects}+</div>
+                <div className="text-4xl font-bold text-[#F5B041]">{stats.projects}+</div>
                 <div className="text-sm text-gray-300 mt-2">Projects Completed</div>
               </motion.div>
               <motion.div
@@ -710,7 +710,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                 transition={{ delay: 0.4 }}
                 className="text-center"
               >
-                <div className="text-4xl font-bold text-[#00C2A8]">{stats.satisfaction}%</div>
+                <div className="text-4xl font-bold text-[#F5B041]">{stats.satisfaction}%</div>
                 <div className="text-sm text-gray-300 mt-2">Satisfaction Rate</div>
               </motion.div>
             </div>

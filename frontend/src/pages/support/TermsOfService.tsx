@@ -10,7 +10,7 @@ export default function TermsOfService() {
       content: [
         {
           subtitle: 'Agreement to Terms',
-          text: 'By accessing and using UdyogWorks services, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.'
+          text: 'By accessing and using OneKraft services, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.'
         },
         {
           subtitle: 'Eligibility',
@@ -28,7 +28,7 @@ export default function TermsOfService() {
       content: [
         {
           subtitle: 'Service Offerings',
-          text: 'UdyogWorks provides digital services including web development, mobile app development, UI/UX design, branding, and business consulting. Specific deliverables and timelines are outlined in individual project agreements.'
+          text: 'OneKraft provides digital services including web development, mobile app development, UI/UX design, branding, and business consulting. Specific deliverables and timelines are outlined in individual project agreements.'
         },
         {
           subtitle: 'Service Modifications',
@@ -68,10 +68,10 @@ export default function TermsOfService() {
       content: [
         {
           subtitle: 'Client Ownership',
-          text: 'Upon full payment, you own the final deliverables created specifically for your project. This includes custom designs, code, and content created by UdyogWorks for your project.'
+          text: 'Upon full payment, you own the final deliverables created specifically for your project. This includes custom designs, code, and content created by OneKraft for your project.'
         },
         {
-          subtitle: 'UdyogWorks Property',
+          subtitle: 'OneKraft Property',
           text: 'We retain ownership of our proprietary tools, frameworks, templates, and methodologies used in delivering services. We also retain the right to showcase completed work in our portfolio unless otherwise agreed.'
         },
         {
@@ -169,7 +169,7 @@ export default function TermsOfService() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white py-20">
+      <div className="bg-gradient-to-br from-[#0A1F44] to-[#1a365d] text-white py-20">
         <div className="container mx-auto px-4">
           <Link to="/" className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -189,7 +189,7 @@ export default function TermsOfService() {
               <h1 className="text-4xl md:text-5xl font-bold">Terms of Service</h1>
             </div>
             <p className="text-xl text-gray-300">
-              Please read these terms carefully before using our services. These terms govern your use of UdyogWorks services.
+              Please read these terms carefully before using our services. These terms govern your use of OneKraft services.
             </p>
             <p className="text-sm text-gray-400 mt-4">
               Last Updated: December 17, 2025
@@ -209,7 +209,7 @@ export default function TermsOfService() {
             className="bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-xl mb-12"
           >
             <p className="text-gray-700 leading-relaxed">
-              These Terms of Service ("Terms") constitute a legally binding agreement between you and UdyogWorks 
+              These Terms of Service ("Terms") constitute a legally binding agreement between you and OneKraft 
               regarding your use of our services. Please read these Terms carefully. By using our services, you 
               acknowledge that you have read, understood, and agree to be bound by these Terms.
             </p>
@@ -225,7 +225,7 @@ export default function TermsOfService() {
               className="mb-12"
             >
               <div className="flex items-center gap-3 mb-6">
-                <div className="bg-gradient-to-br from-[#00C2A8]/10 to-[#0066FF]/10 p-3 rounded-xl text-[#00C2A8]">
+                <div className="bg-gradient-to-br from-[#015bad]/10 to-[#0A1F44]/10 p-3 rounded-xl text-[#F5B041]">
                   {section.icon}
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">{section.title}</h2>
@@ -265,7 +265,7 @@ export default function TermsOfService() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.9 }}
-            className="bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-2xl p-8 text-white"
+            className="bg-gradient-to-br from-[#015bad] to-[#0A1F44] rounded-2xl p-8 text-white"
           >
             <h2 className="text-2xl font-bold mb-4">Questions About These Terms?</h2>
             <p className="text-white/90 mb-6">
@@ -273,7 +273,7 @@ export default function TermsOfService() {
             </p>
             <a
               href="/#contact"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#0066FF] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#0A1F44] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
             >
               Contact Us
             </a>

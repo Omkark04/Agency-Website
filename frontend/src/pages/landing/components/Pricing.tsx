@@ -164,7 +164,7 @@ export const Pricing = () => {
       <section id="pricing" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
         <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00C2A8]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#015bad]"></div>
           </div>
         </div>
       </section>
@@ -182,7 +182,7 @@ export const Pricing = () => {
             viewport={{ once: true }}
             className="text-center mb-8 md:mb-12"
           >
-            <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#00C2A8]/20 to-[#0066FF]/20 text-[#00C2A8] dark:text-[#00C2A8] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
+            <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/20 to-[#0A1F44]/20 text-[#F5B041] dark:text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
               <Sparkles className="inline-block w-3 h-3 md:w-4 md:h-4 mr-2" />
               Pricing Plans
             </span>
@@ -226,7 +226,7 @@ export const Pricing = () => {
                       <h3 className="text-3xl font-bold text-gray-800 dark:text-white mb-2 tracking-tight">
                         {deptName}
                       </h3>
-                      <div className="w-20 h-1 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] mx-auto rounded-full"></div>
+                      <div className="w-20 h-1 bg-gradient-to-r from-[#015bad] to-[#0A1F44] mx-auto rounded-full"></div>
                     </motion.div>
 
                     {/* Cards Grid */}
@@ -261,7 +261,7 @@ export const Pricing = () => {
                               {/* Popular Badge */}
                               {isPopular && (
                                 <div className="absolute top-4 left-4 z-10">
-                                  <div className="px-3 py-1 rounded-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white text-xs font-bold flex items-center gap-1 shadow-lg">
+                                  <div className="px-3 py-1 rounded-full bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white text-xs font-bold flex items-center gap-1 shadow-lg">
                                     <Star className="w-3 h-3 fill-current" />
                                     MOST POPULAR
                                   </div>
@@ -288,37 +288,13 @@ export const Pricing = () => {
                                   <h4 className="text-xl font-bold text-gray-800 dark:text-white line-clamp-1">
                                     {service.title}
                                   </h4>
-                                  {service.discount_percentage && service.discount_percentage > 0 && (
-                                    <span className="ml-2 px-2 py-1 text-xs font-bold bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full shadow-lg whitespace-nowrap">
-                                      {service.discount_percentage}% OFF
-                                    </span>
-                                  )}
                                 </div>
 
-                                {/* Price */}
-                                <div className="mb-6">
-                                  {card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) ? (
-                                    <div className="flex flex-col">
-                                      {card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) && (
-                                        <span className="text-gray-400 dark:text-gray-500 line-through text-lg font-medium">
-                                            ₹{parseFloat(card.price).toLocaleString('en-IN')}
-                                        </span>
-                                      )}
-                                      <div className="text-4xl font-extrabold bg-gradient-to-r from-[#FF6B6B] to-[#FF8E53] bg-clip-text text-transparent">
-                                        ₹{parseFloat(card.discounted_price.toString()).toLocaleString('en-IN')}
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div className="text-4xl font-extrabold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                                      ₹{parseFloat(card.price).toLocaleString('en-IN')}
-                                    </div>
-                                  )}
-                                </div>
 
                                 {/* Details Grid */}
                                 <div className="grid grid-cols-2 gap-3 mb-6 p-4 rounded-xl bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border border-gray-100 dark:border-gray-700">
                                   <div className="flex items-center gap-2">
-                                    <Clock className="w-4 h-4 text-[#00C2A8]" />
+                                    <Clock className="w-4 h-4 text-[#F5B041]" />
                                     <div>
                                       <div className="text-xs text-gray-500 dark:text-gray-400">Delivery</div>
                                       <div className="text-sm font-semibold text-gray-800 dark:text-white">
@@ -327,7 +303,7 @@ export const Pricing = () => {
                                     </div>
                                   </div>
                                   <div className="flex items-center gap-2">
-                                    <RefreshCw className="w-4 h-4 text-[#0066FF]" />
+                                    <RefreshCw className="w-4 h-4 text-[#0A1F44]" />
                                     <div>
                                       <div className="text-xs text-gray-500 dark:text-gray-400">Revisions</div>
                                       <div className="text-sm font-semibold text-gray-800 dark:text-white">
@@ -362,13 +338,13 @@ export const Pricing = () => {
                                       ))}
                                       {card.features.length > (card.title === 'premium' ? 5 : card.title === 'medium' ? 4 : 3) && (
                                         <li className="flex items-center justify-between text-sm ml-7">
-                                          <span className="text-[#00C2A8] dark:text-[#00C2A8] font-medium">+{card.features.length - (card.title === 'premium' ? 5 : card.title === 'medium' ? 4 : 3)} more features</span>
+                                          <span className="text-[#F5B041] dark:text-[#F5B041] font-medium">+{card.features.length - (card.title === 'premium' ? 5 : card.title === 'medium' ? 4 : 3)} more features</span>
                                           <button
                                             onClick={(e) => {
                                               e.stopPropagation();
                                               setSelectedCardForFeatures(card);
                                             }}
-                                            className="hidden md:inline-flex items-center gap-1 text-[#00C2A8] hover:text-[#0066FF] transition-colors font-medium"
+                                            className="hidden md:inline-flex items-center gap-1 text-[#F5B041] hover:text-[#0A1F44] transition-colors font-medium"
                                             aria-label="View all features"
                                           >
                                             <Eye className="w-3.5 h-3.5" />
@@ -387,7 +363,7 @@ export const Pricing = () => {
                                     card.title === 'basic'
                                       ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/30'
                                       : card.title === 'medium'
-                                      ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:shadow-lg hover:shadow-[#00C2A8]/30'
+                                      ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] hover:shadow-lg hover:shadow-[#015bad]/30'
                                       : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg hover:shadow-purple-500/30'
                                   }`}
                                 >
@@ -439,13 +415,8 @@ export const Pricing = () => {
                             <h3 className="text-xl font-bold text-gray-800 dark:text-white tracking-tight leading-tight">
                               {service.title}
                             </h3>
-                            <div className="w-16 h-0.5 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] mt-2 rounded-full"></div>
+                            <div className="w-16 h-0.5 bg-gradient-to-r from-[#015bad] to-[#0A1F44] mt-2 rounded-full"></div>
                           </div>
-                          {service.discount_percentage && service.discount_percentage > 0 && (
-                            <span className="px-2 py-1 text-xs font-bold bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-full shadow-lg whitespace-nowrap">
-                              {service.discount_percentage}% OFF
-                            </span>
-                          )}
                         </div>
                       </motion.div>
 
@@ -468,7 +439,7 @@ export const Pricing = () => {
                                   {/* Popular Badge */}
                                   {isPopular && (
                                     <div className="absolute top-3 left-3 z-10">
-                                      <div className="px-2 py-1 rounded-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white text-xs font-bold flex items-center gap-1 shadow-lg">
+                                      <div className="px-2 py-1 rounded-full bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white text-xs font-bold flex items-center gap-1 shadow-lg">
                                         <Star className="w-3 h-3 fill-current" />
                                         POPULAR
                                       </div>
@@ -490,28 +461,11 @@ export const Pricing = () => {
 
                                   {/* Content */}
                                   <div className="p-5 pt-14">
-                                    {/* Price */}
-                                    <div className="mb-4">
-                                      {card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) ? (
-                                        <div className="flex flex-col">
-                                          <span className="text-gray-400 dark:text-gray-500 line-through text-sm font-medium">
-                                            ₹{parseFloat(card.price).toLocaleString('en-IN')}
-                                          </span>
-                                          <div className="text-3xl font-extrabold bg-gradient-to-r from-[#FF6B6B] to-[#FF8E53] bg-clip-text text-transparent">
-                                            ₹{parseFloat(card.discounted_price.toString()).toLocaleString('en-IN')}
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        <div className="text-3xl font-extrabold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                                          ₹{parseFloat(card.price).toLocaleString('en-IN')}
-                                        </div>
-                                      )}
-                                    </div>
 
                                     {/* Details Grid */}
                                     <div className="grid grid-cols-2 gap-2 mb-4 p-3 rounded-lg bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border border-gray-100 dark:border-gray-700">
                                       <div className="flex items-center gap-1.5">
-                                        <Clock className="w-3 h-3 text-[#00C2A8]" />
+                                        <Clock className="w-3 h-3 text-[#F5B041]" />
                                         <div>
                                           <div className="text-xs text-gray-500 dark:text-gray-400">Delivery</div>
                                           <div className="text-xs font-semibold text-gray-800 dark:text-white">
@@ -520,7 +474,7 @@ export const Pricing = () => {
                                         </div>
                                       </div>
                                       <div className="flex items-center gap-1.5">
-                                        <RefreshCw className="w-3 h-3 text-[#0066FF]" />
+                                        <RefreshCw className="w-3 h-3 text-[#0A1F44]" />
                                         <div>
                                           <div className="text-xs text-gray-500 dark:text-gray-400">Revisions</div>
                                           <div className="text-xs font-semibold text-gray-800 dark:text-white">
@@ -547,7 +501,7 @@ export const Pricing = () => {
                                             </li>
                                           ))}
                                           {card.features.length > 3 && (
-                                            <li className="text-xs text-[#00C2A8] dark:text-[#00C2A8] font-medium ml-6">
+                                            <li className="text-xs text-[#F5B041] dark:text-[#F5B041] font-medium ml-6">
                                               +{card.features.length - 3} more
                                             </li>
                                           )}
@@ -562,7 +516,7 @@ export const Pricing = () => {
                                         card.title === 'basic'
                                           ? 'bg-gradient-to-r from-blue-600 to-purple-600'
                                           : card.title === 'medium'
-                                          ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF]'
+                                          ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44]'
                                           : 'bg-gradient-to-r from-purple-600 to-pink-600'
                                       }`}
                                     >
@@ -576,7 +530,7 @@ export const Pricing = () => {
                                     card.title === 'basic'
                                       ? 'from-blue-600 to-purple-600'
                                       : card.title === 'medium'
-                                      ? 'from-[#00C2A8] to-[#0066FF]'
+                                      ? 'from-[#015bad] to-[#0A1F44]'
                                       : 'from-purple-600 to-pink-600'
                                   }`}></div>
                                 </div>
@@ -599,7 +553,7 @@ export const Pricing = () => {
               >
                 <button
                   onClick={() => navigate('/pricing-plans')}
-                  className="group inline-flex items-center gap-3 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:from-[#00A58E] hover:to-[#0052CC] text-white px-8 py-4 rounded-full font-semibold hover:shadow-2xl hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
+                  className="group inline-flex items-center gap-3 bg-gradient-to-r from-[#015bad] to-[#0A1F44] hover:from-[#00A58E] hover:to-[#0052CC] text-white px-8 py-4 rounded-full font-semibold hover:shadow-2xl hover:shadow-[#015bad]/30 transition-all duration-300 transform hover:scale-105"
                 >
                   <span>View All Pricing Plans</span>
                   <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
@@ -615,9 +569,9 @@ export const Pricing = () => {
             viewport={{ once: true }}
             className="text-center mt-12 md:mt-20"
           >
-            <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#00C2A8] via-[#0066FF] to-purple-500">
+            <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#015bad] via-[#0A1F44] to-purple-500">
               <div className="bg-white dark:bg-gray-900 rounded-xl px-4 py-6 md:px-8 md:py-6">
-                <h3 className="text-lg md:text-2xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent tracking-tight">
+                <h3 className="text-lg md:text-2xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent tracking-tight">
                   Need a Custom Solution?
                 </h3>
                 <p className="hidden md:block text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto leading-relaxed">
@@ -630,7 +584,7 @@ export const Pricing = () => {
                       contactSection.scrollIntoView({ behavior: 'smooth' });
                     }
                   }}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold tracking-wide hover:shadow-lg hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold tracking-wide hover:shadow-lg hover:shadow-[#015bad]/30 transition-all duration-300 transform hover:scale-105"
                 >
                   <Zap className="w-4 h-4 md:w-5 md:h-5" />
                   Get a Custom Quote
@@ -657,13 +611,10 @@ export const Pricing = () => {
                       <div className="flex items-center gap-3 flex-wrap">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
                           selectedCardForFeatures.title === 'basic' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
-                          selectedCardForFeatures.title === 'medium' ? 'bg-[#00C2A8]/10 text-[#00C2A8]' :
+                          selectedCardForFeatures.title === 'medium' ? 'bg-[#015bad]/10 text-[#F5B041]' :
                           'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
                         }`}>
                           {selectedCardForFeatures.title}
-                        </span>
-                        <span className="text-2xl font-extrabold text-gray-900 dark:text-white">
-                          ₹{(selectedCardForFeatures.discounted_price && parseFloat(selectedCardForFeatures.discounted_price.toString()) < parseFloat(selectedCardForFeatures.price) ? parseFloat(selectedCardForFeatures.discounted_price.toString()) : parseFloat(selectedCardForFeatures.price)).toLocaleString('en-IN')}
                         </span>
                       </div>
                     </div>
@@ -671,7 +622,7 @@ export const Pricing = () => {
                 </div>
                 <div className="flex-1 overflow-y-auto p-6">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-[#00C2A8]" />
+                    <Sparkles className="w-5 h-5 text-[#F5B041]" />
                     All Features Included
                   </h3>
                   <ul className="space-y-3">
@@ -688,14 +639,14 @@ export const Pricing = () => {
                       </li>
                     ))}
                   </ul>
-                  <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 border border-[#00C2A8]/20">
+                  <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 border border-[#015bad]/20">
                     <div className="flex items-center gap-4 text-sm">
                       <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-[#00C2A8]" />
+                        <Clock className="w-4 h-4 text-[#F5B041]" />
                         <span className="text-gray-700 dark:text-gray-300">{selectedCardForFeatures.delivery_days || 7} Days Delivery</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <RefreshCw className="w-4 h-4 text-[#0066FF]" />
+                        <RefreshCw className="w-4 h-4 text-[#0A1F44]" />
                         <span className="text-gray-700 dark:text-gray-300">{selectedCardForFeatures.revisions} Revisions</span>
                       </div>
                     </div>
@@ -711,7 +662,7 @@ export const Pricing = () => {
                       selectedCardForFeatures.title === 'basic'
                         ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-blue-500/30'
                         : selectedCardForFeatures.title === 'medium'
-                        ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:shadow-lg hover:shadow-[#00C2A8]/30'
+                        ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] hover:shadow-lg hover:shadow-[#015bad]/30'
                         : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg hover:shadow-purple-500/30'
                     }`}
                   >
@@ -761,9 +712,7 @@ export const Pricing = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-bold text-blue-900 dark:text-blue-300">Selected Plan</h3>
-                        <p className="text-blue-700 dark:text-blue-400 text-sm mt-1 capitalize">
-                          {selectedPriceCard.title} • ₹{(selectedPriceCard.discounted_price && parseFloat(selectedPriceCard.discounted_price.toString()) < parseFloat(selectedPriceCard.price) ? parseFloat(selectedPriceCard.discounted_price.toString()) : parseFloat(selectedPriceCard.price)).toLocaleString('en-IN')}
-                        </p>
+                          {selectedPriceCard.title}
                       </div>
                       <button
                         onClick={handleCloseModal}

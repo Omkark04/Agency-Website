@@ -55,7 +55,7 @@ export const ContactFloat = () => {
           className="bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg shadow-xl mb-3 max-w-sm z-50 overflow-hidden"
           style={{ filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))' }}
         >
-          <div className="bg-gradient-to-r from-[#0B2545] to-[#0066FF] text-white p-4">
+          <div className="bg-gradient-to-r from-[#0A1F44] to-[#0A1F44] text-white p-4">
             <div className="flex justify-between items-start">
               <h3 className="font-semibold text-lg">Contact Us</h3>
               <button
@@ -73,28 +73,28 @@ export const ContactFloat = () => {
 
           <div className="p-4 space-y-3">
             <a
-              href="mailto:udyogworks.official@gmail.com"
-              className="flex items-center text-sm hover:text-[#0066FF] transition-colors group"
+              href="mailto:onekraft.official@gmail.com"
+              className="flex items-center text-sm hover:text-[#0A1F44] transition-colors group"
             >
               <div className="bg-blue-100 dark:bg-blue-900 p-2 rounded-full mr-3 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
-                <FaEnvelope className="text-[#0066FF]" />
+                <FaEnvelope className="text-[#0A1F44]" />
               </div>
-              <span className="text-sm">udyogworks.official@gmail.com</span>
+              <span className="text-sm">onekraft.official@gmail.com</span>
             </a>
 
             <a
               href="tel:+918390498423"
-              className="flex items-center text-sm hover:text-[#0066FF] transition-colors group"
+              className="flex items-center text-sm hover:text-[#0A1F44] transition-colors group"
             >
               <div className="bg-blue-100 dark:bg-blue-900 p-2 rounded-full mr-3 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
-                <FaPhoneAlt className="text-[#0066FF]" />
+                <FaPhoneAlt className="text-[#0A1F44]" />
               </div>
               <span className="text-sm">+91 83904 98423</span>
             </a>
 
             <a
               href="#contact"
-              className="block w-full bg-gradient-to-r from-[#0B2545] to-[#0066FF] text-white hover:from-[#0066FF] hover:to-[#0B2545] font-medium rounded-full px-4 py-2 text-sm text-center transition-all transform hover:scale-105"
+              className="block w-full bg-gradient-to-r from-[#0A1F44] to-[#0A1F44] text-white hover:from-[#0A1F44] hover:to-[#0B2545] font-medium rounded-full px-4 py-2 text-sm text-center transition-all transform hover:scale-105"
               onClick={() => setShowPopup(false)}
             >
               Get Free Consultation
@@ -109,7 +109,7 @@ export const ContactFloat = () => {
       <div className="relative group">
         <button
           onClick={() => setShowPopup(!showPopup)}
-          className={`bg-gradient-to-r from-[#0B2545] to-[#0066FF] hover:from-[#0066FF] hover:to-[#0B2545] text-white rounded-full p-4 shadow-lg
+          className={`bg-gradient-to-r from-[#0A1F44] to-[#0A1F44] hover:from-[#0A1F44] hover:to-[#0B2545] text-white rounded-full p-4 shadow-lg
             transition-all duration-300 transform hover:scale-110 hover:shadow-xl flex items-center justify-center
             ${isMobile ? 'w-14 h-14' : 'w-16 h-16'}`}
           aria-label="Contact information"

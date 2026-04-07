@@ -6,7 +6,7 @@ import PriceCardForm from './PriceCardForm';
 import { Button } from '../../../components/ui/Button';
 import { useAuth } from '../../../hooks/useAuth';
 import { NoDepartmentMessage } from '../../../components/dashboard/NoDepartmentMessage';
-import { FiEdit2, FiTrash2, FiPlus, FiDollarSign, FiPackage, FiGrid } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiPlus, FiPackage, FiGrid } from 'react-icons/fi';
 
 export default function PriceCards() {
   const { user } = useAuth();
@@ -89,7 +89,7 @@ export default function PriceCards() {
           </div>
           
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -109,19 +109,6 @@ export default function PriceCards() {
                 </div>
                 <div className="p-3 bg-green-50 rounded-lg">
                   <FiPackage className="text-green-600 text-xl" />
-                </div>
-              </div>
-            </div>
-            <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500">Avg Price</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">
-                    ₹{cards.length > 0 ? Math.round(cards.reduce((sum, c) => sum + parseFloat(c.price || 0), 0) / cards.length) : 0}
-                  </p>
-                </div>
-                <div className="p-3 bg-purple-50 rounded-lg">
-                  <FiDollarSign className="text-purple-600 text-xl" />
                 </div>
               </div>
             </div>
@@ -145,9 +132,6 @@ export default function PriceCards() {
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         Service
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        Price
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                         Features
@@ -195,11 +179,6 @@ export default function PriceCards() {
 
 
                         <td className="px-6 py-4">
-                          <div className="font-bold text-lg text-gray-900">
-                            ₹{c.price}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
                           <div className="text-sm text-gray-600">
                             {c.features?.slice(0, 2).map((f: string, i: number) => (
                               <div key={i} className="flex items-center gap-1 mb-1">
@@ -242,7 +221,7 @@ export default function PriceCards() {
               {cards.length === 0 && !loading && (
                 <div className="text-center py-16">
                   <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                    <FiDollarSign className="text-3xl text-gray-400" />
+                    <FiGrid className="text-3xl text-gray-400" />
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No price cards yet</h3>
                   <p className="text-gray-500 mb-6">Get started by creating your first price card</p>

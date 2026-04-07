@@ -56,6 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, userRole }) =
     { title: 'Estimations', path: '/dashboard/service-head/estimations', roles: ['service_head'], icon: FiFileText, gradient: 'from-blue-500 to-purple-600' },
     { title: 'Invoices', path: '/dashboard/invoices', roles: ['admin'], icon: FiDollarSign, gradient: 'from-green-500 to-emerald-600' },
     { title: 'Invoices', path: '/dashboard/service-head/invoices', roles: ['service_head'], icon: FiDollarSign, gradient: 'from-green-500 to-emerald-600' },
+    { title: 'Clients', path: '/dashboard/clients', roles: ['admin'], icon: FiImage, gradient: 'from-cyan-500 to-blue-600' },
     { title: 'Blogs', path: '/dashboard/blogs', roles: ['admin'], icon: FiEdit, gradient: 'from-amber-500 to-orange-600' },
     { title: 'Blogs', path: '/dashboard/service-head/blogs', roles: ['service_head'], icon: FiEdit, gradient: 'from-amber-500 to-orange-600' },
     { title: 'Users', path: '/dashboard/users', roles: ['admin'], icon: FiUsers, gradient: 'from-purple-500 to-pink-600' },
@@ -85,7 +86,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, userRole }) =
               <span className="text-white font-black text-xl">U</span>
             </div>
             <div>
-              <h1 className="text-xl font-black text-white tracking-tight">UdyogWorks</h1>
+              <h1 className="text-xl font-black text-white tracking-tight">OneKraft</h1>
               <p className="text-xs text-gray-400 font-medium">Professional Suite</p>
             </div>
           </div>

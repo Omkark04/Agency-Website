@@ -44,7 +44,6 @@ class Order(models.Model):
     # Additional order details
     whatsapp_number = models.CharField(max_length=20, blank=True, null=True, help_text="Client WhatsApp number")
     price_card_title = models.CharField(max_length=200, blank=True, null=True, help_text="Selected price plan title")
-    price_card_price = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, help_text="Selected price plan price")
 
     # Portfolio Project Reference
     portfolio_project = models.ForeignKey(

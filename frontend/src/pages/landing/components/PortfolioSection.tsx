@@ -183,7 +183,7 @@ const PortfolioSection = () => {
       <section id="portfolio" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
         <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00C2A8]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#015bad]"></div>
           </div>
         </div>
       </section>
@@ -203,7 +203,7 @@ const PortfolioSection = () => {
           viewport={{ once: true }}
           className="text-center mb-8 md:mb-12"
         >
-          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#00C2A8]/20 to-[#0066FF]/20 text-[#00C2A8] dark:text-[#00C2A8] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
+          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/20 to-[#0A1F44]/20 text-[#F5B041] dark:text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
             <Briefcase className="inline-block w-3 h-3 md:w-4 md:h-4 mr-2" />
             Our Portfolio
           </span>
@@ -223,7 +223,7 @@ const PortfolioSection = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search projects by title, description, or client..."
-                className="w-full px-6 py-4 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#00C2A8] focus:ring-4 focus:ring-[#00C2A8]/20 transition-all duration-300"
+                className="w-full px-6 py-4 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#015bad] focus:ring-4 focus:ring-[#015bad]/20 transition-all duration-300"
               />
               {searchTerm && (
                 <button
@@ -256,7 +256,7 @@ const PortfolioSection = () => {
                 onClick={() => setActiveFilter('all')}
                 className={`px-5 py-2.5 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
                   activeFilter === 'all'
-                    ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white shadow-lg shadow-[#00C2A8]/30'
+                    ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white shadow-lg shadow-[#015bad]/30'
                     : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:shadow-lg border border-gray-200 dark:border-gray-700'
                 }`}
               >
@@ -267,7 +267,7 @@ const PortfolioSection = () => {
                 onClick={() => setActiveFilter('featured')}
                 className={`px-5 py-2.5 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 flex items-center gap-2 ${
                   activeFilter === 'featured'
-                    ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white shadow-lg shadow-[#00C2A8]/30'
+                    ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white shadow-lg shadow-[#015bad]/30'
                     : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:shadow-lg border border-gray-200 dark:border-gray-700'
                 }`}
               >
@@ -281,7 +281,7 @@ const PortfolioSection = () => {
                   onClick={() => setActiveFilter(service || '')}
                   className={`px-5 py-2.5 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
                     activeFilter === service
-                      ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white shadow-lg shadow-[#00C2A8]/30'
+                      ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white shadow-lg shadow-[#015bad]/30'
                       : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:shadow-lg border border-gray-200 dark:border-gray-700'
                   }`}
                 >
@@ -297,7 +297,7 @@ const PortfolioSection = () => {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="appearance-none bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 py-2.5 pl-4 pr-10 rounded-full focus:outline-none focus:ring-2 focus:ring-[#00C2A8]/30 focus:border-[#00C2A8] transition-all duration-300 font-medium"
+                  className="appearance-none bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 py-2.5 pl-4 pr-10 rounded-full focus:outline-none focus:ring-2 focus:ring-[#015bad]/30 focus:border-[#015bad] transition-all duration-300 font-medium"
                 >
                   <option value="newest">Newest First</option>
                   <option value="oldest">Oldest First</option>
@@ -316,7 +316,7 @@ const PortfolioSection = () => {
                   onClick={() => setViewMode('grid')}
                   className={`p-2 rounded-full transition-all duration-300 ${
                     viewMode === 'grid'
-                      ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white'
+                      ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white'
                       : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                   title="Grid View"
@@ -327,7 +327,7 @@ const PortfolioSection = () => {
                   onClick={() => setViewMode('list')}
                   className={`p-2 rounded-full transition-all duration-300 ${
                     viewMode === 'list'
-                      ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white'
+                      ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white'
                       : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                   title="List View"
@@ -346,7 +346,7 @@ const PortfolioSection = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-6"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 rounded-full">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 rounded-full">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Found {filteredProjects.length} project{filteredProjects.length !== 1 ? 's' : ''} for "{searchTerm}"
               </span>
@@ -383,7 +383,7 @@ const PortfolioSection = () => {
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                className="px-6 py-3 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white rounded-full font-medium hover:opacity-90 transition-opacity"
+                className="px-6 py-3 bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white rounded-full font-medium hover:opacity-90 transition-opacity"
               >
                 Clear Search
               </button>
@@ -456,7 +456,7 @@ const PortfolioSection = () => {
                         <div className="p-6">
                           {/* Service Tag */}
                           {project.service && (
-                            <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 text-[#00C2A8] dark:text-[#00C2A8] text-xs font-semibold mb-3">
+                            <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] dark:text-[#F5B041] text-xs font-semibold mb-3">
                               {project.service.name}
                             </div>
                           )}
@@ -486,7 +486,7 @@ const PortfolioSection = () => {
                               <span>{new Date(project.created_at).toLocaleDateString()}</span>
                             </div>
                             
-                            <button className="flex items-center gap-1 text-[#00C2A8] dark:text-[#00C2A8] font-semibold group-hover:gap-2 transition-all duration-300">
+                            <button className="flex items-center gap-1 text-[#F5B041] dark:text-[#F5B041] font-semibold group-hover:gap-2 transition-all duration-300">
                               View Details
                               <ChevronRight className="w-4 h-4" />
                             </button>
@@ -540,7 +540,7 @@ const PortfolioSection = () => {
                           <div>
                             <div className="flex flex-wrap items-center gap-3 mb-3">
                               {project.service && (
-                                <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 text-[#00C2A8] dark:text-[#00C2A8] text-xs font-semibold">
+                                <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] dark:text-[#F5B041] text-xs font-semibold">
                                   {project.service.name}
                                 </div>
                               )}
@@ -567,7 +567,7 @@ const PortfolioSection = () => {
                               </div>
                             )}
                             
-                            <button className="flex items-center gap-2 text-[#00C2A8] dark:text-[#00C2A8] font-semibold group-hover:gap-3 transition-all duration-300">
+                            <button className="flex items-center gap-2 text-[#F5B041] dark:text-[#F5B041] font-semibold group-hover:gap-3 transition-all duration-300">
                               View Full Case Study
                               <ChevronRight className="w-5 h-5" />
                             </button>
@@ -626,7 +626,7 @@ const PortfolioSection = () => {
                     <div className="p-4">
                       {/* Service Tag */}
                       {project.service && (
-                        <div className="inline-block px-2 py-0.5 rounded-full bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 text-[#00C2A8] dark:text-[#00C2A8] text-xs font-semibold mb-2">
+                        <div className="inline-block px-2 py-0.5 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] dark:text-[#F5B041] text-xs font-semibold mb-2">
                           {project.service.name}
                         </div>
                       )}
@@ -645,14 +645,14 @@ const PortfolioSection = () => {
                       )}
 
                       {/* View Button */}
-                      <button className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white text-sm font-semibold tracking-wide hover:shadow-lg transition-all duration-300">
+                      <button className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white text-sm font-semibold tracking-wide hover:shadow-lg transition-all duration-300">
                         View Details
                         <ChevronRight className="w-3 h-3" />
                       </button>
                     </div>
 
                     {/* Bottom Border */}
-                    <div className="h-1 bg-gradient-to-r from-[#00C2A8] to-[#0066FF]" />
+                    <div className="h-1 bg-gradient-to-r from-[#015bad] to-[#0A1F44]" />
                   </motion.div>
                 ))}
               </div>
@@ -667,7 +667,7 @@ const PortfolioSection = () => {
             >
               <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                 <div className="text-gray-600 dark:text-gray-300 text-sm">
-                  Showing <span className="font-bold text-[#00C2A8]">{filteredProjects.length}</span> of{' '}
+                  Showing <span className="font-bold text-[#F5B041]">{filteredProjects.length}</span> of{' '}
                   <span className="font-bold">{projects.length}</span> total projects
                   {activeFilter !== 'all' && (
                     <span className="ml-2 px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-xs">
@@ -678,7 +678,7 @@ const PortfolioSection = () => {
                 
                 <button
                   onClick={() => navigateTo('/portfolio')}
-                  className="group inline-flex items-center gap-3 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] hover:from-[#00A58E] hover:to-[#0052CC] text-white px-8 py-4 rounded-full font-semibold hover:shadow-2xl hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
+                  className="group inline-flex items-center gap-3 bg-gradient-to-r from-[#015bad] to-[#0A1F44] hover:from-[#00A58E] hover:to-[#0052CC] text-white px-8 py-4 rounded-full font-semibold hover:shadow-2xl hover:shadow-[#015bad]/30 transition-all duration-300 transform hover:scale-105"
                 >
                   <span>View Complete Portfolio</span>
                   <ExternalLink className="w-5 h-5 transition-transform group-hover:translate-x-1" />
@@ -695,9 +695,9 @@ const PortfolioSection = () => {
           viewport={{ once: true }}
           className="text-center mt-12 md:mt-20"
         >
-          <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#00C2A8] via-[#0066FF] to-purple-500">
+          <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#015bad] via-[#0A1F44] to-purple-500">
             <div className="bg-white dark:bg-gray-900 rounded-xl px-4 py-6 md:px-8 md:py-6">
-              <h3 className="text-lg md:text-2xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent tracking-tight">
+              <h3 className="text-lg md:text-2xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent tracking-tight">
                 Ready to Start Your Project?
               </h3>
               <p className="hidden md:block text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto leading-relaxed">
@@ -705,7 +705,7 @@ const PortfolioSection = () => {
               </p>
               <button
                 onClick={() => navigateTo('/portfolio')}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold tracking-wide hover:shadow-lg hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold tracking-wide hover:shadow-lg hover:shadow-[#015bad]/30 transition-all duration-300 transform hover:scale-105"
               >
                 Start Your Project
                 <ExternalLink className="w-4 h-4 md:w-5 md:h-5" />
@@ -777,7 +777,7 @@ const PortfolioSection = () => {
                       </div>
                     )}
                     {selectedProject.service && (
-                      <div className="px-3 py-1 rounded-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white text-sm font-bold">
+                      <div className="px-3 py-1 rounded-full bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white text-sm font-bold">
                         {selectedProject.service.name}
                       </div>
                     )}
@@ -863,7 +863,7 @@ const PortfolioSection = () => {
                 {/* Meta Info */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 rounded-2xl bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
                   <div className="text-center">
-                    <div className="text-3xl font-bold bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent mb-2">
+                    <div className="text-3xl font-bold bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent mb-2">
                       {new Date(selectedProject.created_at).toLocaleDateString('en-US', { 
                         month: 'short',
                         year: 'numeric'
@@ -873,14 +873,14 @@ const PortfolioSection = () => {
                   </div>
                   
                   <div className="text-center">
-                    <div className="text-3xl font-bold bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent mb-2">
+                    <div className="text-3xl font-bold bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent mb-2">
                       {selectedProject.service?.name || 'Various'}
                     </div>
                     <div className="text-gray-600 dark:text-gray-400">Service Category</div>
                   </div>
                   
                   <div className="text-center">
-                    <div className="text-3xl font-bold bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent mb-2">
+                    <div className="text-3xl font-bold bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent mb-2">
                       {selectedProject.is_featured ? 'Featured' : 'Standard'}
                     </div>
                     <div className="text-gray-600 dark:text-gray-400">Project Type</div>
@@ -894,7 +894,7 @@ const PortfolioSection = () => {
                     disabled={!selectedProject.service}
                     className={`inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
                       selectedProject.service
-                        ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white hover:shadow-lg hover:shadow-[#00C2A8]/30'
+                        ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white hover:shadow-lg hover:shadow-[#015bad]/30'
                         : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                     }`}
                   >

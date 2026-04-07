@@ -24,7 +24,6 @@ class OrderSerializer(serializers.ModelSerializer):
     # Add new fields
     whatsapp_number = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     price_card_title = serializers.CharField(required=False, allow_blank=True, allow_null=True)
-    price_card_price = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True)
     total_paid = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
     remaining_amount = serializers.SerializerMethodField()
     service_title = serializers.ReadOnlyField(source='service.title')
@@ -63,7 +62,7 @@ class OrderSerializer(serializers.ModelSerializer):
             'service', 'service_title', 'pricing_plan', 'pricing_plan_id',
             'portfolio_project', 'portfolio_project_id', 'portfolio_project_data', # Added portfolio fields
             'title', 'details', 'price',
-            'whatsapp_number', 'price_card_title', 'price_card_price',
+            'whatsapp_number', 'price_card_title',
             'status', 'progress', 'due_date', # Added 'progress'
             'form_submission', 'total_paid', 'remaining_amount',
             'form_submission_data', 'department_head', 'deliverables',

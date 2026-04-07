@@ -56,7 +56,7 @@ export default function HelpCenter() {
     {
       category: 'Orders & Payments',
       question: 'Can I cancel or modify my order?',
-      answer: 'You can request order modifications or cancellations within 24 hours of placing the order. Contact our support team through the dashboard or email us at support@udyogworks.com.'
+      answer: 'You can request order modifications or cancellations within 24 hours of placing the order. Contact our support team through the dashboard or email us at support@onekraft.com.'
     },
     {
       category: 'Orders & Payments',
@@ -116,7 +116,7 @@ export default function HelpCenter() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white py-20">
+      <div className="bg-gradient-to-br from-[#0A1F44] to-[#1a365d] text-white py-20">
         <div className="container mx-auto px-4">
           <Link to="/" className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -140,7 +140,7 @@ export default function HelpCenter() {
                 placeholder="Search for help..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#00C2A8] shadow-lg"
+                className="w-full pl-12 pr-4 py-4 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#015bad] shadow-lg"
               />
             </div>
           </motion.div>
@@ -165,7 +165,7 @@ export default function HelpCenter() {
                   whileHover={{ y: -5 }}
                   className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 text-left"
                 >
-                  <div className="bg-gradient-to-br from-[#00C2A8]/10 to-[#0066FF]/10 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-[#00C2A8]">
+                  <div className="bg-gradient-to-br from-[#015bad]/10 to-[#0A1F44]/10 w-14 h-14 rounded-xl flex items-center justify-center mb-4 text-[#F5B041]">
                     {link.icon}
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-2">{link.title}</h3>
@@ -189,7 +189,7 @@ export default function HelpCenter() {
             return (
               <div key={category} className="mb-12">
                 <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                  <div className="h-1 w-8 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] rounded-full mr-3"></div>
+                  <div className="h-1 w-8 bg-gradient-to-r from-[#015bad] to-[#0A1F44] rounded-full mr-3"></div>
                   {category}
                 </h3>
                 <div className="space-y-4">
@@ -249,7 +249,7 @@ export default function HelpCenter() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-16 bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-2xl p-8 md:p-12 text-white text-center"
+          className="mt-16 bg-gradient-to-br from-[#015bad] to-[#0A1F44] rounded-2xl p-8 md:p-12 text-white text-center"
         >
           <MessageCircle className="h-12 w-12 mx-auto mb-4" />
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Still have questions?</h2>
@@ -258,8 +258,8 @@ export default function HelpCenter() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="mailto:udyogworks.official@gmail.com"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#0066FF] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+              href="mailto:onekraft.official@gmail.com"
+              className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#0A1F44] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
             >
               <Mail className="h-5 w-5 mr-2" />
               Contact Us

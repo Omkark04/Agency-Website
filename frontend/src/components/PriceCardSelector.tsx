@@ -83,11 +83,7 @@ export const PriceCardSelector: React.FC<PriceCardSelectorProps> = ({
               <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">{card.description}</p>
             </div>
 
-            <div className="mb-4 sm:mb-6">
-              <span className="text-3xl sm:text-4xl font-black text-blue-600 dark:text-blue-400">
-                ₹{typeof card.price === 'string' ? parseFloat(card.price).toLocaleString('en-IN') : Number(card.price).toLocaleString('en-IN')}
-              </span>
-            </div>
+
 
             <ul className="space-y-2 sm:space-y-3">
               {card.features?.map((feature, idx) => (

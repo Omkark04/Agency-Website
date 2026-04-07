@@ -68,7 +68,7 @@ export const PortfolioCard = ({ project, size, onCustomize }: PortfolioCardProps
           
           {/* Featured Badge */}
           {project.is_featured && (
-            <div className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white text-xs font-semibold rounded-full">
+            <div className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white text-xs font-semibold rounded-full">
               Featured
             </div>
           )}
@@ -112,7 +112,7 @@ export const PortfolioCard = ({ project, size, onCustomize }: PortfolioCardProps
         <div className="p-5">
           <div className="mb-3">
             {project.service && (
-              <span className="inline-block px-3 py-1 bg-[#00C2A8]/10 text-[#00C2A8] text-xs font-semibold rounded-full mb-2">
+              <span className="inline-block px-3 py-1 bg-[#015bad]/10 text-[#F5B041] text-xs font-semibold rounded-full mb-2">
                 {project.service.name}
               </span>
             )}
@@ -133,7 +133,7 @@ export const PortfolioCard = ({ project, size, onCustomize }: PortfolioCardProps
           {/* Customize Button */}
           <button
             onClick={() => onCustomize(project)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white rounded-xl font-semibold shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white rounded-xl font-semibold shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             <Sparkles className="h-4 w-4" />
             <span>Start Similar Project</span>
@@ -143,7 +143,7 @@ export const PortfolioCard = ({ project, size, onCustomize }: PortfolioCardProps
           {project.video && (
             <button
               onClick={() => window.open(project.video, '_blank')}
-              className="mt-2 w-full flex items-center justify-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-[#00C2A8] transition-colors text-sm"
+              className="mt-2 w-full flex items-center justify-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-[#F5B041] transition-colors text-sm"
             >
               <ExternalLink className="h-4 w-4" />
               <span>View Demo</span>

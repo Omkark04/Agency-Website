@@ -71,10 +71,7 @@ class Service(models.Model):
         help_text="Display priority within department (lower number = higher priority, must be unique)"
     )
 
-    discount_percentage = models.PositiveIntegerField(
-        default=0,
-        help_text="Discount percentage applied to all price cards in this service"
-    )
+
 
     is_active = models.BooleanField(default=True)
     created_by = models.ForeignKey(
@@ -91,10 +88,6 @@ class Service(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
-        
-        # Propagate discount to all price cards
-        for price_card in self.price_cards.all():
-            price_card.save()
 
     def __str__(self):
         return self.title
@@ -131,8 +124,6 @@ class PriceCard(models.Model):
         related_name="price_cards"
     )
 
-    price = models.DecimalField(max_digits=12, decimal_places=2)
-    discounted_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     revisions = models.PositiveIntegerField(default=1)
     
     description = models.TextField(blank=True)
@@ -142,16 +133,6 @@ class PriceCard(models.Model):
 
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def save(self, *args, **kwargs):
-        # Calculate discounted price
-        if self.service.discount_percentage > 0:
-            discount_multiplier = (100 - self.service.discount_percentage) / 100
-            self.discounted_price = float(self.price) * discount_multiplier
-        else:
-            self.discounted_price = self.price
-            
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.title} - {self.service.title}"

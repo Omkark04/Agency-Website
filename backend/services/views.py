@@ -128,7 +128,7 @@ class ServiceViewSet(viewsets.ModelViewSet):
 
 
 class PriceCardViewSet(viewsets.ModelViewSet):
-    queryset = PriceCard.objects.all().order_by("service", "price")
+    queryset = PriceCard.objects.all().order_by("service", "title")
     serializer_class = PriceCardSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend]

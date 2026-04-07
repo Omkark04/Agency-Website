@@ -20,6 +20,7 @@ import Offers from '../../src/pages/dashboard/admin/Offers';
 import Departments from '../pages/dashboard/admin/Departments';
 import Services from '../pages/dashboard/admin/Services';
 import PriceCards from '../pages/dashboard/admin/PriceCards';
+import ClientsManagement from '../pages/dashboard/admin/ClientsManagement';
 import Users from '../pages/dashboard/admin/Users';
 import Orders from '../pages/dashboard/admin/Orders';
 import Tasks from '../pages/dashboard/admin/Tasks';
@@ -59,6 +60,7 @@ import BlogEditor from '../components/blog/BlogEditor';
 // New Pages
 import { NotificationsPage } from '../pages/Notifications';
 import SettingsPage from '../pages/dashboard/shared/SettingsPage';
+import DepartmentPage from '../pages/DepartmentPage';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -66,6 +68,7 @@ export const AppRoutes: React.FC = () => {
 
       {/* ✅ PUBLIC */}
       <Route path="/" element={<LandingPage />} />
+      <Route path="/departments/:slug" element={<DepartmentPage />} />
       <Route path="/pricing-plans" element={<PricingPlansPage />} />
       <Route path="/help" element={<HelpCenter />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -133,6 +136,7 @@ export const AppRoutes: React.FC = () => {
             <Route path="/dashboard/offers" element={<Offers />} />
             <Route path="/dashboard/services" element={<Services />} />
             <Route path="/dashboard/price-cards" element={<PriceCards />} />
+            <Route path="/dashboard/clients" element={<ClientsManagement />} />
             <Route path="/dashboard/users" element={<Users />} />
             <Route path="/dashboard/orders" element={<Orders />} />
             <Route path="/dashboard/tasks" element={<Tasks />} />

@@ -19,7 +19,7 @@ from services.views import (
 from orders.views import OrderViewSet, OfferViewSet
 from portfolio.views import (
     PortfolioProjectViewSet, CaseStudyViewSet,
-    CaseStudyBySlugView, CaseStudyStatsView
+    CaseStudyBySlugView, CaseStudyStatsView, ClientLogoViewSet
 )
 from testimonials.views import TestimonialViewSet, TestimonialStatsView
 from tasks.views import TaskViewSet
@@ -45,6 +45,7 @@ router.register(r"price-cards", PriceCardViewSet)
 # router.register(r"orders", OrderViewSet)  # Commented out - already registered in orders/urls.py with custom endpoints
 router.register(r"portfolio", PortfolioProjectViewSet)
 router.register(r"case-studies", CaseStudyViewSet)
+router.register(r"client-logos", ClientLogoViewSet)
 router.register(r"tasks", TaskViewSet, basename="task")
 router.register(r"media", MediaViewSet)
 router.register(r"notifications", NotificationViewSet, basename="notification")

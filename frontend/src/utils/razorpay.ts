@@ -129,7 +129,7 @@ export const completeRazorpayPayment = async (
     amount: amount * 100, // Convert to paise
     currency: 'INR',
     order_id: orderId,
-    name: 'UdyogWorks',
+    name: 'OneKraft',
     description: orderDetails.description || orderDetails.title,
     image: '/logo.png', // Optional: Add your logo path
     prefill,

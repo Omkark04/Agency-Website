@@ -18,9 +18,9 @@ const statIconMap = {
 
 // Color mapping for icons
 const statColorMap = {
-  'chart-line': 'text-[#00C2A8]',
-  'users': 'text-[#0066FF]',
-  'award': 'text-[#0B2545] dark:text-[#00C2A8]',
+  'chart-line': 'text-[#F5B041]',
+  'users': 'text-[#0A1F44]',
+  'award': 'text-[#0A1F44] dark:text-[#F5B041]',
   'rocket': 'text-[#FF6B6B]',
   'star': 'text-[#FFD700]',
   'briefcase': 'text-[#8A2BE2]',
@@ -157,7 +157,7 @@ export const TrustStrip = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {stats.map((stat, index) => {
               const IconComponent = statIconMap[stat.icon_name as keyof typeof statIconMap] || statIconMap['chart-line'];
-              const iconColor = statColorMap[stat.icon_name as keyof typeof statColorMap] || 'text-[#00C2A8]';
+              const iconColor = statColorMap[stat.icon_name as keyof typeof statColorMap] || 'text-[#F5B041]';
               
               return (
                 <motion.div 
@@ -174,7 +174,7 @@ export const TrustStrip = () => {
                       {React.cloneElement(IconComponent, { className: `text-2xl ${iconColor}` })}
                     </div>
                   </div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent">
+                  <div className="text-4xl font-bold bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent">
                     {stat.value}
                   </div>
                   <p className="text-gray-600 dark:text-gray-300 mt-2 font-medium">

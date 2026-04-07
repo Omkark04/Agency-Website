@@ -1,7 +1,6 @@
-# portfolio/serializers.py
 from rest_framework import serializers
 from django.utils.text import slugify
-from .models import PortfolioProject, CaseStudy
+from .models import PortfolioProject, CaseStudy, ClientLogo
 
 class PortfolioProjectSerializer(serializers.ModelSerializer):
     class Meta:
@@ -60,6 +59,10 @@ class CaseStudySerializer(serializers.ModelSerializer):
             'service_title', 'featured_image', 'gallery_images',
             'technologies', 'duration', 'results', 'metrics',
             'challenges', 'solutions', 'is_featured', 'is_published',
-            'created_at', 'updated_at'
         ]
         read_only_fields = ['slug', 'created_at', 'updated_at']
+
+class ClientLogoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClientLogo
+        fields = '__all__'

@@ -117,7 +117,7 @@ export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white py-20">
+      <div className="bg-gradient-to-br from-[#0A1F44] to-[#1a365d] text-white py-20">
         <div className="container mx-auto px-4">
           <Link to="/" className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -157,7 +157,7 @@ export default function PrivacyPolicy() {
             className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-xl mb-12"
           >
             <p className="text-gray-700 leading-relaxed">
-              At UdyogWorks, we are committed to protecting your privacy and ensuring the security of your personal information. 
+              At OneKraft, we are committed to protecting your privacy and ensuring the security of your personal information. 
               This Privacy Policy describes how we collect, use, disclose, and safeguard your information when you use our services.
               By using our services, you agree to the collection and use of information in accordance with this policy.
             </p>
@@ -173,7 +173,7 @@ export default function PrivacyPolicy() {
               className="mb-12"
             >
               <div className="flex items-center gap-3 mb-6">
-                <div className="bg-gradient-to-br from-[#00C2A8]/10 to-[#0066FF]/10 p-3 rounded-xl text-[#00C2A8]">
+                <div className="bg-gradient-to-br from-[#015bad]/10 to-[#0A1F44]/10 p-3 rounded-xl text-[#F5B041]">
                   {section.icon}
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">{section.title}</h2>
@@ -195,7 +195,7 @@ export default function PrivacyPolicy() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}
-            className="bg-gradient-to-br from-[#00C2A8] to-[#0066FF] rounded-2xl p-8 text-white"
+            className="bg-gradient-to-br from-[#015bad] to-[#0A1F44] rounded-2xl p-8 text-white"
           >
             <h2 className="text-2xl font-bold mb-4">Questions About Our Privacy Policy?</h2>
             <p className="text-white/90 mb-6">
@@ -203,11 +203,11 @@ export default function PrivacyPolicy() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <a
-                href="mailto:privacy@udyogworks.com"
-                className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#0066FF] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+                href="mailto:privacy@onekraft.com"
+                className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#0A1F44] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <Mail className="h-5 w-5 mr-2" />
-                privacy@udyogworks.com
+                privacy@onekraft.com
               </a>
               <a
                 href="/#contact"

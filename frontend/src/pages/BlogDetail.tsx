@@ -60,7 +60,7 @@ export default function BlogDetail() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-[#0B2545] to-[#1a365d] text-white py-12">
+      <div className="bg-gradient-to-br from-[#0A1F44] to-[#1a365d] text-white py-12">
         <div className="container mx-auto px-4">
           <Link to="/blog" className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -144,7 +144,7 @@ export default function BlogDetail() {
           {/* Author Card */}
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 mb-8">
             <div className="flex items-center gap-4">
-              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#00C2A8] to-[#0066FF] flex items-center justify-center text-white text-2xl font-bold">
+              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#015bad] to-[#0A1F44] flex items-center justify-center text-white text-2xl font-bold">
                 {blog.author.first_name?.charAt(0) || blog.author.username?.charAt(0) || 'U'}
               </div>
               <div>

@@ -195,10 +195,10 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login', onAuthSucces
 
         {/* TABS */}
         <div className="flex border-b flex-shrink-0">
-          <button onClick={() => setMode('login')} className={`flex-1 py-3 ${mode === 'login' && 'border-b-2 border-[#00C2A8]'}`}>
+          <button onClick={() => setMode('login')} className={`flex-1 py-3 ${mode === 'login' && 'border-b-2 border-[#015bad]'}`}>
             Sign In
           </button>
-          <button onClick={() => setMode('signup')} className={`flex-1 py-3 ${mode === 'signup' && 'border-b-2 border-[#00C2A8]'}`}>
+          <button onClick={() => setMode('signup')} className={`flex-1 py-3 ${mode === 'signup' && 'border-b-2 border-[#015bad]'}`}>
             Sign Up
           </button>
         </div>
@@ -244,7 +244,7 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login', onAuthSucces
                 name="password" 
                 value={formData.password} 
                 onChange={handleInputChange} 
-                className="w-full border p-2 rounded pr-10 bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-[#00C2A8] focus:border-transparent outline-none transition-all" 
+                className="w-full border p-2 rounded pr-10 bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-[#015bad] focus:border-transparent outline-none transition-all" 
                 required 
               />
               <button 
@@ -307,7 +307,7 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login', onAuthSucces
           {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
 
 
-          <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white py-2 rounded">
+          <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white py-2 rounded">
             {loading ? 'Processing...' : mode === 'login' ? 'Sign In' : 'Create Account'}
           </button>
 
@@ -335,7 +335,7 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login', onAuthSucces
         {/* FOOTER */}
         <div className="p-4 text-center border-t flex-shrink-0">
           {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
-          <button onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="text-[#00C2A8] font-semibold">
+          <button onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="text-[#F5B041] font-semibold">
             {mode === 'login' ? 'Sign Up' : 'Sign In'}
           </button>
         </div>

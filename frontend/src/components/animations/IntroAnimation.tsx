@@ -11,8 +11,8 @@ interface IntroAnimationProps {
 
 export const IntroAnimation = ({ 
   onComplete, 
-  title = "UdyogWorks", 
-  subtitle = "Business Development & Marketing Agency",
+  title = "OneKraft", 
+  subtitle = "",
   duration,
   page = 'landing'
 }: IntroAnimationProps) => {

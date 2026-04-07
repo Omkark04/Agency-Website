@@ -95,7 +95,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
             <p className="text-red-600 dark:text-red-400 text-lg font-medium">{error}</p>
             <button 
               onClick={fetchOffers}
-              className="mt-4 px-6 py-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white rounded-lg hover:opacity-90 transition-opacity"
+              className="mt-4 px-6 py-2 bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white rounded-lg hover:opacity-90 transition-opacity"
             >
               Retry Loading Offers
             </button>
@@ -141,7 +141,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 text-[#00C2A8] dark:text-[#00C2A8] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
+          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] dark:text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
             Special Offers
           </span>
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent tracking-tight leading-tight px-4">
@@ -160,7 +160,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
               type="checkbox"
               checked={featuredOnly}
               onChange={() => setFeaturedOnly((s) => !s)}
-              className="w-4 h-4 text-[#00C2A8] bg-gray-100 border-gray-300 rounded focus:ring-[#00C2A8] focus:ring-2"
+              className="w-4 h-4 text-[#F5B041] bg-gray-100 border-gray-300 rounded focus:ring-[#015bad] focus:ring-2"
             />
             <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">Featured Only</span>
           </label>
@@ -170,7 +170,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
               type="checkbox"
               checked={limitedOnly}
               onChange={() => setLimitedOnly((s) => !s)}
-              className="w-4 h-4 text-[#00C2A8] bg-gray-100 border-gray-300 rounded focus:ring-[#00C2A8] focus:ring-2"
+              className="w-4 h-4 text-[#F5B041] bg-gray-100 border-gray-300 rounded focus:ring-[#015bad] focus:ring-2"
             />
             <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">Limited Time</span>
           </label>
@@ -296,13 +296,13 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
                   <motion.a
                     whileTap={{ scale: 0.95 }}
                     href={offer.cta_link || `/offers/${offer.slug || offer.id}`}
-                    className="block w-full text-center bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-4 py-2 rounded-lg text-sm font-semibold tracking-wide"
+                    className="block w-full text-center bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white px-4 py-2 rounded-lg text-sm font-semibold tracking-wide"
                   >
                     {offer.cta_text || "Claim Offer"}
                   </motion.a>
                 </div>
 
-                <div className="h-1 bg-gradient-to-r from-[#00C2A8] to-[#0066FF]" />
+                <div className="h-1 bg-gradient-to-r from-[#015bad] to-[#0A1F44]" />
               </motion.article>
             ))}
           </div>

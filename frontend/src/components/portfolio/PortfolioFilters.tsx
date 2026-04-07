@@ -32,7 +32,7 @@ export const PortfolioFilters = ({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
       <div className="flex items-center gap-2 mb-4">
-        <Filter className="h-5 w-5 text-[#00C2A8]" />
+        <Filter className="h-5 w-5 text-[#F5B041]" />
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Filter Portfolio</h3>
       </div>
 
@@ -45,7 +45,7 @@ export const PortfolioFilters = ({
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search projects..."
-            className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-4 focus:ring-[#00C2A8]/20 focus:border-[#00C2A8] transition-all bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-4 focus:ring-[#015bad]/20 focus:border-[#015bad] transition-all bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
           />
         </div>
 
@@ -58,7 +58,7 @@ export const PortfolioFilters = ({
               onDepartmentChange(value);
               onServiceChange(null); // Reset service when department changes
             }}
-            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-4 focus:ring-[#00C2A8]/20 focus:border-[#00C2A8] transition-all bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-4 focus:ring-[#015bad]/20 focus:border-[#015bad] transition-all bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
           >
             <option value="">All Departments</option>
             {departments.map(dept => (
@@ -78,7 +78,7 @@ export const PortfolioFilters = ({
               onServiceChange(value);
             }}
             disabled={!selectedDepartment && filteredServices.length === 0}
-            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-4 focus:ring-[#00C2A8]/20 focus:border-[#00C2A8] transition-all bg-white dark:bg-gray-900 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:ring-4 focus:ring-[#015bad]/20 focus:border-[#015bad] transition-all bg-white dark:bg-gray-900 text-gray-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <option value="">All Services</option>
             {filteredServices.map(service => (
@@ -95,21 +95,21 @@ export const PortfolioFilters = ({
         <div className="mt-4 flex flex-wrap gap-2">
           <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
           {searchTerm && (
-            <span className="px-3 py-1 bg-[#00C2A8]/10 text-[#00C2A8] text-sm rounded-full flex items-center gap-1">
+            <span className="px-3 py-1 bg-[#015bad]/10 text-[#F5B041] text-sm rounded-full flex items-center gap-1">
               Search: "{searchTerm}"
-              <button onClick={() => onSearchChange('')} className="ml-1 hover:text-[#0066FF]">×</button>
+              <button onClick={() => onSearchChange('')} className="ml-1 hover:text-[#0A1F44]">×</button>
             </span>
           )}
           {selectedDepartment && (
-            <span className="px-3 py-1 bg-[#00C2A8]/10 text-[#00C2A8] text-sm rounded-full flex items-center gap-1">
+            <span className="px-3 py-1 bg-[#015bad]/10 text-[#F5B041] text-sm rounded-full flex items-center gap-1">
               {departments.find(d => d.id === selectedDepartment)?.title}
-              <button onClick={() => onDepartmentChange(null)} className="ml-1 hover:text-[#0066FF]">×</button>
+              <button onClick={() => onDepartmentChange(null)} className="ml-1 hover:text-[#0A1F44]">×</button>
             </span>
           )}
           {selectedService && (
-            <span className="px-3 py-1 bg-[#00C2A8]/10 text-[#00C2A8] text-sm rounded-full flex items-center gap-1">
+            <span className="px-3 py-1 bg-[#015bad]/10 text-[#F5B041] text-sm rounded-full flex items-center gap-1">
               {services.find(s => s.id === selectedService)?.title}
-              <button onClick={() => onServiceChange(null)} className="ml-1 hover:text-[#0066FF]">×</button>
+              <button onClick={() => onServiceChange(null)} className="ml-1 hover:text-[#0A1F44]">×</button>
             </span>
           )}
         </div>

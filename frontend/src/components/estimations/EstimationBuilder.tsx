@@ -353,7 +353,7 @@ const EstimationBuilder: React.FC<EstimationBuilderProps> = ({
               value={formData.department_head_email}
               onChange={(e) => setFormData({ ...formData, department_head_email: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="your.email@udyogworks.in"
+              placeholder="your.email@onekraft.in"
             />
           </div>
           <div>

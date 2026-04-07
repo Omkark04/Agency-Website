@@ -3,7 +3,6 @@ import type { PriceCard } from '../../../api/pricecards';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
 import {
-  FiDollarSign,
   FiPackage,
   FiGrid
 } from 'react-icons/fi';
@@ -17,9 +16,8 @@ type PriceCardFormProps = {
 export default function PriceCardForm({ initial, services, onSaved }: PriceCardFormProps) {
   const [form, setForm] = useState<Partial<PriceCard>>({
     title: 'basic',
-    department: undefined, // 🔥 FIX
+    department: undefined,
     service: undefined,
-    price: '0',
     revisions: 1,
     delivery_days: 1,
     is_active: true,
@@ -57,9 +55,8 @@ export default function PriceCardForm({ initial, services, onSaved }: PriceCardF
 
       const payload = {
         title: form.title,
-        department: form.department, // ✅ FIXED
+        department: form.department,
         service: form.service,
-        price: form.price?.toString(),
         revisions: form.revisions,
         delivery_days: form.delivery_days,
         features: form.features,
@@ -140,19 +137,6 @@ export default function PriceCardForm({ initial, services, onSaved }: PriceCardF
         </select>
       </div>
 
-      {/* ✅ PRICE */}
-      <div>
-        <label className="text-sm font-semibold mb-2 flex items-center gap-2">
-          <FiDollarSign /> Price (₹) *
-        </label>
-        <Input
-          type="number"
-          min="0"
-          value={form.price || ''}
-          onChange={e => setForm({ ...form, price: e.target.value })}
-          required
-        />
-      </div>
 
       {/* ✅ REVISIONS */}
       <Input

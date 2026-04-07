@@ -16,11 +16,11 @@ interface SEOHeadProps {
   author?: string;
 }
 
-const SITE_TITLE = 'UdyogWorks';
-const DEFAULT_DESCRIPTION = 'Transform your business with UdyogWorks. Expert services in web development, data analytics, digital marketing, and business consulting.';
-const DEFAULT_IMAGE = 'https://udyogworks.in/og-image.jpg';
-const SITE_URL = 'https://udyogworks.in';
-const DEFAULT_KEYWORDS = 'business development, web development agencies, digital solutions, digital marketing agency, business consulting, UdyogWorks, top web agencies, design, technology, education';
+const SITE_TITLE = 'OneKraft';
+const DEFAULT_DESCRIPTION = 'Transform your business with OneKraft. Expert services in web development, data analytics, digital marketing, and business consulting.';
+const DEFAULT_IMAGE = 'https://onekraft.in/og-image.jpg';
+const SITE_URL = 'https://onekraft.in';
+const DEFAULT_KEYWORDS = 'web development agencies, digital solutions, digital marketing agency, business consulting, OneKraft, top web agencies, design, technology, education';
 
 export const SEOHead: React.FC<SEOHeadProps> = ({
   title,
@@ -34,7 +34,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
   section,
   tags,
   schema,
-  author = 'UdyogWorks'
+  author = 'OneKraft'
 }) => {
   const fullTitle = `${title} | ${SITE_TITLE}`;
   const absoluteUrl = url.startsWith('http') ? url : `${SITE_URL}${url}`;
@@ -70,7 +70,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={absoluteImage} />
-      <meta name="twitter:creator" content="@udyogworks" />
+      <meta name="twitter:creator" content="@onekraft" />
 
       {/* Structured Data (JSON-LD) */}
       {schema && (

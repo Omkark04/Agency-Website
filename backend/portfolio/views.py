@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Count
-from .models import PortfolioProject, CaseStudy
-from .serializers import PortfolioProjectSerializer, CaseStudySerializer
+from .models import PortfolioProject, CaseStudy, ClientLogo
+from .serializers import PortfolioProjectSerializer, CaseStudySerializer, ClientLogoSerializer
 
 class PortfolioProjectViewSet(viewsets.ModelViewSet):
     queryset = PortfolioProject.objects.all()
@@ -92,3 +92,10 @@ class CaseStudyStatsView(generics.GenericAPIView):
                 'count': item['count']
             } for item in by_service]
         })
+
+class ClientLogoViewSet(viewsets.ModelViewSet):
+    queryset = ClientLogo.objects.all()
+    serializer_class = ClientLogoSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['is_active']

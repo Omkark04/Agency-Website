@@ -4,8 +4,8 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { listOrders, getDashboardStats, getRecentActivity, type DashboardStats, type RecentActivity } from '../../../api/orders';
 import { useAuth } from '../../../hooks/useAuth';
 import { logout } from '../../../utils/auth';
-import logo from '../../../assets/UdyogWorks logo.png';
-import logoWhite from '../../../assets/UdyogWorks logo.png';
+import logo from '../../../assets/OneKraft logo.png';
+import logoWhite from '../../../assets/OneKraft logo.png';
 import OffersSection from '@/components/dashboard/OffersSection';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Variants } from 'framer-motion';
@@ -703,7 +703,7 @@ export default function ClientDashboard() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.9 }}
                       src={logo}
-                      alt="UdyogWorks Logo"
+                      alt="OneKraft Logo"
                       className="h-10 sm:h-12 transition-transform duration-300 group-hover:scale-105"
                     />
                   ) : (
@@ -713,14 +713,14 @@ export default function ClientDashboard() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.9 }}
                       src={logoWhite || logo} // Fallback to regular logo if white version not available
-                      alt="UdyogWorks Logo"
+                      alt="OneKraft Logo"
                       className="h-10 sm:h-12 transition-transform duration-300 group-hover:scale-105 invert dark:invert-0"
                     />
                   )}
                 </AnimatePresence>
               </div>
               <div>
-                <h1 className="text-lg font-bold text-gray-900 dark:text-white">UdyogWorks</h1>
+                <h1 className="text-lg font-bold text-gray-900 dark:text-white">OneKraft</h1>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Client Portal</p>
               </div>
             </div>

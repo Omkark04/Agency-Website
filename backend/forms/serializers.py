@@ -172,11 +172,9 @@ class ServiceFormSubmissionSerializer(serializers.ModelSerializer):
         if client and not client_email:
             client_email = client.email
         
-        # Get price from submission data (price_card_id should be in data)
-        price = 0
+        # Get price card info from submission data
         price_card = None
         price_card_title = None
-        price_card_price = None
         
         # Check if price_card_id is in submission data
         if 'price_card_id' in submission.data:
@@ -184,24 +182,9 @@ class ServiceFormSubmissionSerializer(serializers.ModelSerializer):
                 from services.models import PriceCard
                 price_card_id = submission.data['price_card_id']
                 price_card = PriceCard.objects.get(id=price_card_id, service=submission.service)
-                # Use discounted_price if available, otherwise original price
-                price = price_card.discounted_price if price_card.discounted_price is not None else price_card.price
                 price_card_title = price_card.title
-                price_card_price = price
             except (PriceCard.DoesNotExist, ValueError):
-                # Fallback to service starting price (min discounted price)
-                from django.db.models import Min
-                min_price = submission.service.price_cards.filter(is_active=True).aggregate(Min('discounted_price')).get('discounted_price__min')
-                if min_price is None:
-                    min_price = submission.service.price_cards.filter(is_active=True).aggregate(Min('price')).get('price__min')
-                price = min_price or 0
-        else:
-            # Fallback to service starting price (min discounted price)
-            from django.db.models import Min
-            min_price = submission.service.price_cards.filter(is_active=True).aggregate(Min('discounted_price')).get('discounted_price__min')
-            if min_price is None:
-                min_price = submission.service.price_cards.filter(is_active=True).aggregate(Min('price')).get('price__min')
-            price = min_price or 0
+                pass
         
         # Create order
         order = Order.objects.create(
@@ -212,9 +195,8 @@ class ServiceFormSubmissionSerializer(serializers.ModelSerializer):
             title=f"{submission.form.title} - {submission.submission_summary[:50]}",
             details=f"Form submission ID: {submission.id}\n\nSubmission: {submission.submission_summary}",
             status='pending',
-            price=price,
+            price=0,
             price_card_title=price_card_title,
-            price_card_price=price_card_price,
             form_submission=submission,
         )
         

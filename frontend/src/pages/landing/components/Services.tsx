@@ -129,7 +129,7 @@ export const Services = () => {
             <p className="text-red-600 dark:text-red-400 text-lg font-medium">{error}</p>
             <button 
               onClick={fetchServices}
-              className="mt-4 px-6 py-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white rounded-lg hover:opacity-90 transition-opacity"
+              className="mt-4 px-6 py-2 bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white rounded-lg hover:opacity-90 transition-opacity"
             >
               Retry Loading Services
             </button>
@@ -151,7 +151,7 @@ export const Services = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 text-[#00C2A8] dark:text-[#00C2A8] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
+          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] dark:text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
             Our Services
           </span>
           <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent px-4 tracking-tight leading-tight">
@@ -176,8 +176,8 @@ export const Services = () => {
               ? (iconMap[firstService.icon_name as keyof typeof iconMap] || iconMap['palette'])
               : iconMap['palette'];
             const iconColor = firstService
-              ? (iconColorMap[firstService.icon_name as keyof typeof iconColorMap] || 'text-[#00C2A8]')
-              : 'text-[#00C2A8]';
+              ? (iconColorMap[firstService.icon_name as keyof typeof iconColorMap] || 'text-[#F5B041]')
+              : 'text-[#F5B041]';
             
             return (
               <motion.div
@@ -229,7 +229,7 @@ export const Services = () => {
                     <div className="mb-6 space-y-4">
                       {departmentServices.map((service) => {
                         const serviceIcon = iconMap[service.icon_name as keyof typeof iconMap] || iconMap['palette'];
-                        const serviceIconColor = iconColorMap[service.icon_name as keyof typeof iconColorMap] || 'text-[#00C2A8]';
+                        const serviceIconColor = iconColorMap[service.icon_name as keyof typeof iconColorMap] || 'text-[#F5B041]';
                         
                         return (
                           <div key={service.id} className="p-4 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800">
@@ -273,7 +273,7 @@ export const Services = () => {
                               <div className="space-y-1 ml-[4.5rem]">
                                 {service.features.slice(0, 2).map((feature) => (
                                   <div key={feature.id} className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
-                                    <div className="w-1 h-1 rounded-full bg-[#00C2A8] mt-1.5 flex-shrink-0"></div>
+                                    <div className="w-1 h-1 rounded-full bg-[#015bad] mt-1.5 flex-shrink-0"></div>
                                     <span className="line-clamp-1">{feature.title}</span>
                                   </div>
                                 ))}
@@ -295,13 +295,9 @@ export const Services = () => {
                   <div className="flex flex-col gap-3">
                     <button
                       onClick={() => {
-                        if (user) {
-                          navigate('/client-dashboard/services');
-                        } else {
-                          navigate('/pricing-plans');
-                        }
+                        navigate(`/departments/${department.slug}`);
                       }}
-                      className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white font-semibold tracking-wide hover:shadow-xl hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-[1.02]"
+                      className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white font-semibold tracking-wide hover:shadow-xl hover:shadow-[#015bad]/30 transition-all duration-300 transform hover:scale-[1.02]"
                     >
                       <span>Check Services</span>
                       <FaChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -314,7 +310,7 @@ export const Services = () => {
                           contactSection.scrollIntoView({ behavior: 'smooth' });
                         }
                       }}
-                      className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold tracking-wide hover:border-[#00C2A8] hover:text-[#00C2A8] dark:hover:text-[#00C2A8] transition-all duration-300"
+                      className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold tracking-wide hover:border-[#015bad] hover:text-[#F5B041] dark:hover:text-[#F5B041] transition-all duration-300"
                     >
                       <span>Make Custom Order</span>
                     </button>
@@ -322,7 +318,7 @@ export const Services = () => {
                 </div>
 
                 {/* Hover Effect Border */}
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#015bad] to-[#0A1F44] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
               </motion.div>
             );
           })}
@@ -341,8 +337,8 @@ export const Services = () => {
               ? (iconMap[firstService.icon_name as keyof typeof iconMap] || iconMap['palette'])
               : iconMap['palette'];
             const iconColor = firstService
-              ? (iconColorMap[firstService.icon_name as keyof typeof iconColorMap] || 'text-[#00C2A8]')
-              : 'text-[#00C2A8]';
+              ? (iconColorMap[firstService.icon_name as keyof typeof iconColorMap] || 'text-[#F5B041]')
+              : 'text-[#F5B041]';
             
             return (
               <motion.div
@@ -386,7 +382,7 @@ export const Services = () => {
                     <div className="mb-4 space-y-2">
                       {departmentServices.map((service) => {
                         const serviceIcon = iconMap[service.icon_name as keyof typeof iconMap] || iconMap['palette'];
-                        const serviceIconColor = iconColorMap[service.icon_name as keyof typeof iconColorMap] || 'text-[#00C2A8]';
+                        const serviceIconColor = iconColorMap[service.icon_name as keyof typeof iconColorMap] || 'text-[#F5B041]';
                         
                         return (
                           <div key={service.id} className="flex items-center gap-2.5 p-2 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700/50 dark:to-gray-800/50">
@@ -422,13 +418,9 @@ export const Services = () => {
                   <div className="flex flex-col gap-2">
                     <button
                       onClick={() => {
-                        if (user) {
-                          navigate('/client-dashboard/services');
-                        } else {
-                          navigate('/pricing-plans');
-                        }
+                        navigate(`/departments/${department.slug}`);
                       }}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white text-sm font-semibold tracking-wide hover:shadow-lg transition-all duration-300"
+                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white text-sm font-semibold tracking-wide hover:shadow-lg transition-all duration-300"
                     >
                       <span>Check Services</span>
                       <FaChevronRight className="w-3 h-3" />
@@ -441,7 +433,7 @@ export const Services = () => {
                           contactSection.scrollIntoView({ behavior: 'smooth' });
                         }
                       }}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-semibold tracking-wide hover:border-[#00C2A8] hover:text-[#00C2A8] transition-all duration-300"
+                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-semibold tracking-wide hover:border-[#015bad] hover:text-[#F5B041] transition-all duration-300"
                     >
                       <span>Make Custom Order</span>
                     </button>
@@ -449,7 +441,7 @@ export const Services = () => {
                 </div>
 
                 {/* Bottom Border */}
-                <div className="h-1 bg-gradient-to-r from-[#00C2A8] to-[#0066FF]" />
+                <div className="h-1 bg-gradient-to-r from-[#015bad] to-[#0A1F44]" />
               </motion.div>
             );
           })}
@@ -484,9 +476,9 @@ export const Services = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#00C2A8] via-[#0066FF] to-purple-500">
+          <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#015bad] via-[#0A1F44] to-purple-500">
             <div className="bg-white dark:bg-gray-900 rounded-xl px-4 py-6 md:px-8 md:py-8">
-              <h3 className="text-lg md:text-2xl lg:text-3xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent tracking-tight">
+              <h3 className="text-lg md:text-2xl lg:text-3xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent tracking-tight">
                 Ready to Transform Your Business?
               </h3>
               <p className="hidden md:block text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto text-lg leading-relaxed">
@@ -501,7 +493,7 @@ export const Services = () => {
                       contactSection.scrollIntoView({ behavior: 'smooth' });
                     }
                   }}
-                  className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold tracking-wide hover:shadow-lg hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105"
+                  className="bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold tracking-wide hover:shadow-lg hover:shadow-[#015bad]/30 transition-all duration-300 transform hover:scale-105"
                 >
                   Get a Custom Quote
                 </button>
@@ -529,7 +521,7 @@ export const Services = () => {
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
         <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] my-8 shadow-2xl flex flex-col">
           {/* Enhanced Modal Header */}
-          <div className="sticky top-0 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] p-6 flex items-center justify-between z-10 rounded-t-2xl">
+          <div className="sticky top-0 bg-gradient-to-r from-[#015bad] to-[#0A1F44] p-6 flex items-center justify-between z-10 rounded-t-2xl">
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-white mb-1">
                 {services.find(s => s.id === selectedServiceId)?.title || 'Service'} Request

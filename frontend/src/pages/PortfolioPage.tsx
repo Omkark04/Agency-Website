@@ -125,14 +125,14 @@ export const PortfolioPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 rounded-full mb-4">
-              <Briefcase className="h-5 w-5 text-[#00C2A8]" />
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 rounded-full mb-4">
+              <Briefcase className="h-5 w-5 text-[#F5B041]" />
               <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Our Work Portfolio
               </span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Explore Our <span className="bg-gradient-to-r from-[#00C2A8] to-[#0066FF] bg-clip-text text-transparent">Success Stories</span>
+              Explore Our <span className="bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent">Success Stories</span>
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               Browse through our portfolio and customize any project to fit your business needs
@@ -154,7 +154,7 @@ export const PortfolioPage = () => {
           {/* Portfolio Grid - Masonry Layout */}
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader className="h-12 w-12 animate-spin text-[#00C2A8]" />
+              <Loader className="h-12 w-12 animate-spin text-[#F5B041]" />
             </div>
           ) : filteredPortfolios.length === 0 ? (
             <div className="text-center py-20">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Check, Home, LayoutDashboard, Search, X, Filter,
@@ -27,6 +27,148 @@ import { useAuth } from '../hooks/useAuth';
 import IntroAnimation from '../components/animations/IntroAnimation';
 import { useIntro } from '../context/IntroContext';
 
+function PricingCarousel({ serviceCards, service, openFormWithPriceCard, setSelectedCardForFeatures }: { serviceCards: PriceCard[], service: Service, openFormWithPriceCard: (card: PriceCard) => void, setSelectedCardForFeatures: (card: PriceCard) => void }) {
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [activeIndex, setActiveIndex] = useState(0);
+
+    const handleScroll = () => {
+        if (!scrollRef.current) return;
+        const index = Math.round(scrollRef.current.scrollLeft / scrollRef.current.clientWidth);
+        setActiveIndex(index);
+    };
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (window.innerWidth >= 768) return; 
+            if (!scrollRef.current) return;
+            const nextIndex = (activeIndex + 1) % serviceCards.length;
+            const targetLeft = nextIndex * scrollRef.current.clientWidth;
+            scrollRef.current.scrollTo({ left: targetLeft, behavior: 'smooth' });
+        }, 5000); 
+        return () => clearInterval(interval);
+    }, [activeIndex, serviceCards.length]);
+
+    return (
+        <div className="relative">
+            <div className="md:hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-full bg-gradient-to-l from-white dark:from-gray-800 to-transparent pointer-events-none" />
+            
+            <div 
+                ref={scrollRef}
+                onScroll={handleScroll}
+                className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 overflow-x-auto md:overflow-visible pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide -mx-4 md:mx-0 px-4 md:px-0 scroll-smooth"
+            >
+                {serviceCards.map((card) => {
+                    const isPopular = card.title === 'medium';
+                    return (
+                        <div 
+                            key={card.id} 
+                            className="min-w-[280px] w-[85vw] max-w-[340px] md:w-auto md:max-w-none md:min-w-0 snap-center flex-shrink-0 md:flex-shrink"
+                        >
+                            <div className={`h-full relative overflow-hidden rounded-2xl border transition-all duration-300 hover:shadow-xl group
+                                ${card.title === 'basic' ? 'border-blue-100 dark:border-blue-900/30 bg-gradient-to-b from-blue-50/50 to-white dark:from-blue-900/10 dark:to-gray-800' : 
+                                  card.title === 'medium' ? 'border-[#015bad]/30 bg-gradient-to-b from-[#015bad]/5 to-white dark:from-[#015bad]/10 dark:to-gray-800 scale-100 md:scale-105 shadow-lg z-10 ring-1 ring-[#015bad]/20' : 
+                                  'border-purple-100 dark:border-purple-900/30 bg-gradient-to-b from-purple-50/50 to-white dark:from-purple-900/10 dark:to-gray-800'}
+                            `}>
+                                {isPopular && (
+                                    <div className="absolute top-0 right-0 bg-gradient-to-bl from-[#015bad] to-[#0A1F44] text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-20">
+                                        POPULAR
+                                    </div>
+                                )}
+                                
+                                <div className="p-5 md:p-6 flex flex-col h-full">
+                                    <div className="mb-4">
+                                        <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase mb-3
+                                             ${card.title === 'basic' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                                               card.title === 'medium' ? 'bg-[#015bad]/10 text-[#F5B041] dark:text-[#F5B041]' :
+                                               'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'}
+                                        `}>
+                                            {card.title}
+                                        </div>
+                                        <p className="text-sm text-gray-500 mt-2 whitespace-normal break-words">
+                                            {card.description}
+                                        </p>
+                                    </div>
+
+                                    <div className="flex items-center gap-4 py-4 border-t border-b border-gray-100 dark:border-gray-700/50 mb-4 text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                                        <div className="flex items-center gap-1.5">
+                                            <Clock className="w-3.5 h-3.5 text-[#F5B041]" />
+                                            <span>{card.delivery_days} Days</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <RefreshCw className="w-3.5 h-3.5 text-[#0A1F44]" />
+                                            <span>{card.revisions} Rev.</span>
+                                        </div>
+                                    </div>
+
+                                    <ul className="space-y-3 mb-6 flex-1">
+                                        {card.features?.slice(0, 5).map((feature, i) => (
+                                            <li key={i} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                                                <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                                <span className="line-clamp-1">{feature}</span>
+                                            </li>
+                                        ))}
+                                        {(card.features?.length || 0) > 5 && (
+                                            <li className="flex items-center justify-between text-xs pl-6">
+                                                <span className="text-gray-400">+{ (card.features?.length || 0) - 5 } more</span>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedCardForFeatures(card);
+                                                    }}
+                                                    className="hidden md:inline-flex items-center gap-1 text-[#F5B041] hover:text-[#0A1F44] transition-colors font-medium"
+                                                    aria-label="View all features"
+                                                >
+                                                    <Eye className="w-3.5 h-3.5" />
+                                                    <span>View All</span>
+                                                </button>
+                                            </li>
+                                        )}
+                                    </ul>
+
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                const message = `Hi, I am interested in the *${card.title}* plan for *${service.title}* services.`;
+                                                window.open(`https://wa.me/918010957676?text=${encodeURIComponent(message)}`, '_blank');
+                                            }}
+                                            className={`flex-1 py-2.5 px-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-1 border border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white hover:shadow-lg hover:shadow-[#25D366]/20 bg-transparent`}
+                                        >
+                                            Enquire Now
+                                        </button>
+                                        <button
+                                            onClick={() => openFormWithPriceCard(card)}
+                                            className={`flex-1 py-2.5 px-2 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1 group
+                                                ${card.title === 'medium' 
+                                                    ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white hover:shadow-lg hover:shadow-[#015bad]/25' 
+                                                    : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100'}
+                                            `}
+                                        >
+                                            Choose Plan <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+            
+            {/* Dots Indicator */}
+            <div className="md:hidden flex justify-center items-center gap-2 mt-4 pb-2">
+                {serviceCards.map((_, idx) => (
+                    <div 
+                        key={idx} 
+                        className={`transition-all duration-300 rounded-full h-2 ${
+                            idx === activeIndex ? 'w-6 bg-[#015bad]' : 'w-2 bg-gray-300 dark:bg-gray-600'
+                        }`}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export default function PricingPlansPage() {
   const [cards, setCards] = useState<PriceCard[]>([]);
   const [services, setServices] = useState<Service[]>([]);
@@ -35,7 +177,7 @@ export default function PricingPlansPage() {
   const [selectedDepartment, setSelectedDepartment] = useState<number | null>(null);
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [selectedTier, setSelectedTier] = useState<'basic' | 'medium' | 'premium' | null>(null);
-  const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 1000000 });
+
 
   const [showFilters, setShowFilters] = useState(false);
 
@@ -148,15 +290,7 @@ export default function PricingPlansPage() {
   const getServiceCards = (serviceId: number) => {
     return cards.filter(card => {
         if (card.service !== serviceId) return false;
-
-        // Apply Card-Specific Filters
-        // 1. Tier
         if (selectedTier && card.title !== selectedTier) return false;
-
-        // 2. Price Range
-        const price = parseFloat(card.price);
-        if (price < priceRange.min || price > priceRange.max) return false;
-
         return true;
     });
   };
@@ -166,8 +300,6 @@ export default function PricingPlansPage() {
     setSelectedDepartment(null);
     setSelectedService(null);
     setSelectedTier(null);
-    setPriceRange({ min: 0, max: 1000000 });
-    // Clear URL query parameters
     setSearchParams({});
   };
 
@@ -232,8 +364,8 @@ export default function PricingPlansPage() {
                                     />
                             </div>
                         ) : (
-                            <div className="w-12 h-12 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-[#00C2A8]/10 to-[#0066FF]/10 flex items-center justify-center">
-                                <CategoryIcon className="w-6 h-6 md:w-8 md:h-8 text-[#0066FF]" />
+                            <div className="w-12 h-12 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-[#015bad]/10 to-[#0A1F44]/10 flex items-center justify-center">
+                                <CategoryIcon className="w-6 h-6 md:w-8 md:h-8 text-[#0A1F44]" />
                             </div>
                         )}
                     </div>
@@ -297,7 +429,7 @@ export default function PricingPlansPage() {
              <div className="flex flex-col items-center gap-4">
                  <div className="relative w-16 h-16">
                      <div className="absolute inset-0 border-4 border-gray-200 dark:border-gray-800 rounded-full"></div>
-                     <div className="absolute inset-0 border-4 border-t-[#00C2A8] border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
+                     <div className="absolute inset-0 border-4 border-t-[#015bad] border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
                  </div>
                  <p className="text-gray-500 dark:text-gray-400 font-medium animate-pulse">Loading Plans...</p>
              </div>
@@ -323,7 +455,7 @@ export default function PricingPlansPage() {
                                 className="w-full h-full object-cover"
                             />
                         ) : (
-                            <div key="desktop-gradient" className="w-full h-full bg-gradient-to-r from-[#00C2A8]/10 via-[#0066FF]/10 to-purple-500/10" />
+                            <div key="desktop-gradient" className="w-full h-full bg-gradient-to-r from-[#015bad]/10 via-[#0A1F44]/10 to-purple-500/10" />
                         )}
                     </AnimatePresence>
                 </div>
@@ -342,7 +474,7 @@ export default function PricingPlansPage() {
                                 className="w-full h-full object-cover"
                             />
                         ) : (
-                            <div key="mobile-gradient" className="w-full h-full bg-gradient-to-r from-[#00C2A8]/10 via-[#0066FF]/10 to-purple-500/10" />
+                            <div key="mobile-gradient" className="w-full h-full bg-gradient-to-r from-[#015bad]/10 via-[#0A1F44]/10 to-purple-500/10" />
                         )}
                     </AnimatePresence>
                 </div>
@@ -357,7 +489,7 @@ export default function PricingPlansPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                  >
-                    <span className="inline-block px-4 py-1.5 rounded-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-[#00C2A8] text-sm font-semibold mb-6 shadow-sm">
+                    <span className="inline-block px-4 py-1.5 rounded-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-[#F5B041] text-sm font-semibold mb-6 shadow-sm">
                         <Sparkles className="inline-block w-4 h-4 mr-2" />
                         {selectedDepartment 
                           ? departments.find(d => d.id === selectedDepartment)?.name || 'Complete Catalog'
@@ -400,7 +532,7 @@ export default function PricingPlansPage() {
               {user && (
                 <button
                   onClick={() => navigateTo('/client-dashboard')}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white rounded-full hover:shadow-lg hover:shadow-[#00C2A8]/30 transition-all duration-300 transform hover:scale-105 text-sm md:text-base"
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white rounded-full hover:shadow-lg hover:shadow-[#015bad]/30 transition-all duration-300 transform hover:scale-105 text-sm md:text-base"
                 >
                   <LayoutDashboard className="h-4 w-4" />
                   <span className="hidden sm:inline">Dashboard</span>
@@ -432,7 +564,7 @@ export default function PricingPlansPage() {
                             placeholder="Search services or departments..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-[#00C2A8]/20 focus:border-[#00C2A8] transition-all"
+                            className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-[#015bad]/20 focus:border-[#015bad] transition-all"
                         />
                         {searchQuery && (
                             <button onClick={() => setSearchQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -443,19 +575,7 @@ export default function PricingPlansPage() {
                 </div>
 
                  {/* Dropdowns */}
-                 <select
-                  value={selectedDepartment || ''}
-                  onChange={(e) => {
-                    setSelectedDepartment(e.target.value ? Number(e.target.value) : null);
-                    setSelectedService(null);
-                  }}
-                  className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-sm"
-                >
-                  <option value="">All Departments</option>
-                  {departments.map(dept => (
-                    <option key={dept.id} value={dept.id}>{dept.name}</option>
-                  ))}
-                </select>
+
 
                 <select
                   value={selectedService || ''}
@@ -479,17 +599,7 @@ export default function PricingPlansPage() {
                   <option value="premium">Premium</option>
                 </select>
 
-                <div className="flex items-center gap-2">
-                     <span className="text-sm text-gray-500 whitespace-nowrap">Max:</span>
-                     <input
-                        type="number"
-                        placeholder="Price"
-                        value={priceRange.max === 1000000 ? '' : priceRange.max}
-                        onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value ? Number(e.target.value) : 1000000 })}
-                        className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-sm"
-                     />
-                </div>
-             </div>
+              </div>
              
              <div className="flex justify-end mt-4">
                  <button onClick={resetFilters} className="text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white underline">
@@ -527,126 +637,17 @@ export default function PricingPlansPage() {
 
                                 {/* Pricing Cards Grid/Scroll */}
                                 {serviceCards.length > 0 ? (
-                                    <div className="relative">
-                                         {/* Mobile Hint - Visible only on mobile if content overflows */}
-                                         <div className="md:hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-full bg-gradient-to-l from-white dark:from-gray-800 to-transparent pointer-events-none" />
-                                         
-                                         <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 overflow-x-auto md:overflow-visible pb-4 md:pb-0 snap-x snap-mandatory scrollbar-hide -mx-4 md:mx-0 px-4 md:px-0">
-                                            {serviceCards.map((card) => {
-                                                const isPopular = card.title === 'medium';
-                                                return (
-                                                    <div 
-                                                        key={card.id} 
-                                                        className="min-w-[280px] w-[85vw] max-w-[340px] md:w-auto md:max-w-none md:min-w-0 snap-center flex-shrink-0 md:flex-shrink"
-                                                    >
-                                                        <div className={`h-full relative overflow-hidden rounded-2xl border transition-all duration-300 hover:shadow-xl group
-                                                            ${card.title === 'basic' ? 'border-blue-100 dark:border-blue-900/30 bg-gradient-to-b from-blue-50/50 to-white dark:from-blue-900/10 dark:to-gray-800' : 
-                                                              card.title === 'medium' ? 'border-[#00C2A8]/30 bg-gradient-to-b from-[#00C2A8]/5 to-white dark:from-[#00C2A8]/10 dark:to-gray-800 scale-100 md:scale-105 shadow-lg z-10 ring-1 ring-[#00C2A8]/20' : 
-                                                              'border-purple-100 dark:border-purple-900/30 bg-gradient-to-b from-purple-50/50 to-white dark:from-purple-900/10 dark:to-gray-800'}
-                                                        `}>
-                                                            {isPopular && (
-                                                                <div className="absolute top-0 right-0 bg-gradient-to-bl from-[#00C2A8] to-[#0066FF] text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-20">
-                                                                    POPULAR
-                                                                </div>
-                                                            )}
-                                                            
-                                                            {/* Discount Badge */}
-                                                            {service.discount_percentage && service.discount_percentage > 0 && (
-                                                                <div className="absolute top-0 left-0 bg-gradient-to-br from-red-500 to-pink-500 text-white text-[10px] font-bold px-3 py-1 rounded-br-xl shadow-sm z-20">
-                                                                    {service.discount_percentage}% OFF
-                                                                </div>
-                                                            )}
-                                                            
-                                                            <div className="p-5 md:p-6 flex flex-col h-full">
-                                                                <div className="mb-4">
-                                                                    <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase mb-3
-                                                                         ${card.title === 'basic' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
-                                                                           card.title === 'medium' ? 'bg-[#00C2A8]/10 text-[#00C2A8] dark:text-[#00C2A8]' :
-                                                                           'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'}
-                                                                    `}>
-                                                                        {card.title}
-                                                                    </div>
-                                                                    <div className="flex flex-col">
-                                                                        <div className="flex items-baseline gap-2">
-                                                                            <span className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">
-                                                                            ₹{(card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) ? parseFloat(card.discounted_price.toString()) : parseFloat(card.price)).toLocaleString('en-IN')}
-                                                                            </span>
-                                                                            {card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) && (
-                                                                                <span className="text-sm text-gray-500 line-through">
-                                                                                    ₹{parseFloat(card.price).toLocaleString('en-IN')}
-                                                                                </span>
-                                                                            )}
-                                                                        </div>
-                                                                        {card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) && (
-                                                                            <span className="text-xs text-green-600 dark:text-green-400 font-semibold mt-1">
-                                                                                On Sale
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
-                                                                    <p className="text-sm text-gray-500 mt-2 whitespace-normal break-words">
-                                                                        {card.description}
-                                                                    </p>
-                                                                </div>
-
-                                                                <div className="flex items-center gap-4 py-4 border-t border-b border-gray-100 dark:border-gray-700/50 mb-4 text-xs md:text-sm text-gray-600 dark:text-gray-400">
-                                                                    <div className="flex items-center gap-1.5">
-                                                                        <Clock className="w-3.5 h-3.5 text-[#00C2A8]" />
-                                                                        <span>{card.delivery_days} Days</span>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-1.5">
-                                                                        <RefreshCw className="w-3.5 h-3.5 text-[#0066FF]" />
-                                                                        <span>{card.revisions} Rev.</span>
-                                                                    </div>
-                                                                </div>
-
-                                                                <ul className="space-y-3 mb-6 flex-1">
-                                                                    {card.features?.slice(0, 5).map((feature, i) => (
-                                                                        <li key={i} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
-                                                                            <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                                                            <span className="line-clamp-1">{feature}</span>
-                                                                        </li>
-                                                                    ))}
-                                                                    {(card.features?.length || 0) > 5 && (
-                                                                        <li className="flex items-center justify-between text-xs pl-6">
-                                                                            <span className="text-gray-400">+{ (card.features?.length || 0) - 5 } more</span>
-                                                                            <button
-                                                                                onClick={(e) => {
-                                                                                    e.stopPropagation();
-                                                                                    setSelectedCardForFeatures(card);
-                                                                                }}
-                                                                                className="hidden md:inline-flex items-center gap-1 text-[#00C2A8] hover:text-[#0066FF] transition-colors font-medium"
-                                                                                aria-label="View all features"
-                                                                            >
-                                                                                <Eye className="w-3.5 h-3.5" />
-                                                                                <span>View All</span>
-                                                                            </button>
-                                                                        </li>
-                                                                    )}
-                                                                </ul>
-
-                                                                <button
-                                                                    onClick={() => openFormWithPriceCard(card)}
-                                                                    className={`w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 group
-                                                                        ${card.title === 'medium' 
-                                                                            ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white hover:shadow-lg hover:shadow-[#00C2A8]/25' 
-                                                                            : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100'}
-                                                                    `}
-                                                                >
-                                                                    Choose Plan
-                                                                    <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                         </div>
-                                    </div>
+                                    <PricingCarousel 
+                                        serviceCards={serviceCards} 
+                                        service={service} 
+                                        openFormWithPriceCard={openFormWithPriceCard} 
+                                        setSelectedCardForFeatures={setSelectedCardForFeatures} 
+                                    />
                                 ) : (
                                     <div className="p-8 text-center bg-gray-50 dark:bg-gray-900/50 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700">
                                         <p className="text-gray-500 dark:text-gray-400 italic">
                                             No pricing plans tailored for your current filters are displayed here. 
-                                            <button onClick={resetFilters} className="text-[#00C2A8] hover:underline ml-1">Clear filters</button> to see all plans.
+                                            <button onClick={resetFilters} className="text-[#F5B041] hover:underline ml-1">Clear filters</button> to see all plans.
                                         </p>
                                     </div>
                                 )}
@@ -681,22 +682,12 @@ export default function PricingPlansPage() {
                                      {getServiceCards(detailService.id).map(card => {
                                          const isPopular = card.title === 'medium';
                                          return (
-                                            <div key={card.id} className={`rounded-xl border p-4 ${card.title === 'basic' ? 'border-blue-100 bg-blue-50/20' : card.title === 'medium' ? 'border-[#00C2A8]/30 bg-[#00C2A8]/5' : 'border-purple-100 bg-purple-50/20'}`}>
+                                            <div key={card.id} className={`rounded-xl border p-4 ${card.title === 'basic' ? 'border-blue-100 bg-blue-50/20' : card.title === 'medium' ? 'border-[#015bad]/30 bg-[#015bad]/5' : 'border-purple-100 bg-purple-50/20'}`}>
                                                  <div className="flex justify-between items-start mb-2">
-                                                     <span className={`text-xs font-bold uppercase px-2 py-1 rounded ${card.title === 'basic' ? 'bg-blue-100 text-blue-700' : card.title === 'medium' ? 'bg-[#00C2A8]/20 text-[#00C2A8]' : 'bg-purple-100 text-purple-700'}`}>
+                                                     <span className={`text-xs font-bold uppercase px-2 py-1 rounded ${card.title === 'basic' ? 'bg-blue-100 text-blue-700' : card.title === 'medium' ? 'bg-[#015bad]/20 text-[#F5B041]' : 'bg-purple-100 text-purple-700'}`}>
                                                          {card.title}
                                                      </span>
-                                                     {isPopular && <span className="text-[10px] font-bold text-[#00C2A8]">MOST POPULAR</span>}
-                                                 </div>
-                                                 <div className="mb-2">
-                                                     <div className="text-2xl font-bold">
-                                                        ₹{(card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) ? parseFloat(card.discounted_price.toString()) : parseFloat(card.price)).toLocaleString('en-IN')}
-                                                     </div>
-                                                     {card.discounted_price && parseFloat(card.discounted_price.toString()) < parseFloat(card.price) && (
-                                                        <div className="text-sm text-gray-500 line-through">
-                                                            ₹{parseFloat(card.price).toLocaleString('en-IN')}
-                                                        </div>
-                                                     )}
+                                                     {isPopular && <span className="text-[10px] font-bold text-[#F5B041]">MOST POPULAR</span>}
                                                  </div>
                                                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 whitespace-normal break-words">{card.description}</p>
                                                  
@@ -750,21 +741,19 @@ export default function PricingPlansPage() {
                       <div className="flex items-center gap-3 flex-wrap">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
                           selectedCardForFeatures.title === 'basic' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
-                          selectedCardForFeatures.title === 'medium' ? 'bg-[#00C2A8]/10 text-[#00C2A8]' :
+                          selectedCardForFeatures.title === 'medium' ? 'bg-[#015bad]/10 text-[#F5B041]' :
                           'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
                         }`}>
                           {selectedCardForFeatures.title}
                         </span>
-                        <span className="text-2xl font-extrabold text-gray-900 dark:text-white">
-                          ₹{(selectedCardForFeatures.discounted_price && parseFloat(selectedCardForFeatures.discounted_price.toString()) < parseFloat(selectedCardForFeatures.price) ? parseFloat(selectedCardForFeatures.discounted_price.toString()) : parseFloat(selectedCardForFeatures.price)).toLocaleString('en-IN')}
-                        </span>
+
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="flex-1 overflow-y-auto p-6">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-[#00C2A8]" />
+                    <Sparkles className="w-5 h-5 text-[#F5B041]" />
                     All Features Included
                   </h3>
                   <ul className="space-y-3">
@@ -781,14 +770,14 @@ export default function PricingPlansPage() {
                       </li>
                     ))}
                   </ul>
-                  <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 border border-[#00C2A8]/20">
+                  <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 border border-[#015bad]/20">
                     <div className="flex items-center gap-4 text-sm">
                       <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-[#00C2A8]" />
+                        <Clock className="w-4 h-4 text-[#F5B041]" />
                         <span className="text-gray-700 dark:text-gray-300">{selectedCardForFeatures.delivery_days} Days Delivery</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <RefreshCw className="w-4 h-4 text-[#0066FF]" />
+                        <RefreshCw className="w-4 h-4 text-[#0A1F44]" />
                         <span className="text-gray-700 dark:text-gray-300">{selectedCardForFeatures.revisions} Revisions</span>
                       </div>
                     </div>
@@ -802,7 +791,7 @@ export default function PricingPlansPage() {
                     }}
                     className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 group ${
                       selectedCardForFeatures.title === 'medium' 
-                        ? 'bg-gradient-to-r from-[#00C2A8] to-[#0066FF] text-white hover:shadow-lg hover:shadow-[#00C2A8]/25' 
+                        ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white hover:shadow-lg hover:shadow-[#015bad]/25' 
                         : 'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100'
                     }`}
                   >
@@ -825,7 +814,7 @@ export default function PricingPlansPage() {
               animate={{ opacity: 1, scale: 1 }}
               className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 backdrop-blur-xl rounded-3xl shadow-3xl overflow-hidden"
             >
-              <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#00C2A8] via-[#0066FF] to-[#00C2A8]" />
+              <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#015bad] via-[#0A1F44] to-[#015bad]" />
              
               <div className="p-6 max-h-[calc(90vh-8rem)] overflow-y-auto">
                 <DialogHeader>
@@ -845,18 +834,13 @@ export default function PricingPlansPage() {
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-8 p-5 rounded-2xl bg-gradient-to-r from-[#00C2A8]/10 to-[#0066FF]/10 border border-[#00C2A8]/20 backdrop-blur-sm"
+                    className="mb-8 p-5 rounded-2xl bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 border border-[#015bad]/20 backdrop-blur-sm"
                   >
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-bold text-gray-900 dark:text-white">Selected Plan</h3>
-                        <p className="text-[#0066FF] dark:text-[#00C2A8] text-sm mt-1 capitalize">
-                          {selectedPriceCard.title} • ₹{(selectedPriceCard.discounted_price && parseFloat(selectedPriceCard.discounted_price.toString()) < parseFloat(selectedPriceCard.price) ? parseFloat(selectedPriceCard.discounted_price.toString()) : parseFloat(selectedPriceCard.price)).toLocaleString('en-IN')}
-                          {selectedPriceCard.discounted_price && parseFloat(selectedPriceCard.discounted_price.toString()) < parseFloat(selectedPriceCard.price) && (
-                              <span className="ml-2 text-xs text-gray-500 line-through">
-                                  Original: ₹{parseFloat(selectedPriceCard.price).toLocaleString('en-IN')}
-                              </span>
-                          )}
+                        <p className="text-[#0A1F44] dark:text-[#F5B041] text-sm mt-1 capitalize">
+                          {selectedPriceCard.title}
                         </p>
                       </div>
                       <button

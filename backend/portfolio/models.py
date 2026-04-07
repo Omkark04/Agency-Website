@@ -82,3 +82,18 @@ class CaseStudy(models.Model):
     
     def __str__(self):
         return self.title
+
+class ClientLogo(models.Model):
+    id = models.AutoField(primary_key=True)
+    caption = models.CharField(max_length=255, default="Client")
+    logo = models.URLField()
+    site_link = models.URLField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "client_logos"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.caption

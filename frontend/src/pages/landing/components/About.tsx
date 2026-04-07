@@ -8,22 +8,22 @@ import { Button as MovingBorderContainer } from "@/components/ui/moving-border";
 
 const features = [
   {
-    icon: <Lightbulb className="h-8 w-8 text-[#00C2A8]" />,
+    icon: <Lightbulb className="h-8 w-8 text-[#F5B041]" />,
     title: 'Innovative Solutions',
     description: 'We stay ahead of the curve with cutting-edge technologies and creative approaches to solve complex business challenges.'
   },
   {
-    icon: <Users className="h-8 w-8 text-[#0066FF]" />,
+    icon: <Users className="h-8 w-8 text-[#0A1F44]" />,
     title: 'Client-Centric Approach',
     description: 'Your success is our priority. We work closely with you to understand your unique needs and deliver tailored solutions.'
   },
   {
-    icon: <Rocket className="h-8 w-8 text-[#0B2545] dark:text-[#00C2A8]" />,
+    icon: <Rocket className="h-8 w-8 text-[#0A1F44] dark:text-[#F5B041]" />,
     title: 'Rapid Execution',
     description: 'We value your time. Our agile methodology ensures quick turnarounds without compromising on quality.'
   },
   {
-    icon: <Award className="h-8 w-8 text-[#00C2A8]" />,
+    icon: <Award className="h-8 w-8 text-[#F5B041]" />,
     title: 'Proven Track Record',
     description: 'Trusted by businesses of all sizes, we deliver measurable results that drive growth and success.'
   }
@@ -69,7 +69,7 @@ const StackingCard = ({ feature, index, totalCards }: { feature: typeof features
       }}
       className="sticky top-20 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700"
     >
-      <div className="bg-[#00C2A8]/10 p-2 rounded-lg w-fit mb-4">
+      <div className="bg-[#015bad]/10 p-2 rounded-lg w-fit mb-4">
         {feature.icon}
       </div>
       <h3 className="font-semibold text-lg mb-2 text-gray-800 dark:text-white">{feature.title}</h3>
@@ -151,7 +151,7 @@ export const About = () => {
                   // Loading skeleton
                   <div className="h-96 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
                     <div className="text-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00C2A8] mx-auto mb-4"></div>
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#015bad] mx-auto mb-4"></div>
                       <span className="text-gray-400 dark:text-gray-600">Loading images...</span>
                     </div>
                   </div>
@@ -220,7 +220,7 @@ export const About = () => {
                     onClick={() => setCurrentImageIndex(index)}
                     className={`h-2 rounded-full transition-all duration-300 ${
                       index === currentImageIndex 
-                        ? 'w-8 bg-gradient-to-r from-[#00C2A8] to-[#0066FF]' 
+                        ? 'w-8 bg-gradient-to-r from-[#015bad] to-[#0A1F44]' 
                         : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'
                     }`}
                     aria-label={`Go to image ${index + 1}`}
@@ -240,9 +240,9 @@ export const About = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6 tracking-tight">Why Choose UdyogWorks?</h2>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6 tracking-tight">Why Choose OneKraft?</h2>
             <p className="text-gray-600 dark:text-gray-300 mb-6 md:mb-8 leading-relaxed">
-              At UdyogWorks, we're more than just a service provider – we're your strategic partner in digital transformation. 
+              At OneKraft, we're more than just a service provider – we're your strategic partner in digital transformation. 
               Our mission is to empower businesses with innovative solutions that drive real results.
             </p>
             
@@ -257,7 +257,7 @@ export const About = () => {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl hover:shadow-md transition-shadow duration-300"
                 >
-                  <div className="bg-[#00C2A8]/10 p-2 rounded-lg w-fit mb-4">
+                  <div className="bg-[#015bad]/10 p-2 rounded-lg w-fit mb-4">
                     {feature.icon}
                   </div>
                   <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>

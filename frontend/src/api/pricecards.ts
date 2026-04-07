@@ -5,11 +5,9 @@ export interface PriceCard {
   title: 'basic' | 'medium' | 'premium';
   department: number;
   service: number;
-  price: string;
-  discounted_price?: string | number; // Discounted Price
   revisions: number;
   description?: string;
-  features?: string[]; // JSON field
+  features?: string[];
   delivery_days?: number;
   is_active: boolean;
   created_at?: string;
