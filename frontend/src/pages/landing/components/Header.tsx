@@ -23,7 +23,7 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
   const [services, setServices] = useState<Service[]>([]);
 
   const lastScrollY = useRef(0);
-  const megaMenuTimeout = useRef<ReturnType<typeof setTimeout>>();
+  const megaMenuTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const navigate = useNavigate();
 
   // Load departments and services for mega menu
