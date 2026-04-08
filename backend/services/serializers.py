@@ -1,11 +1,7 @@
 from rest_framework import serializers
-from .models import Department, Service, PriceCard
+from .models import Department, Service, PriceCard, PricingPlan, PricingComparison
 from accounts.models import User
 
-
-from rest_framework import serializers
-from .models import Department, Service, PriceCard
-from accounts.models import User
 
 
 class TeamHeadMiniSerializer(serializers.ModelSerializer):
@@ -100,10 +96,6 @@ class PriceCardSerializer(serializers.ModelSerializer):
         model = PriceCard
         fields = "__all__"
         read_only_fields = ["created_at"]
-from rest_framework import serializers
-from .models import PricingPlan, PricingComparison
-
-# Your existing serializers...
 
 class PricingFeatureSerializer(serializers.Serializer):
     id = serializers.IntegerField()

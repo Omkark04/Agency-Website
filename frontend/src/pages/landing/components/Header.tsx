@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, LogIn, UserPlus, LogOut, Home } from 'lucide-react';
+import { Menu, X, LogIn, UserPlus, LogOut, Home, ChevronDown, ArrowRight } from 'lucide-react';
 import { AuthModal } from './AuthModal';
 import logo from '../../../assets/OneKraft logo.png';
 import { getCurrentUser, logout } from '../../../utils/auth';
 import { UserAvatar } from '../../../components/ui/UserAvatar';
-
+import { listDepartments, type Department } from '../../../api/departments';
+import { listServices, type Service } from '../../../api/services';
 
 interface HeaderProps {
   onAuthButtonClick?: () => void;
@@ -17,9 +18,47 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [user, setUser] = useState<any>(getCurrentUser());
+  const [showMegaMenu, setShowMegaMenu] = useState(false);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
 
   const lastScrollY = useRef(0);
+  const megaMenuTimeout = useRef<ReturnType<typeof setTimeout>>();
   const navigate = useNavigate();
+
+  // Load departments and services for mega menu
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [deptRes, svcRes] = await Promise.all([
+          listDepartments({ is_active: true }),
+          listServices({ is_active: true }),
+        ]);
+        setDepartments(deptRes.data);
+        setServices(svcRes.data);
+      } catch (err) {
+        console.error('Header: failed to load mega menu data', err);
+      }
+    };
+    load();
+  }, []);
+
+  // Group services under their departments
+  const servicesByDept = departments
+    .map(dept => ({
+      ...dept,
+      items: services.filter(s => s.department === dept.id).slice(0, 5),
+    }))
+    .filter(d => d.items.length > 0);
+
+  const handleServicesMouseEnter = () => {
+    clearTimeout(megaMenuTimeout.current);
+    setShowMegaMenu(true);
+  };
+
+  const handleServicesMouseLeave = () => {
+    megaMenuTimeout.current = setTimeout(() => setShowMegaMenu(false), 180);
+  };
 
   const openAuthModal = (mode: 'login' | 'signup') => {
     if (onAuthButtonClick) {
@@ -42,12 +81,9 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
     navigate('/');
   };
 
-  // Get dashboard route based on user role (similar to AuthModal.tsx)
   const getDashboardRoute = () => {
     if (!user) return '/client-dashboard';
-
     const userRole = user.role || localStorage.getItem('role');
-
     if (userRole === 'admin') return '/dashboard';
     if (userRole === 'service_head') return '/dashboard/service-head';
     if (userRole === 'team_member') return '/team-member-dashboard';
@@ -63,7 +99,6 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
     }
   };
 
-
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -72,27 +107,17 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
         lastScrollY.current = currentScrollY;
       }
     };
-
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Listen for auth changes
   useEffect(() => {
-    const handleStorageChange = () => {
-      setUser(getCurrentUser());
-    };
-
+    const handleStorageChange = () => setUser(getCurrentUser());
     window.addEventListener('storage', handleStorageChange);
-
-    // Also check on mount and after modal closes
     const interval = setInterval(() => {
       const currentUser = getCurrentUser();
-      if (currentUser !== user) {
-        setUser(currentUser);
-      }
+      if (currentUser !== user) setUser(currentUser);
     }, 1000);
-
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       clearInterval(interval);
@@ -108,18 +133,20 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
     { name: 'Testimonials', href: '#testimonials' },
     { name: 'Contact', href: '#contact' },
   ];
+
   return (
     <>
       <header
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled
-          ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-lg border-b border-gray-100 dark:border-gray-800'
-          : 'bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800'
-          }`}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+          isScrolled
+            ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-lg border-b border-gray-100 dark:border-gray-800'
+            : 'bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800'
+        }`}
       >
         <div className="py-0.5 md:py-1 max-w-7xl w-full px-3 sm:px-4 md:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-4 sm:gap-8 md:gap-28">
 
-            {/* Logo - Left Side */}
+            {/* Logo */}
             <Link to="/" className="flex items-center group flex-shrink-0 relative z-50">
               <img
                 src={logo}
@@ -128,24 +155,49 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
               />
             </Link>
 
-            {/* Desktop Navigation - Left aligned */}
+            {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center justify-start space-x-6 xl:space-x-8 flex-grow">
-              {navLinks.map(link => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={(e) => handleNavigation(e, link.href)}
-                  className="text-gray-800 dark:text-gray-200 hover:text-[#015bad]
-                    dark:hover:text-[#F5B041] transition-all duration-300 font-medium relative group whitespace-nowrap"
-                >
-                  {link.name}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#015bad] dark:bg-[#F5B041]
-                    transition-all duration-300 group-hover:w-full"></span>
-                </a>
-              ))}
+              {navLinks.map(link =>
+                link.name === 'Services' ? (
+                  /* ── Services with Mega Menu ── */
+                  <div
+                    key="Services"
+                    className="relative"
+                    onMouseEnter={handleServicesMouseEnter}
+                    onMouseLeave={handleServicesMouseLeave}
+                  >
+                    <a
+                      href={link.href}
+                      onClick={(e) => handleNavigation(e, link.href)}
+                      className="flex items-center gap-1 text-gray-800 dark:text-gray-200 hover:text-[#015bad]
+                        dark:hover:text-[#F5B041] transition-all duration-300 font-medium relative group whitespace-nowrap"
+                    >
+                      {link.name}
+                      <ChevronDown
+                        size={14}
+                        className={`transition-transform duration-300 ${showMegaMenu ? 'rotate-180 text-[#015bad]' : ''}`}
+                      />
+                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#015bad] dark:bg-[#F5B041]
+                        transition-all duration-300 group-hover:w-full" />
+                    </a>
+                  </div>
+                ) : (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    onClick={(e) => handleNavigation(e, link.href)}
+                    className="text-gray-800 dark:text-gray-200 hover:text-[#015bad]
+                      dark:hover:text-[#F5B041] transition-all duration-300 font-medium relative group whitespace-nowrap"
+                  >
+                    {link.name}
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#015bad] dark:bg-[#F5B041]
+                      transition-all duration-300 group-hover:w-full" />
+                  </a>
+                )
+              )}
             </nav>
 
-            {/* Auth Buttons - Right Side (flex-shrink-0 to maintain size) */}
+            {/* Auth Buttons */}
             <div className="hidden lg:flex items-center space-x-3 xl:space-x-4 flex-shrink-0">
               {!user ? (
                 <>
@@ -158,7 +210,6 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                     <LogIn size={18} />
                     <span>Login</span>
                   </button>
-
                   <button
                     onClick={() => openAuthModal('signup')}
                     className="bg-[#015bad] hover:bg-[#0a4882] text-white px-5 py-2.5 rounded-lg
@@ -175,7 +226,6 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                     <UserAvatar user={user} size="sm" />
                     <span>Hi, {user.username}</span>
                   </div>
-
                   <button
                     onClick={() => navigate(getDashboardRoute())}
                     className="bg-[#015bad] hover:bg-[#0a4882] text-white px-4 py-2 rounded-lg flex items-center
@@ -184,7 +234,6 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                     <Home size={16} />
                     <span>Dashboard</span>
                   </button>
-
                   <button
                     onClick={handleLogout}
                     className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg flex items-center
@@ -196,7 +245,6 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                 </>
               )}
             </div>
-
 
             {/* Mobile Menu Toggle */}
             <div className="lg:hidden -mr-1">
@@ -214,14 +262,13 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
             </div>
           </div>
 
-
           {/* Mobile Menu */}
           <div
-            className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-[600px] opacity-100 mt-2' : 'max-h-0 opacity-0'
-              }`}
+            className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+              isMobileMenuOpen ? 'max-h-[600px] opacity-100 mt-2' : 'max-h-0 opacity-0'
+            }`}
           >
             <div className="py-2 space-y-1 border-t border-gray-100 dark:border-gray-800">
-              {/* Mobile Navigation Links */}
               {navLinks.map(link => (
                 <a
                   key={link.name}
@@ -234,22 +281,17 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                 </a>
               ))}
 
-
-              {/* Mobile Auth Section */}
               <div className="pt-3 mt-3 border-t border-gray-100 dark:border-gray-800 space-y-2.5">
                 {!user ? (
                   <>
                     <button
                       onClick={() => openAuthModal('login')}
                       className="w-full px-3 py-2.5 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800
-                        rounded-lg transition-all duration-300 font-medium
-                        flex items-center justify-center gap-2"
+                        rounded-lg transition-all duration-300 font-medium flex items-center justify-center gap-2"
                     >
                       <LogIn size={18} />
                       <span>Login</span>
                     </button>
-
-
                     <button
                       onClick={() => openAuthModal('signup')}
                       className="w-full bg-[#F5B041] hover:bg-[#e6a030] text-[#0A1F44] px-3 py-2.5
@@ -262,27 +304,22 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                   </>
                 ) : (
                   <>
-                    <p className="font-semibold text-center text-white py-2 flex items-center justify-center gap-3">
+                    <p className="font-semibold text-center py-2 flex items-center justify-center gap-3 text-gray-800 dark:text-gray-200">
                       <UserAvatar user={user} size="sm" />
                       <span>Hi, {user.username}</span>
                     </p>
-
                     <button
-                      onClick={() => {
-                        navigate(getDashboardRoute());
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="w-full bg-[#F5B041] hover:bg-[#e6a030] text-[#0A1F44] px-3 py-2.5 rounded-lg
+                      onClick={() => { navigate(getDashboardRoute()); setIsMobileMenuOpen(false); }}
+                      className="w-full bg-[#015bad] hover:bg-[#0a4882] text-white px-3 py-2.5 rounded-lg
                         font-bold shadow-md hover:shadow-lg transition-all duration-300
                         flex items-center justify-center gap-2"
                     >
                       <Home size={18} />
                       <span>Dashboard</span>
                     </button>
-
                     <button
                       onClick={handleLogout}
-                      className="w-full bg-white/10 hover:bg-white/20 border border-white/30 text-white px-3 py-2.5 rounded-lg
+                      className="w-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200 px-3 py-2.5 rounded-lg
                         font-medium shadow-md hover:shadow-lg transition-all duration-300
                         flex items-center justify-center gap-2"
                     >
@@ -294,8 +331,87 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
               </div>
             </div>
           </div>
+        </div>
 
+        {/* ── Mega Menu ── */}
+        <div
+          onMouseEnter={handleServicesMouseEnter}
+          onMouseLeave={handleServicesMouseLeave}
+          className={`absolute top-full left-0 w-full bg-white dark:bg-gray-900 shadow-2xl border-t-2 border-[#015bad]
+            transition-all duration-200 origin-top overflow-hidden
+            ${showMegaMenu ? 'opacity-100 scale-y-100 pointer-events-auto' : 'opacity-0 scale-y-95 pointer-events-none'}`}
+          style={{ transformOrigin: 'top center' }}
+        >
+          {servicesByDept.length > 0 ? (
+            <div className="max-w-7xl mx-auto px-8 py-8">
+              <div
+                className="grid gap-x-8 gap-y-6"
+                style={{ gridTemplateColumns: `repeat(${Math.min(servicesByDept.length, 4)}, minmax(0, 1fr))` }}
+              >
+                {servicesByDept.map(dept => (
+                  <div key={dept.id} className="group/col">
+                    {/* Department header */}
+                    <div className="flex items-center gap-2 mb-3 pb-2 border-b-2 border-[#015bad]/20">
+                      {dept.logo && (
+                        <img
+                          src={dept.logo}
+                          alt={dept.title}
+                          className="w-5 h-5 object-contain"
+                        />
+                      )}
+                      <button
+                        onClick={() => { navigate(`/departments/${dept.slug}`); setShowMegaMenu(false); }}
+                        className="font-bold text-[#015bad] dark:text-[#F5B041] text-sm uppercase tracking-wider
+                          hover:text-[#0a4882] dark:hover:text-[#e6a030] transition-colors text-left"
+                      >
+                        {dept.title}
+                      </button>
+                    </div>
 
+                    {/* Services list */}
+                    <ul className="space-y-1.5">
+                      {dept.items.map(service => (
+                        <li key={service.id}>
+                          <a
+                            href="#services"
+                            onClick={(e) => { handleNavigation(e, '#services'); setShowMegaMenu(false); }}
+                            className="group flex items-center gap-1.5 text-gray-600 dark:text-gray-400
+                              hover:text-[#015bad] dark:hover:text-white text-sm transition-colors duration-150 py-0.5"
+                          >
+                            <ArrowRight
+                              size={12}
+                              className="opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0
+                                transition-all duration-150 text-[#015bad] flex-shrink-0"
+                            />
+                            <span>{service.title}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer row */}
+              <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  {services.length} services across {departments.length} departments
+                </p>
+                <a
+                  href="#services"
+                  onClick={(e) => { handleNavigation(e, '#services'); setShowMegaMenu(false); }}
+                  className="flex items-center gap-1.5 text-sm font-semibold text-[#015bad] dark:text-[#F5B041]
+                    hover:gap-2.5 transition-all duration-200"
+                >
+                  View All Services <ArrowRight size={14} />
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div className="max-w-7xl mx-auto px-8 py-6 text-center text-gray-400 text-sm">
+              Loading services...
+            </div>
+          )}
         </div>
       </header>
 
@@ -308,4 +424,5 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
     </>
   );
 };
+
 export default Header;

@@ -1,0 +1,13 @@
+{
+  "venvPath": ".",
+  "venv": ".env",
+  "pythonVersion": "3.13",
+  "include": [
+    "backend"
+  ],
+  "extraPaths": [
+    "backend"
+  ],
+  "reportMissingImports": "none",
+  "reportMissingModuleSource": "none"
+}

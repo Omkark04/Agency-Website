@@ -1,9 +1,4 @@
-from rest_framework import viewsets, status
-from django_filters.rest_framework import DjangoFilterBackend
-from .models import Department, PriceCard, Service
-from .serializers import DepartmentSerializer, ServiceSerializer, PriceCardSerializer
-from accounts.permissions import IsAdmin
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes

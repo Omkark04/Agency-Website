@@ -314,16 +314,6 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                 </div>
               )}
 
-              <div className="w-full max-w-xs mt-6 md:mt-0">
-                <button
-                  onClick={() => isAuthenticated ? navigate('/client-dashboard/services') : navigate('/pricing-plans')}
-                  className="w-full bg-gradient-to-r from-[#015bad] to-[#0A1F44] hover:opacity-90 text-white font-semibold py-3 px-8 rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-105"
-                >
-                  View Services
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </button>
-              </div>
-
               {/* Departments List - Mobile Only */}
               {departments.length > 0 && (
                 <div className="block md:hidden mt-6 -mx-4">
@@ -370,7 +360,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                       {[...departments, ...departments].map((dept, index) => (
                         <motion.div
                           key={`${dept.id}-mobile-${index}`}
-                          onClick={() => navigate(`/pricing-plans?department=${dept.id}`)}
+                          onClick={() => navigate(`/departments/${dept.slug}`)}
                           className="flex-shrink-0 w-[200px] bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 cursor-pointer hover:bg-white/15 transition-all"
                           whileTap={{ scale: 0.95 }}
                         >
@@ -593,7 +583,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                         y: -5,
                         transition: { duration: 0.2 }
                       }}
-                      onClick={() => navigate(`/pricing-plans?department=${dept.id}`)}
+                      onClick={() => navigate(`/departments/${dept.slug}`)}
                       className="relative group cursor-pointer"
                     >
                       {/* Animated gradient background */}
