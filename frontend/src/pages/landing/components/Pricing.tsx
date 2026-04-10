@@ -161,7 +161,7 @@ export const Pricing = () => {
 
   if (loading) {
     return (
-      <section id="pricing" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <section id="pricing" className="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#015bad]"></div>
@@ -173,23 +173,23 @@ export const Pricing = () => {
 
   return (
     <>
-      <section id="pricing" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-hidden">
+      <section id="pricing" className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
         <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
           {/* Section Header */}
-          <motion.div
+           <motion.div
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-8 md:mb-12"
           >
-            <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/20 to-[#0A1F44]/20 text-[#F5B041] dark:text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
+            <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/20 to-[#0A1F44]/20 text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
               <Sparkles className="inline-block w-3 h-3 md:w-4 md:h-4 mr-2" />
               Pricing Plans
             </span>
-            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent tracking-tight leading-tight px-4">
+            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent tracking-tight leading-tight px-4">
               Simple, Transparent Pricing
             </h2>
-            <p className="hidden md:block text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
+            <p className="hidden md:block text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed">
               Choose the perfect plan that fits your business needs. No hidden fees, cancel anytime.
             </p>
           </motion.div>
@@ -200,13 +200,13 @@ export const Pricing = () => {
               animate={{ opacity: 1 }}
               className="text-center py-20"
             >
-              <div className="inline-block p-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-3xl mb-6">
-                <Zap className="w-16 h-16 text-gray-400 dark:text-gray-600" />
+              <div className="inline-block p-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl mb-6">
+                <Zap className="w-16 h-16 text-gray-400" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">
+              <h3 className="text-2xl font-bold text-gray-700 mb-2">
                 No Pricing Plans Available
               </h3>
-              <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+              <p className="text-gray-500 max-w-md mx-auto">
                 Please check back later or contact us for custom quotes.
               </p>
             </motion.div>
@@ -223,7 +223,7 @@ export const Pricing = () => {
                       viewport={{ once: true }}
                       className="text-center mb-10"
                     >
-                      <h3 className="text-3xl font-bold text-gray-800 dark:text-white mb-2 tracking-tight">
+                      <h3 className="text-3xl font-bold text-gray-800 mb-2 tracking-tight">
                         {deptName}
                       </h3>
                       <div className="w-20 h-1 bg-gradient-to-r from-[#015bad] to-[#0A1F44] mx-auto rounded-full"></div>
@@ -253,7 +253,7 @@ export const Pricing = () => {
                           <MovingBorderContainer
                             borderRadius="1rem"
                             containerClassName="w-full h-full bg-transparent p-[3px]"
-                            className="bg-white dark:bg-gray-800 border-neutral-200 dark:border-gray-700 p-0 overflow-hidden items-start justify-start flex-col h-full w-full"
+                            className="bg-white border-neutral-200 p-0 overflow-hidden items-start justify-start flex-col h-full w-full"
                             duration={Math.floor(Math.random() * 2000) + 2000}
                             as="div"
                           >
@@ -272,10 +272,10 @@ export const Pricing = () => {
                               <div className="absolute top-4 right-4 z-10">
                                 <div className={`px-3 py-1 rounded-full text-xs font-semibold uppercase ${
                                   card.title === 'basic' 
-                                    ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-blue-600 dark:text-blue-400'
+                                    ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-blue-600'
                                     : card.title === 'medium'
-                                    ? 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 text-green-600 dark:text-green-400'
-                                    : 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-600 dark:text-purple-400'
+                                    ? 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 text-green-600'
+                                    : 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-600'
                                 }`}>
                                   {card.title}
                                 </div>
@@ -285,19 +285,19 @@ export const Pricing = () => {
                               <div className="p-6 pt-16">
                                 {/* Service Name */}
                                 <div className="flex items-center justify-between mb-4">
-                                  <h4 className="text-xl font-bold text-gray-800 dark:text-white line-clamp-1">
+                                  <h4 className="text-xl font-bold text-gray-800 line-clamp-1">
                                     {service.title}
                                   </h4>
                                 </div>
 
 
-                                {/* Details Grid */}
-                                <div className="grid grid-cols-2 gap-3 mb-6 p-4 rounded-xl bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border border-gray-100 dark:border-gray-700">
+                                 {/* Details Grid */}
+                                <div className="grid grid-cols-2 gap-3 mb-6 p-4 rounded-xl bg-gradient-to-br from-gray-50 to-white border border-gray-100">
                                   <div className="flex items-center gap-2">
                                     <Clock className="w-4 h-4 text-[#F5B041]" />
                                     <div>
-                                      <div className="text-xs text-gray-500 dark:text-gray-400">Delivery</div>
-                                      <div className="text-sm font-semibold text-gray-800 dark:text-white">
+                                      <div className="text-xs text-gray-500">Delivery</div>
+                                      <div className="text-sm font-semibold text-gray-800">
                                         {card.delivery_days || 7} days
                                       </div>
                                     </div>
@@ -305,8 +305,8 @@ export const Pricing = () => {
                                   <div className="flex items-center gap-2">
                                     <RefreshCw className="w-4 h-4 text-[#0A1F44]" />
                                     <div>
-                                      <div className="text-xs text-gray-500 dark:text-gray-400">Revisions</div>
-                                      <div className="text-sm font-semibold text-gray-800 dark:text-white">
+                                      <div className="text-xs text-gray-500">Revisions</div>
+                                      <div className="text-sm font-semibold text-gray-800">
                                         {card.revisions}
                                       </div>
                                     </div>
@@ -315,7 +315,7 @@ export const Pricing = () => {
 
                                 {/* Description */}
                                 {card.description && (
-                                  <p className="text-gray-600 dark:text-gray-300 mb-6 line-clamp-2">
+                                  <p className="text-gray-600 mb-6 line-clamp-2">
                                     {card.description}
                                   </p>
                                 )}
@@ -327,18 +327,18 @@ export const Pricing = () => {
                                       {card.features.slice(0, card.title === 'premium' ? 5 : card.title === 'medium' ? 4 : 3).map((feature, idx) => (
                                         <li key={idx} className="flex items-start gap-2">
                                           <div className="flex-shrink-0 mt-0.5">
-                                            <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                              <Check className="w-3 h-3 text-green-600 dark:text-green-400 stroke-[3]" />
+                                            <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                                              <Check className="w-3 h-3 text-green-600 stroke-[3]" />
                                             </div>
                                           </div>
-                                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                                          <span className="text-sm text-gray-700">
                                             {feature}
                                           </span>
                                         </li>
                                       ))}
-                                      {card.features.length > (card.title === 'premium' ? 5 : card.title === 'medium' ? 4 : 3) && (
+                                       {card.features.length > (card.title === 'premium' ? 5 : card.title === 'medium' ? 4 : 3) && (
                                         <li className="flex items-center justify-between text-sm ml-7">
-                                          <span className="text-[#F5B041] dark:text-[#F5B041] font-medium">+{card.features.length - (card.title === 'premium' ? 5 : card.title === 'medium' ? 4 : 3)} more features</span>
+                                          <span className="text-[#F5B041] font-medium">+{card.features.length - (card.title === 'premium' ? 5 : card.title === 'medium' ? 4 : 3)} more features</span>
                                           <button
                                             onClick={(e) => {
                                               e.stopPropagation();
@@ -412,7 +412,7 @@ export const Pricing = () => {
                       >
                         <div className="flex items-center justify-between">
                           <div>
-                            <h3 className="text-xl font-bold text-gray-800 dark:text-white tracking-tight leading-tight">
+                            <h3 className="text-xl font-bold text-gray-800 tracking-tight leading-tight">
                               {service.title}
                             </h3>
                             <div className="w-16 h-0.5 bg-gradient-to-r from-[#015bad] to-[#0A1F44] mt-2 rounded-full"></div>
@@ -435,7 +435,7 @@ export const Pricing = () => {
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.5, delay: index * 0.1 }}
                               >
-                                <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden h-full">
+                                <div className="relative bg-white rounded-xl shadow-lg overflow-hidden h-full">
                                   {/* Popular Badge */}
                                   {isPopular && (
                                     <div className="absolute top-3 left-3 z-10">
@@ -450,10 +450,10 @@ export const Pricing = () => {
                                   <div className="absolute top-3 right-3 z-10">
                                     <div className={`px-2 py-1 rounded-full text-xs font-semibold uppercase ${
                                       card.title === 'basic' 
-                                        ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-blue-600 dark:text-blue-400'
+                                        ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-blue-600'
                                         : card.title === 'medium'
-                                        ? 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 text-green-600 dark:text-green-400'
-                                        : 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-600 dark:text-purple-400'
+                                        ? 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 text-green-600'
+                                        : 'bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-600'
                                     }`}>
                                       {card.title}
                                     </div>
@@ -462,13 +462,13 @@ export const Pricing = () => {
                                   {/* Content */}
                                   <div className="p-5 pt-14">
 
-                                    {/* Details Grid */}
-                                    <div className="grid grid-cols-2 gap-2 mb-4 p-3 rounded-lg bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border border-gray-100 dark:border-gray-700">
+                                     {/* Details Grid */}
+                                    <div className="grid grid-cols-2 gap-2 mb-4 p-3 rounded-lg bg-gradient-to-br from-gray-50 to-white border border-gray-100">
                                       <div className="flex items-center gap-1.5">
                                         <Clock className="w-3 h-3 text-[#F5B041]" />
                                         <div>
-                                          <div className="text-xs text-gray-500 dark:text-gray-400">Delivery</div>
-                                          <div className="text-xs font-semibold text-gray-800 dark:text-white">
+                                          <div className="text-xs text-gray-500">Delivery</div>
+                                          <div className="text-xs font-semibold text-gray-800">
                                             {card.delivery_days || 7} days
                                           </div>
                                         </div>
@@ -476,8 +476,8 @@ export const Pricing = () => {
                                       <div className="flex items-center gap-1.5">
                                         <RefreshCw className="w-3 h-3 text-[#0A1F44]" />
                                         <div>
-                                          <div className="text-xs text-gray-500 dark:text-gray-400">Revisions</div>
-                                          <div className="text-xs font-semibold text-gray-800 dark:text-white">
+                                          <div className="text-xs text-gray-500">Revisions</div>
+                                          <div className="text-xs font-semibold text-gray-800">
                                             {card.revisions}
                                           </div>
                                         </div>
@@ -488,20 +488,20 @@ export const Pricing = () => {
                                     {card.features && card.features.length > 0 && (
                                       <div className="mb-4">
                                         <ul className="space-y-2">
-                                          {card.features.slice(0, 3).map((feature, idx) => (
+                                           {card.features.slice(0, 3).map((feature, idx) => (
                                             <li key={idx} className="flex items-start gap-2">
                                               <div className="flex-shrink-0 mt-0.5">
-                                                <div className="w-4 h-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                                  <Check className="w-2.5 h-2.5 text-green-600 dark:text-green-400 stroke-[3]" />
+                                                <div className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center">
+                                                  <Check className="w-2.5 h-2.5 text-green-600 stroke-[3]" />
                                                 </div>
                                               </div>
-                                              <span className="text-xs text-gray-700 dark:text-gray-300 line-clamp-1">
+                                              <span className="text-xs text-gray-700 line-clamp-1">
                                                 {feature}
                                               </span>
                                             </li>
                                           ))}
                                           {card.features.length > 3 && (
-                                            <li className="text-xs text-[#F5B041] dark:text-[#F5B041] font-medium ml-6">
+                                            <li className="text-xs text-[#F5B041] font-medium ml-6">
                                               +{card.features.length - 3} more
                                             </li>
                                           )}
@@ -549,7 +549,7 @@ export const Pricing = () => {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="text-center mt-12 pt-8 border-t border-gray-200 dark:border-gray-700"
+                className="text-center mt-12 pt-8 border-t border-gray-200"
               >
                 <button
                   onClick={() => navigate('/pricing-plans')}
@@ -570,11 +570,11 @@ export const Pricing = () => {
             className="text-center mt-12 md:mt-20"
           >
             <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#015bad] via-[#0A1F44] to-purple-500">
-              <div className="bg-white dark:bg-gray-900 rounded-xl px-4 py-6 md:px-8 md:py-6">
+              <div className="bg-white rounded-xl px-4 py-6 md:px-8 md:py-6">
                 <h3 className="text-lg md:text-2xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent tracking-tight">
                   Need a Custom Solution?
                 </h3>
-                <p className="hidden md:block text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto leading-relaxed">
+                <p className="hidden md:block text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
                   We've got you covered. Contact us for a personalized quote tailored to your specific needs.
                 </p>
                 <button
@@ -597,22 +597,22 @@ export const Pricing = () => {
 
       {/* Features Modal - Desktop Only */}
       <Dialog open={!!selectedCardForFeatures} onOpenChange={() => setSelectedCardForFeatures(null)}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden p-0 border-0 bg-white dark:bg-gray-900 rounded-2xl">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden p-0 border-0 bg-white rounded-2xl">
           {selectedCardForFeatures && (() => {
             const service = getService(selectedCardForFeatures.service);
             return (
               <div className="h-full flex flex-col max-h-[85vh]">
-                <div className="p-6 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 flex-shrink-0">
+                <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white flex-shrink-0">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 pr-4">
-                      <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                      <DialogTitle className="text-2xl font-bold text-gray-900 mb-2">
                         {service?.title}
                       </DialogTitle>
                       <div className="flex items-center gap-3 flex-wrap">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                          selectedCardForFeatures.title === 'basic' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                          selectedCardForFeatures.title === 'basic' ? 'bg-blue-100 text-blue-700' :
                           selectedCardForFeatures.title === 'medium' ? 'bg-[#015bad]/10 text-[#F5B041]' :
-                          'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
+                          'bg-purple-100 text-purple-700'
                         }`}>
                           {selectedCardForFeatures.title}
                         </span>
@@ -621,19 +621,19 @@ export const Pricing = () => {
                   </div>
                 </div>
                 <div className="flex-1 overflow-y-auto p-6">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-[#F5B041]" />
                     All Features Included
                   </h3>
                   <ul className="space-y-3">
                     {selectedCardForFeatures.features?.map((feature, i) => (
-                      <li key={i} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                      <li key={i} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
                         <div className="flex-shrink-0 mt-0.5">
-                          <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                            <Check className="w-3 h-3 text-green-600 dark:text-green-400 stroke-[3]" />
+                          <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
+                            <Check className="w-3 h-3 text-green-600 stroke-[3]" />
                           </div>
                         </div>
-                        <span className="text-sm text-gray-700 dark:text-gray-300 flex-1">
+                        <span className="text-sm text-gray-700 flex-1">
                           {feature}
                         </span>
                       </li>
@@ -643,16 +643,16 @@ export const Pricing = () => {
                     <div className="flex items-center gap-4 text-sm">
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-[#F5B041]" />
-                        <span className="text-gray-700 dark:text-gray-300">{selectedCardForFeatures.delivery_days || 7} Days Delivery</span>
+                        <span className="text-gray-700">{selectedCardForFeatures.delivery_days || 7} Days Delivery</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <RefreshCw className="w-4 h-4 text-[#0A1F44]" />
-                        <span className="text-gray-700 dark:text-gray-300">{selectedCardForFeatures.revisions} Revisions</span>
+                        <span className="text-gray-700">{selectedCardForFeatures.revisions} Revisions</span>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="p-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+                <div className="p-6 border-t border-gray-100 bg-gray-50">
                   <button
                     onClick={() => {
                       setSelectedCardForFeatures(null);
@@ -683,7 +683,7 @@ export const Pricing = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 backdrop-blur-xl rounded-3xl shadow-3xl overflow-hidden"
+              className="relative bg-gradient-to-br from-white to-gray-50 backdrop-blur-xl rounded-3xl shadow-3xl overflow-hidden"
             >
               {/* Modal header gradient */}
               <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500" />
@@ -692,10 +692,10 @@ export const Pricing = () => {
                 <DialogHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                      <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                         {selectedService.title}
                       </DialogTitle>
-                      <DialogDescription className="text-gray-600 dark:text-gray-400 mt-2">
+                      <DialogDescription className="text-gray-600 mt-2">
                         Complete your service request
                       </DialogDescription>
                     </div>
@@ -703,20 +703,20 @@ export const Pricing = () => {
                 </DialogHeader>
 
                 <div className="mt-6">
-                  {/* Selected Plan Summary */}
+                   {/* Selected Plan Summary */}
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-8 p-5 rounded-2xl bg-gradient-to-r from-blue-50/80 to-cyan-50/80 dark:from-blue-900/20 dark:to-cyan-900/20 border border-blue-200 dark:border-blue-700/50 backdrop-blur-sm"
+                    className="mb-8 p-5 rounded-2xl bg-gradient-to-r from-blue-50/80 to-cyan-50/80 border border-blue-200 backdrop-blur-sm"
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-bold text-blue-900 dark:text-blue-300">Selected Plan</h3>
+                        <h3 className="font-bold text-blue-900">Selected Plan</h3>
                           {selectedPriceCard.title}
                       </div>
                       <button
                         onClick={handleCloseModal}
-                        className="flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                        className="flex items-center text-blue-600 hover:text-blue-800 font-medium"
                       >
                         <ArrowLeft className="w-4 h-4 mr-2" />
                         Change Plan

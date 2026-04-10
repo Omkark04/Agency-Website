@@ -18,7 +18,7 @@ export default function SocialLoginButtons({
       <button
         onClick={onGoogleLogin}
         disabled={loading}
-        className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-white"
       >
         <FcGoogle className="text-2xl" />
         <span className="font-medium text-gray-700">Continue with Google</span>

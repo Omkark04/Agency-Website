@@ -201,7 +201,6 @@ const ServiceCard = ({ service, onSelect, index }: { service: Service; onSelect:
 
 
 
-        {/* Service logo or category icon */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -209,17 +208,9 @@ const ServiceCard = ({ service, onSelect, index }: { service: Service; onSelect:
           className="mb-5 relative"
         >
           <div className="absolute -inset-3 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          {service.logo ? (
-             <img
-               src={service.logo}
-               alt={service.title}
-               className="relative w-14 h-14 rounded-xl shadow-lg object-contain bg-white dark:bg-gray-800 p-1"
-             />
-          ) : (
-            <div className="relative p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 shadow-lg">
-              <CategoryIcon className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-            </div>
-          )}
+          <div className="relative p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 shadow-lg">
+            <CategoryIcon className="w-7 h-7 text-blue-600 dark:text-blue-400" />
+          </div>
         </motion.div>
 
 
@@ -422,20 +413,9 @@ const ServiceListItem = ({ service, onSelect, index }: { service: Service; onSel
               transition={{ duration: 0.6 }}
               className="relative"
             >
-              {service.logo ? (
-                <>
-                  <div className="absolute -inset-2 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <img
-                    src={service.logo}
-                    alt={service.title}
-                    className="relative w-14 h-14 rounded-xl shadow-lg"
-                  />
-                </>
-              ) : (
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg">
-                  <Globe className="w-7 h-7 text-white" />
-                </div>
-              )}
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg">
+                <Globe className="w-7 h-7 text-white" />
+              </div>
             </motion.div>
 
 

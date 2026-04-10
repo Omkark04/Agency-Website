@@ -36,11 +36,7 @@ export default function ServiceForm({
   const [isActive, setIsActive] = useState(initial?.is_active ?? true);
   const [discountPercentage, setDiscountPercentage] = useState<number>(initial?.discount_percentage || 0);
 
-  // ✅ LOGO STATES (MATCHING YOUR DEPARTMENT FORM STYLE)
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(
-    initial?.logo || null
-  );
+
 
   const [loading, setLoading] = useState(false);
   
@@ -72,22 +68,7 @@ export default function ServiceForm({
       .then(res => setServices(res.data))
       .catch(err => console.error(err));
   }, []);
-  // ✅ FILE SELECT
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setLogoFile(file);
-      setLogoPreview(URL.createObjectURL(file));
-    }
-  };
 
-  // ✅ REMOVE LOGO
-  const removeLogo = () => {
-    setLogoFile(null);
-    setLogoPreview(null);
-    const fileInput = document.getElementById('service-logo-upload') as HTMLInputElement;
-    if (fileInput) fileInput.value = '';
-  };
 
   // ✅ SUBMIT
   const submit = async (e: React.FormEvent) => {
@@ -95,23 +76,10 @@ export default function ServiceForm({
     setLoading(true);
 
     try {
-      let logoUrl = initial?.logo || null;
 
-      // ✅ Upload new logo if selected
-      if (logoFile) {
-        const formData = new FormData();
-        formData.append('file', logoFile);
-
-        const uploadRes = await api.post('/api/upload/', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-
-        logoUrl = uploadRes.data.url; // ✅ Cloudinary URL
-      }
 
       const payload = {
         title,
-        logo: logoUrl,
         short_description: shortDesc,
         long_description: longDesc,
         department: departmentId === '' ? undefined : departmentId,
@@ -178,40 +146,7 @@ export default function ServiceForm({
         />
       </div>
 
-      {/* ✅ LOGO UPLOAD */}
-      <div className="service-form__group">
-        <label className="service-form__label">
-          <FiUpload /> Service Logo
-        </label>
 
-        {(logoPreview || initial?.logo) && (
-          <div className="service-form__logo-preview-wrapper">
-            <img
-              src={logoPreview || initial?.logo}
-              className="service-form__logo-preview"
-            />
-            <button
-              type="button"
-              onClick={removeLogo}
-              className="service-form__logo-remove"
-            >
-              <FiX size={14} />
-            </button>
-          </div>
-        )}
-
-        <input
-          id="service-logo-upload"
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="service-form__logo-input"
-        />
-
-        <label htmlFor="service-logo-upload" className="service-form__logo-label">
-          {logoPreview ? 'Change Logo' : 'Upload Service Logo'}
-        </label>
-      </div>
 
       {/* ✅ DEPARTMENT */}
       <div className="service-form__group">

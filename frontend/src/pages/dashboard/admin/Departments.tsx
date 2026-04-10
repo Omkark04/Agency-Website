@@ -204,17 +204,13 @@ export default function Departments() {
                     <tr key={d.id} className="departments__table-row">
                       <td className="departments__table-cell">
                         <div className="departments__dept-info">
-                          {d.logo ? (
-                            <img 
-                              src={d.logo} 
-                              alt={d.title} 
-                              className="departments__dept-logo"
-                            />
-                          ) : (
-                            <div className="departments__dept-logo-placeholder">
+                          <div className="departments__dept-logo-placeholder">
+                            {d.logo ? (
+                              <img src={d.logo} alt="" className="departments__dept-logo-img" />
+                            ) : (
                               <FiLayers className="departments__dept-logo-icon" />
-                            </div>
-                          )}
+                            )}
+                          </div>
                           <div>
                             <div className="departments__dept-title">{d.title}</div>
                             <div className="departments__dept-description">

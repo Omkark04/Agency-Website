@@ -81,19 +81,14 @@ export default function Blog() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <div className="bg-gradient-to-br from-gray-50 via-white to-gray-50">
       <SEOHead 
         title="Blog & Insights"
         description="Read the latest insights, tips, and stories about web development, design, and digital transformation from the experts at OneKraft."
         url="/blog"
       />
-      {/* Header */}
-      <div className="bg-gradient-to-br from-[#0A1F44] to-[#1a365d] text-white py-20">
+      <div className="bg-gradient-to-br from-[#0A1F44] to-[#1a365d] text-white pt-32 md:pt-40 pb-10">
         <div className="container mx-auto px-4">
-          <Link to="/" className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
-          </Link>
           
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -164,7 +159,7 @@ export default function Blog() {
                       <p className="text-gray-600 mb-6 leading-relaxed">{featuredPost.excerpt}</p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#015bad] to-[#0A1F44] flex items-center justify-center text-white font-semibold">
+                           <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#015bad] to-[#0A1F44] flex items-center justify-center text-white font-semibold">
                             {getAuthorInitial(featuredPost.author)}
                           </div>
                           <div>
@@ -174,7 +169,7 @@ export default function Blog() {
                             </p>
                           </div>
                         </div>
-                        <Link
+                         <Link
                           to={`/blog/${featuredPost.id}`}
                           className="inline-flex items-center gap-2 text-[#0A1F44] font-semibold hover:gap-3 transition-all"
                         >
@@ -196,7 +191,7 @@ export default function Blog() {
               className="mb-12"
             >
               <div className="flex flex-wrap gap-3 justify-center">
-                {allCategories.map((category) => (
+                 {allCategories.map((category) => (
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
@@ -216,7 +211,7 @@ export default function Blog() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {regularPosts.map((post, index) => (
                 <motion.article
-                  key={post.id}
+                   key={post.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.1 * index }}
@@ -251,7 +246,7 @@ export default function Blog() {
                         </>
                       )}
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 hover:text-[#0A1F44] transition-colors">
+                     <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 hover:text-[#0A1F44] transition-colors">
                       {post.title}
                     </h3>
                     <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
@@ -262,7 +257,7 @@ export default function Blog() {
                         </div>
                         <span className="text-sm font-medium text-gray-700">{getAuthorName(post.author)}</span>
                       </div>
-                      <Link
+                       <Link
                         to={`/blog/${post.id}`}
                         className="text-[#0A1F44] font-semibold text-sm hover:gap-2 inline-flex items-center gap-1 transition-all"
                       >

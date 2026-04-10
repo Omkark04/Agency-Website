@@ -102,17 +102,17 @@ export const Services = () => {
   // Loading skeleton
   if (loading) {
     return (
-      <section id="services" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <section id="services" className="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
           <div className="text-center mb-16">
-            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-48 mx-auto mb-4 animate-pulse"></div>
-            <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-full w-96 mx-auto mb-4 animate-pulse"></div>
-            <div className="h-1 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-full w-20 mx-auto animate-pulse"></div>
+            <div className="h-6 bg-gray-200 rounded-full w-48 mx-auto mb-4 animate-pulse"></div>
+            <div className="h-12 bg-gray-200 rounded-full w-96 mx-auto mb-4 animate-pulse"></div>
+            <div className="h-1 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full w-20 mx-auto animate-pulse"></div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-80 bg-gray-200 dark:bg-gray-700 rounded-2xl"></div>
+                <div className="h-80 bg-gray-200 rounded-2xl"></div>
               </div>
             ))}
           </div>
@@ -123,10 +123,10 @@ export const Services = () => {
 
   if (error) {
     return (
-      <section id="services" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <section id="services" className="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 max-w-7xl text-center">
-          <div className="inline-block p-6 bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-200 dark:border-red-800">
-            <p className="text-red-600 dark:text-red-400 text-lg font-medium">{error}</p>
+          <div className="inline-block p-6 bg-red-50 rounded-2xl border border-red-200">
+            <p className="text-red-600 text-lg font-medium">{error}</p>
             <button 
               onClick={fetchServices}
               className="mt-4 px-6 py-2 bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white rounded-lg hover:opacity-90 transition-opacity"
@@ -139,9 +139,9 @@ export const Services = () => {
     );
   }
 
-  return (
+   return (
     <>
-      <section id="services" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <section id="services" className="py-20 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Section Header */}
         <motion.div 
@@ -151,13 +151,13 @@ export const Services = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] dark:text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
+          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
             Our Services
           </span>
-          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent px-4 tracking-tight leading-tight">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent px-4 tracking-tight leading-tight">
             Comprehensive Solutions Tailored for Your Success
           </h2>
-          <p className="hidden md:block text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
+          <p className="hidden md:block text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed">
             We offer a wide range of professional services across multiple departments, 
             each led by industry experts committed to delivering exceptional results.
           </p>
@@ -182,7 +182,7 @@ export const Services = () => {
             return (
               <motion.div
                 key={department.id}
-                className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300"
+                className="group relative bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -193,25 +193,17 @@ export const Services = () => {
                 <div className="p-8">
                   {/* Department Name & Logo - Same Line */}
                   <div className="flex items-center gap-4 mb-4">
-                    {department.logo ? (
-                      <img
-                        src={department.logo}
-                        alt={department.title}
-                        width="64"
-                        height="64"
-                        loading="lazy"
-                        decoding="async"
-                        className="w-16 h-16 object-contain rounded-xl flex-shrink-0"
-                      />
-                    ) : (
-                      <div className={`w-16 h-16 rounded-xl flex items-center justify-center ${iconColor.replace('text-', 'bg-')}/10 flex-shrink-0`}>
-                        {React.cloneElement(IconComponent, { 
+                    <div className={`w-16 h-16 rounded-xl flex items-center justify-center ${iconColor.replace('text-', 'bg-')}/10 flex-shrink-0 overflow-hidden`}>
+                      {department.logo ? (
+                        <img src={department.logo} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        React.cloneElement(IconComponent, { 
                           className: `text-3xl ${iconColor}`
-                        })}
-                      </div>
-                    )}
+                        })
+                      )}
+                    </div>
                     <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-gray-800 dark:text-white tracking-tight leading-tight">
+                      <h3 className="text-2xl font-bold text-gray-800 tracking-tight leading-tight">
                         {department.title}
                       </h3>
                     </div>
@@ -219,7 +211,7 @@ export const Services = () => {
 
                   {/* Department Description */}
                   {department.short_description && (
-                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-6 line-clamp-2 leading-relaxed">
+                    <p className="text-gray-600 text-sm mb-6 line-clamp-2 leading-relaxed">
                       {department.short_description}
                     </p>
                   )}
@@ -232,30 +224,13 @@ export const Services = () => {
                         const serviceIconColor = iconColorMap[service.icon_name as keyof typeof iconColorMap] || 'text-[#F5B041]';
                         
                         return (
-                          <div key={service.id} className="p-4 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800">
+                          <div key={service.id} className="p-4 rounded-xl bg-cyan-50/50 border border-cyan-100 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
                             <div className="flex items-start gap-4 mb-3">
-                              {service.logo ? (
-                                <img
-                                  src={service.logo}
-                                  alt={service.title}
-                                  width="56"
-                                  height="56"
-                                  loading="lazy"
-                                  decoding="async"
-                                  className="w-14 h-14 object-contain rounded-lg flex-shrink-0"
-                                />
-                              ) : (
-                                <div className={`w-14 h-14 rounded-lg flex items-center justify-center ${serviceIconColor.replace('text-', 'bg-')}/10 flex-shrink-0`}>
-                                  {React.cloneElement(serviceIcon, { 
-                                    className: `text-2xl ${serviceIconColor}`
-                                  })}
-                                </div>
-                              )}
                               <div className="flex-1">
-                                <h4 className="font-bold text-gray-800 dark:text-white text-base mb-1 tracking-tight leading-snug">
+                                <h4 className="font-bold text-gray-800 text-base mb-1 tracking-tight leading-snug">
                                   {service.title}
                                 </h4>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed">
+                                <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
                                   {service.short_description}
                                 </p>
                               </div>
@@ -272,7 +247,7 @@ export const Services = () => {
                             {service.features && service.features.length > 0 && (
                               <div className="space-y-1 ml-[4.5rem]">
                                 {service.features.slice(0, 2).map((feature) => (
-                                  <div key={feature.id} className="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-400">
+                                  <div key={feature.id} className="flex items-start gap-2 text-xs text-gray-600">
                                     <div className="w-1 h-1 rounded-full bg-[#015bad] mt-1.5 flex-shrink-0"></div>
                                     <span className="line-clamp-1">{feature.title}</span>
                                   </div>
@@ -284,8 +259,8 @@ export const Services = () => {
                       })}
                     </div>
                   ) : (
-                    <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 text-center">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 text-center">
+                      <p className="text-sm text-gray-500">
                         No services available yet
                       </p>
                     </div>
@@ -310,7 +285,7 @@ export const Services = () => {
                           contactSection.scrollIntoView({ behavior: 'smooth' });
                         }
                       }}
-                      className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold tracking-wide hover:border-[#015bad] hover:text-[#F5B041] dark:hover:text-[#F5B041] transition-all duration-300"
+                      className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-white border-2 border-gray-200 text-gray-700 font-semibold tracking-wide hover:border-[#015bad] hover:text-[#F5B041] transition-all duration-300"
                     >
                       <span>Make Custom Order</span>
                     </button>
@@ -343,7 +318,7 @@ export const Services = () => {
             return (
               <motion.div
                 key={department.id}
-                className="flex-shrink-0 w-[300px] bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"
+                className="flex-shrink-0 w-[300px] bg-white rounded-xl shadow-lg overflow-hidden"
                 initial={{ opacity: 0, x: 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -353,25 +328,17 @@ export const Services = () => {
                 <div className="p-5">
                   {/* Department Name & Logo */}
                   <div className="flex items-center gap-3 mb-4">
-                    {department.logo ? (
-                      <img
-                        src={department.logo}
-                        alt={department.title}
-                        width="48"
-                        height="48"
-                        loading="lazy"
-                        decoding="async"
-                        className="w-12 h-12 object-contain rounded-lg flex-shrink-0"
-                      />
-                    ) : (
-                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${iconColor.replace('text-', 'bg-')}/10 flex-shrink-0`}>
-                        {React.cloneElement(IconComponent, { 
+                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${iconColor.replace('text-', 'bg-')}/10 flex-shrink-0 overflow-hidden`}>
+                      {department.logo ? (
+                        <img src={department.logo} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        React.cloneElement(IconComponent, { 
                           className: `text-2xl ${iconColor}`
-                        })}
-                      </div>
-                    )}
+                        })
+                      )}
+                    </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-800 dark:text-white line-clamp-2 tracking-tight leading-tight">
+                      <h3 className="text-lg font-bold text-gray-800 line-clamp-2 tracking-tight leading-tight">
                         {department.title}
                       </h3>
                     </div>
@@ -385,26 +352,9 @@ export const Services = () => {
                         const serviceIconColor = iconColorMap[service.icon_name as keyof typeof iconColorMap] || 'text-[#F5B041]';
                         
                         return (
-                          <div key={service.id} className="flex items-center gap-2.5 p-2 rounded-lg bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700/50 dark:to-gray-800/50">
-                            {service.logo ? (
-                              <img
-                                src={service.logo}
-                                alt={service.title}
-                                width="32"
-                                height="32"
-                                loading="lazy"
-                                decoding="async"
-                                className="w-8 h-8 object-contain rounded flex-shrink-0"
-                              />
-                            ) : (
-                              <div className={`w-8 h-8 rounded flex items-center justify-center ${serviceIconColor.replace('text-', 'bg-')}/10 flex-shrink-0`}>
-                                {React.cloneElement(serviceIcon, { 
-                                  className: `text-base ${serviceIconColor}`
-                                })}
-                              </div>
-                            )}
+                          <div key={service.id} className="flex items-center gap-2.5 p-2 rounded-lg bg-cyan-50/50 border border-cyan-100 min-h-[50px]">
                             <div className="flex-1 min-w-0">
-                              <h4 className="text-sm font-semibold text-gray-800 dark:text-white line-clamp-2 tracking-tight leading-snug">
+                              <h4 className="text-sm font-semibold text-gray-800 line-clamp-2 tracking-tight leading-snug">
                                 {service.title}
                               </h4>
                             </div>
@@ -433,7 +383,7 @@ export const Services = () => {
                           contactSection.scrollIntoView({ behavior: 'smooth' });
                         }
                       }}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-semibold tracking-wide hover:border-[#015bad] hover:text-[#F5B041] transition-all duration-300"
+                      className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-white border border-gray-200 text-gray-700 text-sm font-semibold tracking-wide hover:border-[#015bad] hover:text-[#F5B041] transition-all duration-300"
                     >
                       <span>Make Custom Order</span>
                     </button>
@@ -456,12 +406,12 @@ export const Services = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="inline-block p-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-2xl">
-              <FaBullhorn className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">
+            <div className="inline-block p-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl">
+              <FaBullhorn className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-2xl font-bold text-gray-700 mb-2">
                 No Services Found
               </h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-6">
+              <p className="text-gray-500 mb-6">
                 No services are currently available.
               </p>
             </div>
@@ -476,12 +426,12 @@ export const Services = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#015bad] via-[#0A1F44] to-purple-500">
-            <div className="bg-white dark:bg-gray-900 rounded-xl px-4 py-6 md:px-8 md:py-8">
+           <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#015bad] via-[#0A1F44] to-purple-500">
+            <div className="bg-white rounded-xl px-4 py-6 md:px-8 md:py-8">
               <h3 className="text-lg md:text-2xl lg:text-3xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent tracking-tight">
                 Ready to Transform Your Business?
               </h3>
-              <p className="hidden md:block text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto text-lg leading-relaxed">
+              <p className="hidden md:block text-gray-600 mb-6 max-w-2xl mx-auto text-lg leading-relaxed">
                 Our expert teams are ready to deliver exceptional results. 
                 Get a personalized consultation and discover how we can help you achieve your goals.
               </p>
@@ -499,7 +449,7 @@ export const Services = () => {
                 </button>
                 <button
                   onClick={() => navigateTo('/client-dashboard/services')}
-                  className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 text-gray-700 dark:text-gray-300 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold tracking-wide hover:shadow-lg transition-all duration-300"
+                  className="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 px-6 py-2.5 md:px-8 md:py-3 rounded-full text-sm md:text-base font-semibold tracking-wide hover:shadow-lg transition-all duration-300"
                 >
                   View All Services
                 </button>
@@ -519,7 +469,7 @@ export const Services = () => {
     {/* Form Modal */}
     {showFormModal && selectedServiceId && (
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] my-8 shadow-2xl flex flex-col">
+        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] my-8 shadow-2xl flex flex-col">
           {/* Enhanced Modal Header */}
           <div className="sticky top-0 bg-gradient-to-r from-[#015bad] to-[#0A1F44] p-6 flex items-center justify-between z-10 rounded-t-2xl">
             <div className="flex-1">

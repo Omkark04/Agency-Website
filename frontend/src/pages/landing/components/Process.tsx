@@ -12,28 +12,32 @@ const Process = () => {
       title: 'Discover',
       icon: <FaSearch className="text-3xl md:text-4xl text-white" />,
       description: 'We analyze your business needs and goals to create a customized strategy.',
-      color: 'from-[#015bad] to-[#00A5C2]'
+      color: 'from-cyan-400 to-blue-500',
+      shadow: 'shadow-cyan-500/50'
     },
     {
       id: 2,
       title: 'Plan',
       icon: <FaClipboardList className="text-3xl md:text-4xl text-white" />,
       description: 'Our team creates a detailed project roadmap with milestones and deliverables.',
-      color: 'from-[#0A1F44] to-[#0052CC]'
+      color: 'from-blue-500 to-indigo-600',
+      shadow: 'shadow-blue-500/50'
     },
     {
       id: 3,
       title: 'Build',
       icon: <FaCode className="text-3xl md:text-4xl text-white" />,
       description: 'We develop your solution with cutting-edge technology and best practices.',
-      color: 'from-[#0A1F44] to-[#1A365D]'
+      color: 'from-indigo-600 to-violet-600',
+      shadow: 'shadow-indigo-500/50'
     },
     {
       id: 4,
       title: 'Deliver',
       icon: <FaRocket className="text-3xl md:text-4xl text-white" />,
       description: 'We launch your project and provide ongoing support for success.',
-      color: 'from-[#8A2BE2] to-[#4B0082]'
+      color: 'from-violet-600 to-fuchsia-600',
+      shadow: 'shadow-violet-500/50'
     }
   ];
 
@@ -58,40 +62,47 @@ const Process = () => {
           </p>
         </motion.div>
 
-        {/* Desktop: Timeline Layout */}
+        {/* Desktop: Horizontal Progressive Layout */}
         <div className="hidden md:block relative">
-          {/* Timeline line */}
-          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-[#015bad] via-[#0A1F44] to-[#8A2BE2] transform -translate-x-1/2"></div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, index) => (
               <motion.div
                 key={step.id}
-                className={`relative ${index % 2 === 0 ? 'lg:pr-20' : 'lg:pl-20 lg:mt-40'}`}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="group relative rounded-[2.5rem] overflow-hidden flex flex-col h-full shadow-lg bg-white text-gray-900 border border-gray-100 hover:bg-[#0A1F44] hover:text-white transition-all duration-500"
               >
-                {/* Step number on timeline */}
-                <div className="hidden lg:flex absolute top-0 left-1/2 w-12 h-12 bg-white dark:bg-gray-800 rounded-full border-4 border-white dark:border-gray-900 items-center justify-center transform -translate-x-1/2 -translate-y-6 z-10">
-                  <span className="text-lg font-bold bg-gradient-to-r bg-clip-text text-transparent from-[#015bad] to-[#0A1F44]">
-                    0{step.id}
-                  </span>
+                {/* Header with Title and Icon Box */}
+                <div className="p-8 pb-0 flex justify-between items-start">
+                  <h3 className="text-2xl font-bold leading-tight max-w-[70%] group-hover:text-white transition-colors duration-500">
+                    {step.title}
+                  </h3>
+                  
+                  {/* Icon Box in Top Right Corner area */}
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br ${step.color} ${step.shadow} shadow-lg transition-all duration-500 group-hover:scale-110`}>
+                    <div className="text-2xl text-white">
+                      {step.icon}
+                    </div>
+                  </div>
                 </div>
 
-                <div className={`relative bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 group hover:shadow-xl transition-all duration-300`}>
-                  {/* Corner accent */}
-                  <div className={`absolute top-0 right-0 w-16 h-16 overflow-hidden`}>
-                    <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${step.color} opacity-10 transform rotate-45 origin-bottom-left`}></div>
-                  </div>
-                  
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 bg-gradient-to-br ${step.color} shadow-md`}>
-                    {step.icon}
-                  </div>
-                  
-                  <h3 className="text-xl font-bold mb-3 dark:text-white tracking-tight">{step.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{step.description}</p>
+                {/* Divider Line */}
+                <div className="px-8 mt-6">
+                  <div className="w-full h-[1px] bg-gray-200 group-hover:bg-[#00BCD4]/30 transition-colors duration-500" />
+                </div>
+
+                {/* Content */}
+                <div className="p-8 pt-6 flex-grow">
+                  <p className="text-base leading-relaxed text-gray-600 group-hover:text-gray-300 transition-colors duration-500">
+                    {step.description}
+                  </p>
+                </div>
+
+                {/* Floating Number */}
+                <div className="absolute bottom-6 right-8 text-4xl font-black opacity-10 text-gray-200 group-hover:text-[#00BCD4] group-hover:opacity-20 transition-all duration-500">
+                  0{step.id}
                 </div>
               </motion.div>
             ))}

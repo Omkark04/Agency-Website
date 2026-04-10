@@ -16,6 +16,7 @@ import {
   List,
   Sparkles,
   ChevronLeft,
+  ChevronDown,
   ZoomIn
 } from 'lucide-react';
 import { Button as MovingBorderContainer } from "@/components/ui/moving-border";
@@ -37,9 +38,8 @@ const PortfolioSection = () => {
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
   const [activeFilter, setActiveFilter] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'featured'>('newest');
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [totalProjectsCount, setTotalProjectsCount] = useState<number>(0);
   
   // Service form modal state
   const [isServiceFormOpen, setIsServiceFormOpen] = useState(false);
@@ -52,18 +52,38 @@ const PortfolioSection = () => {
   const [galleryIndex, setGalleryIndex] = useState(0);
 
 
-  useEffect(() => {
-    loadProjects();
-  }, []);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'featured'>('newest');
 
   useEffect(() => {
-    filterAndSortProjects();
-  }, [projects, activeFilter, searchTerm, sortBy, viewMode]);
+    loadData();
+  }, [activeFilter]);
 
-  const loadProjects = async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
-      const data = await fetchPortfolioProjects();
+      
+      // Load departments if empty
+      if (departments.length === 0) {
+        import('../../../api/departments').then(mod => {
+          mod.listDepartments({ is_active: true }).then(res => setDepartments(res.data));
+        });
+      }
+
+      // Fetch all projects just to get the total count if we haven't
+      if (totalProjectsCount === 0) {
+         fetchPortfolioProjects().then(data => setTotalProjectsCount(data.length));
+      }
+
+      let params: any = {};
+      if (activeFilter !== 'all' && activeFilter !== 'featured') {
+        params.service__department = Number(activeFilter);
+      } else if (activeFilter === 'featured') {
+        params.is_featured = true;
+      }
+      
+      const data = await fetchPortfolioProjects(params);
       setProjects(data);
     } catch (error) {
       console.error('Failed to load portfolio:', error);
@@ -72,24 +92,12 @@ const PortfolioSection = () => {
     }
   };
 
-  const getUniqueServices = () => {
-    const services = projects
-      .map(project => project.service?.name)
-      .filter((service, index, self) => 
-        service && self.indexOf(service) === index
-      );
-    return services;
-  };
+  useEffect(() => {
+    filterAndSortProjects();
+  }, [projects, searchTerm, sortBy, viewMode]);
 
   const filterAndSortProjects = () => {
     let filtered = [...projects];
-
-    // Apply category filter
-    if (activeFilter === 'featured') {
-      filtered = filtered.filter(project => project.is_featured);
-    } else if (activeFilter !== 'all') {
-      filtered = filtered.filter(project => project.service?.name === activeFilter);
-    }
 
     // Apply search filter
     if (searchTerm) {
@@ -180,7 +188,7 @@ const PortfolioSection = () => {
   // Loading state remains the same...
   if (loading) {
     return (
-      <section id="portfolio" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <section id="portfolio" className="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#015bad]"></div>
@@ -193,7 +201,7 @@ const PortfolioSection = () => {
   return (
     <section 
       id="portfolio" 
-      className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-hidden"
+      className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden"
     >
       <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
         {/* Section Header - Updated with better layout */}
@@ -203,32 +211,32 @@ const PortfolioSection = () => {
           viewport={{ once: true }}
           className="text-center mb-8 md:mb-12"
         >
-          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/20 to-[#0A1F44]/20 text-[#F5B041] dark:text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
+          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/20 to-[#0A1F44]/20 text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
             <Briefcase className="inline-block w-3 h-3 md:w-4 md:h-4 mr-2" />
             Our Portfolio
           </span>
-          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent tracking-tight leading-tight px-4">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent tracking-tight leading-tight px-4">
             Showcasing Excellence
           </h2>
-          <p className="hidden md:block text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto mb-8 leading-relaxed">
+          <p className="hidden md:block text-gray-600 text-lg max-w-3xl mx-auto mb-8 leading-relaxed">
             Explore our diverse portfolio of successful projects that demonstrate our expertise, 
             creativity, and commitment to delivering exceptional results.
           </p>
           
           {/* Search Bar - Hidden on Mobile */}
-          <div className="hidden md:block max-w-xl mx-auto mb-8">
+           <div className="hidden md:block max-w-xl mx-auto mb-8">
             <div className="relative">
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search projects by title, description, or client..."
-                className="w-full px-6 py-4 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-[#015bad] focus:ring-4 focus:ring-[#015bad]/20 transition-all duration-300"
+                className="w-full px-6 py-4 rounded-2xl border-2 border-gray-200 bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#015bad] focus:ring-4 focus:ring-[#015bad]/20 transition-all duration-300"
               />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -246,10 +254,10 @@ const PortfolioSection = () => {
         >
           <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
             {/* Filter Buttons */}
-            <div className="flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+             <div className="flex flex-wrap gap-3">
+              <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm">
                 <Filter className="w-4 h-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter:</span>
+                <span className="text-sm font-medium text-gray-700">Filter:</span>
               </div>
               
               <button
@@ -257,47 +265,55 @@ const PortfolioSection = () => {
                 className={`px-5 py-2.5 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
                   activeFilter === 'all'
                     ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white shadow-lg shadow-[#015bad]/30'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:shadow-lg border border-gray-200 dark:border-gray-700'
+                    : 'bg-white text-gray-700 hover:shadow-lg border border-gray-200'
                 }`}
               >
-                All Projects ({projects.length})
+                All Projects ({totalProjectsCount || projects.length})
               </button>
               
-              <button
+               <button
                 onClick={() => setActiveFilter('featured')}
                 className={`px-5 py-2.5 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 flex items-center gap-2 ${
                   activeFilter === 'featured'
                     ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white shadow-lg shadow-[#015bad]/30'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:shadow-lg border border-gray-200 dark:border-gray-700'
+                    : 'bg-white text-gray-700 hover:shadow-lg border border-gray-200'
                 }`}
               >
                 <Star className="w-4 h-4" />
                 Featured
               </button>
               
-              {getUniqueServices().map(service => (
-                <button
-                  key={service}
-                  onClick={() => setActiveFilter(service || '')}
-                  className={`px-5 py-2.5 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
-                    activeFilter === service
-                      ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white shadow-lg shadow-[#015bad]/30'
-                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:shadow-lg border border-gray-200 dark:border-gray-700'
+              <div className="relative">
+                <select
+                  value={departments.some(d => d.id.toString() === activeFilter) ? activeFilter : "all"}
+                  onChange={(e) => setActiveFilter(e.target.value)}
+                  className={`appearance-none bg-white border border-gray-200 text-gray-700 py-2.5 pl-5 pr-12 rounded-full focus:outline-none focus:ring-2 focus:ring-[#015bad]/30 focus:border-[#015bad] transition-all duration-300 font-semibold shadow-sm hover:shadow-md cursor-pointer ${
+                    departments.some(d => d.id.toString() === activeFilter)
+                      ? 'border-cyan-100 text-[#015bad] bg-cyan-50/50'
+                      : ''
                   }`}
                 >
-                  {service}
-                </button>
-              ))}
+                  <option value="all">All Departments</option>
+                  {departments.map(dept => (
+                    <option key={dept.id} value={dept.id.toString()}>
+                      {dept.title}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
+                  <ChevronDown className="h-4 w-4 text-gray-400" />
+                </div>
+              </div>
             </div>
 
             {/* Sort & View Controls */}
             <div className="flex items-center gap-4">
               {/* Sort Dropdown */}
-              <div className="relative">
+               <div className="relative">
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="appearance-none bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 py-2.5 pl-4 pr-10 rounded-full focus:outline-none focus:ring-2 focus:ring-[#015bad]/30 focus:border-[#015bad] transition-all duration-300 font-medium"
+                  className="appearance-none bg-white border border-gray-200 text-gray-700 py-2.5 pl-4 pr-10 rounded-full focus:outline-none focus:ring-2 focus:ring-[#015bad]/30 focus:border-[#015bad] transition-all duration-300 font-medium"
                 >
                   <option value="newest">Newest First</option>
                   <option value="oldest">Oldest First</option>
@@ -311,13 +327,13 @@ const PortfolioSection = () => {
               </div>
 
               {/* View Mode Toggle */}
-              <div className="flex items-center gap-1 bg-white dark:bg-gray-800 rounded-full p-1 border border-gray-200 dark:border-gray-700">
+               <div className="flex items-center gap-1 bg-white rounded-full p-1 border border-gray-200">
                 <button
                   onClick={() => setViewMode('grid')}
                   className={`p-2 rounded-full transition-all duration-300 ${
                     viewMode === 'grid'
                       ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white'
-                      : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                      : 'text-gray-500 hover:text-gray-700'
                   }`}
                   title="Grid View"
                 >
@@ -328,7 +344,7 @@ const PortfolioSection = () => {
                   className={`p-2 rounded-full transition-all duration-300 ${
                     viewMode === 'list'
                       ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white'
-                      : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                      : 'text-gray-500 hover:text-gray-700'
                   }`}
                   title="List View"
                 >
@@ -340,19 +356,19 @@ const PortfolioSection = () => {
         </motion.div>
 
         {/* Results Counter */}
-        {searchTerm && (
+         {searchTerm && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="mb-6"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 rounded-full">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-medium text-gray-700">
                 Found {filteredProjects.length} project{filteredProjects.length !== 1 ? 's' : ''} for "{searchTerm}"
               </span>
               <button
                 onClick={() => setSearchTerm('')}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                className="text-gray-500 hover:text-gray-700"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -361,19 +377,19 @@ const PortfolioSection = () => {
         )}
 
         {/* Portfolio Grid/List View */}
-        {filteredProjects.length === 0 ? (
+         {filteredProjects.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="text-center py-20"
           >
-            <div className="inline-block p-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-3xl mb-6">
-              <Briefcase className="w-16 h-16 text-gray-400 dark:text-gray-600" />
+            <div className="inline-block p-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl mb-6">
+              <Briefcase className="w-16 h-16 text-gray-400" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">
+            <h3 className="text-2xl font-bold text-gray-700 mb-2">
               No Projects Found
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-6">
+            <p className="text-gray-500 max-w-md mx-auto mb-6">
               {searchTerm
                 ? `No projects match "${searchTerm}". Try different keywords or clear the search.`
                 : activeFilter !== 'all'
@@ -411,7 +427,7 @@ const PortfolioSection = () => {
                     <MovingBorderContainer
                       borderRadius="1rem"
                       containerClassName="w-full h-full bg-transparent p-[3px]"
-                      className="bg-white dark:bg-gray-800 border-neutral-200 dark:border-gray-700 p-0 overflow-hidden items-start justify-start flex-col h-full w-full"
+                      className="bg-white border-neutral-200 p-0 overflow-hidden items-start justify-start flex-col h-full w-full"
                       duration={Math.floor(Math.random() * 2000) + 2000} // Random duration for variety
                       as="div"
                     >
@@ -456,24 +472,24 @@ const PortfolioSection = () => {
                         <div className="p-6">
                           {/* Service Tag */}
                           {project.service && (
-                            <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] dark:text-[#F5B041] text-xs font-semibold mb-3">
+                            <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] text-xs font-semibold mb-3">
                               {project.service.name}
                             </div>
                           )}
 
                           {/* Title */}
-                          <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2 line-clamp-1">
+                          <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-1">
                             {project.title}
                           </h3>
 
                           {/* Description */}
-                          <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                          <p className="text-gray-600 mb-4 line-clamp-2">
                             {project.description}
                           </p>
 
                           {/* Client Info */}
                           {project.client_name && (
-                            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
                               <User className="w-4 h-4" />
                               <span>Client: {project.client_name}</span>
                             </div>
@@ -481,12 +497,12 @@ const PortfolioSection = () => {
 
                           {/* Date */}
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                            <div className="flex items-center gap-2 text-sm text-gray-500">
                               <Calendar className="w-4 h-4" />
                               <span>{new Date(project.created_at).toLocaleDateString()}</span>
                             </div>
                             
-                            <button className="flex items-center gap-1 text-[#F5B041] dark:text-[#F5B041] font-semibold group-hover:gap-2 transition-all duration-300">
+                            <button className="flex items-center gap-1 text-[#015bad] font-semibold group-hover:gap-2 transition-all duration-300 bg-cyan-50/50 border border-cyan-100 hover:bg-cyan-100 px-4 py-2 rounded-lg">
                               View Details
                               <ChevronRight className="w-4 h-4" />
                             </button>
@@ -511,7 +527,7 @@ const PortfolioSection = () => {
                     key={project.id}
                     variants={itemVariants}
                     whileHover={{ x: 4, transition: { duration: 0.2 } }}
-                    className="group relative overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer"
+                    className="group relative overflow-hidden rounded-2xl bg-white shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer"
                     onClick={() => setSelectedProject(project)}
                   >
                     <div className="flex flex-col md:flex-row">
@@ -540,34 +556,34 @@ const PortfolioSection = () => {
                           <div>
                             <div className="flex flex-wrap items-center gap-3 mb-3">
                               {project.service && (
-                                <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] dark:text-[#F5B041] text-xs font-semibold">
+                                <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] text-xs font-semibold">
                                   {project.service.name}
                                 </div>
                               )}
-                              <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                              <div className="text-sm text-gray-500 flex items-center gap-1">
                                 <Calendar className="w-4 h-4" />
                                 {new Date(project.created_at).toLocaleDateString()}
                               </div>
                             </div>
 
-                            <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-3">
+                            <h3 className="text-2xl font-bold text-gray-800 mb-3">
                               {project.title}
                             </h3>
 
-                            <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                            <p className="text-gray-600 mb-4 line-clamp-2">
                               {project.description}
                             </p>
                           </div>
 
-                          <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
+                          <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
                             {project.client_name && (
-                              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                              <div className="flex items-center gap-2 text-sm text-gray-500">
                                 <User className="w-4 h-4" />
                                 <span>Client: {project.client_name}</span>
                               </div>
                             )}
                             
-                            <button className="flex items-center gap-2 text-[#F5B041] dark:text-[#F5B041] font-semibold group-hover:gap-3 transition-all duration-300">
+                            <button className="flex items-center gap-2 text-[#015bad] font-semibold group-hover:gap-3 transition-all duration-300 bg-cyan-50/50 border border-cyan-100 hover:bg-cyan-100 px-4 py-2 rounded-lg">
                               View Full Case Study
                               <ChevronRight className="w-5 h-5" />
                             </button>
@@ -586,7 +602,7 @@ const PortfolioSection = () => {
                 {filteredProjects.map((project, index) => (
                   <motion.div
                     key={project.id}
-                    className="flex-shrink-0 w-[280px] bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"
+                    className="flex-shrink-0 w-[280px] bg-white rounded-xl shadow-lg overflow-hidden"
                     initial={{ opacity: 0, x: 30 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
@@ -626,26 +642,26 @@ const PortfolioSection = () => {
                     <div className="p-4">
                       {/* Service Tag */}
                       {project.service && (
-                        <div className="inline-block px-2 py-0.5 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] dark:text-[#F5B041] text-xs font-semibold mb-2">
+                        <div className="inline-block px-2 py-0.5 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] text-xs font-semibold mb-2">
                           {project.service.name}
                         </div>
                       )}
 
                       {/* Title */}
-                      <h3 className="text-base font-bold text-gray-800 dark:text-white mb-2 line-clamp-2 tracking-tight leading-tight">
+                      <h3 className="text-base font-bold text-gray-800 mb-2 line-clamp-2 tracking-tight leading-tight">
                         {project.title}
                       </h3>
 
                       {/* Client Info */}
                       {project.client_name && (
-                        <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mb-3">
+                        <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
                           <User className="w-3 h-3" />
                           <span className="line-clamp-1">{project.client_name}</span>
                         </div>
                       )}
 
                       {/* View Button */}
-                      <button className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white text-sm font-semibold tracking-wide hover:shadow-lg transition-all duration-300">
+                      <button className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-cyan-50/50 border border-cyan-100 text-[#015bad] text-sm font-semibold tracking-wide hover:bg-cyan-100 transition-all duration-300">
                         View Details
                         <ChevronRight className="w-3 h-3" />
                       </button>
@@ -663,14 +679,14 @@ const PortfolioSection = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700"
+              className="mt-12 pt-8 border-t border-gray-200"
             >
               <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
-                <div className="text-gray-600 dark:text-gray-300 text-sm">
+                <div className="text-gray-600 text-sm">
                   Showing <span className="font-bold text-[#F5B041]">{filteredProjects.length}</span> of{' '}
                   <span className="font-bold">{projects.length}</span> total projects
                   {activeFilter !== 'all' && (
-                    <span className="ml-2 px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-xs">
+                    <span className="ml-2 px-2 py-1 bg-gray-100 rounded-full text-xs">
                       Filtered by: {activeFilter}
                     </span>
                   )}
@@ -696,11 +712,11 @@ const PortfolioSection = () => {
           className="text-center mt-12 md:mt-20"
         >
           <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#015bad] via-[#0A1F44] to-purple-500">
-            <div className="bg-white dark:bg-gray-900 rounded-xl px-4 py-6 md:px-8 md:py-6">
+            <div className="bg-white rounded-xl px-4 py-6 md:px-8 md:py-6">
               <h3 className="text-lg md:text-2xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent tracking-tight">
                 Ready to Start Your Project?
               </h3>
-              <p className="hidden md:block text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto leading-relaxed">
+              <p className="hidden md:block text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
                 Join our satisfied clients and let us bring your vision to life with our expertise.
               </p>
               <button
@@ -725,15 +741,15 @@ const PortfolioSection = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="relative w-full max-w-4xl bg-white dark:bg-gray-900 rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+            className="relative w-full max-w-4xl bg-white rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button */}
             <button
               onClick={() => setSelectedProject(null)}
-              className="absolute top-4 right-4 z-10 p-2 bg-white/10 dark:bg-gray-800/10 backdrop-blur-sm rounded-full hover:bg-white/20 dark:hover:bg-gray-800/20 transition-colors"
+              className="absolute top-4 left-4 z-20 p-2 bg-black/50 backdrop-blur-sm rounded-full hover:bg-black/70 transition-colors"
             >
-              <X className="w-6 h-6 text-gray-800 dark:text-white" />
+              <X className="w-6 h-6 text-white" />
             </button>
 
             {/* Modal Content */}
@@ -798,10 +814,10 @@ const PortfolioSection = () => {
               <div className="p-8">
                 {/* Description */}
                 <div className="mb-8">
-                  <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">
                     Project Overview
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                  <p className="text-gray-600 leading-relaxed">
                     {selectedProject.description}
                   </p>
                 </div>
@@ -809,7 +825,7 @@ const PortfolioSection = () => {
                 {/* Additional Images - Horizontal Slider */}
                 {selectedProject.images && selectedProject.images.length > 0 && (
                   <div className="mb-8">
-                    <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4">
                       Gallery
                     </h3>
                     <div className="relative">
@@ -851,7 +867,7 @@ const PortfolioSection = () => {
                           {selectedProject.images.map((_, index) => (
                             <div 
                               key={index}
-                              className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"
+                              className="w-2 h-2 rounded-full bg-gray-300"
                             />
                           ))}
                         </div>
@@ -860,8 +876,8 @@ const PortfolioSection = () => {
                   </div>
                 )}
 
-                {/* Meta Info */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 rounded-2xl bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
+                 {/* Meta Info */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 rounded-2xl bg-gradient-to-br from-gray-50 to-white">
                   <div className="text-center">
                     <div className="text-3xl font-bold bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent mb-2">
                       {new Date(selectedProject.created_at).toLocaleDateString('en-US', { 
@@ -869,21 +885,21 @@ const PortfolioSection = () => {
                         year: 'numeric'
                       })}
                     </div>
-                    <div className="text-gray-600 dark:text-gray-400">Completed</div>
+                    <div className="text-gray-600">Completed</div>
                   </div>
                   
                   <div className="text-center">
                     <div className="text-3xl font-bold bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent mb-2">
                       {selectedProject.service?.name || 'Various'}
                     </div>
-                    <div className="text-gray-600 dark:text-gray-400">Service Category</div>
+                    <div className="text-gray-600">Service Category</div>
                   </div>
                   
                   <div className="text-center">
                     <div className="text-3xl font-bold bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent mb-2">
                       {selectedProject.is_featured ? 'Featured' : 'Standard'}
                     </div>
-                    <div className="text-gray-600 dark:text-gray-400">Project Type</div>
+                    <div className="text-gray-600">Project Type</div>
                   </div>
                 </div>
 
@@ -895,7 +911,7 @@ const PortfolioSection = () => {
                     className={`inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
                       selectedProject.service
                         ? 'bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white hover:shadow-lg hover:shadow-[#015bad]/30'
-                        : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
                     <Sparkles className="w-5 h-5" />
@@ -933,19 +949,19 @@ const PortfolioSection = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="relative inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-2xl rounded-2xl"
+              className="relative inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl"
             >
               {/* Modal Header */}
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="px-6 py-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <h3 className="text-2xl font-bold text-gray-900">
                       Start Similar Project: {serviceFormProject.title}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-gray-600 mt-1">
                       Service: {serviceFormProject.service.name}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 mt-1">
                       Fill out the form below to request a custom version of this project
                     </p>
                   </div>
@@ -954,7 +970,7 @@ const PortfolioSection = () => {
                       setIsServiceFormOpen(false);
                       setServiceFormProject(null);
                     }}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     <X className="h-6 w-6" />
                   </button>

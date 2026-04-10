@@ -68,17 +68,17 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
 
   if (loading) {
     return (
-      <section id="offers" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <section id="offers" className="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
           <div className="text-center mb-16">
-            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-32 mx-auto mb-4 animate-pulse"></div>
-            <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-full w-64 mx-auto mb-4 animate-pulse"></div>
-            <div className="h-1 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-full w-20 mx-auto animate-pulse"></div>
+            <div className="h-6 bg-gray-200 rounded-full w-32 mx-auto mb-4 animate-pulse"></div>
+            <div className="h-12 bg-gray-200 rounded-full w-64 mx-auto mb-4 animate-pulse"></div>
+            <div className="h-1 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full w-20 mx-auto animate-pulse"></div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="animate-pulse">
-                <div className="h-80 bg-gray-200 dark:bg-gray-700 rounded-2xl"></div>
+                <div className="h-80 bg-gray-200 rounded-2xl"></div>
               </div>
             ))}
           </div>
@@ -89,10 +89,10 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
 
   if (error) {
     return (
-      <section id="offers" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <section id="offers" className="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl text-center">
-          <div className="inline-block p-6 bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-200 dark:border-red-800">
-            <p className="text-red-600 dark:text-red-400 text-lg font-medium">{error}</p>
+          <div className="inline-block p-6 bg-red-50 rounded-2xl border border-red-200">
+            <p className="text-red-600 text-lg font-medium">{error}</p>
             <button 
               onClick={fetchOffers}
               className="mt-4 px-6 py-2 bg-gradient-to-r from-[#015bad] to-[#0A1F44] text-white rounded-lg hover:opacity-90 transition-opacity"
@@ -107,7 +107,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
 
   if (!offers || offers.length === 0) {
     return (
-      <section id="offers" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <section id="offers" className="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
           <motion.div 
             className="text-center py-20"
@@ -115,12 +115,12 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="inline-block p-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-2xl">
-              <div className="w-16 h-16 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-4"></div>
-              <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">
+            <div className="inline-block p-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl">
+              <div className="w-16 h-16 bg-gray-300 rounded-full mx-auto mb-4"></div>
+              <h3 className="text-2xl font-bold text-gray-700 mb-2">
                 No Offers Available
               </h3>
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-gray-500">
                 No offers are currently available. Check back soon!
               </p>
             </div>
@@ -131,7 +131,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
   }
 
   return (
-    <section id="offers" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+     <section id="offers" className="py-20 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Section Header */}
         <motion.div 
@@ -141,13 +141,13 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] dark:text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
+          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
             Special Offers
           </span>
-          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent tracking-tight leading-tight px-4">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent tracking-tight leading-tight px-4">
             Exclusive Deals & Promotions
           </h2>
-          <p className="hidden md:block text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
+          <p className="hidden md:block text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed">
             Discover amazing offers and limited-time deals on our premium services. 
             Save big while getting the quality you deserve.
           </p>
@@ -162,7 +162,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
               onChange={() => setFeaturedOnly((s) => !s)}
               className="w-4 h-4 text-[#F5B041] bg-gray-100 border-gray-300 rounded focus:ring-[#015bad] focus:ring-2"
             />
-            <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">Featured Only</span>
+            <span className="text-sm text-gray-700 font-medium">Featured Only</span>
           </label>
 
           <label className="inline-flex items-center space-x-2 cursor-pointer">
@@ -172,7 +172,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
               onChange={() => setLimitedOnly((s) => !s)}
               className="w-4 h-4 text-[#F5B041] bg-gray-100 border-gray-300 rounded focus:ring-[#015bad] focus:ring-2"
             />
-            <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">Limited Time</span>
+            <span className="text-sm text-gray-700 font-medium">Limited Time</span>
           </label>
         </div>
 
@@ -181,7 +181,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
           {offers.slice(0, limit).map((offer) => (
             <motion.article 
               key={offer.id} 
-              className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300"
+              className="group relative bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
@@ -193,7 +193,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
             >
               <div className="relative">
                 {renderBadge(offer)}
-                <div className="h-48 w-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-xl overflow-hidden flex items-center justify-center group">
+                <div className="h-48 w-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl overflow-hidden flex items-center justify-center group">
                   {(offer.imageURL || offer.image) ? (
                     <motion.img
                       whileHover={{ scale: 1.05 }}
@@ -204,14 +204,14 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="text-gray-400 dark:text-gray-500 text-sm">No image</div>
+                    <div className="text-gray-400 text-sm">No image</div>
                   )}
                 </div>
               </div>
 
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-3 tracking-tight">{offer.title}</h3>
-                <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 leading-relaxed">{offer.short_description || offer.description}</p>
+                <h3 className="text-xl font-bold text-gray-800 mb-3 tracking-tight">{offer.title}</h3>
+                <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed">{offer.short_description || offer.description}</p>
 
                 <div className="mt-3 flex items-center justify-between">
                   <div>
@@ -256,7 +256,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
             {offers.slice(0, limit).map((offer, index) => (
               <motion.article 
                 key={offer.id} 
-                className="flex-shrink-0 w-[280px] bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden"
+                className="flex-shrink-0 w-[280px] bg-white rounded-xl shadow-lg overflow-hidden"
                 initial={{ opacity: 0, x: 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -264,7 +264,7 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
               >
                 <div className="relative">
                   {renderBadge(offer)}
-                  <div className="h-40 w-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 overflow-hidden flex items-center justify-center">
+                  <div className="h-40 w-full bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden flex items-center justify-center">
                     {(offer.imageURL || offer.image) ? (
                       <img
                         src={(offer.imageURL || offer.image) || undefined}
@@ -273,13 +273,13 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
                         loading="lazy"
                       />
                     ) : (
-                      <div className="text-gray-400 dark:text-gray-500 text-xs">No image</div>
+                      <div className="text-gray-400 text-xs">No image</div>
                     )}
                   </div>
                 </div>
 
                 <div className="p-4">
-                  <h3 className="text-base font-bold text-gray-800 dark:text-white mb-2 line-clamp-2 tracking-tight leading-tight">{offer.title}</h3>
+                  <h3 className="text-base font-bold text-gray-800 mb-2 line-clamp-2 tracking-tight leading-tight">{offer.title}</h3>
                   
                   <div className="mb-3">
                     {offer.discounted_price && offer.original_price && offer.discounted_price < offer.original_price ? (

@@ -5,7 +5,8 @@ class Department(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(unique=True)
-    logo = models.URLField(null=True, blank=True)
+    logo = models.ImageField(upload_to="departments/logos/", null=True, blank=True)
+
     short_description = models.TextField(blank=True)
 
     # Team Head assignment → must be a user with role = service_head
@@ -21,6 +22,29 @@ class Department(models.Model):
         default=999,
         unique=True,
         help_text="Display priority (lower number = higher priority, must be unique)"
+    )
+    
+    hero_bg_desktop = models.ForeignKey(
+        'media.Media',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='department_desktop_heroes',
+        help_text="Hero background for desktop view (Image or Video)"
+    )
+    hero_bg_mobile = models.ForeignKey(
+        'media.Media',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='department_mobile_heroes',
+        help_text="Hero background for mobile view (Image or Video)"
+    )
+    hero_caption = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text="Optional caption to display on the hero section"
     )
 
     is_active = models.BooleanField(default=True)
@@ -46,7 +70,6 @@ class Service(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
-    logo = models.URLField(null=True, blank=True)
 
     short_description = models.TextField(blank=True)
     long_description = models.TextField(blank=True)

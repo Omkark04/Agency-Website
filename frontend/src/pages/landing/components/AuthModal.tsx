@@ -65,7 +65,7 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login', onAuthSucces
 
     // Calculate password strength for UI
   const getPasswordStrength = () => {
-    if (!formData.password) return { percent: 0, color: 'bg-gray-200 dark:bg-gray-700', label: '' };
+    if (!formData.password) return { percent: 0, color: 'bg-gray-200', label: '' };
     let score = 0;
     if (passwordValidation.minLength) score++;
     if (passwordValidation.hasLowerCase) score++;
@@ -179,26 +179,26 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login', onAuthSucces
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={toggleModal}>
-      <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+      <div className="bg-white rounded-xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
 
 
         {/* HEADER */}
         <div className="flex justify-between items-center p-4 border-b flex-shrink-0">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-bold text-gray-900">
             {mode === 'login' ? 'Welcome Back' : 'Create Account'}
           </h2>
-          <button onClick={toggleModal}>
-            <X size={24} />
+          <button onClick={toggleModal} className="p-1 hover:bg-gray-100 rounded-lg transition-colors bg-transparent">
+            <X size={24} className="text-gray-500 hover:text-gray-700" />
           </button>
         </div>
 
 
         {/* TABS */}
         <div className="flex border-b flex-shrink-0">
-          <button onClick={() => setMode('login')} className={`flex-1 py-3 ${mode === 'login' && 'border-b-2 border-[#015bad]'}`}>
+          <button onClick={() => setMode('login')} className={`flex-1 py-3 transition-colors ${mode === 'login' ? 'border-b-2 border-[#015bad] bg-white font-bold text-[#015bad]' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}>
             Sign In
           </button>
-          <button onClick={() => setMode('signup')} className={`flex-1 py-3 ${mode === 'signup' && 'border-b-2 border-[#015bad]'}`}>
+          <button onClick={() => setMode('signup')} className={`flex-1 py-3 transition-colors ${mode === 'signup' ? 'border-b-2 border-[#015bad] bg-white font-bold text-[#015bad]' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}>
             Sign Up
           </button>
         </div>
@@ -212,19 +212,19 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login', onAuthSucces
             <>
               <div className="mb-3">
                 <label>Full Name</label>
-                <input type="text" name="name" value={formData.name} onChange={handleInputChange} className="w-full border p-2 rounded" required />
+                <input type="text" name="name" value={formData.name} onChange={handleInputChange} className="w-full border p-2 rounded bg-white text-gray-900" required />
               </div>
 
 
               <div className="mb-3">
                 <label>Username</label>
-                <input type="text" name="username" value={formData.username} onChange={handleInputChange} className="w-full border p-2 rounded" required />
+                <input type="text" name="username" value={formData.username} onChange={handleInputChange} className="w-full border p-2 rounded bg-white text-gray-900" required />
               </div>
 
 
               <div className="mb-3">
                 <label>Phone Number</label>
-                <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full border p-2 rounded" pattern="[0-9]{10}" required />
+                <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full border p-2 rounded bg-white text-gray-900" pattern="[0-9]{10}" required />
               </div>
             </>
           )}
@@ -232,25 +232,25 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login', onAuthSucces
 
           <div className="mb-3">
             <label>Email</label>
-            <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full border p-2 rounded" required />
+            <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full border p-2 rounded bg-white text-gray-900" required />
           </div>
 
 
           <div className="mb-3">
-            <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+            <label className="block mb-1 text-sm font-medium text-gray-700">Password</label>
             <div className="relative">
               <input 
                 type={showPassword ? 'text' : 'password'} 
                 name="password" 
                 value={formData.password} 
                 onChange={handleInputChange} 
-                className="w-full border p-2 rounded pr-10 bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-[#015bad] focus:border-transparent outline-none transition-all" 
+                className="w-full border p-2 rounded pr-10 bg-white focus:ring-2 focus:ring-[#015bad] focus:border-transparent outline-none transition-all" 
                 required 
               />
               <button 
                 type="button" 
                 onClick={() => setShowPassword(!showPassword)} 
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -263,39 +263,37 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login', onAuthSucces
                {/* Progress Bar */}
               <div className="mb-3">
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-gray-500 dark:text-gray-400">Password Strength</span>
+                  <span className="text-gray-500">Password Strength</span>
                   <span className={`font-semibold ${getPasswordStrength().color.replace('bg-', 'text-')}`}>
                     {getPasswordStrength().label}
                   </span>
                 </div>
-                <div className="h-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden transition-all">
+                <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden transition-all">
                   <div 
                     className={`h-full ${getPasswordStrength().color} transition-all duration-500 ease-out`} 
                     style={{ width: `${getPasswordStrength().percent}%` }}
                   />
                 </div>
-              </div>
-
-              <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Password Requirements:</p>
+              </div>               <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="text-xs font-semibold text-gray-700 mb-2">Password Requirements:</p>
                 <div className="space-y-1">
-                  <div className={`flex items-center text-xs ${passwordValidation.minLength ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                  <div className={`flex items-center text-xs ${passwordValidation.minLength ? 'text-green-600' : 'text-gray-500'}`}>
                     {passwordValidation.minLength ? <Check size={14} className="mr-1" /> : <div className="w-3.5 h-3.5 mr-1 rounded-full border border-gray-400" />}
                     <span>At least 6 characters</span>
                   </div>
-                  <div className={`flex items-center text-xs ${passwordValidation.hasUpperCase ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                  <div className={`flex items-center text-xs ${passwordValidation.hasUpperCase ? 'text-green-600' : 'text-gray-500'}`}>
                     {passwordValidation.hasUpperCase ? <Check size={14} className="mr-1" /> : <div className="w-3.5 h-3.5 mr-1 rounded-full border border-gray-400" />}
                     <span>One uppercase letter (A-Z)</span>
                   </div>
-                  <div className={`flex items-center text-xs ${passwordValidation.hasLowerCase ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                  <div className={`flex items-center text-xs ${passwordValidation.hasLowerCase ? 'text-green-600' : 'text-gray-500'}`}>
                     {passwordValidation.hasLowerCase ? <Check size={14} className="mr-1" /> : <div className="w-3.5 h-3.5 mr-1 rounded-full border border-gray-400" />}
                     <span>One lowercase letter (a-z)</span>
                   </div>
-                  <div className={`flex items-center text-xs ${passwordValidation.hasNumber ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                  <div className={`flex items-center text-xs ${passwordValidation.hasNumber ? 'text-green-600' : 'text-gray-500'}`}>
                     {passwordValidation.hasNumber ? <Check size={14} className="mr-1" /> : <div className="w-3.5 h-3.5 mr-1 rounded-full border border-gray-400" />}
                     <span>One number (0-9)</span>
                   </div>
-                  <div className={`flex items-center text-xs ${passwordValidation.hasSpecialChar ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                  <div className={`flex items-center text-xs ${passwordValidation.hasSpecialChar ? 'text-green-600' : 'text-gray-500'}`}>
                     {passwordValidation.hasSpecialChar ? <Check size={14} className="mr-1" /> : <div className="w-3.5 h-3.5 mr-1 rounded-full border border-gray-400" />}
                     <span>One special character (!@#$...)</span>
                   </div>
@@ -317,7 +315,7 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login', onAuthSucces
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">
+              <span className="px-2 bg-white text-gray-500">
                 {mode === 'login' ? 'Or continue with' : 'Or sign up with'}
               </span>
             </div>
@@ -335,7 +333,7 @@ export const AuthModal = ({ isOpen, onClose, defaultMode = 'login', onAuthSucces
         {/* FOOTER */}
         <div className="p-4 text-center border-t flex-shrink-0">
           {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
-          <button onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="text-[#F5B041] font-semibold">
+          <button onClick={() => setMode(mode === 'login' ? 'signup' : 'login')} className="text-[#F5B041] font-semibold bg-transparent hover:bg-transparent px-1 py-0 border-none">
             {mode === 'login' ? 'Sign Up' : 'Sign In'}
           </button>
         </div>

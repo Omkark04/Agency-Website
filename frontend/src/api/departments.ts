@@ -4,11 +4,27 @@ export interface Department {
   id: number;
   title: string;
   slug: string;
-  logo?: string | null;
+
   short_description?: string;
+  logo?: string;
   team_head?: number | null;
   priority: number;
   is_active: boolean;
+  
+  hero_caption?: string;
+  hero_bg_desktop?: number;
+  hero_bg_mobile?: number;
+  hero_bg_desktop_details?: {
+    url: string;
+    media_type: 'image' | 'video';
+    caption?: string;
+  };
+  hero_bg_mobile_details?: {
+    url: string;
+    media_type: 'image' | 'video';
+    caption?: string;
+  };
+  
   created_at: string;
 }
 

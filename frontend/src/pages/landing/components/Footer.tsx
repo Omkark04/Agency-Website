@@ -57,8 +57,8 @@ export const Footer = () => {
     {
       title: 'Company',
       links: [
-        { name: 'About Us', url: '#about', isHash: true },
-        { name: 'Testimonials', url: '#testimonials', isHash: true },
+        { name: 'About Us', url: '/about' },
+        { name: 'Testimonials', url: '/#testimonials', isHash: true },
         { name: 'Portfolio', url: '/portfolio' },
         { name: 'Blog', url: '/blog' },
         { name: 'LinkedIn', url: 'https://linkedin.com/company/onekraft', external: true },
@@ -68,7 +68,7 @@ export const Footer = () => {
       title: 'Support',
       links: [
         { name: 'Help Center', url: '/help' },
-        { name: 'Contact Us', url: '/#contact' },
+        { name: 'Contact Us', url: '/contact' },
         { name: 'Privacy Policy', url: '/privacy' },
         { name: 'Terms of Service', url: '/terms' },
         { name: 'FAQ', url: '/faq' },
@@ -84,7 +84,7 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 pt-16 pb-8">
+    <footer className="bg-white border-t border-gray-100 pt-16 pb-8">
       <div className="container mx-auto px-4 md:px-8 lg:px-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Logo and Description */}
@@ -94,7 +94,7 @@ export const Footer = () => {
                 OneKraft
               </div>
             </div>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600">
               Empowering businesses with innovative digital solutions. We help you build, create, and grow your online presence.
             </p>
             
@@ -105,7 +105,7 @@ export const Footer = () => {
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-gray-100 dark:bg-gray-800 hover:bg-[#F5B041] dark:hover:bg-[#F5B041] hover:text-[#0A1F44] p-2 rounded-full text-gray-600 dark:text-gray-400 transition-all duration-300"
+                  className="bg-gray-100 hover:bg-[#F5B041] hover:text-[#0A1F44] p-2 rounded-full text-gray-600 transition-all duration-300"
                   whileHover={{ y: -2 }}
                   aria-label={social.label}
                 >
@@ -125,7 +125,7 @@ export const Footer = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="space-y-4"
             >
-              <h3 className="text-gray-900 dark:text-white font-semibold text-lg">{column.title}</h3>
+              <h3 className="text-gray-900 font-semibold text-lg">{column.title}</h3>
               <ul className="space-y-3">
                 {column.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
@@ -134,7 +134,7 @@ export const Footer = () => {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gray-600 dark:text-gray-400 hover:text-[#015bad] dark:hover:text-[#F5B041] transition-colors duration-300 text-sm"
+                        className="text-gray-600 hover:text-[#015bad] transition-colors duration-300 text-sm"
                       >
                         {link.name}
                       </a>
@@ -142,14 +142,14 @@ export const Footer = () => {
                       <a
                         href={link.url}
                         onClick={(e) => handleHashLinkClick(e, link.url)}
-                        className="text-gray-600 dark:text-gray-400 hover:text-[#015bad] dark:hover:text-[#F5B041] transition-colors duration-300 text-sm cursor-pointer"
+                        className="text-gray-600 hover:text-[#015bad] transition-colors duration-300 text-sm cursor-pointer"
                       >
                         {link.name}
                       </a>
                     ) : (
                       <Link
                         to={link.url}
-                        className="text-gray-600 dark:text-gray-400 hover:text-[#015bad] dark:hover:text-[#F5B041] transition-colors duration-300 text-sm"
+                        className="text-gray-600 hover:text-[#015bad] transition-colors duration-300 text-sm"
                       >
                         {link.name}
                       </Link>
@@ -162,22 +162,22 @@ export const Footer = () => {
         </div>
         
         {/* Bottom Bar */}
-        <div className="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-gray-500 dark:text-gray-500 text-center md:text-left mb-4 md:mb-0">
+        <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-sm text-gray-500 text-center md:text-left mb-4 md:mb-0">
             © {currentYear} OneKraft. All rights reserved.
           </p>
           
           <div className="flex flex-wrap justify-center space-x-6">
-            <Link to="/privacy" className="text-sm text-gray-500 hover:text-[#015bad] dark:hover:text-[#F5B041] transition-colors duration-300">
+            <Link to="/privacy" className="text-sm text-gray-500 hover:text-[#015bad] transition-colors duration-300">
               Privacy Policy
             </Link>
-            <Link to="/terms" className="text-sm text-gray-500 hover:text-[#015bad] dark:hover:text-[#F5B041] transition-colors duration-300">
+            <Link to="/terms" className="text-sm text-gray-500 hover:text-[#015bad] transition-colors duration-300">
               Terms of Service
             </Link>
-            <Link to="/cookies" className="text-sm text-gray-500 hover:text-[#015bad] dark:hover:text-[#F5B041] transition-colors duration-300">
+            <Link to="/cookies" className="text-sm text-gray-500 hover:text-[#015bad] transition-colors duration-300">
               Cookie Policy
             </Link>
-            <Link to="/sitemap" className="text-sm text-gray-500 hover:text-[#015bad] dark:hover:text-[#F5B041] transition-colors duration-300">
+            <Link to="/sitemap" className="text-sm text-gray-500 hover:text-[#015bad] transition-colors duration-300">
               Sitemap
             </Link>
           </div>

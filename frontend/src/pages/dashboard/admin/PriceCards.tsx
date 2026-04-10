@@ -157,17 +157,9 @@ export default function PriceCards() {
                             const service = services.find(s => s.id === c.service);
                             return (
                               <div className="flex items-center gap-3">
-                                {service?.logo ? (
-                                  <img
-                                    src={service.logo}
-                                    alt={service.title}
-                                    className="w-10 h-10 object-cover rounded border"
-                                  />
-                                ) : (
-                                  <div className="p-2 bg-blue-50 rounded-lg">
-                                    <FiPackage className="text-blue-600" />
-                                  </div>
-                                )}
+                                <div className="p-2 bg-blue-50 rounded-lg">
+                                  <FiPackage className="text-blue-600" />
+                                </div>
 
                                 <span className="font-medium text-gray-900">
                                   {service?.title || `Service #${c.service}`}

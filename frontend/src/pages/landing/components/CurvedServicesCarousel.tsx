@@ -126,23 +126,13 @@ export const CurvedServicesCarousel = () => {
                     <div className="relative z-10 flex flex-col h-full justify-between">
                       {/* Service icon/logo */}
                       <div>
-                        {service.logo ? (
-                          <motion.img
-                            src={service.logo}
-                            alt={service.title}
-                            className="w-16 h-16 object-contain mb-3 drop-shadow-lg"
-                            whileHover={{ rotate: 360, scale: 1.1 }}
-                            transition={{ duration: 0.6 }}
-                          />
-                        ) : (
-                          <motion.div
-                            className={`w-16 h-16 bg-gradient-to-br ${service.gradient_colors} rounded-xl flex items-center justify-center mb-3 shadow-lg`}
-                            whileHover={{ rotate: 360, scale: 1.1 }}
-                            transition={{ duration: 0.6 }}
-                          >
-                            <Icon className="w-8 h-8 text-white" />
-                          </motion.div>
-                        )}
+                        <motion.div
+                          className={`w-16 h-16 bg-gradient-to-br ${service.gradient_colors} rounded-xl flex items-center justify-center mb-3 shadow-lg`}
+                          whileHover={{ rotate: 360, scale: 1.1 }}
+                          transition={{ duration: 0.6 }}
+                        >
+                          <Icon className="w-8 h-8 text-white" />
+                        </motion.div>
                         
                         {/* Service title */}
                         <h4 className="text-white font-bold text-lg line-clamp-2 drop-shadow-md">

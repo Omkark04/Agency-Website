@@ -19,8 +19,7 @@ export default function OffersPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['all']);
   const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const { theme } = useTheme();
-  const isDarkMode = theme === 'dark';
+  const isDarkMode = false;
 
   useEffect(() => {
     fetchOffers();

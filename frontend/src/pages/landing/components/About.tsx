@@ -8,7 +8,7 @@ import { Button as MovingBorderContainer } from "@/components/ui/moving-border";
 
 const features = [
   {
-    icon: <Lightbulb className="h-8 w-8 text-[#F5B041]" />,
+    icon: <Lightbulb className="h-8 w-8 text-[#00BCD4]" />,
     title: 'Innovative Solutions',
     description: 'We stay ahead of the curve with cutting-edge technologies and creative approaches to solve complex business challenges.'
   },
@@ -18,12 +18,12 @@ const features = [
     description: 'Your success is our priority. We work closely with you to understand your unique needs and deliver tailored solutions.'
   },
   {
-    icon: <Rocket className="h-8 w-8 text-[#0A1F44] dark:text-[#F5B041]" />,
+    icon: <Rocket className="h-8 w-8 text-[#0A1F44]" />,
     title: 'Rapid Execution',
     description: 'We value your time. Our agile methodology ensures quick turnarounds without compromising on quality.'
   },
   {
-    icon: <Award className="h-8 w-8 text-[#F5B041]" />,
+    icon: <Award className="h-8 w-8 text-[#00BCD4]" />,
     title: 'Proven Track Record',
     description: 'Trusted by businesses of all sizes, we deliver measurable results that drive growth and success.'
   }
@@ -67,13 +67,13 @@ const StackingCard = ({ feature, index, totalCards }: { feature: typeof features
         opacity,
         zIndex,
       }}
-      className="sticky top-20 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700"
+      className="sticky top-20 bg-white p-6 rounded-xl shadow-lg border border-gray-100"
     >
       <div className="bg-[#015bad]/10 p-2 rounded-lg w-fit mb-4">
         {feature.icon}
       </div>
-      <h3 className="font-semibold text-lg mb-2 text-gray-800 dark:text-white">{feature.title}</h3>
-      <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{feature.description}</p>
+      <h3 className="font-semibold text-lg mb-2 text-gray-800">{feature.title}</h3>
+      <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
     </motion.div>
   );
 };
@@ -125,7 +125,7 @@ export const About = () => {
   };
 
   return (
-    <section id="about" className="py-12 md:py-20 bg-white dark:bg-gray-900">
+    <section id="about" className="py-12 md:py-20 bg-white">
       <div className="container mx-auto px-4 md:px-8 lg:px-12">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Left Column - Image */}
@@ -139,20 +139,20 @@ export const About = () => {
             <MovingBorderContainer
               borderRadius="1rem"
               containerClassName="bg-transparent w-full h-auto p-[3px]"
-              className="bg-white dark:bg-gray-800 rounded p-[3px]
-            bg-gradient-to-r from-indigo-500 via-purple-500 to-green-500
+              className="bg-white rounded p-[3px]
+            bg-gradient-to-r from-cyan-500 via-blue-500 to-[#0A1F44]
             transition-all duration-300 hover:scale-[1.02] overflow-hidden w-full h-full"
               duration={3000}
               as="div"
-              borderClassName="bg-[radial-gradient(#06b6d4_40%,transparent_60%)]"
+              borderClassName="bg-[radial-gradient(#00BCD4_40%,transparent_60%)]"
             >
-              <div className="bg-white dark:bg-gray-800 w-full h-full relative">
+              <div className="bg-white w-full h-full relative">
                 {isLoading ? (
                   // Loading skeleton
-                  <div className="h-96 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+                  <div className="h-96 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                     <div className="text-center">
                       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#015bad] mx-auto mb-4"></div>
-                      <span className="text-gray-400 dark:text-gray-600">Loading images...</span>
+                      <span className="text-gray-400">Loading images...</span>
                     </div>
                   </div>
                 ) : aboutImages.length > 0 ? (
@@ -201,10 +201,10 @@ export const About = () => {
                   </div>
                 ) : (
                   // Fallback when no images are found
-                  <div className="h-96 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+                  <div className="h-96 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                     <div className="text-center">
-                      <ImageIcon className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                      <span className="text-gray-400 dark:text-gray-600">About Us</span>
+                      <ImageIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                      <span className="text-gray-400">About Us</span>
                     </div>
                   </div>
                 )}
@@ -221,15 +221,15 @@ export const About = () => {
                     className={`h-2 rounded-full transition-all duration-300 ${
                       index === currentImageIndex 
                         ? 'w-8 bg-gradient-to-r from-[#015bad] to-[#0A1F44]' 
-                        : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'
+                        : 'w-2 bg-gray-300 hover:bg-gray-400'
                     }`}
                     aria-label={`Go to image ${index + 1}`}
                   />
                 ))}
               </div>
             )}
-            <div className="absolute -bottom-6 -right-6 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg w-3/4">
-              <p className="text-gray-600 dark:text-gray-300 text-sm">Expereinced Teams are always ready to help you.</p>
+            <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-xl shadow-lg w-3/4">
+              <p className="text-gray-600 text-sm">Expereinced Teams are always ready to help you.</p>
             </div>
           </motion.div>
 
@@ -241,7 +241,7 @@ export const About = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6 tracking-tight">Why Choose OneKraft?</h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6 md:mb-8 leading-relaxed">
+            <p className="text-gray-600 mb-6 md:mb-8 leading-relaxed">
               At OneKraft, we're more than just a service provider – we're your strategic partner in digital transformation. 
               Our mission is to empower businesses with innovative solutions that drive real results.
             </p>
@@ -255,13 +255,13 @@ export const About = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl hover:shadow-md transition-shadow duration-300"
+                  className="bg-cyan-50/50 border border-cyan-100 p-6 rounded-3xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
                 >
-                  <div className="bg-[#015bad]/10 p-2 rounded-lg w-fit mb-4">
+                  <div className="bg-cyan-100 p-2 rounded-xl w-fit mb-4">
                     {feature.icon}
                   </div>
-                  <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">{feature.description}</p>
+                  <h3 className="font-bold text-xl mb-2 text-gray-900">{feature.title}</h3>
+                  <p className="text-gray-600 text-sm font-medium">{feature.description}</p>
                 </motion.div>
               ))}
             </div>

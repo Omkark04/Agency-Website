@@ -11,7 +11,6 @@ export interface Service {
   id: number;
   title: string;
   slug?: string;
-  logo?: string | null;
   short_description: string;
   long_description?: string;
   department: number;

@@ -29,20 +29,20 @@ export const ClientsSection = () => {
   const marqueeClients = [...clients, ...clients, ...clients, ...clients, ...clients, ...clients, ...clients];
 
   return (
-    <section className="py-24 bg-white dark:bg-gray-900 border-y border-gray-100 dark:border-gray-800 overflow-hidden relative">
+    <section className="py-24 bg-white border-y border-gray-100 overflow-hidden relative">
       {/* Background visual flair */}
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
       <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
       
-      <div className="absolute left-1/4 top-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute right-1/4 top-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute left-1/4 top-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute right-1/4 top-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 text-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold text-sm mb-4 border border-blue-100 dark:border-blue-800/50"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-semibold text-sm mb-4 border border-blue-100"
         >
           <FiTrendingUp /> Trusted By Industry Leaders
         </motion.div>
@@ -52,10 +52,10 @@ export const ClientsSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
-          className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white"
+          className="text-3xl md:text-5xl font-black text-gray-900"
         >
           Empowering the World's
-          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 mt-2">
+          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mt-2">
             Most Innovative Teams
           </span>
         </motion.h2>
@@ -63,10 +63,10 @@ export const ClientsSection = () => {
 
       <div className="relative flex overflow-x-hidden group">
         {/* Left fade overlay */}
-        <div className="absolute top-0 left-0 w-32 md:w-64 h-full bg-gradient-to-r from-white to-transparent dark:from-gray-900 z-10 pointer-events-none" />
+        <div className="absolute top-0 left-0 w-32 md:w-64 h-full bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
         
         {/* Right fade overlay */}
-        <div className="absolute top-0 right-0 w-32 md:w-64 h-full bg-gradient-to-l from-white to-transparent dark:from-gray-900 z-10 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 md:w-64 h-full bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
         {/* CSS Animation style block for marquee */}
         <style>
@@ -92,7 +92,7 @@ export const ClientsSection = () => {
           {marqueeClients.map((client, index) => (
             <div 
               key={`client-${index}`} 
-              className="px-6 md:px-12 flex-shrink-0 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300 transform hover:scale-110"
+              className="px-6 md:px-12 flex-shrink-0 transition-all duration-300 transform hover:scale-110"
             >
               {client.site_link ? (
                 <a href={client.site_link} target="_blank" rel="noopener noreferrer" className="block outline-none" title={client.caption}>

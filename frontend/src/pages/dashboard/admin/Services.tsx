@@ -142,7 +142,6 @@ const Services = () => {
             <table className="services__table">
               <thead className="services__table-head">
                 <tr>
-                  <th>Logo</th>
                   <th>Service</th>
                   <th>Department</th>
                   <th>Status</th>
@@ -154,20 +153,7 @@ const Services = () => {
                 {filteredServices.map(service => (
                   <tr key={service.id}>
 
-                    {/* ✅ LOGO COLUMN */}
-                    <td className="services__table-cell">
-                      {service.logo ? (
-                        <img
-                          src={service.logo}
-                          alt={service.title}
-                          className="services__logo"
-                        />
-                      ) : (
-                        <div className="services__logo-placeholder">
-                          <FiImage />
-                        </div>
-                      )}
-                    </td>
+
 
                     {/* ✅ TITLE */}
                     <td className="services__table-cell services__title">{service.title}</td>

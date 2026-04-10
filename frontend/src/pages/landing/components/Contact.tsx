@@ -94,14 +94,14 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" className="py-20 bg-gray-50 dark:bg-gray-900">
+    <section id="contact" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-6xl">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Get In Touch
           </h2>
           <div className="w-20 h-1 bg-gradient-to-r from-[#015bad] to-[#0A1F44] mx-auto mb-6"></div>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-gray-600 max-w-2xl mx-auto">
             Have a project in mind or want to discuss how we can help? Send us a message
             and our team will get back to you shortly.
           </p>
@@ -116,13 +116,13 @@ const Contact = () => {
             transition={{ duration: 0.6 }}
             className="w-full lg:w-1/2"
           >
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+            <div className="bg-white rounded-xl shadow-lg p-8">
               {submitStatus && (
                 <div
                   className={`p-4 mb-6 rounded-lg ${
                     submitStatus.success
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200'
-                      : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-red-100 text-red-700'
                   }`}
                 >
                   {submitStatus.message}
@@ -132,7 +132,7 @@ const Contact = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                       Full Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -141,13 +141,13 @@ const Contact = () => {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300"
                       placeholder="John Doe"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                       Email Address <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -156,7 +156,7 @@ const Contact = () => {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300"
                       placeholder="john@example.com"
                       required
                     />
@@ -164,7 +164,7 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
                     Phone Number
                   </label>
                   <input
@@ -173,20 +173,20 @@ const Contact = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300"
                     placeholder="+91 98765 43210"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="department" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-1">
                     Department <span className="text-red-500">*</span>
                   </label>
                   <select
                     id="department"
                     value={selectedDepartment}
                     onChange={(e) => setSelectedDepartment(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300 appearance-none"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300 appearance-none"
                     required
                   >
                     <option value="">Select Department</option>
@@ -199,7 +199,7 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="service" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="service" className="block text-sm font-medium text-gray-700 mb-1">
                     Service <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -207,7 +207,7 @@ const Contact = () => {
                     name="service_id"
                     value={formData.service_id}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300 appearance-none"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300 appearance-none"
                     required
                     disabled={!selectedDepartment}
                   >
@@ -221,7 +221,7 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
                     Your Message <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -231,7 +231,7 @@ const Contact = () => {
                     value={formData.message}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300 resize-none"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 focus:ring-2 focus:ring-[#015bad] focus:border-transparent transition-all duration-300 resize-none"
                     placeholder="Tell us about your project..."
                   ></textarea>
                 </div>
@@ -271,8 +271,8 @@ const Contact = () => {
             className="space-y-8 w-full lg:w-1/2"
           >
             <div>
-              <h3 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Contact Information</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-8">
+              <h3 className="text-2xl font-bold mb-6 text-gray-900">Contact Information</h3>
+              <p className="text-gray-600 mb-8">
                 Have questions or want to discuss your project? Reach out to us through any of these channels.
               </p>
 
@@ -285,30 +285,30 @@ const Contact = () => {
                     <Mail className="h-6 w-6 text-[#0A1F44]" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white">Email Us</h4>
+                    <h4 className="font-semibold text-gray-900">Email Us</h4>
                     <a href="mailto:info@onekraft.com" className="text-[#0A1F44] hover:underline">onekraft.official@gmail.com</a>
                   </div>
                 </div>
 
                 <div className="flex items-start">
-                  <div className="bg-[#0A1F44]/10 dark:bg-[#015bad]/10 p-3 rounded-full mr-4">
-                    <Phone className="h-6 w-6 text-[#0A1F44] dark:text-[#F5B041]" />
+                  <div className="bg-[#0A1F44]/10 p-3 rounded-full mr-4">
+                    <Phone className="h-6 w-6 text-[#0A1F44]" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white">Call Us</h4>
-                    <a href="tel:+918390498423" className="text-gray-600 dark:text-gray-400 hover:underline">+91 83904 98423</a>
+                    <h4 className="font-semibold text-gray-900">Call Us</h4>
+                    <a href="tel:+918390498423" className="text-gray-600 hover:underline">+91 83904 98423</a>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-12">
-                <h4 className="font-semibold text-gray-900 dark:text-white mb-4">Follow Us</h4>
+               <div className="mt-12">
+                <h4 className="font-semibold text-gray-900 mb-4">Follow Us</h4>
                 <div className="flex space-x-4">
                   <a
                     href="https://facebook.com/onekraft"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300 text-[#1877F2]"
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-300 text-[#1877F2]"
                     aria-label="Facebook"
                   >
                     <Facebook size={20} />
@@ -317,7 +317,7 @@ const Contact = () => {
                     href="https://twitter.com/onekraft"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300 text-[#1DA1F2]"
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-300 text-[#1DA1F2]"
                     aria-label="Twitter"
                   >
                     <Twitter size={20} />
@@ -326,7 +326,7 @@ const Contact = () => {
                     href="https://instagram.com/onekraft"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300 text-[#E4405F]"
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-300 text-[#E4405F]"
                     aria-label="Instagram"
                   >
                     <Instagram size={20} />
@@ -335,7 +335,7 @@ const Contact = () => {
                     href="https://linkedin.com/company/onekraft"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300 text-[#0A66C2]"
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-300 text-[#0A66C2]"
                     aria-label="LinkedIn"
                   >
                     <Linkedin size={20} />

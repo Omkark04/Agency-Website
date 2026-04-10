@@ -44,6 +44,9 @@ import AdminProfile from '../pages/dashboard/admin/Profile';
 import ClientProfile from '../pages/dashboard/client/Profile';
 import ServiceHeadProfile from '../pages/dashboard/teamhead/Profile';
 import TeamMemberProfile from '../pages/dashboard/teammember/Profile';
+import AboutPage from '../pages/AboutPage';
+import ContactPage from '../pages/ContactPage';
+import TestimonialsPage from '../pages/TestimonialsPage';
 
 // Support Pages
 import HelpCenter from '../pages/support/HelpCenter';
@@ -61,22 +64,30 @@ import BlogEditor from '../components/blog/BlogEditor';
 import { NotificationsPage } from '../pages/Notifications';
 import SettingsPage from '../pages/dashboard/shared/SettingsPage';
 import DepartmentPage from '../pages/DepartmentPage';
+import { StaticThemeWrapper } from '../components/layout/StaticThemeWrapper';
 
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
 
-      {/* ✅ PUBLIC */}
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/departments/:slug" element={<DepartmentPage />} />
-      <Route path="/pricing-plans" element={<PricingPlansPage />} />
-      <Route path="/help" element={<HelpCenter />} />
-      <Route path="/privacy" element={<PrivacyPolicy />} />
-      <Route path="/terms" element={<TermsOfService />} />
-      <Route path="/faq" element={<FAQ />} />
-      <Route path="/blog" element={<Blog />} />
-      <Route path="/blog/:id" element={<BlogDetail />} />
-      <Route path="/offers" element={<OffersPage />} />
+      {/* ✅ PUBLIC - Forced Dark Theme */}
+      <Route element={<StaticThemeWrapper />}>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/departments/:slug" element={<DepartmentPage />} />
+        <Route path="/pricing-plans" element={<PricingPlansPage />} />
+        <Route path="/help" element={<HelpCenter />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:id" element={<BlogDetail />} />
+        <Route path="/offers" element={<OffersPage />} />
+        <Route path="/portfolio" element={<PortfolioPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/testimonials" element={<TestimonialsPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+      </Route>
+
       <Route path="/auth/callback" element={<OAuthCallback />} />
 
       {/* ✅ PROTECTED DASHBOARD WITH LAYOUT */}

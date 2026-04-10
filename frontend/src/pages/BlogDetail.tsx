@@ -58,16 +58,8 @@ export default function BlogDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-[#0A1F44] to-[#1a365d] text-white py-12">
-        <div className="container mx-auto px-4">
-          <Link to="/blog" className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Blog
-          </Link>
-        </div>
-      </div>
+    <div className="bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <div className="pt-24 md:pt-32"></div>
 
       {/* Content */}
       <div className="container mx-auto px-4 py-12">
