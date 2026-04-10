@@ -298,7 +298,7 @@ export const IntroAnimation = ({
                 }}
                 className="relative z-10 mt-10 md:mt-12"
               >
-                <div className={`grid grid-cols-2 gap-x-4 gap-y-3 sm:gap-x-8 sm:gap-y-4 max-w-4xl mx-auto items-center justify-center`}>
+                <div className={`grid grid-cols-1 md:grid-cols-2 gap-y-3 md:gap-x-12 md:gap-y-6 max-w-4xl mx-auto items-center justify-center`}>
                   {departments.map((dept, idx) => (
                     <motion.div
                       key={dept}
@@ -307,11 +307,13 @@ export const IntroAnimation = ({
                         visible: { opacity: 1, y: 0 }
                       }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
-                      className="flex items-center justify-center"
+                      className="flex items-center justify-center md:block"
                     >
-                      <p className={`intro-subtitle whitespace-nowrap uppercase tracking-[0.15em] font-medium ${
-                        isMobile ? 'text-[10px] sm:text-xs' : 'text-xs sm:text-sm md:text-base'
-                      } ${idx % 2 === 0 ? 'text-right pr-2 border-r border-blue-500/30' : 'text-left pl-2'}`}>
+                      <p className={`intro-subtitle uppercase tracking-[0.18em] font-medium transition-all
+                        text-center md:text-left
+                        ${isMobile ? 'text-[10px] leading-relaxed px-4' : 'text-xs sm:text-sm md:text-base whitespace-nowrap'}
+                        ${!isMobile && idx % 2 === 0 ? 'md:text-right md:border-r md:border-blue-500/30 md:pr-6 md:pl-0' : !isMobile ? 'md:pl-6' : ''}
+                      `}>
                         {dept}
                       </p>
                     </motion.div>

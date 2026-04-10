@@ -247,7 +247,8 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
 
               {/* Departments List - Mobile Only */}
               {departments.length > 0 && (
-                <div className="block md:hidden mt-6 -mx-4">
+                <div className="block md:hidden mt-6 overflow-hidden">
+                  <div className="-mx-4">
                   <style>{`
                     @keyframes marquee-departments {
                       0% { transform: translateX(0); }
@@ -310,7 +311,8 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
               {/* Stats - Mobile Only (below departments) */}
               <div className="block md:hidden mt-6 w-full max-w-full overflow-x-hidden">

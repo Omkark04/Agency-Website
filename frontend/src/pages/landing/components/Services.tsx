@@ -304,7 +304,7 @@ export const Services = () => {
                 <motion.div
                   key={department.id}
                   onClick={() => navigate(`/departments/${department.slug}`)}
-                  className={`group relative flex flex-col items-center justify-center py-8 px-10 w-full max-w-[280px] transition-all duration-300 cursor-pointer rounded-3xl shadow-lg border ${isBranding
+                  className={`group relative flex flex-col items-center justify-center py-8 px-8 w-full max-w-[340px] md:max-w-none transition-all duration-300 cursor-pointer rounded-3xl shadow-lg border ${isBranding
                       ? 'border-[#E1306C] bg-white'
                       : 'border-cyan-100 bg-cyan-50/20'
                     }`}

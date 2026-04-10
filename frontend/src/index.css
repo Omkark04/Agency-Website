@@ -27,21 +27,23 @@ a:hover {
 }
 
 html {
-  height: 100%;
+  height: auto;
+  min-height: 100%;
   overflow-x: hidden;
 }
 
-body, #root {
+body {
   margin: 0;
   padding: 0;
   width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
+  display: block;
 }
 
-body {
-  display: block;
-  overflow-x: hidden;
+#root {
+  width: 100%;
+  min-height: 100vh;
 }
 
 /* Hide scrollbar but keep functionality */

@@ -167,7 +167,7 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
             : 'bg-white border-b border-gray-100'
         }`}
       >
-        <div className="py-0.5 md:py-1 max-w-7xl w-full px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="py-0.5 md:py-1 max-w-7xl w-full px-4 sm:px-6 md:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-4 sm:gap-8 md:gap-28">
 
             {/* Logo */}

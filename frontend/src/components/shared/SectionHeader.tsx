@@ -68,6 +68,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           max-w-3xl 
           ${marginClass} 
           leading-relaxed
+          break-words
         `}>
           {description}
         </p>
