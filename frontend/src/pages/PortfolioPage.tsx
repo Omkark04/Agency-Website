@@ -119,10 +119,9 @@ export const PortfolioPage = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           {/* Hero Section */}
           <SectionHeader
-            badge="Our Work Portfolio"
-            icon={<Briefcase className="h-5 w-5 mr-1" />}
-            title="Explore Our Success Stories"
-            caption="Visual stories"
+            caption="Our Work Portfolio"
+            title="Explore Our"
+            highlightedTitle="Success Stories"
             description="Browse through our portfolio and customize any project to fit your business needs"
           />
 
