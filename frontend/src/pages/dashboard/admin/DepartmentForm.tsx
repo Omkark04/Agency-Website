@@ -96,11 +96,11 @@ export default function DepartmentForm({ initial, onSaved }: any) {
       if (logo) formData.append('logo', logo);
 
       if (initial?.id) {
-        await api.patch(`/api/services/departments/${initial.id}/`, formData, {
+        await api.patch(`/api/departments/${initial.id}/`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       } else {
-        await api.post('/api/services/departments/', formData, {
+        await api.post('/api/departments/', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       }

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { FaSearch, FaClipboardList, FaCode, FaRocket } from 'react-icons/fa';
 import { useProtectedNavigation } from '../../../hooks/useProtectedNavigation';
 import { AuthModal } from './AuthModal';
+import { SectionHeader } from '../../../components/shared/SectionHeader';
 
 
 const Process = () => {
@@ -44,23 +45,12 @@ const Process = () => {
   return (
     <section className="py-12 md:py-20 bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4 md:px-8 lg:px-12">
-        <motion.div 
-          className="text-center mb-8 md:mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] dark:text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
-            Our Process
-          </span>
-          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent tracking-tight leading-tight px-4">
-            How We Work
-          </h2>
-          <p className="hidden md:block text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
-            Our proven 4-step process ensures that every project is delivered on time, within budget, and exceeds your expectations.
-          </p>
-        </motion.div>
+        <SectionHeader
+          caption="Success roadmap"
+          title="How"
+          highlightedTitle="We Work"
+          description="Our proven 4-step process ensures that every project is delivered on time, within budget, and exceeds your expectations."
+        />
 
         {/* Desktop: Horizontal Progressive Layout */}
         <div className="hidden md:block relative">

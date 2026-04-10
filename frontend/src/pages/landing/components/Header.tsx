@@ -269,11 +269,11 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
               )}
             </div>
 
-            {/* Mobile Menu Toggle */}
-            <div className="lg:hidden -mr-1">
+            <div className="lg:hidden">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 transition-colors duration-300"
+                className="p-2 rounded-lg bg-transparent border-none hover:bg-gray-100 transition-colors duration-300 flex items-center justify-center p-0"
+                style={{ background: 'transparent', border: 'none' }}
                 aria-label="Toggle menu"
               >
                 {isMobileMenuOpen ? (

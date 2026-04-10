@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { SectionHeader } from '../../../components/shared/SectionHeader';
 import { listClientLogos, ClientLogo } from '../../../api/clientLogos';
 import { FiTrendingUp } from 'react-icons/fi';
 
@@ -14,7 +15,7 @@ export const ClientsSection = () => {
         const res = await listClientLogos({ is_active: true });
         setClients(res.data);
       } catch (err) {
-        console.error("Failed to load client logos:", err);
+        // Silently fail
       } finally {
         setLoading(false);
       }
@@ -37,29 +38,12 @@ export const ClientsSection = () => {
       <div className="absolute left-1/4 top-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute right-1/4 top-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 text-center relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-semibold text-sm mb-4 border border-blue-100"
-        >
-          <FiTrendingUp /> Trusted By Industry Leaders
-        </motion.div>
-        
-        <motion.h2 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-          className="text-3xl md:text-5xl font-black text-gray-900"
-        >
-          Empowering the World's
-          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mt-2">
-            Most Innovative Teams
-          </span>
-        </motion.h2>
-      </div>
+      <SectionHeader
+        caption="Trusted by leaders"
+        title="Empowering the World's"
+        highlightedTitle="Most Innovative Teams"
+        className="mb-12"
+      />
 
       <div className="relative flex overflow-x-hidden group">
         {/* Left fade overlay */}

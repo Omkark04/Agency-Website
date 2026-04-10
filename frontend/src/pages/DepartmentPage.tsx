@@ -4,6 +4,7 @@ import {
   Check, Home, ArrowLeft, Sparkles, Clock, Star, Filter, X, ChevronRight, Eye, RefreshCw, Search,
   Globe, Smartphone, Palette, Code, BarChart, LineChart
 } from 'lucide-react';
+import { SectionHeader } from '../components/shared/SectionHeader';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { listPriceCards, type PriceCard } from '../api/pricecards';
 import { listServices, type Service } from '../api/services';
@@ -240,7 +241,7 @@ export default function DepartmentPage() {
       setPortfolio(portRes);
       setSelectedService(null);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      // Silently fail or use a more refined error reporting mechanism
     } finally {
       setLoading(false);
     }
@@ -388,10 +389,13 @@ export default function DepartmentPage() {
       <div className="max-w-7xl mx-auto w-full px-3 sm:px-4 md:px-8 lg:px-12 py-10 md:py-20 pb-20">
 
         {/* ── Services & Pricing header ── */}
-        <div className="text-center mb-8 md:mb-14">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            Services &amp; Pricing Plans
-          </h2>
+        <SectionHeader
+          caption="Our expertise"
+          title="Services &"
+          highlightedTitle="Pricing Plans"
+          description={department?.short_description || `Explore our specialized ${department?.title} services and find the perfect plan for your business needs.`}
+          className="mb-8 md:mb-10"
+        />
 
           {/* FIX: column layout — search full-width, tier pills scroll horizontally */}
           <div className="flex flex-col gap-3 items-center">
@@ -421,7 +425,6 @@ export default function DepartmentPage() {
               ))}
             </div>
           </div>
-        </div>
 
         {/* ── Services listing ── */}
         <div className="space-y-8 md:space-y-12">

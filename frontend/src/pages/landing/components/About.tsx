@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { fetchAboutImages } from '../../../api/media';
 import type { MediaItem } from '../../../api/media';
 import { Button as MovingBorderContainer } from "@/components/ui/moving-border";
+import { SectionHeader } from '../../../components/shared/SectionHeader';
 
 
 const features = [
@@ -106,7 +107,7 @@ export const About = () => {
       const images = await fetchAboutImages();
       setAboutImages(images);
     } catch (error) {
-      console.error('Failed to load about images:', error);
+      // Silently fail
     } finally {
       setIsLoading(false);
     }
@@ -240,11 +241,14 @@ export const About = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6 tracking-tight">Why Choose OneKraft?</h2>
-            <p className="text-gray-600 mb-6 md:mb-8 leading-relaxed">
-              At OneKraft, we're more than just a service provider – we're your strategic partner in digital transformation. 
-              Our mission is to empower businesses with innovative solutions that drive real results.
-            </p>
+            <SectionHeader
+              caption="Our story"
+              title="Why Choose"
+              highlightedTitle="OneKraft?"
+              description="At OneKraft, we're more than just a service provider – we're your strategic partner in digital transformation. Our mission is to empower businesses with innovative solutions that drive real results."
+              align="left"
+              className="mb-8"
+            />
             
             {/* Desktop: Grid Layout */}
             <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-6">

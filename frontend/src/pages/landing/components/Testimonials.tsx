@@ -6,6 +6,7 @@ import { listTestimonials, createTestimonial } from '../../../api/testinomials';
 import type { TestimonialSubmission, Testimonial } from '../../../api/testinomials';
 import { listServices } from '../../../api/services';
 import { getTestimonialStats } from '../../../api/testinomials';
+import { SectionHeader } from '../../../components/shared/SectionHeader';
 
 
 const Testimonials = () => {
@@ -55,7 +56,7 @@ const Testimonials = () => {
         : ((response.data as any).results || []);
       setServices(servicesData);
     } catch (error) {
-      console.error('Error fetching services:', error);
+      // Silently fail
     }
   };
 
@@ -132,7 +133,6 @@ const Testimonials = () => {
       setTimeout(() => fetchTestimonials(), 2000);
     } catch (error) {
       alert('Failed to submit testimonial. Please try again.');
-      console.error('Error submitting testimonial:', error);
     } finally {
       setSubmitting(false);
     }
@@ -168,29 +168,17 @@ const Testimonials = () => {
       <div className="absolute bottom-1/4 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
       
       <div className="container mx-auto px-4 md:px-8 lg:px-12 relative">
-        <motion.div 
-          className="text-center mb-8 md:mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-3 py-1.5 md:px-4 md:py-2 mb-4 md:mb-6">
-            <Sparkles className="h-3 w-3 md:h-4 md:w-4 text-cyan-300" />
-            <span className="text-xs md:text-sm text-cyan-300 font-medium">Trusted by Industry Leaders</span>
-            <Sparkles className="h-3 w-3 md:h-4 md:w-4 text-cyan-300" />
-          </div>
-          
-          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent animate-gradient-x tracking-tight leading-tight px-4">
-            Client Success Stories
-          </h2>
-          
-          <p className="hidden md:block text-gray-300 max-w-2xl mx-auto text-lg leading-relaxed">
-            Discover why industry leaders choose us. Real results from real partnerships.
-          </p>
+        <div className="text-center">
+          <SectionHeader
+            caption="What they say"
+            title="Client"
+            highlightedTitle="Success Stories"
+            description="Discover why industry leaders choose us. Real results from real partnerships."
+            dark
+          />
           
           {/* Stats Bar */}
-          <div className="flex flex-wrap justify-center gap-4 md:gap-8 mt-6 md:mt-10">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-10">
             <div className="text-center">
               <div className="text-2xl md:text-3xl font-bold text-cyan-300">{stats.satisfaction}%</div>
               <div className="text-xs md:text-sm text-gray-400">Satisfaction</div>
@@ -208,7 +196,7 @@ const Testimonials = () => {
           {/* Add testimonial button */}
           <motion.button
             onClick={() => setShowForm(true)}
-            className="mt-6 md:mt-8 group relative inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold py-2.5 px-6 md:py-3 md:px-8 rounded-full text-sm md:text-base transition-all duration-300 overflow-hidden"
+            className="group relative inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold py-2.5 px-6 md:py-3 md:px-8 rounded-full text-sm md:text-base transition-all duration-300 overflow-hidden"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -217,7 +205,7 @@ const Testimonials = () => {
             <span className="hidden sm:inline">Share Your Experience</span>
             <span className="sm:hidden">Share</span>
           </motion.button>
-        </motion.div>
+        </div>
 
         {testimonials.length === 0 ? (
           <div className="text-center py-12 max-w-md mx-auto">

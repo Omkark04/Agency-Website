@@ -11,6 +11,7 @@ import { fetchPortfolioProjects, type PortfolioProject } from '../api/portfolio'
 import { listDepartments, type Department } from '../api/departments';
 import { listServices, type Service } from '../api/services';
 import { useToast } from '../components/Toast';
+import { SectionHeader } from '../components/shared/SectionHeader';
 
 export const PortfolioPage = () => {
   const navigate = useNavigate();
@@ -117,24 +118,13 @@ export const PortfolioPage = () => {
       <main className="pt-24 md:pt-36 pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           {/* Hero Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 rounded-full mb-4">
-              <Briefcase className="h-5 w-5 text-[#F5B041]" />
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Our Work Portfolio
-              </span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              Explore Our <span className="bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent">Success Stories</span>
-            </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Browse through our portfolio and customize any project to fit your business needs
-            </p>
-          </motion.div>
+          <SectionHeader
+            badge="Our Work Portfolio"
+            icon={<Briefcase className="h-5 w-5 mr-1" />}
+            title="Explore Our Success Stories"
+            caption="Visual stories"
+            description="Browse through our portfolio and customize any project to fit your business needs"
+          />
 
           {/* Filters */}
           <PortfolioFilters

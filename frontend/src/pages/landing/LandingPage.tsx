@@ -32,7 +32,7 @@ export const LandingPage = () => {
     <>
       {/* Main Content - Always rendered so it shows through transparent text */}
       <div 
-        className={`min-h-screen overflow-x-hidden transition-opacity duration-500 bg-white text-gray-900 ${
+        className={`transition-opacity duration-500 bg-white text-gray-900 ${
           isLoaded ? 'opacity-100' : 'opacity-0'
         }`}
       >
@@ -58,7 +58,7 @@ export const LandingPage = () => {
           }}
         />
         
-        <main className="overflow-x-hidden">
+        <main>
           <Hero onGetStartedClick={() => setIsAuthModalOpen(true)} />
           <Services />
           <ClientsSection />

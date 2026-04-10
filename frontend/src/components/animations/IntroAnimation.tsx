@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { listDepartments } from '../../api/departments';
 
 interface IntroAnimationProps {
   onComplete: () => void;
@@ -12,17 +13,20 @@ interface IntroAnimationProps {
 export const IntroAnimation = ({ 
   onComplete, 
   title = "OneKraft", 
-  subtitle = "",
+  subtitle: initialSubtitle = "",
   duration,
   page = 'landing'
 }: IntroAnimationProps) => {
   // Determine duration based on page if not explicitly provided
-  const animationDuration = duration ?? (page === 'pricing-plans' ? 3000 : 4000);
+  const animationDuration = duration ?? (page === 'pricing-plans' ? 3000 : 5000);
   
   const [showSlogan, setShowSlogan] = useState(false);
   const [showParticles, setShowParticles] = useState(false);
   const [scaleOut, setScaleOut] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  
+  const [departments, setDepartments] = useState<string[]>([]);
+
   const prefersReducedMotion = useReducedMotion();
   const animationFrameRef = useRef<number | undefined>(undefined);
   const startTimeRef = useRef<number>(0);
@@ -45,6 +49,21 @@ export const IntroAnimation = ({
       animationFrameRef.current = undefined;
     }
   };
+
+  // Fetch departments
+  useEffect(() => {
+    const fetchDepts = async () => {
+      try {
+        const res = await listDepartments({ is_active: true });
+        if (res.data && res.data.length > 0) {
+          setDepartments(res.data.map((d: any) => d.title));
+        }
+      } catch (err) {
+        // Fallback to static if needed, but we'll try to get real titles
+      }
+    };
+    fetchDepts();
+  }, []);
 
   useEffect(() => {
     if (prefersReducedMotion) {
@@ -118,8 +137,7 @@ export const IntroAnimation = ({
             willChange: 'opacity',
           }}
         >
-          <style jsx>{`
-
+          <style>{`
             .intro-title {
               background: linear-gradient(
                 135deg,
@@ -265,24 +283,57 @@ export const IntroAnimation = ({
               </h1>
             </motion.div>
 
-            {/* Subtitle */}
-            <AnimatePresence>
-              {showSlogan && !scaleOut && subtitle && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                  className="relative z-10 mt-8 md:mt-10"
-                >
-                  <p className={`intro-subtitle text-center max-w-3xl mx-auto uppercase tracking-widest ${
-                    isMobile ? 'text-sm sm:text-base' : 'text-base sm:text-lg md:text-xl lg:text-2xl'
-                  }`}>
-                    {subtitle}
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Departments Grid */}
+            {showSlogan && !scaleOut && departments.length > 0 && (
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  visible: {
+                    transition: {
+                      staggerChildren: 0.1,
+                      delayChildren: 0.2
+                    }
+                  }
+                }}
+                className="relative z-10 mt-10 md:mt-12"
+              >
+                <div className={`grid grid-cols-2 gap-x-4 gap-y-3 sm:gap-x-8 sm:gap-y-4 max-w-4xl mx-auto items-center justify-center`}>
+                  {departments.map((dept, idx) => (
+                    <motion.div
+                      key={dept}
+                      variants={{
+                        hidden: { opacity: 0, y: 10 },
+                        visible: { opacity: 1, y: 0 }
+                      }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
+                      className="flex items-center justify-center"
+                    >
+                      <p className={`intro-subtitle whitespace-nowrap uppercase tracking-[0.15em] font-medium ${
+                        isMobile ? 'text-[10px] sm:text-xs' : 'text-xs sm:text-sm md:text-base'
+                      } ${idx % 2 === 0 ? 'text-right pr-2 border-r border-blue-500/30' : 'text-left pl-2'}`}>
+                        {dept}
+                      </p>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {!departments.length && showSlogan && !scaleOut && initialSubtitle && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="relative z-10 mt-8 text-center"
+              >
+                <p className={`intro-subtitle uppercase tracking-[0.2em] font-medium ${
+                  isMobile ? 'text-sm' : 'text-lg'
+                }`}>
+                  {initialSubtitle}
+                </p>
+              </motion.div>
+            )}
             
             {/* Decorative Bottom Line */}
             {!scaleOut && (

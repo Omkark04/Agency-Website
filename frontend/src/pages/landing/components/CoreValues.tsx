@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { SectionHeader } from '../../../components/shared/SectionHeader';
 import { Users, Hammer, Lightbulb, Shield, Heart, TrendingUp } from 'lucide-react';
 
 const coreValues = [
@@ -48,25 +49,12 @@ export const CoreValues = () => {
   return (
     <section className="py-24 bg-white">
       <div className="container mx-auto px-4 md:px-8 lg:px-12">
-        <div className="text-center mb-16">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-bold text-gray-900 mb-4"
-          >
-            Our Core Values
-          </motion.h2>
-          <motion.div 
-            initial={{ width: 0 }}
-            whileInView={{ width: '80px' }}
-            viewport={{ once: true }}
-            className="h-1.5 bg-gradient-to-r from-[#015bad] to-[#F5B041] mx-auto rounded-full"
-          />
-          <p className="text-gray-600 mt-6 max-w-2xl mx-auto text-lg font-medium">
-            The principles that define our culture and drive our commitment to your success.
-          </p>
-        </div>
+        <SectionHeader
+          caption="The foundation"
+          title="Our"
+          highlightedTitle="Core Values"
+          description="The principles that define our culture and drive our commitment to your success."
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {coreValues.map((value, index) => (

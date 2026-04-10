@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Send, MapPin, Mail, Phone, Facebook, Twitter, Instagram, Linkedin, MessageCircle } from 'lucide-react';
 import api from '../../../api/api';
+import { SectionHeader } from '../../../components/shared/SectionHeader';
 
 
 const Contact = () => {
@@ -25,7 +26,9 @@ const Contact = () => {
   useEffect(() => {
     api.get('/api/departments/')
       .then(res => setDepartments(res.data))
-      .catch(err => console.error(err));
+      .catch(err => {
+        // Silently fail or use a global notification
+      });
   }, []);
 
   // Load services when department changes
@@ -36,7 +39,9 @@ const Contact = () => {
     }
     api.get(`/api/services/?department=${selectedDepartment}`)
       .then(res => setServices(res.data))
-      .catch(err => console.error(err));
+      .catch(err => {
+        // Silently fail
+      });
   }, [selectedDepartment]);
 
   const handleChange = (
@@ -96,16 +101,13 @@ const Contact = () => {
   return (
     <section id="contact" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-6xl">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Get In Touch
-          </h2>
-          <div className="w-20 h-1 bg-gradient-to-r from-[#015bad] to-[#0A1F44] mx-auto mb-6"></div>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Have a project in mind or want to discuss how we can help? Send us a message
-            and our team will get back to you shortly.
-          </p>
-        </div>
+        {/* Section Header */}
+        <SectionHeader
+          caption="Reach out"
+          title="Get"
+          highlightedTitle="In Touch"
+          description="Have a project in mind or want to discuss how we can help? Send us a message and our team will get back to you shortly."
+        />
 
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Contact Form */}

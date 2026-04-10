@@ -8,6 +8,7 @@ import { listServices } from '../../../api/services';
 import type { Service } from '../../../api/services';
 import { Button as MovingBorderContainer } from "@/components/ui/moving-border";
 import DynamicFormRenderer from '../../../components/forms/DynamicFormRenderer';
+import { SectionHeader } from '../../../components/shared/SectionHeader';
 import {
   Dialog,
   DialogContent,
@@ -44,7 +45,7 @@ export const Pricing = () => {
       setCards(cardsRes.data);
       setServices(servicesRes.data);
     } catch (error) {
-      console.error('Error fetching pricing data:', error);
+      // Silently fail
     } finally {
       setLoading(false);
     }
@@ -176,23 +177,12 @@ export const Pricing = () => {
       <section id="pricing" className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
         <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
           {/* Section Header */}
-           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-8 md:mb-12"
-          >
-            <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/20 to-[#0A1F44]/20 text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
-              <Sparkles className="inline-block w-3 h-3 md:w-4 md:h-4 mr-2" />
-              Pricing Plans
-            </span>
-            <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent tracking-tight leading-tight px-4">
-              Simple, Transparent Pricing
-            </h2>
-            <p className="hidden md:block text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed">
-              Choose the perfect plan that fits your business needs. No hidden fees, cancel anytime.
-            </p>
-          </motion.div>
+          <SectionHeader
+            caption="Select your deal"
+            title="Simple, Transparent"
+            highlightedTitle="Pricing"
+            description="Choose the perfect plan that fits your business needs. No hidden fees, cancel anytime."
+          />
 
           {displayCards.length === 0 ? (
             <motion.div

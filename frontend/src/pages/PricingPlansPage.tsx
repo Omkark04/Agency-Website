@@ -23,6 +23,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { SEOHead } from '../components/shared/SEOHead';
+import { SectionHeader } from '../components/shared/SectionHeader';
 import { useAuth } from '../hooks/useAuth';
 import IntroAnimation from '../components/animations/IntroAnimation';
 import { useIntro } from '../context/IntroContext';
@@ -210,11 +211,8 @@ export default function PricingPlansPage() {
   const { hasViewedPricingIntro, setHasViewedPricingIntro } = useIntro();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [showIntro, setShowIntro] = useState(!hasViewedPricingIntro);
-
   const handleIntroComplete = () => {
-    setShowIntro(false);
-    setHasViewedPricingIntro(true);
+    // No longer used but kept for context if needed, or can be removed
   };
 
   useEffect(() => {
@@ -265,7 +263,7 @@ export default function PricingPlansPage() {
       setDesktopImages(desktopImgs);
       setMobileImages(mobileImgs);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      // Silently fail
     } finally {
       setLoading(false);
     }
@@ -403,16 +401,6 @@ export default function PricingPlansPage() {
 
   return (
     <>
-      <AnimatePresence>
-        {showIntro && (
-          <IntroAnimation
-            onComplete={handleIntroComplete}
-            title="Our Services"
-            subtitle={null}
-            duration={2000}
-          />
-        )}
-      </AnimatePresence>
       <SEOHead 
         title="Pricing Plans"
         description="Choose the perfect plan for your business needs. Transparent pricing for web development, design, and digital marketing services."
@@ -478,24 +466,19 @@ export default function PricingPlansPage() {
             </div>
 
             <div className="relative z-10 container mx-auto px-4 pt-32 md:pt-40 pb-16 md:pb-20 text-center">
-                 <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                 >
-                    <span className="inline-block px-4 py-1.5 rounded-full bg-white/50 backdrop-blur-sm border border-gray-200 text-[#F5B041] text-sm font-semibold mb-6 shadow-sm">
-                        <Sparkles className="inline-block w-4 h-4 mr-2" />
-                        {selectedDepartment 
-                          ? departments.find(d => d.id === selectedDepartment)?.name || 'Complete Catalog'
-                          : 'Complete Catalog'
-                        }
-                    </span>
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-6 leading-tight pb-4">
-                        {selectedDepartment 
-                          ? `${departments.find(d => d.id === selectedDepartment)?.name} Plans`
-                          : 'All Pricing Plans'
-                        }
-                    </h1>
+                 <div className="mb-0">
+                    <SectionHeader
+                      caption={selectedDepartment 
+                        ? departments.find(d => d.id === selectedDepartment)?.name || 'Service Category'
+                        : 'Complete Catalog'}
+                      title={selectedDepartment 
+                        ? `${departments.find(d => d.id === selectedDepartment)?.name}`
+                        : 'ALL PRICING'}
+                      highlightedTitle={selectedDepartment ? "PLANS" : "PLANS"}
+                      description="Choose the perfect plan for your business needs. Transparent pricing for web development, design, and digital marketing services."
+                      className="mb-6"
+                    />
+                 </div>
                     {selectedDepartment && (
                       <button
                         onClick={resetFilters}
@@ -505,7 +488,6 @@ export default function PricingPlansPage() {
                         Clear Filter
                       </button>
                     )}
-                 </motion.div>
             </div>
         </div>
 

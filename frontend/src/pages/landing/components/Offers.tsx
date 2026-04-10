@@ -1,8 +1,10 @@
 // frontend/src/pages/landing/components/Offers.tsx
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Tag } from "lucide-react";
 import { listOffers } from "@/api/offers";
 import type { Offer } from "@/api/offers";
+import { SectionHeader } from '../../../components/shared/SectionHeader';
 import { useProtectedNavigation } from "../../../hooks/useProtectedNavigation";
 import AuthModal from './AuthModal';
 
@@ -38,10 +40,8 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
       const resp = await listOffers(params);
       // If your API returns paginated object {results: [...]} handle both
       const data: Offer[] = (resp.data && (resp.data.results ?? resp.data)) || [];
-      console.log(data);
       setOffers(Array.isArray(data) ? data : []);
     } catch (err: any) {
-      console.error("Failed to load offers:", err);
       setError("Failed to load offers. Please try again later.");
     } finally {
       setLoading(false);
@@ -134,24 +134,12 @@ export default function Offers({ limit = 6, showFeaturedOnly = false }: Props) {
      <section id="offers" className="py-20 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Section Header */}
-        <motion.div 
-          className="text-center mb-8 md:mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-gradient-to-r from-[#015bad]/10 to-[#0A1F44]/10 text-[#F5B041] text-xs md:text-sm font-semibold tracking-wide mb-3 md:mb-4">
-            Special Offers
-          </span>
-          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent tracking-tight leading-tight px-4">
-            Exclusive Deals & Promotions
-          </h2>
-          <p className="hidden md:block text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed">
-            Discover amazing offers and limited-time deals on our premium services. 
-            Save big while getting the quality you deserve.
-          </p>
-        </motion.div>
+        <SectionHeader
+          caption="Exclusive Opportunities"
+          title="DEALS &"
+          highlightedTitle="SPECIAL OFFERS"
+          description="Discover amazing deals and limited-time promotions on our premium services. Save big while getting the quality you deserve."
+        />
 
         {/* Filter Options - Hidden on Mobile */}
         <div className="hidden md:flex flex-wrap items-center justify-center gap-4 mb-12">

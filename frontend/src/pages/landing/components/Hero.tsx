@@ -243,67 +243,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                 </div>
               )}
 
-              {/* Services Carousel - Mobile Only */}
-              {services.length > 0 && (
-                <div className="block md:hidden mt-6 w-full -mx-4">
-                  <style>{`
-                    @keyframes marquee-services {
-                      0% { transform: translateX(0); }
-                      100% { transform: translateX(-50%); }
-                    }
-                    .animate-marquee-services {
-                      animation: marquee-services 25s linear infinite;
-                    }
-                    .animate-marquee-services:hover {
-                      animation-play-state: paused;
-                    }
-                  `}</style>
 
-                  <motion.h3
-                    className="text-base font-semibold text-white/90 mb-3 px-4 flex items-center gap-2"
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                  >
-                    <motion.div
-                      animate={{
-                        rotate: [0, 10, -10, 0],
-                        scale: [1, 1.1, 1.1, 1]
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        repeatDelay: 3
-                      }}
-                    >
-                      <CheckCircle className="h-5 w-5 text-[#F5B041]" />
-                    </motion.div>
-                    Our Services
-                  </motion.h3>
-
-                  <div className="relative overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
-                    {/* Gradient edges */}
-                    <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0A1F44] to-transparent z-10 pointer-events-none" />
-                    <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0A1F44] to-transparent z-10 pointer-events-none" />
-
-                    <div className="flex gap-4 w-max animate-marquee-services">
-                      {[...services, ...services].map((service, index) => (
-                        <motion.div
-                          key={`${service.id}-mobile-${index}`}
-                          onClick={() => isAuthenticated ? navigate('/client-dashboard/services') : navigate('/pricing-plans')}
-                          className="flex-shrink-0 w-[140px] bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-3 cursor-pointer hover:bg-white/15 transition-all"
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <div className="flex flex-col items-center gap-2 text-center h-full justify-center">
-                            <span className="text-sm font-medium text-white line-clamp-2">
-                              {service.title}
-                            </span>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* Departments List - Mobile Only */}
               {departments.length > 0 && (
