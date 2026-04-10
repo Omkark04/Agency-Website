@@ -4,5 +4,9 @@
     "python.analysis.extraPaths": [
         "${workspaceFolder}/backend"
     ],
-    "python.analysis.pythonPath": "${workspaceFolder}/.env/Scripts/python.exe"
+    "python.analysis.pythonPath": "${workspaceFolder}/.env/Scripts/python.exe",
+    "css.lint.unknownAtRules": "ignore",
+    "files.associations": {
+        "*.css": "tailwindcss"
+    }
 }

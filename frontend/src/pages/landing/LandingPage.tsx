@@ -32,7 +32,7 @@ export const LandingPage = () => {
     <>
       {/* Main Content - Always rendered so it shows through transparent text */}
       <div 
-        className={`transition-opacity duration-500 bg-white text-gray-900 ${
+        className={`overflow-x-hidden transition-opacity duration-500 bg-white text-gray-900 ${
           isLoaded ? 'opacity-100' : 'opacity-0'
         }`}
       >
