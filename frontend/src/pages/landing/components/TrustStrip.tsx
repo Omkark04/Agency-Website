@@ -94,7 +94,7 @@ export const TrustStrip = () => {
       <div className="container mx-auto px-4 md:px-8 lg:px-12">
         {/* Client Logos */}
         <div className="mb-12">
-          <h3 className="text-center text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-6">
+          <h3 className="text-center text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-tight mb-6">
             Trusted by industry leaders
           </h3>
           {clients.length === 0 ? (

@@ -79,6 +79,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             'department', 'department_title', 'team_members', 'team_members_details',
             'priority', 'is_active', 'created_by', 'created_at'
         ]
+        read_only_fields = ['slug', 'created_by', 'created_at']
 
     def get_team_members_details(self, obj):
         return TeamHeadMiniSerializer(obj.team_members.all(), many=True).data

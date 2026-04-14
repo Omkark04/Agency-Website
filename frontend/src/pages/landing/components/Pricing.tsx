@@ -174,7 +174,7 @@ export const Pricing = () => {
 
   return (
     <>
-      <section id="pricing" className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+      <section id="pricing" className="py-16 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
         <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
           {/* Section Header */}
           <SectionHeader
@@ -193,7 +193,7 @@ export const Pricing = () => {
               <div className="inline-block p-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl mb-6">
                 <Zap className="w-16 h-16 text-gray-400" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-700 mb-2">
+              <h3 className="text-xl font-bold text-gray-700 mb-2">
                 No Pricing Plans Available
               </h3>
               <p className="text-gray-500 max-w-md mx-auto">
@@ -213,7 +213,7 @@ export const Pricing = () => {
                       viewport={{ once: true }}
                       className="text-center mb-10"
                     >
-                      <h3 className="text-3xl font-bold text-gray-800 mb-2 tracking-tight">
+                      <h3 className="text-2xl font-bold text-gray-800 mb-2 tracking-tight">
                         {deptName}
                       </h3>
                       <div className="w-20 h-1 bg-gradient-to-r from-[#015bad] to-[#0A1F44] mx-auto rounded-full"></div>
@@ -275,7 +275,7 @@ export const Pricing = () => {
                               <div className="p-6 pt-16">
                                 {/* Service Name */}
                                 <div className="flex items-center justify-between mb-4">
-                                  <h4 className="text-xl font-bold text-gray-800 line-clamp-1">
+                                  <h4 className="text-lg font-bold text-gray-800 line-clamp-1">
                                     {service.title}
                                   </h4>
                                 </div>
@@ -402,9 +402,9 @@ export const Pricing = () => {
                       >
                         <div className="flex items-center justify-between">
                           <div>
-                            <h3 className="text-xl font-bold text-gray-800 tracking-tight leading-tight">
-                              {service.title}
-                            </h3>
+                             <h3 className="text-lg font-bold text-gray-800 tracking-tight leading-tight">
+                               {service.title}
+                             </h3>
                             <div className="w-16 h-0.5 bg-gradient-to-r from-[#015bad] to-[#0A1F44] mt-2 rounded-full"></div>
                           </div>
                         </div>

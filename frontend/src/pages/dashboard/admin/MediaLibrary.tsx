@@ -295,6 +295,10 @@ export default function MediaLibrary() {
               </p>
               <ul className="space-y-2 text-sm text-gray-700">
                 <li className="flex items-center justify-between bg-white p-2 rounded-lg border border-blue-100">
+                  <span className="font-medium">Homepage Hero Gallery</span>
+                  <code className="bg-gray-100 px-2 py-0.5 rounded text-xs text-blue-600 font-mono">Intro</code>
+                </li>
+                <li className="flex items-center justify-between bg-white p-2 rounded-lg border border-blue-100">
                   <span className="font-medium">Landing Hero BG</span>
                   <code className="bg-gray-100 px-2 py-0.5 rounded text-xs text-blue-600 font-mono">Hero Background</code>
                 </li>

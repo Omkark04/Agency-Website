@@ -5,7 +5,7 @@ import {
   Globe, Smartphone, Palette, Code, BarChart, LineChart
 } from 'lucide-react';
 import { SectionHeader } from '../components/shared/SectionHeader';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { listPriceCards, type PriceCard } from '../api/pricecards';
 import { listServices, type Service } from '../api/services';
 import { listDepartments, type Department } from '../api/departments';
@@ -199,6 +199,8 @@ export default function DepartmentPage() {
   const navigate = useNavigate();
   const { navigateTo } = useProtectedNavigation();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const serviceIdParam = searchParams.get('service');
 
   const [department, setDepartment] = useState<Department | null>(null);
   const [otherDepartments, setOtherDepartments] = useState<Department[]>([]);
@@ -239,7 +241,12 @@ export default function DepartmentPage() {
       setCards(cardsRes.data);
       setServices(servicesRes.data);
       setPortfolio(portRes);
-      setSelectedService(null);
+      
+      if (serviceIdParam) {
+        setSelectedService(parseInt(serviceIdParam));
+      } else {
+        setSelectedService(null);
+      }
     } catch (error) {
       // Silently fail or use a more refined error reporting mechanism
     } finally {
@@ -247,13 +254,36 @@ export default function DepartmentPage() {
     }
   };
 
-  const filteredServices = services.filter(s => {
-    if (selectedService && s.id !== selectedService) return false;
-    if (searchQuery &&
-      !s.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !s.short_description?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-    return true;
-  });
+  // Scroll to selected service if it comes from URL
+  useEffect(() => {
+    if (serviceIdParam && !loading && services.length > 0) {
+      const id = parseInt(serviceIdParam);
+      const timeout = setTimeout(() => {
+        const element = document.getElementById(`service-${id}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 500);
+      return () => clearTimeout(timeout);
+    }
+  }, [serviceIdParam, loading, services.length]);
+
+  const filteredServices = services
+    .filter(s => {
+      if (selectedService && s.id !== selectedService && !serviceIdParam) return false;
+      if (searchQuery &&
+        !s.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !s.short_description?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      if (serviceIdParam) {
+        const id = parseInt(serviceIdParam);
+        if (a.id === id) return -1;
+        if (b.id === id) return 1;
+      }
+      return 0;
+    });
 
   const getServiceCards = (serviceId: number) =>
     cards
@@ -320,8 +350,8 @@ export default function DepartmentPage() {
         description={department.short_description || `Explore our professional ${department.title} services, pricing plans, and portfolio.`}
       />
 
-      {/* Hero section handles its own spacing */}
-      <section className="relative pt-24 pb-14 md:pt-40 md:pb-32 overflow-hidden mt-14 md:mt-20 min-h-[60vh] flex items-center">
+      {/* Hero section matches the provided wide-banner reference image ratio with a height adjustment */}
+      <section className="relative overflow-hidden mt-14 md:mt-20 pt-20 md:pt-32 pb-8 md:pb-12 aspect-[3/4] md:aspect-[3/4] min-h-[40vh] md:min-h-[400px] flex items-center bg-gray-900">
         {/* Background Media Container */}
         <div className="absolute inset-0 z-0">
           {/* Mobile Background */}
@@ -353,9 +383,6 @@ export default function DepartmentPage() {
               <div className="absolute inset-0 bg-gradient-to-br from-[#0A1F44] to-[#015bad]" />
             )}
           </div>
-
-          {/* Dark Overlay for Readability */}
-          <div className="absolute inset-0 bg-black/50 z-[1]" />
         </div>
 
         <div className="container mx-auto px-4 relative z-10">

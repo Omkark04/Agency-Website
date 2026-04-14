@@ -70,11 +70,11 @@ const StackingCard = ({ feature, index, totalCards }: { feature: typeof features
       }}
       className="sticky top-20 bg-white p-6 rounded-xl shadow-lg border border-gray-100"
     >
-      <div className="bg-[#015bad]/10 p-2 rounded-lg w-fit mb-4">
+      <div className="bg-[#015bad]/5 p-2 rounded-lg w-fit mb-3">
         {feature.icon}
       </div>
-      <h3 className="font-semibold text-lg mb-2 text-gray-800">{feature.title}</h3>
-      <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+      <h3 className="font-semibold text-base mb-1.5 text-gray-800">{feature.title}</h3>
+      <p className="text-gray-600 text-[13px] leading-relaxed">{feature.description}</p>
     </motion.div>
   );
 };
@@ -92,11 +92,11 @@ export const About = () => {
   useEffect(() => {
     if (aboutImages.length > 1) {
       const interval = setInterval(() => {
-        setCurrentImageIndex((prevIndex) => 
+        setCurrentImageIndex((prevIndex) =>
           (prevIndex + 1) % aboutImages.length
         );
       }, 5000);
-      
+
       return () => clearInterval(interval);
     }
   }, [aboutImages.length]);
@@ -114,13 +114,13 @@ export const About = () => {
   };
 
   const handlePrevImage = () => {
-    setCurrentImageIndex(prev => 
+    setCurrentImageIndex(prev =>
       prev === 0 ? aboutImages.length - 1 : prev - 1
     );
   };
 
   const handleNextImage = () => {
-    setCurrentImageIndex(prev => 
+    setCurrentImageIndex(prev =>
       (prev + 1) % aboutImages.length
     );
   };
@@ -172,7 +172,7 @@ export const About = () => {
                         className="w-full h-full object-cover"
                       />
                     </AnimatePresence>
-                    
+
                     {/* Image Navigation Arrows */}
                     {aboutImages.length > 1 && (
                       <>
@@ -190,7 +190,7 @@ export const About = () => {
                         </button>
                       </>
                     )}
-                    
+
                     {/* Image Caption */}
                     {aboutImages[currentImageIndex]?.caption && (
                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 z-10">
@@ -211,7 +211,7 @@ export const About = () => {
                 )}
               </div>
             </MovingBorderContainer>
-            
+
             {/* Image Indicators (Dots) */}
             {aboutImages.length > 1 && (
               <div className="flex justify-center space-x-2 mt-4">
@@ -219,11 +219,10 @@ export const About = () => {
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      index === currentImageIndex 
-                        ? 'w-8 bg-gradient-to-r from-[#015bad] to-[#0A1F44]' 
-                        : 'w-2 bg-gray-300 hover:bg-gray-400'
-                    }`}
+                    className={`h-2 rounded-full transition-all duration-300 ${index === currentImageIndex
+                      ? 'w-8 bg-gradient-to-r from-[#015bad] to-[#0A1F44]'
+                      : 'w-2 bg-gray-300 hover:bg-gray-400'
+                      }`}
                     aria-label={`Go to image ${index + 1}`}
                   />
                 ))}
@@ -249,7 +248,7 @@ export const About = () => {
               align="left"
               className="mb-8"
             />
-            
+
             {/* Desktop: Grid Layout */}
             <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-6">
               {features.map((feature, index) => (
@@ -261,11 +260,11 @@ export const About = () => {
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className="bg-cyan-50/50 border border-cyan-100 p-6 rounded-3xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
                 >
-                  <div className="bg-cyan-100 p-2 rounded-xl w-fit mb-4">
+                  <div className="bg-cyan-100 p-2 rounded-xl w-fit mb-3">
                     {feature.icon}
                   </div>
-                  <h3 className="font-bold text-xl mb-2 text-gray-900">{feature.title}</h3>
-                  <p className="text-gray-600 text-sm font-medium">{feature.description}</p>
+                  <h3 className="font-bold text-lg mb-1 text-gray-900">{feature.title}</h3>
+                  <p className="text-gray-600 text-[13px] font-medium leading-normal">{feature.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -273,9 +272,9 @@ export const About = () => {
             {/* Mobile: Stacking Cards */}
             <div className="md:hidden relative space-y-4 min-h-[800px]">
               {features.map((feature, index) => (
-                <StackingCard 
-                  key={index} 
-                  feature={feature} 
+                <StackingCard
+                  key={index}
+                  feature={feature}
                   index={index}
                   totalCards={features.length}
                 />

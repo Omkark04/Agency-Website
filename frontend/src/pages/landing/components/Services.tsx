@@ -313,16 +313,16 @@ export const Services = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
-                  <div className="mb-4 flex items-center justify-center">
+                  <div className="mb-3 flex items-center justify-center">
                     {department.logo ? (
-                      <img src={department.logo} alt="" className="h-10 w-10 object-contain text-[#0A1F44]" />
+                      <img src={department.logo} alt="" className="h-8 w-8 object-contain text-[#0A1F44]" />
                     ) : (
-                      <div className="text-3xl text-[#0A1F44]">
+                      <div className="text-2xl text-[#0A1F44]">
                         {IconComponent}
                       </div>
                     )}
                   </div>
-                  <h3 className="text-xl font-normal text-[#0A1F44] tracking-wide">
+                  <h3 className="text-base font-bold text-[#0A1F44] tracking-tight text-center">
                     {department.title}
                   </h3>
                 </motion.div>
@@ -360,7 +360,7 @@ export const Services = () => {
           >
             <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#015bad] via-[#0A1F44] to-purple-500">
               <div className="bg-white rounded-xl px-4 py-6 md:px-8 md:py-8">
-                <h3 className="text-lg md:text-2xl lg:text-3xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent tracking-tight">
+                <h3 className="text-lg md:text-xl lg:text-2xl font-bold mb-2 md:mb-3 bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent tracking-tight">
                   Ready to Transform Your Business?
                 </h3>
                 <p className="hidden md:block text-gray-600 mb-6 max-w-2xl mx-auto text-lg leading-relaxed">

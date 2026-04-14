@@ -34,7 +34,6 @@ export const fetchHeroImages = async (): Promise<MediaItem[]> => {
     const response = await api.get<MediaItem[]>('/api/media/', {
       params: {
         caption__icontains: 'Intro',
-        media_type: 'image',
         ordering: '-created_at'
       }
     });

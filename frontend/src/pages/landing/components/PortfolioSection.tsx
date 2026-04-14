@@ -202,7 +202,7 @@ const PortfolioSection = () => {
   return (
     <section 
       id="portfolio" 
-      className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden"
+      className="py-16 bg-gradient-to-b from-gray-50 to-white overflow-hidden"
     >
       <div className="container mx-auto px-4 md:px-8 lg:px-12 max-w-7xl">
         {/* Section Header */}
@@ -467,7 +467,7 @@ const PortfolioSection = () => {
                           )}
 
                           {/* Title */}
-                          <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-1">
+                          <h3 className="text-lg font-bold text-gray-800 mb-1.5 line-clamp-1">
                             {project.title}
                           </h3>
 
@@ -702,7 +702,7 @@ const PortfolioSection = () => {
         >
           <div className="inline-block p-1 rounded-2xl bg-gradient-to-r from-[#015bad] via-[#0A1F44] to-purple-500">
             <div className="bg-white rounded-xl px-4 py-6 md:px-8 md:py-6">
-              <h3 className="text-lg md:text-2xl font-bold mb-3 md:mb-4 bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent tracking-tight">
+              <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3 bg-gradient-to-r from-[#015bad] to-[#0A1F44] bg-clip-text text-transparent tracking-tight">
                 Ready to Start Your Project?
               </h3>
               <p className="hidden md:block text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">

@@ -25,7 +25,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
 
   return (
     <motion.div
-      className={`${alignmentClass} mb-12 md:mb-20 ${className}`}
+      className={`${alignmentClass} mb-10 md:mb-14 ${className}`}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -35,9 +35,9 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       <p className={`
         ${dark ? 'text-gray-400' : 'text-gray-500'} 
         italic font-serif 
-        text-xl md:text-2xl 
-        mb-2 md:mb-3 
-        tracking-wide
+        text-lg md:text-xl 
+        mb-1 md:mb-2 
+        tracking-tight
       `}>
         {caption}
       </p>
@@ -45,16 +45,16 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       {/* Main Title: Bold, Uppercase, High Tracking */}
       <h2 className={`
         ${dark ? 'text-white' : 'text-[#0A1F44]'} 
-        text-3xl md:text-5xl lg:text-6xl 
+        text-2xl md:text-3xl lg:text-4xl 
         font-bold 
         uppercase 
-        tracking-[0.15em] 
+        tracking-tight 
         leading-tight
-        mb-6
+        mb-4
       `}>
         {title}
         {highlightedTitle && (
-          <span className="text-[#2563EB] block md:inline md:ml-4">
+          <span className="text-[#2563EB] block md:inline md:ml-3">
             {highlightedTitle}
           </span>
         )}

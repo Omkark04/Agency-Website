@@ -79,6 +79,13 @@ class ServiceViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
+    def perform_create(self, serializer):
+        """Set the created_by field to the current user"""
+        if self.request.user.is_authenticated:
+            serializer.save(created_by=self.request.user)
+        else:
+            serializer.save()
+    
     def update(self, request, *args, **kwargs):
         """
         Update a service with enhanced error logging

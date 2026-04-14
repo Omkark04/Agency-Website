@@ -161,7 +161,7 @@ const Testimonials = () => {
   }
 
   return (
-    <section id="testimonials" className="py-12 md:py-20 bg-gradient-to-b from-[#0A1F44] via-[#0F2B4F] to-[#0B2545] text-white overflow-hidden relative">
+    <section id="testimonials" className="py-12 md:py-16 bg-gradient-to-b from-[#0A1F44] via-[#0F2B4F] to-[#0B2545] text-white overflow-hidden relative">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-grid-white/[0.02] bg-grid opacity-30" />
       <div className="absolute top-1/4 left-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl" />
@@ -281,7 +281,7 @@ const Testimonials = () => {
                             </div>
                             
                             {/* Content */}
-                            <p className="text-gray-200 mb-8 line-clamp-4 group-hover/card:line-clamp-none transition-all duration-300">
+                            <p className="text-sm text-gray-200 mb-6 line-clamp-4 group-hover/card:line-clamp-none transition-all duration-300 leading-relaxed">
                               "{testimonial.content}"
                             </p>
                           </div>
@@ -305,8 +305,8 @@ const Testimonials = () => {
                             )}
                             
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-bold text-lg truncate">{testimonial.client_name}</h4>
-                              <p className="text-cyan-300 text-sm truncate">{testimonial.client_role}</p>
+                              <h4 className="font-bold text-base truncate">{testimonial.client_name}</h4>
+                              <p className="text-cyan-300 text-xs truncate">{testimonial.client_role}</p>
                               {testimonial.client_company && (
                                 <p className="text-gray-400 text-sm truncate">{testimonial.client_company}</p>
                               )}
@@ -388,7 +388,7 @@ const Testimonials = () => {
                                   />
                                 ))}
                               </div>
-                              <p className="text-base md:text-xl text-gray-200 mb-6 md:mb-8 line-clamp-4 md:line-clamp-none leading-relaxed">
+                              <p className="text-sm md:text-lg text-gray-200 mb-6 md:mb-8 line-clamp-4 md:line-clamp-none leading-relaxed">
                                 "{testimonials[currentIndex].content}"
                               </p>
                             </div>

@@ -219,29 +219,6 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               className="z-10 space-y-6 md:space-y-8 w-full max-w-full overflow-x-hidden md:overflow-visible"
             >
 
-              {/* Top 3 Departments - Desktop Only */}
-              {departments.length > 0 && (
-                <div className="hidden md:flex flex-row gap-4 mt-8 w-full">
-                  {departments.slice(0, 3).map((dept) => (
-                    <motion.div
-                      key={dept.id}
-                      onClick={() => navigate(`/departments/${dept.slug}`)}
-                      className="flex-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 cursor-pointer hover:bg-white/20 hover:border-white/40 hover:-translate-y-1 transition-all flex flex-col items-center justify-center text-center gap-3 shadow-xl"
-                    >
-                      <div className="w-full flex justify-center">
-                        <div className="w-14 h-14 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-sm rounded-xl border border-white/10 flex items-center justify-center overflow-hidden p-2">
-                          {dept.logo ? (
-                            <img src={dept.logo} alt="" className="w-full h-full object-contain drop-shadow-md" />
-                          ) : (
-                            <Building2 className="h-6 w-6 text-white drop-shadow-md" />
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-sm font-bold text-white line-clamp-2 leading-tight tracking-wide">{dept.title}</p>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
 
 
 
@@ -249,7 +226,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               {departments.length > 0 && (
                 <div className="block md:hidden mt-6 overflow-hidden">
                   <div className="-mx-4">
-                  <style>{`
+                    <style>{`
                     @keyframes marquee-departments {
                       0% { transform: translateX(0); }
                       100% { transform: translateX(-50%); }
@@ -262,57 +239,57 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                     }
                   `}</style>
 
-                  <motion.h3
-                    className="text-base font-semibold text-white/90 mb-3 px-4 flex items-center gap-2"
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                  >
-                    <motion.div
-                      animate={{
-                        rotate: [0, 10, -10, 0],
-                        scale: [1, 1.1, 1.1, 1]
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        repeatDelay: 3
-                      }}
+                    <motion.h3
+                      className="text-base font-semibold text-white/90 mb-3 px-4 flex items-center gap-2"
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
                     >
-                      <Building2 className="h-5 w-5 text-[#F5B041]" />
-                    </motion.div>
-                    Our Departments
-                  </motion.h3>
+                      <motion.div
+                        animate={{
+                          rotate: [0, 10, -10, 0],
+                          scale: [1, 1.1, 1.1, 1]
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          repeatDelay: 3
+                        }}
+                      >
+                        <Building2 className="h-5 w-5 text-[#F5B041]" />
+                      </motion.div>
+                      Our Departments
+                    </motion.h3>
 
-                  <div className="relative overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
-                    {/* Gradient edges */}
-                    <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0A1F44] to-transparent z-10 pointer-events-none" />
-                    <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0A1F44] to-transparent z-10 pointer-events-none" />
+                    <div className="relative overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+                      {/* Gradient edges */}
+                      <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0A1F44] to-transparent z-10 pointer-events-none" />
+                      <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0A1F44] to-transparent z-10 pointer-events-none" />
 
-                    <div className="flex gap-4 w-max animate-marquee-departments">
-                      {[...departments, ...departments].map((dept, index) => (
-                        <motion.div
-                          key={`${dept.id}-mobile-${index}`}
-                          onClick={() => navigate(`/departments/${dept.slug}`)}
-                          className="flex-shrink-0 w-[200px] bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 cursor-pointer hover:bg-white/15 transition-all"
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-gradient-to-br from-[#015bad] to-[#0A1F44] rounded-lg flex items-center justify-center overflow-hidden">
-                              {dept.logo ? (
-                                <img src={dept.logo} alt="" className="w-full h-full object-cover" />
-                              ) : (
-                                <Building2 className="h-6 w-6 text-white" />
-                              )}
+                      <div className="flex gap-4 w-max animate-marquee-departments">
+                        {[...departments, ...departments].map((dept, index) => (
+                          <motion.div
+                            key={`${dept.id}-mobile-${index}`}
+                            onClick={() => navigate(`/departments/${dept.slug}`)}
+                            className="flex-shrink-0 w-[200px] bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 cursor-pointer hover:bg-white/15 transition-all"
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 bg-gradient-to-br from-[#015bad] to-[#0A1F44] rounded-lg flex items-center justify-center overflow-hidden">
+                                {dept.logo ? (
+                                  <img src={dept.logo} alt="" className="w-full h-full object-cover" />
+                                ) : (
+                                  <Building2 className="h-6 w-6 text-white" />
+                                )}
+                              </div>
+                              <p className="text-sm font-semibold text-white line-clamp-2">{dept.title}</p>
                             </div>
-                            <p className="text-sm font-semibold text-white line-clamp-2">{dept.title}</p>
-                          </div>
-                        </motion.div>
-                      ))}
+                          </motion.div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
               {/* Stats - Mobile Only (below departments) */}
               <div className="block md:hidden mt-6 w-full max-w-full overflow-x-hidden">
@@ -361,7 +338,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                   <div className="bg-white rounded-xl overflow-hidden">
                     {isLoading ? (
                       // Loading skeleton
-                      <div className="h-80 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                      <div className="flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200" style={{ aspectRatio: '5/3' }}>
                         <div className="text-center">
                           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#015bad] mx-auto mb-4"></div>
                           <span className="text-gray-400">Loading images...</span>
@@ -369,18 +346,30 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                       </div>
                     ) : heroImages.length > 0 ? (
                       // Image Gallery
-                      <div className="relative h-80 overflow-hidden group">
+                      <div className="relative overflow-hidden group" style={{ aspectRatio: '5/3' }}>
                         {/* Main Image */}
-                        <motion.img
-                          key={currentImageIndex}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.5 }}
-                          src={heroImages[currentImageIndex]?.url}
-                          alt={heroImages[currentImageIndex]?.caption || 'Hero Business Image'}
-                          className="w-full h-full object-cover"
-                        />
+                        {heroImages[currentImageIndex]?.media_type === 'video' ? (
+                          <video
+                            key={currentImageIndex}
+                            src={heroImages[currentImageIndex].url}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <motion.img
+                            key={currentImageIndex}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.5 }}
+                            src={heroImages[currentImageIndex]?.url}
+                            alt={heroImages[currentImageIndex]?.caption || 'Hero Business Image'}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
 
                         {/* Image Navigation Arrows */}
                         {heroImages.length > 1 && (
@@ -418,10 +407,10 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                       </div>
                     ) : (
                       // Fallback when no images are found
-                      <div className="h-80 bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col items-center justify-center p-6">
+                      <div className="bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col items-center justify-center p-6" style={{ aspectRatio: '5/3' }}>
                         <ImageIcon className="h-16 w-16 text-gray-300 mb-4" />
                         <span className="text-gray-400 text-center">
-                          No hero images found. Upload images with 'hero' in caption.
+                          No hero images found. Upload images with 'Intro' in caption.
                         </span>
                       </div>
                     )}
@@ -479,7 +468,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               transition={{ delay: 0.6 }}
               className="text-center"
             >
-              <div className="text-4xl font-bold text-[#00BCD4]">{stats.clients}+</div>
+              <div className="text-3xl font-bold text-[#00BCD4]">{stats.clients}+</div>
               <div className="text-sm text-gray-300 mt-2">Happy Clients</div>
             </motion.div>
             <motion.div
@@ -488,7 +477,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               transition={{ delay: 0.8 }}
               className="text-center"
             >
-              <div className="text-4xl font-bold text-[#00BCD4]">{stats.projects}+</div>
+              <div className="text-3xl font-bold text-[#00BCD4]">{stats.projects}+</div>
               <div className="text-sm text-gray-300 mt-2">Projects Completed</div>
             </motion.div>
             <motion.div
@@ -497,7 +486,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               transition={{ delay: 1.0 }}
               className="text-center"
             >
-              <div className="text-4xl font-bold text-[#00BCD4]">{stats.satisfaction}%</div>
+              <div className="text-3xl font-bold text-[#00BCD4]">{stats.satisfaction}%</div>
               <div className="text-sm text-gray-300 mt-2">Satisfaction Rate</div>
             </motion.div>
           </div>

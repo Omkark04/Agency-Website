@@ -167,7 +167,7 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
             : 'bg-white border-b border-gray-100'
         }`}
       >
-        <div className="py-0.5 md:py-1 max-w-7xl w-full px-4 sm:px-6 md:px-6 lg:px-8">
+        <div className="py-2 md:py-2.5 max-w-7xl w-full px-4 sm:px-6 md:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-4 sm:gap-8 md:gap-28">
 
             {/* Logo */}
@@ -175,7 +175,7 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
               <img
                 src={logo}
                 alt="OneKraft Logo"
-                className="h-14 sm:h-16 md:h-20 w-auto object-contain transition-transform duration-300 scale-[1.3] md:scale-[1.6] origin-left group-hover:scale-[1.35] md:group-hover:scale-[1.65]"
+                className="h-10 sm:h-12 md:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
             </Link>
 
@@ -398,9 +398,9 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                     <ul className="space-y-1.5">
                       {dept.items.map(service => (
                         <li key={service.id}>
-                          <a
-                            href="#services"
-                            onClick={(e) => { handleNavigation(e, '#services'); setShowMegaMenu(false); }}
+                          <Link
+                            to={`/departments/${dept.slug}?service=${service.id}`}
+                            onClick={() => setShowMegaMenu(false)}
                             className="group flex items-center gap-1.5 text-gray-600
                               hover:text-[#015bad] text-sm transition-colors duration-150 py-0.5"
                           >
@@ -410,7 +410,7 @@ export const Header = ({ onAuthButtonClick }: HeaderProps) => {
                                 transition-all duration-150 text-[#015bad] flex-shrink-0"
                             />
                             <span>{service.title}</span>
-                          </a>
+                          </Link>
                         </li>
                       ))}
                     </ul>
