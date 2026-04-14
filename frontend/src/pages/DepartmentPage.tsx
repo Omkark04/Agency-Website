@@ -350,8 +350,8 @@ export default function DepartmentPage() {
         description={department.short_description || `Explore our professional ${department.title} services, pricing plans, and portfolio.`}
       />
 
-      {/* Hero section matches the provided wide-banner reference image ratio with a height adjustment */}
-      <section className="relative overflow-hidden mt-14 md:mt-20 pt-20 md:pt-32 pb-8 md:pb-12 aspect-[3/4] md:aspect-[3/4] min-h-[40vh] md:min-h-[400px] flex items-center bg-gray-900">
+    {/* Hero section matches the provided wide-banner reference image ratio with a height adjustment */}
+      <section className="relative overflow-hidden mt-14 md:mt-20 aspect-[3/4] md:aspect-auto md:h-[80vh] md:min-h-[650px] md:max-h-[900px] w-full flex items-center bg-gray-900">
         {/* Background Media Container */}
         <div className="absolute inset-0 z-0">
           {/* Mobile Background */}
