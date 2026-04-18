@@ -161,7 +161,6 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                 >
                   <source src={mobileHeroBackground.url} type="video/mp4" />
                 </video>
-                <div className="absolute inset-0 bg-black/40 z-[1]" />
               </>
             ) : (
               <>
@@ -169,7 +168,6 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                   className="absolute inset-0 w-full h-full bg-contain bg-no-repeat bg-center z-0"
                   style={{ backgroundImage: `url(${mobileHeroBackground.url})` }}
                 />
-                <div className="absolute inset-0 bg-black/40 z-[1]" />
               </>
             )
           ) : (
@@ -191,8 +189,6 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                 >
                   <source src={heroBackground.url} type="video/mp4" />
                 </video>
-                {/* Overlay for better text readability */}
-                <div className="absolute inset-0 bg-black/40 z-[1]" />
               </>
             ) : (
               <>
@@ -200,8 +196,6 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                   className="absolute inset-0 w-full h-full bg-contain bg-no-repeat bg-center z-0"
                   style={{ backgroundImage: `url(${heroBackground.url})` }}
                 />
-                {/* Overlay for better text readability */}
-                <div className="absolute inset-0 bg-black/40 z-[1]" />
               </>
             )
           ) : (
