@@ -6,8 +6,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg, Count, Sum
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from services.models import Department, PriceCard, Service, PricingPlan, PricingComparison
-from services.serializers import (
+from .models import Department, PriceCard, Service, PricingPlan, PricingComparison
+from .serializers import (
     DepartmentSerializer, ServiceSerializer, PriceCardSerializer,
     PricingPlanSerializer, PricingComparisonSerializer
 )

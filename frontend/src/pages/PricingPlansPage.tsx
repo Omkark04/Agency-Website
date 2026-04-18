@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { 
   Check, Home, LayoutDashboard, Search, X, Filter,
   ChevronRight, ArrowLeft, Sparkles, Clock, RefreshCw, Star,
-  Globe, Smartphone, Palette, Code, BarChart, LineChart, Eye
+  Globe, Smartphone, Palette, Code, BarChart, LineChart, Eye, MessageCircle
 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { listPriceCards } from '../api/pricecards';
@@ -127,16 +127,6 @@ function PricingCarousel({ serviceCards, service, openFormWithPriceCard, setSele
                                     </ul>
 
                                     <div className="flex gap-2">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                const message = `Hi, I am interested in the *${card.title}* plan for *${service.title}* services.`;
-                                                window.open(`https://wa.me/918010957676?text=${encodeURIComponent(message)}`, '_blank');
-                                            }}
-                                            className={`flex-1 py-2.5 px-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-1 border border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white hover:shadow-lg hover:shadow-[#25D366]/20 bg-transparent`}
-                                        >
-                                            Enquire Now
-                                        </button>
                                         <button
                                             onClick={() => openFormWithPriceCard(card)}
                                             className={`flex-1 py-2.5 px-2 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-1 group
@@ -392,6 +382,20 @@ export default function PricingPlansPage() {
                     <div className={`prose prose-sm dark:prose-invert max-w-none text-gray-500 dark:text-gray-400 whitespace-normal break-words ${isModal ? 'block' : 'hidden md:block'}`}>
                         <p>{service.long_description}</p>
                     </div>
+
+                    <div className="mt-5">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const message = `Hi, I am interested in exploring the *${service.title}* services.`;
+                          window.open(`https://wa.me/919604177408?text=${encodeURIComponent(message)}`, '_blank');
+                        }}
+                        className="py-2 px-5 w-full sm:w-auto rounded-xl text-sm font-semibold transition-all duration-300 inline-flex items-center justify-center gap-2 border-2 border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white hover:shadow-lg hover:shadow-[#25D366]/20 bg-white"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        Enquire Now
+                      </button>
+                    </div>
                 </div>
             </div>
           </>
@@ -596,23 +600,16 @@ export default function PricingPlansPage() {
                                 </div>
 
                                 {/* Pricing Cards Grid/Scroll — full-width on mobile */}
-                                <div className="w-full px-4 pb-5 md:px-8 md:pb-8 lg:px-10 lg:pb-10">
-                                    {serviceCards.length > 0 ? (
+                                {serviceCards.length > 0 && (
+                                    <div className="w-full px-4 pb-5 md:px-8 md:pb-8 lg:px-10 lg:pb-10">
                                         <PricingCarousel 
                                             serviceCards={serviceCards} 
                                             service={service} 
                                             openFormWithPriceCard={openFormWithPriceCard} 
                                             setSelectedCardForFeatures={setSelectedCardForFeatures} 
                                         />
-                                    ) : (
-                                        <div className="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200 m-4 md:m-0">
-                                            <p className="text-gray-500 italic">
-                                                No pricing plans tailored for your current filters are displayed here. 
-                                                <button onClick={resetFilters} className="text-[#F5B041] hover:underline ml-1">Clear filters</button> to see all plans.
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
+                                    </div>
+                                )}
                             </div>
                         </MovingBorderContainer>
                     );
@@ -638,49 +635,51 @@ export default function PricingPlansPage() {
                          <div className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
                              {renderServiceContent(detailService, true)}
                              
-                             <div className="mt-8">
-                                <h4 className="font-bold text-lg mb-4">Pricing Plans</h4>
-                                <div className="space-y-6">
-                                     {getServiceCards(detailService.id).map(card => {
-                                         const isPopular = card.title === 'medium';
-                                         return (
-                                            <div key={card.id} className={`rounded-xl border p-4 ${card.title === 'basic' ? 'border-blue-100 bg-blue-50/20' : card.title === 'medium' ? 'border-[#015bad]/30 bg-[#015bad]/5' : 'border-purple-100 bg-purple-50/20'}`}>
-                                                 <div className="flex justify-between items-start mb-2">
-                                                     <span className={`text-xs font-bold uppercase px-2 py-1 rounded ${card.title === 'basic' ? 'bg-blue-100 text-blue-700' : card.title === 'medium' ? 'bg-[#015bad]/20 text-[#F5B041]' : 'bg-purple-100 text-purple-700'}`}>
-                                                         {card.title}
-                                                     </span>
-                                                     {isPopular && <span className="text-[10px] font-bold text-[#F5B041]">MOST POPULAR</span>}
-                                                 </div>
-                                                 <p className="text-sm text-gray-600 mb-4 whitespace-normal break-words">{card.description}</p>
-                                                 
-                                                 <div className="flex gap-4 text-xs text-gray-500 mb-4">
-                                                     <span>{card.delivery_days} Days Delivery</span>
-                                                     <span>{card.revisions} Revisions</span>
-                                                 </div>
-                                                 
-                                                 <div className="space-y-2 mb-4">
-                                                     {card.features?.map((f, i) => (
-                                                         <div key={i} className="flex gap-2 text-sm">
-                                                             <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                                             <span>{f}</span>
-                                                         </div>
-                                                     ))}
-                                                 </div>
-                                                 
-                                                 <button
-                                                    onClick={() => {
-                                                        handleCloseDetailModal();
-                                                        openFormWithPriceCard(card);
-                                                    }}
-                                                    className="w-full py-2 rounded-lg bg-gray-900 text-white font-medium text-sm"
-                                                 >
-                                                     Choose Plan
-                                                 </button>
-                                            </div>
-                                         )
-                                     })}
-                                </div>
-                             </div>
+                             {getServiceCards(detailService.id).length > 0 && (
+                               <div className="mt-8">
+                                  <h4 className="font-bold text-lg mb-4">Pricing Plans</h4>
+                                  <div className="space-y-6">
+                                       {getServiceCards(detailService.id).map(card => {
+                                           const isPopular = card.title === 'medium';
+                                           return (
+                                              <div key={card.id} className={`rounded-xl border p-4 ${card.title === 'basic' ? 'border-blue-100 bg-blue-50/20' : card.title === 'medium' ? 'border-[#015bad]/30 bg-[#015bad]/5' : 'border-purple-100 bg-purple-50/20'}`}>
+                                                   <div className="flex justify-between items-start mb-2">
+                                                       <span className={`text-xs font-bold uppercase px-2 py-1 rounded ${card.title === 'basic' ? 'bg-blue-100 text-blue-700' : card.title === 'medium' ? 'bg-[#015bad]/20 text-[#F5B041]' : 'bg-purple-100 text-purple-700'}`}>
+                                                           {card.title}
+                                                       </span>
+                                                       {isPopular && <span className="text-[10px] font-bold text-[#F5B041]">MOST POPULAR</span>}
+                                                   </div>
+                                                   <p className="text-sm text-gray-600 mb-4 whitespace-normal break-words">{card.description}</p>
+                                                   
+                                                   <div className="flex gap-4 text-xs text-gray-500 mb-4">
+                                                       <span>{card.delivery_days} Days Delivery</span>
+                                                       <span>{card.revisions} Revisions</span>
+                                                   </div>
+                                                   
+                                                   <div className="space-y-2 mb-4">
+                                                       {card.features?.map((f, i) => (
+                                                           <div key={i} className="flex gap-2 text-sm">
+                                                               <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                                                               <span>{f}</span>
+                                                           </div>
+                                                       ))}
+                                                   </div>
+                                                   
+                                                   <button
+                                                      onClick={() => {
+                                                          handleCloseDetailModal();
+                                                          openFormWithPriceCard(card);
+                                                      }}
+                                                      className="w-full py-2 rounded-lg bg-gray-900 text-white font-medium text-sm"
+                                                   >
+                                                       Choose Plan
+                                                   </button>
+                                              </div>
+                                           )
+                                       })}
+                                  </div>
+                               </div>
+                             )}
                          </div>
                      </div>
                  )}

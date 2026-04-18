@@ -349,7 +349,7 @@ const Contact = () => {
                 <h4 className="font-bold text-xl mb-2">Need Immediate Assistance?</h4>
                 <p className="mb-4 text-white/90">Chat with our team on WhatsApp for quick responses.</p>
                 <a 
-                  href="https://wa.me/918010957676"
+                  href="https://wa.me/919604177408"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#25D366] font-medium rounded-lg hover:bg-opacity-90 transition-all duration-300"
