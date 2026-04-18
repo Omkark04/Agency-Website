@@ -289,7 +289,7 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
             </motion.div>
 
             {/* Right Content - Dynamic Hero Image Gallery - Desktop Only */}
-            {(isLoading || heroImages.length > 0) && (
+            {heroImages.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
