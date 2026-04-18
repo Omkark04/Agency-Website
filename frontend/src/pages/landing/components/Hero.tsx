@@ -306,11 +306,23 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
                   <div className="bg-gradient-to-br from-[#015bad] to-[#0A1F44] rounded-2xl p-1 shadow-2xl">
                     <div className="bg-white rounded-xl overflow-hidden">
                       {isLoading ? (
-                        // Loading skeleton
-                        <div className="flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200" style={{ aspectRatio: '5/3' }}>
-                          <div className="text-center">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#015bad] mx-auto mb-4"></div>
-                            <span className="text-gray-400">Loading images...</span>
+                        // Refined Loading Skeleton
+                        <div
+                          className="relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#0A1F44]/80 to-[#015bad]/60"
+                          style={{ aspectRatio: '5/3' }}
+                        >
+                          {/* Shimmer overlay */}
+                          <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.8s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                          {/* Content */}
+                          <div className="text-center space-y-4 z-10">
+                            <div className="relative mx-auto w-14 h-14">
+                              <div className="absolute inset-0 rounded-full border-2 border-cyan-400/30" />
+                              <div className="absolute inset-0 rounded-full border-t-2 border-cyan-400 animate-spin" />
+                            </div>
+                            <div className="space-y-2">
+                              <div className="h-2.5 w-32 mx-auto bg-white/20 rounded-full animate-pulse" />
+                              <div className="h-2 w-20 mx-auto bg-white/10 rounded-full animate-pulse" />
+                            </div>
                           </div>
                         </div>
                       ) : heroImages.length > 0 ? (
@@ -422,30 +434,32 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
 
           </div>
 
-          {/* Stats Bar - Bottom of Hero */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
-            className="absolute bottom-6 left-0 right-0 z-20 px-4 md:px-12"
-          >
-            <div className="max-w-xl mx-auto bg-white/15 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg px-6 py-4 flex items-center justify-around gap-4">
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-white drop-shadow">{stats.clients}+</div>
-                <div className="text-xs md:text-sm text-white/80 mt-0.5 font-medium">Happy Clients</div>
-              </div>
-              <div className="w-px h-10 bg-white/30" />
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-white drop-shadow">{stats.projects}+</div>
-                <div className="text-xs md:text-sm text-white/80 mt-0.5 font-medium">Projects Completed</div>
-              </div>
-              <div className="w-px h-10 bg-white/30" />
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-white drop-shadow">{stats.satisfaction}%</div>
-                <div className="text-xs md:text-sm text-white/80 mt-0.5 font-medium">Satisfaction Rate</div>
-              </div>
+        </div>
+
+        {/* Stats Bar - pinned to bottom-center of section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+          className="absolute bottom-6 left-0 right-0 z-20 flex justify-center px-4"
+        >
+          <div className="bg-white/15 backdrop-blur-md border border-white/30 rounded-2xl shadow-lg px-8 py-4 flex items-center gap-8">
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-bold text-cyan-300 drop-shadow">{stats.clients}+</div>
+              <div className="text-xs md:text-sm text-cyan-100/90 mt-0.5 font-medium">Happy Clients</div>
             </div>
-          </motion.div>
+            <div className="w-px h-10 bg-white/30" />
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-bold text-cyan-300 drop-shadow">{stats.projects}+</div>
+              <div className="text-xs md:text-sm text-cyan-100/90 mt-0.5 font-medium">Projects Completed</div>
+            </div>
+            <div className="w-px h-10 bg-white/30" />
+            <div className="text-center">
+              <div className="text-2xl md:text-3xl font-bold text-cyan-300 drop-shadow">{stats.satisfaction}%</div>
+              <div className="text-xs md:text-sm text-cyan-100/90 mt-0.5 font-medium">Satisfaction Rate</div>
+            </div>
+          </div>
+        </motion.div>
 
           {/* Animated background dots */}
           <div className="absolute inset-0 overflow-hidden z-[2]">
@@ -469,7 +483,6 @@ export const Hero = ({ onGetStartedClick }: { onGetStartedClick?: () => void }) 
               />
             ))}
           </div>
-        </div>
       </section>
     </>
   );
